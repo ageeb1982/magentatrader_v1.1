@@ -1,0 +1,354 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/site.css" rel="stylesheet" />
+
+<script src="/js/jquery.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.js"></script>
+
+<script src="/js/date.js"></script>
+
+<script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.input.min.js"></script>
+<script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.chart.min.js"></script>
+
+<link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
+
+@*Menu*@
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
+        <div class="navbar-header">
+            <a class="navbar-brand topnav" href="/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"></span></a>
+        </div>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-3 col-md-3 col-lg-offset-1">
+                <div style="background-color: lightgray; font-size: 9px;">Last&nbsp;Updated:</div>
+                <div id="LastUpdate"><i class="fa fa-spinner fa-spin"></i></div>
+            </div>
+            <div class="col-xs-3 col-md-4">
+                <div>&nbsp;</div>
+            </div>
+            <div class="col-xs-3 col-md-4">
+                <div>&nbsp;</div>
+            </div>
+        </div>
+        <div class="row">
+            <hr size="1" />
+        </div>
+        <div class="marginCenter">
+            <div class="row">
+                <div class="col-lg-4 col-md-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-user fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge" id="UsersCounts">&nbsp;<i class="fa fa-spinner fa-spin"></i></div>
+                                    <div>Registered Users</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="~/Admin/User">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <div class="panel panel-green">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-tasks fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge" id="EventsCounts">&nbsp;<i class="fa fa-spinner fa-spin"></i></div>
+                                    <div>Events</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="~/Admin/Event">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <div class="panel panel-yellow">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-shopping-cart fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge" id="SalesCounts">&nbsp;<i class="fa fa-spinner fa-spin"></i></div>
+                                    <div>Purchases</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="~/Admin/Sales">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-4">
+                    <div class="panel panel-red">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-support fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge" id="ProductsCounts">&nbsp;<i class="fa fa-spinner fa-spin"></i></div>
+                                    <div>Products Listed</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="~/Admin/Product">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <div class="panel panel-brown">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-archive fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge" id="PackagesCounts">&nbsp;<i class="fa fa-spinner fa-spin"></i></div>
+                                    <div>Product Packages</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="~/Admin/Package">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <div class="panel panel-violet">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-newspaper-o fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge" id="NewsCounts">&nbsp;<i class="fa fa-spinner fa-spin"></i></div>
+                                    <div>Posted News</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="~/Admin/News">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+</div>
+
+@*Module*@
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var uid = setInterval(myUsers, 10000);
+        var eid = setInterval(myEvents, 10000);
+        var sid = setInterval(mySales, 10000);
+        var pid = setInterval(myProducts, 10000);
+        var mid = setInterval(myPackages, 10000);
+        var nid = setInterval(myNews, 10000);
+
+        myUsers();
+        myEvents();
+        mySales();
+        myProducts();
+        myPackages();
+        myNews();
+
+        function myUsers() {
+            $.ajax({
+                url: '/api/User',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (Results) {
+                    if (Results.length > 0) {
+                        document.getElementById("UsersCounts").innerHTML = "" + Results.length;
+                    } else {
+                        document.getElementById("UsersCounts").innerHTML = "0";
+                    }
+                    mySync();
+                }
+            }).fail(
+                function (xhr, textStatus, err) {
+                    alert(err);
+                }
+            );
+        }
+
+        function myEvents() {
+            $.ajax({
+                url: '/api/Event',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (Results) {
+                    if (Results.length > 0) {
+                        document.getElementById("EventsCounts").innerHTML = "" + Results.length;
+                    } else {
+                        document.getElementById("EventsCounts").innerHTML = "0";
+                    }
+                    mySync();
+                }
+            }).fail(
+                function (xhr, textStatus, err) {
+                    alert(err);
+                }
+            );
+        }
+
+        function mySales() {
+            $.ajax({
+                url: '/api/Sales',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (Results) {
+                    if (Results.length > 0) {
+                        document.getElementById("SalesCounts").innerHTML = "" + Results.length;
+                    } else {
+                        document.getElementById("SalesCounts").innerHTML = "0";
+                    }
+                    mySync();
+                }
+            }).fail(
+                function (xhr, textStatus, err) {
+                    alert(err);
+                }
+            );
+        }
+
+        function myProducts() {
+            $.ajax({
+                url: '/api/Product',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (Results) {
+                    if (Results.length > 0) {
+                        document.getElementById("ProductsCounts").innerHTML = "" + Results.length;
+                    } else {
+                        document.getElementById("ProductsCounts").innerHTML = "0";
+                    }
+                    mySync();
+                }
+            }).fail(
+                function (xhr, textStatus, err) {
+                    alert(err);
+                }
+            );
+        }
+
+        function myPackages() {
+            $.ajax({
+                url: '/api/ProductPackage',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (Results) {
+                    if (Results.length > 0) {
+                        document.getElementById("PackagesCounts").innerHTML = "" + Results.length;
+                    } else {
+                        document.getElementById("PackagesCounts").innerHTML = "0";
+                    }
+                    mySync();
+                }
+            }).fail(
+                function (xhr, textStatus, err) {
+                    alert(err);
+                }
+            );
+        }
+
+        function myNews() {
+            $.ajax({
+                url: '/api/News',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (Results) {
+                    if (Results.length > 0) {
+                        document.getElementById("NewsCounts").innerHTML = "" + Results.length;
+                    } else {
+                        document.getElementById("NewsCounts").innerHTML = "0";
+                    }
+                    mySync();
+                }
+            }).fail(
+                function (xhr, textStatus, err) {
+                    alert(err);
+                }
+            );
+        }
+
+        function mySync() {
+            document.getElementById("LastUpdate").innerHTML = "" + new Date().today() + " " + new Date().timeNow();
+        }
+
+    });
+
+    Date.prototype.today = function () {
+        return ((this.getDate() < 10) ? "0" : "") + this.getDate() + "/" + (((this.getMonth() + 1) < 10) ? "0" : "") + (this.getMonth() + 1) + "/" + this.getFullYear();
+    }
+
+    Date.prototype.timeNow = function () {
+        return ((this.getHours() < 10) ? "0" : "") + this.getHours() + ":" + ((this.getMinutes() < 10) ? "0" : "") + this.getMinutes() + ":" + ((this.getSeconds() < 10) ? "0" : "") + this.getSeconds();
+    }
+
+
+</script>

@@ -1,0 +1,430 @@
+﻿@{
+    ViewBag.Title = "User";
+}
+
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/styles.css" rel="stylesheet" />
+
+<script src="/js/jquery.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+
+<script src="/js/date.js"></script>
+
+<script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.input.min.js"></script>
+<script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.chart.min.js"></script>
+
+<link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
+@*Menu*@
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="~/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"></span></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li role="presentation" class="active"><a href="~/Admin/user">Users</a></li>
+                <li role="presentation"><a href="~/Admin/Event">Event</a></li>
+                <li role="presentation"><a href="~/Admin/Sales">Sales</a></li>
+                <li role="presentation"><a href="~/Admin/Product">Products</a></li>
+                <li role="presentation"><a href="~/Admin/Package">Packages</a></li>
+                <li role="presentation"><a href="~/Admin/News">News</a></li>
+                <li role="presentation"><a href="~/Admin/"><i class="fa fa-home"></i></a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+@*List*@
+<div id="DivUsers">
+    <div class="container">
+
+        <div class="row">
+            <h2 class="section-heading">User</h2>
+            <div class="col-lg-11">
+                <h4>Users</h4>
+            </div>
+            <div class="col-lg-1">
+                <button id="CmdAddUser" type="submit" class="btn btn-primary" onclick="CmdUserAdd_OnClick()">Add</button>
+            </div>
+        </div>
+
+        <br />
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="UserGrid" class="grid"></div>
+            </div>
+        </div>
+
+        <br />
+
+        <div class="row">
+            <div class="btn-group col-md-7" id="naviagtionPageUser">
+                <button type="button" class="btn btn-default" id="btnMoveToFirstPageUser">
+                    <span class="glyphicon glyphicon-fast-backward"></span>
+                </button>
+                <button type="button" class="btn btn-default" id="btnMoveToPreviousPageUser">
+                    <span class="glyphicon glyphicon-step-backward"></span>
+                </button>
+                <button type="button" class="btn btn-default" disabled style="width:100px" id="btnCurrentPageUser"></button>
+                <button type="button" class="btn btn-default" id="btnMoveToNextPageUser">
+                    <span class="glyphicon glyphicon-step-forward"></span>
+                </button>
+                <button type="button" class="btn btn-default" id="btnMoveToLastPageUser">
+                    <span class="glyphicon glyphicon-fast-forward"></span>
+                </button>
+            </div>
+            <div class="col-md-5">
+                <div class="pull-right"><span id="usersTotal"></span></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@*User Detail*@
+<div class="modal fade" id="UserEdit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title">Edit User Information</h4>
+            </div>
+            <div class="modal-body">
+                <dl class="dl-horizontal">
+                    <dt>User Name</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_Id" type="hidden" />
+                        <input class="form-control" id="UserEdit_UserName" type="text" readonly/>
+                    </dd>
+                    <dt>First Name</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_FirstName" type="text" />
+                    </dd>
+                    <dt>Last Name</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_LastName" type="text" />
+                    </dd>
+                    <dt>Email Address</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_EmailAddress" type="text" />
+                    </dd>
+                    <dt>Phone Number</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_PhoneNumber" type="text" />
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="CmdUserEditOk" onclick="CmdUserEditOk_OnClick()">
+                    Ok
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="CmdUserEditCancel" onclick="CmdUserCancel_OnClick()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Loading*@
+<div class="modal fade" id="loading" tabindex="-1" role="dialog" aria-labelledby="Loading..." aria-hidden="true">
+    <div class="modal-dialog" style="width: 220px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Loading...</h4>
+            </div>
+            <div class="modal-body">
+                <img src="/img/progress_bar.gif" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Module*@
+<script type="text/javascript">
+
+    var Users;
+    var UserGrid;
+
+    var btnFirstPageUser;
+    var btnPreviousPageUser;
+    var btnNextPageUser;
+    var btnLastPageUser;
+    var btnCurrentPageUser;
+
+    function CmdUserEdit_OnClick() {
+        Users.editItem(Users.currentItem);
+
+        $('#UserEdit').modal('show');
+
+        var User = Users.currentEditItem;
+        document.getElementById('UserEdit_Id').value = User.Id !== null && typeof (User.Id) != 'undefined' ? wijmo.Globalize.format(User.Id) : '';
+        document.getElementById('UserEdit_UserName').value = User.UserName ? User.UserName : '';
+        document.getElementById('UserEdit_FirstName').value = User.FirstName ? User.FirstName : '';
+        document.getElementById('UserEdit_LastName').value = User.LastName ? User.LastName : '';
+        document.getElementById('UserEdit_EmailAddress').value = User.EmailAddress ? User.EmailAddress : '';
+        document.getElementById('UserEdit_PhoneNumber').value = User.PhoneNumber ? User.PhoneNumber : '';
+    }
+    function CmdUserAdd_OnClick() {
+
+        window.location.href = '/Account/Register';
+
+    }
+
+    function CmdUserEditOk_OnClick() {
+        if (confirm("Save User?") == true) {
+
+            var errorUser = ValidateUserEdit();
+            if (errorUser == "") {
+
+
+                var User = new Object();
+
+                User.Id = document.getElementById('UserEdit_Id').value;
+                User.UserName = document.getElementById('UserEdit_UserName').value;
+                User.FirstName = document.getElementById('UserEdit_FirstName').value;
+                User.LastName = document.getElementById('UserEdit_LastName').value;
+                User.EmailAddress = document.getElementById('UserEdit_EmailAddress').value;
+                User.PhoneNumber = document.getElementById('UserEdit_PhoneNumber').value;
+
+
+                var data = JSON.stringify(User);
+
+                // Add New
+                if (User.Id == 0) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/AddUser",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: data,
+                        success: function (id) {
+                            if (id > 0) {
+                                window.location.reload();
+                            } else {
+                                alert("Not added");
+                            }
+                        }
+                    });
+
+                    // Edit
+                } else {
+                    $.ajax({
+                        type: "PUT",
+                        url: "/api/UpdateUser/" + User.Id,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: data,
+                        statusCode: {
+                            200: function () {
+                                window.location.reload();
+                            },
+                            404: function () {
+                                alert("Not found");
+                            },
+                            400: function () {
+                                alert("Bad request");
+                            }
+                        }
+                    });
+                }
+            }
+            else {
+                $('#UserEdit').modal('hide');
+                alert(errorUser);
+                $('#UserEdit').modal('show');
+            }
+        }
+    }
+    function CmdUserCancel_OnClick() {
+        $('#UserEdit').modal('show');
+        $('#UserEdit').modal('hide');
+
+
+    }
+
+    function GetUsers() {
+        var users = new wijmo.collections.ObservableArray();
+        $('#loading').modal('show');
+        $.ajax({
+            url: '/api/User',
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            data: {},
+            success: function (Results) {
+                $('#loading').modal('hide');
+                if (Results.length > 0) {
+                    $('#usersTotal').text('Total number of User(s) : ' + Results.length);
+                    for (i = 0; i < Results.length; i++) {
+                        users.push({
+                            EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditUser' onclick='CmdUserEdit_OnClick()'>Edit</button>",
+                            DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteUser' onclick='CmdUserDelete_OnClick()'>Delete</button>",
+                            Id: Results[i]["Id"],
+                            UserName: Results[i]["UserName"],
+                            FirstName: Results[i]["FirstName"],
+                            LastName: Results[i]["LastName"],
+                            EmailAddress: Results[i]["EmailAddress"],
+                            PhoneNumber: Results[i]["PhoneNumber"]
+                        });
+                    }
+                } else {
+                    alert("No data.");
+                }
+            }
+        }).fail(
+            function (xhr, textStatus, err) {
+                alert(err);
+            }
+        );
+        return users;
+    }
+    function UpdateNavigateButtonsUser() {
+        if (Users.pageSize <= 0) {
+            document.getElementById('naviagtionPageUser').style.display = 'none';
+            return;
+        }
+        document.getElementById('naviagtionPageUser').style.display = 'block';
+        if (Users.pageIndex === 0) {
+            btnFirstPageUser.setAttribute('disabled', 'disabled');
+            btnPreviousPageUser.setAttribute('disabled', 'disabled');
+            btnNextPageUser.removeAttribute('disabled');
+            btnLastPageUser.removeAttribute('disabled');
+        }
+        else if (Users.pageIndex === (Users.pageCount - 1)) {
+            btnFirstPageUser.removeAttribute('disabled');
+            btnPreviousPageUser.removeAttribute('disabled');
+            btnLastPageUser.setAttribute('disabled', 'disabled');
+            btnNextPageUser.setAttribute('disabled', 'disabled');
+        }
+        else {
+            btnFirstPageUser.removeAttribute('disabled');
+            btnPreviousPageUser.removeAttribute('disabled');
+            btnNextPageUser.removeAttribute('disabled');
+            btnLastPageUser.removeAttribute('disabled');
+        }
+        btnCurrentPageUser.innerHTML = (Users.pageIndex + 1) + ' / ' + Users.pageCount;
+    }
+    function ValidateUserEdit() {
+        var errortext = "";
+        //Firstname
+        var fname = document.getElementById('UserEdit_FirstName').value;
+        if (!(isNaN(fname))) {
+            errortext += "\n Invalid First name";
+        }
+        //Lastname
+        var lname = document.getElementById('UserEdit_LastName').value;
+        if (!(isNaN(lname))) {
+            errortext += "\n Invalid Last name";
+        }
+        //Email
+        var email = document.getElementById('UserEdit_EmailAddress').value;
+        var filter = /^([a-zA-Z0-9_\.\-])+\@@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if (!filter.test(email)) {
+            errortext += "\n Invalid Email Address";
+        }
+        //Phone number
+        var phone = document.getElementById('UserEdit_PhoneNumber').value;
+        if (isNaN(phone)) {
+            errortext += "\n Invalid Phone number";
+        }
+
+        return errortext;
+    }
+
+    $(document).ready(function () {
+        btnFirstPageUser = document.getElementById('btnMoveToFirstPageUser');
+        btnPreviousPageUser = document.getElementById('btnMoveToPreviousPageUser');
+        btnNextPageUser = document.getElementById('btnMoveToNextPageUser');
+        btnLastPageUser = document.getElementById('btnMoveToLastPageUser');
+        btnCurrentPageUser = document.getElementById('btnCurrentPageUser');
+
+        Users = new wijmo.collections.CollectionView(GetUsers());
+
+        UserGrid = new wijmo.grid.FlexGrid('#UserGrid');
+
+        UserGrid.initialize({
+            columns: [
+                        {
+                            "header": "Edit",
+                            "binding": "EditId",
+                            "width": 60,
+                            "allowSorting": false,
+                            "isContentHtml": true
+                        },
+                        {
+                            "header": "User Name",
+                            "binding": "UserName",
+                            "allowSorting": false,
+                            "width": "4*"
+                        },
+                        {
+                            "header": "First Name",
+                            "binding": "FirstName",
+                            "allowSorting": false,
+                            "width": "4*"
+                        },
+                        {
+                            "header": "Last Name",
+                            "binding": "LastName",
+                            "allowSorting": false,
+                            "width": "4*"
+                        },
+                        {
+                            "header": "Email Address",
+                            "binding": "EmailAddress",
+                            "allowSorting": false,
+                            "width": "4*"
+                        },
+                        {
+                            "header": "Phone Number",
+                            "binding": "PhoneNumber",
+                            "allowSorting": false,
+                            "width": "4*"
+                        }
+            ],
+            autoGenerateColumns: false,
+            itemsSource: Users,
+            isReadOnly: true,
+            selectionMode: wijmo.grid.SelectionMode.Row
+        });
+
+        UserGrid.trackChanges = true;
+
+        Users.pageSize = 15;
+
+
+        UpdateNavigateButtonsUser();
+
+        // Page Button Users
+        btnFirstPageUser.addEventListener('click', function () {
+            Users.moveToFirstPage();
+            UpdateNavigateButtonsUser();
+        });
+        btnPreviousPageUser.addEventListener('click', function () {
+            Users.moveToPreviousPage();
+            UpdateNavigateButtonsUser();
+        });
+        btnNextPageUser.addEventListener('click', function () {
+            Users.moveToNextPage();
+            UpdateNavigateButtonsUser();
+        });
+        btnLastPageUser.addEventListener('click', function () {
+            Users.moveToLastPage();
+            UpdateNavigateButtonsUser();
+        });
+
+    });
+</script>
