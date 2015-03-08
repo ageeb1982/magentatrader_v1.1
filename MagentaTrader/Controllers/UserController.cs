@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Web;
+using System.Security;
 using System.Net.Http;
 using System.Web.Http;
 
@@ -93,7 +95,7 @@ namespace MagentaTrader.Controllers
             try
             {
                 var Users = from d in db.MstUsers where d.Id == Id select d;
-
+                
                 if (Users.Any())
                 {
                     var UpdatedUser = Users.FirstOrDefault();
@@ -142,6 +144,27 @@ namespace MagentaTrader.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
+        }
+
+        // GET api/GetUser/dpilger
+        [Authorize]
+        [Route("api/GetUser/{username}")]
+        public List<Models.User> GetUserInfo( String username )
+        {
+            List<Models.User> UserInfo = null;
+            var Info = from m in db.MstUsers
+                       where m.UserName == username
+                       select new Models.User
+                       {
+                           UserName = m.UserName,
+                           FirstName = m.FirstName,
+                           LastName = m.LastName,
+                           EmailAddress = m.EmailAddress,
+                           PhoneNumber = m.PhoneNumber
+                       };
+
+            UserInfo = Info.ToList();
+            return UserInfo;
         }
     }
 }

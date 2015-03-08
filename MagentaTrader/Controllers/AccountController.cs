@@ -68,6 +68,9 @@ namespace MagentaTrader.Controllers
                 if (user != null)
                 {
                     await SignInAsync(user, model.RememberMe);
+                    HttpCookie MagentaCookie = new HttpCookie("MagentaTrader_USER");
+                    MagentaCookie.Value = model.UserName;
+                    Response.Cookies.Add(MagentaCookie);
                     return RedirectToLocal(returnUrl);
                 }
                 else

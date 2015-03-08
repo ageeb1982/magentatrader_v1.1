@@ -4,3 +4,20 @@
     a {
         color: #337ab7 !important;
     }
+    .info-div {
+        white-space:nowrap;
+        text-align:center;
+    }
+    .box {
+        background-color: coral;
+        width: 30%;
+        display:inline-block;
+        margin:10px 0;
+        border-radius:5px;
+    }
+    .text {
+        padding: 20px 0;
+        color:black;
+        font-weight:bold;
+        text-align:center;
+    }

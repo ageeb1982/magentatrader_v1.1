@@ -67,3 +67,25 @@ textarea {
         margin-right: 100px;
     }
 }
+.info-div {
+    white-space:nowrap;
+    text-align:center;
+}
+.box {
+    width: 30%;
+    display:inline-block;
+    margin:5px 0;
+    border-radius:5px;
+}
+.text {
+    padding: 10px 0;
+    text-align:center;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.info-container-wrapper {
+    margin-top: 70px;
+}
