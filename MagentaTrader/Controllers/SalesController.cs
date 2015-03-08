@@ -70,6 +70,67 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
+        // GET api/UserSales
+        [Authorize]
+        [Route("api/UserSales/{UserName}")]
+        public List<Models.Sales> GetUserSales(string UserName)
+        {
+            var retryCounter = 0;
+            List<Models.Sales> values;
+
+            while (true)
+            {
+                try
+                {
+                    var Sales = from d in db.TrnSales
+                                where d.MstUser.UserName == UserName
+                                orderby d.SalesDate descending
+                                select new Models.Sales
+                                {
+                                    Id = d.Id,
+                                    ProductPackageId = d.ProductPackageId,
+                                    ProductPackage = d.MstProductPackage.ProductPackage,
+                                    ProductPackageURL = d.MstProductPackage.PackageURL,
+                                    UserId = d.UserId,
+                                    User = d.MstUser.UserName,
+                                    FirstName = d.MstUser.FirstName,
+                                    LastName = d.MstUser.LastName,
+                                    SalesNumber = d.SalesNumber,
+                                    SalesDate = d.SalesDate.ToShortDateString(),
+                                    RenewalDate = d.RenewalDate.ToShortDateString(),
+                                    ExpiryDate = d.ExpiryDate.ToShortDateString(),
+                                    Particulars = d.Particulars,
+                                    Quantity = d.Quantity,
+                                    Price = d.Price,
+                                    Amount = d.Amount,
+                                    IsActive = d.IsActive,
+                                    IsRefunded = d.IsRefunded
+                                };
+                    if (Sales.Count() > 0)
+                    {
+                        values = Sales.ToList();
+                    }
+                    else
+                    {
+                        values = new List<Models.Sales>();
+                    }
+                    break;
+                }
+                catch
+                {
+                    if (retryCounter == 3)
+                    {
+                        values = new List<Models.Sales>();
+                        break;
+                    }
+
+                    System.Threading.Thread.Sleep(1000);
+                    retryCounter++;
+                }
+            }
+            return values;
+        }
+
         // POST api/AddSales
         [Authorize]
         [Route("api/AddSales")]

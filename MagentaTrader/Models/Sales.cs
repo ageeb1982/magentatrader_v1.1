@@ -10,6 +10,7 @@ namespace MagentaTrader.Models
         public int Id { get; set; }
         public int ProductPackageId { get; set; }
         public string ProductPackage { get; set; }
+        public string ProductPackageURL { get; set; }
         public int UserId { get; set; }
         public string User { get; set; }
         public string FirstName { get; set; }

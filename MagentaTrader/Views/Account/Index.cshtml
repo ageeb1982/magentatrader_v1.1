@@ -30,6 +30,7 @@
         </div>
     </div>
 </nav>
+
 <div class="container">
     <div class="container-fluid info-container-wrapper">
         <div class="col-lg-6">
@@ -79,8 +80,10 @@
                 </div>
             </div>
         </div>
+        <div class="col-lg-6">
+            <div id="SalesGrid" class="grid"></div>
+        </div>
     </div>
-</div>
 </div>
 
 @*Loading*@
@@ -112,7 +115,6 @@
         }
         return null;
     }
-
     function GetUserInfo() {
         var username = readCookie("MagentaTrader_USER");
         $('#loading').modal('show');
@@ -149,6 +151,7 @@
         $('#username, #firstname, #lastname, #emailadd, #phonenum').text(". . .");
         GetUserInfo();
     });
+
 </script>
 
 
