@@ -52,7 +52,7 @@
                     <div class="text">First Name:</div>
                 </div>
                 <div class="box">
-                    <div class="text" id="firstname">Derek</div>
+                    <div class="text" id="firstname">Loading...</div>
                 </div>
             </div>
             <div class="info-div">
@@ -60,7 +60,7 @@
                     <div class="text">Last Name:</div>
                 </div>
                 <div class="box">
-                    <div class="text" id="lastname">Pilger</div>
+                    <div class="text" id="lastname">Loading...</div>
                 </div>
             </div>
             <div class="info-div">
@@ -68,7 +68,7 @@
                     <div class="text">Phone Number:</div>
                 </div>
                 <div class="box">
-                    <div class="text" id="phonenum">941-555-1212</div>
+                    <div class="text" id="phonenum">Loading...</div>
                 </div>
             </div>
             <div class="info-div">
@@ -76,7 +76,7 @@
                     <div class="text">Email Address:</div>
                 </div>
                 <div class="box">
-                    <div class="text" id="emailadd">derekpilger@hotmail.com</div>
+                    <div class="text" id="emailadd">Loading...</div>
                 </div>
             </div>
         </div>
@@ -108,21 +108,22 @@
 <script type="text/javascript">
 
     // Get value from cookie
-    function readCookie(name) {
-        var value = name + "=";
-        var cookieValue = document.cookie.split(';');
-        for (var i = 0; i < cookieValue.length; i++) {
-            var c = cookieValue[i];
-            while (c.charAt(0) == ' ')
-                c = c.substring(1, c.length);
-            if (c.indexOf(value) == 0)
-                return c.substring(value.length, c.length);
-        }
-        return null;
-    }
+    //function readCookie(name) {
+    //    var value = name + "=";
+    //    var cookieValue = document.cookie.split(';');
+    //    for (var i = 0; i < cookieValue.length; i++) {
+    //        var c = cookieValue[i];
+    //        while (c.charAt(0) == ' ')
+    //            c = c.substring(1, c.length);
+    //        if (c.indexOf(value) == 0)
+    //            return c.substring(value.length, c.length);
+    //    }
+    //    return null;
+    //}
 
     function GetUserInfo() {
-        var username = readCookie("MagentaTrader_USER");
+        // var username = readCookie("MagentaTrader_USER");
+        var username = '@User.Identity.Name';
         $('#loading').modal('show');
         $.ajax({
             url: '/api/GetUser/' + username,
@@ -134,14 +135,14 @@
                 $('#loading').modal('hide');
                 if (Results.length > 0) {
                     
-                    $('#username').text(Results[0].UserName);
-                    $('#firstname').text(Results[0].FirstName);
-                    $('#lastname').text(Results[0].LastName);
-                    $('#emailadd').text(Results[0].EmailAddress);
-                    $('#phonenum').text(Results[0].PhoneNumber);
+                    $('#username').html('<b>' + Results[0].UserName + '</b>');
+                    $('#firstname').html('<b>' + Results[0].FirstName + '</b>');
+                    $('#lastname').html('<b>' + Results[0].LastName + '</b>');
+                    $('#emailadd').html('<b>' + Results[0].EmailAddress + '</b>');
+                    $('#phonenum').html('<b>' + Results[0].PhoneNumber + '</b>');
                 }
                 else {
-                    alert("No data.");
+                    // alert("No data.");
                     $('#username, #firstname, #lastname, #emailadd, #phonenum').text("");
                 }
             }
@@ -154,8 +155,10 @@
     }
 
     function GetUserPurchases() {
-        var purchases = new wijmo.collections.ObservableArray(),
-            username = readCookie("MagentaTrader_USER");
+        var purchases = new wijmo.collections.ObservableArray();
+        var username = '@User.Identity.Name';
+
+            //username = readCookie("MagentaTrader_USER");
 
         $("#loading").modal('show');
         $.ajax({
