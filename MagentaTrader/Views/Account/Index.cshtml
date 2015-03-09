@@ -33,7 +33,7 @@
 
 <div class="container">
     <div class="container-fluid info-container-wrapper">
-        <div class="col-lg-6">
+        <div class="col-lg-4">
             <div class="row">
                 <div class="clearfix text-center">
                     <h4>Account Information</h4>
@@ -41,7 +41,7 @@
             </div>
             <div class="info-div">
                 <div class="box">
-                    <div class="text">Username</div>
+                    <div class="text">Username:</div>
                 </div>
                 <div class="box">
                     <div class="text" id="username">dpilger</div>
@@ -49,7 +49,7 @@
             </div>
             <div class="info-div">
                 <div class="box">
-                    <div class="text">First Name</div>
+                    <div class="text">First Name:</div>
                 </div>
                 <div class="box">
                     <div class="text" id="firstname">Derek</div>
@@ -57,7 +57,7 @@
             </div>
             <div class="info-div">
                 <div class="box">
-                    <div class="text">Last Name</div>
+                    <div class="text">Last Name:</div>
                 </div>
                 <div class="box">
                     <div class="text" id="lastname">Pilger</div>
@@ -65,7 +65,7 @@
             </div>
             <div class="info-div">
                 <div class="box">
-                    <div class="text">Phone Number</div>
+                    <div class="text">Phone Number:</div>
                 </div>
                 <div class="box">
                     <div class="text" id="phonenum">941-555-1212</div>
@@ -73,14 +73,14 @@
             </div>
             <div class="info-div">
                 <div class="box">
-                    <div class="text">Email Address</div>
+                    <div class="text">Email Address:</div>
                 </div>
                 <div class="box">
                     <div class="text" id="emailadd">derekpilger@hotmail.com</div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-8">
             <div class="row">
                 <div class="clearfix text-center">
                     <h4>Purchases</h4>
@@ -172,7 +172,7 @@
                             SalesDate: Results[i]["SalesDate"],
                             ProductPackage: Results[i]["ProductPackage"],
                             Amount: Results[i]["Amount"],
-                            ProductPackageURL: Results[i]["ProductPackageURL"]
+                            ProductPackageURL: "<a href='" + Results[i]["ProductPackageURL"] + "'>" + Results[i]["ProductPackageURL"] + "</a>"
                         });
                     } 
                 } else {
@@ -203,10 +203,10 @@
                     "header": "Sales Date",
                     "binding": "SalesDate",
                     "allowSorting": false,
-                    "width": "4*"
+                    "width": 100
                 },
                 {
-                    "header": "Product Package",
+                    "header": "Package",
                     "binding": "ProductPackage",
                     "allowSorting": false,
                     "width": "4*"
@@ -215,13 +215,14 @@
                     "header": "Amount",
                     "binding": "Amount",
                     "allowSorting": false,
-                    "width": "4*"
+                    "width": 100
                 },
                 {
-                    "header": "Product Package URL",
-                    "binding": "Product Package URL",
+                    "header": "URL",
+                    "binding": "ProductPackageURL",
                     "allowSorting": false,
-                    "width": "4*"
+                    "width": "4*",
+                    "isContentHtml": true
                 }
             ],
             autoGenerateColumns: false,
