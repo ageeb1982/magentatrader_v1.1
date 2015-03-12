@@ -93,47 +93,49 @@
 </div>
 
 @*User Detail*@
-<div class="modal fade" id="UserEdit">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                    &times;
-                </button>
-                <h4 class="modal-title">Edit User Information</h4>
-            </div>
-            <div class="modal-body">
-                <dl class="dl-horizontal">
-                    <dt>User Name</dt>
-                    <dd>
-                        <input class="form-control" id="UserEdit_Id" type="hidden" />
-                        <input class="form-control" id="UserEdit_UserName" type="text" readonly/>
-                    </dd>
-                    <dt>First Name</dt>
-                    <dd>
-                        <input class="form-control" id="UserEdit_FirstName" type="text" />
-                    </dd>
-                    <dt>Last Name</dt>
-                    <dd>
-                        <input class="form-control" id="UserEdit_LastName" type="text" />
-                    </dd>
-                    <dt>Email Address</dt>
-                    <dd>
-                        <input class="form-control" id="UserEdit_EmailAddress" type="text" />
-                    </dd>
-                    <dt>Phone Number</dt>
-                    <dd>
-                        <input class="form-control" id="UserEdit_PhoneNumber" type="text" />
-                    </dd>
-                </dl>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="CmdUserEditOk" onclick="CmdUserEditOk_OnClick()">
-                    Ok
-                </button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal" id="CmdUserEditCancel" onclick="CmdUserCancel_OnClick()">
-                    Cancel
-                </button>
+<div id="scroll">
+    <div class="modal fade" id="UserEdit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title">Edit User Information</h4>
+                </div>
+                <div class="modal-body">
+                    <dl class="dl-horizontal">
+                        <dt>User Name</dt>
+                        <dd>
+                            <input class="form-control" id="UserEdit_Id" type="hidden" />
+                            <input class="form-control" id="UserEdit_UserName" type="text" readonly />
+                        </dd>
+                        <dt>First Name</dt>
+                        <dd>
+                            <input class="form-control" id="UserEdit_FirstName" type="text" />
+                        </dd>
+                        <dt>Last Name</dt>
+                        <dd>
+                            <input class="form-control" id="UserEdit_LastName" type="text" />
+                        </dd>
+                        <dt>Email Address</dt>
+                        <dd>
+                            <input class="form-control" id="UserEdit_EmailAddress" type="text" />
+                        </dd>
+                        <dt>Phone Number</dt>
+                        <dd>
+                            <input class="form-control" id="UserEdit_PhoneNumber" type="text" />
+                        </dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="CmdUserEditOk" onclick="CmdUserEditOk_OnClick()">
+                        Ok
+                    </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="CmdUserEditCancel" onclick="CmdUserCancel_OnClick()">
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>

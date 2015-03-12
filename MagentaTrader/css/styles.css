@@ -27,3 +27,7 @@
     dt {
     margin-top: 5px;
     }
+    .scroll{
+        max-height: 450px;
+        overflow-y: hidden;
+    }
