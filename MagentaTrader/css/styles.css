@@ -21,3 +21,9 @@
         font-weight:bold;
         text-align:center;
     }
+    dd {
+    margin-bottom: 8px;
+    }
+    dt {
+    margin-top: 5px;
+    }
