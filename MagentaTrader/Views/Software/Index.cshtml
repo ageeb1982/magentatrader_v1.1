@@ -1,7 +1,7 @@
 ﻿@{
     ViewBag.Title = "Software";
 
-    var Version = "v.Beta.1.20150301";
+    var Version = "v.Beta.1.20150315";
     var Symbol = Request.QueryString["symbol"];
 }
 
@@ -54,6 +54,13 @@
                         <a href="#" onclick="openEarnings()">
                             <div><strong>Earnings</strong></div>
                             <div>Price movements on earnings.</div>
+                        </a>
+                    </li>
+                    <li>
+                        <hr style="margin: 10px 0 10px 0;" />
+                        <a href="#" onclick="openPrePostEarnings()">
+                            <div><strong>Pre/Post Earning Price Movement</strong></div>
+                            <div>Movement of prices 10 days after and before earnings.</div>
                         </a>
                     </li>
                 </ul>
@@ -208,12 +215,43 @@
     </div>
 </div>
 
+<div class="modal" id="PrePostEarnings" tabindex="-1" role="dialog">
+    <div class="modal-dialog" style="width: 1100px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 id="PrePostEarningsTitle" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="PrePostDateButtons" class="row"></div>
+                <br />
+                <div id="PrePostEarningsGrid" class="grid"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="/js/date.js"></script>
 
 <link rel="stylesheet" href="/amcharts/amcharts/style.css" type="text/css">
 <script src="/amcharts/amcharts/amcharts.js" type="text/javascript"></script>
 <script src="/amcharts/amcharts/serial.js" type="text/javascript"></script>
 <script src="/amcharts/amcharts/amstock.js" type="text/javascript"></script>
+
+<script src="/js/knockout-3.2.0.js"></script>
+
+<link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
+<script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.input.min.js"></script>
+<script src="/wijmo/interop/knockout/wijmo.knockout.min.js"></script>
 
 <script type="text/javascript">
     // Modal
@@ -279,7 +317,8 @@
 
     // Earning variables
 
-    var earningDates = []; 
+    var earningDates = [];
+    var PrePostEarningsGrid;
 
     // Earnings
 
@@ -388,6 +427,253 @@
             }
         }
         return AmCharts.roundTo(percentage,2);
+    }
+
+    // Pre/Post Earnings
+
+    function openPrePostEarnings() {
+        $("#PrePostEarningsTitle").text(dataSymbol + " Pre/Post Earnings");
+        $('#PrePostEarnings').modal('show');
+
+        $("#PrePostDateButtons").empty();
+        for (var i = 0; i < earningDates.length; i++) {
+            $("#PrePostDateButtons").append("<div class='col-lg-3'><button type='submit' class='btn btn-primary btn-block' onclick='createPrePostEarningTable(this)'>" + earningDates[i] + "</button></div>");
+        }
+        $("#PrePostEarningsGrid").empty();
+    }
+    function createPrePostEarningTable(button) {
+        $.ajax({
+            url: '/api/StockEarningHistory/' + dataSymbol + '/' + button.textContent,
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            data: {},
+            success: function (result) {
+                if (result.length > 0) {
+
+                    var EarningDates = new wijmo.collections.ObservableArray();
+                    var y = 0;
+                    for (var i = 0; i < result.length; i++) {
+                        EarningDates.push({
+                            date: "<font face='Arial Narrow' size=2>" + result[i].EarningDate + "</font>",
+                            time: result[i].EarningTime,
+                            dayB10: prePostEarningPercentage(result[i].EarningDate, -10),
+                            dayB09: prePostEarningPercentage(result[i].EarningDate, -9),
+                            dayB08: prePostEarningPercentage(result[i].EarningDate, -8),
+                            dayB07: prePostEarningPercentage(result[i].EarningDate, -7),
+                            dayB06: prePostEarningPercentage(result[i].EarningDate, -6),
+                            dayB05: prePostEarningPercentage(result[i].EarningDate, -5),
+                            dayB04: prePostEarningPercentage(result[i].EarningDate, -4),
+                            dayB03: prePostEarningPercentage(result[i].EarningDate, -3),
+                            dayB02: prePostEarningPercentage(result[i].EarningDate, -2),
+                            dayB01: prePostEarningPercentage(result[i].EarningDate, -1),
+                            day0: "<font face='Arial Narrow' size=2>" + result[i].EarningTime + "</font>",
+                            dayA01: prePostEarningPercentage(result[i].EarningDate, 1),
+                            dayA02: prePostEarningPercentage(result[i].EarningDate, 2),
+                            dayA03: prePostEarningPercentage(result[i].EarningDate, 3),
+                            dayA04: prePostEarningPercentage(result[i].EarningDate, 4),
+                            dayA05: prePostEarningPercentage(result[i].EarningDate, 5),
+                            dayA06: prePostEarningPercentage(result[i].EarningDate, 6),
+                            dayA07: prePostEarningPercentage(result[i].EarningDate, 7),
+                            dayA08: prePostEarningPercentage(result[i].EarningDate, 8),
+                            dayA09: prePostEarningPercentage(result[i].EarningDate, 9),
+                            dayA10: prePostEarningPercentage(result[i].EarningDate, 10),
+                        })
+                        y++;
+                        if (y > 9) break;
+                    }
+
+                    var Earnings = new wijmo.collections.CollectionView(EarningDates);
+
+                    PrePostEarningsGrid.dispose();
+                    PrePostEarningsGrid = new wijmo.grid.FlexGrid('#PrePostEarningsGrid');
+
+                    PrePostEarningsGrid.initialize({
+                        columns: [
+                                    {
+                                        "header": "Date",
+                                        "binding": "date",
+                                        "width": 80,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "-10",
+                                        "binding": "dayB10",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "-9",
+                                        "binding": "dayB09",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "-8",
+                                        "binding": "dayB08",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "-7",
+                                        "binding": "dayB07",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "-6",
+                                        "binding": "dayB06",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "-5",
+                                        "binding": "dayB05",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "-4",
+                                        "binding": "dayB04",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "-3",
+                                        "binding": "dayB03",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "-2",
+                                        "binding": "dayB02",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "-1",
+                                        "binding": "dayB01",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "0",
+                                        "binding": "day0",
+                                        "width": 80,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "+1",
+                                        "binding": "dayA01",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "+2",
+                                        "binding": "dayA02",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "+3",
+                                        "binding": "dayA03",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "+4",
+                                        "binding": "dayA04",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "+5",
+                                        "binding": "dayA05",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "+6",
+                                        "binding": "dayA06",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "+7",
+                                        "binding": "dayA07",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "+8",
+                                        "binding": "dayA08",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "+9",
+                                        "binding": "dayA09",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "+10",
+                                        "binding": "dayA10",
+                                        "width": "10*",
+                                        "isContentHtml": true
+                                    }
+                        ],
+                        autoGenerateColumns: false,
+                        itemsSource: Earnings,
+                        isReadOnly: true,
+                        selectionMode: wijmo.grid.SelectionMode.Row
+                    });
+
+                    PrePostEarningsGrid.trackChanges = true;
+
+                    Earnings.pageSize = 10;
+                }
+            }
+        });
+    }
+    function prePostEarningPercentage(earningDate, interval) {
+        var GreenColor = "#0FB203";
+        var RedColor = "#A80008";
+
+        var startPrice = 0;
+        var endPrice = 0;
+        var percentage = 0;
+
+        var returnPercentage = "";
+
+        for (var i = 0; i < chartData.length; i++) {
+            var chartDate = new Date(chartData[i]["date"]);
+            if (parseDate(earningDate).equals(chartDate) == true) {
+                if (interval >= 0) {
+                    startPrice = chartData[i].close;
+                    endPrice = chartData[i - Math.abs(interval)].close;
+                } else {
+                    //startPrice = chartData[i + Math.abs(interval)].close;
+                    //endPrice = chartData[i].close;
+                    startPrice = chartData[i + 11].close;
+                    endPrice = chartData[i + Math.abs(interval)].close;
+                }
+                if (startPrice > 0) {
+                    percentage = ((endPrice - startPrice) / startPrice) * 100;
+                } else {
+                    percentage = 0;;
+                }
+                break;
+            }
+        }
+
+        if (percentage < 0) {
+            returnPercentage = "<font face='Arial Narrow' size=1 color='red'>" + AmCharts.roundTo(percentage, 2).toString() + "%</font>";
+        } else {
+            returnPercentage = "<font face='Arial Narrow' size=1 color='green'>" + AmCharts.roundTo(percentage, 2).toString() + "%</font>";
+        }
+
+        return returnPercentage;
     }
 
     // Stock Chart
@@ -1673,5 +1959,10 @@
             }
         });
 
+        // Earnings global variables
+
+        PrePostEarningsGrid = new wijmo.grid.FlexGrid('#PrePostEarningsGrid');
+
     });
 </script>
+

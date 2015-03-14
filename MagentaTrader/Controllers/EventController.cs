@@ -182,6 +182,7 @@ namespace MagentaTrader.Controllers
                 try
                 {
                     var Events = from d in db.MstEvents
+                                 where d.IsArchived == false
                                  orderby d.Id descending
                                  select new Models.Event
                                  {
