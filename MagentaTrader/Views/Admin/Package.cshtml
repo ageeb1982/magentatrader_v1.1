@@ -138,6 +138,10 @@
                     <dd>
                         <input class="form-control" id="ProductPackageEdit_Particulars" type="text" />
                     </dd>
+                    <dt>Package URL</dt>
+                    <dd>
+                        <input class="form-control" id="ProductPackageEdit_PackageURL" type="text" />
+                    </dd>   
                 </dl>
             </div>
             <div class="modal-footer">
@@ -196,6 +200,7 @@
         document.getElementById('ProductPackageEdit_WithSoftware').checked = ProductPackage.WithSoftware;
         document.getElementById('ProductPackageEdit_IsReoccuring').checked = ProductPackage.IsReoccuring;
         document.getElementById('ProductPackageEdit_Particulars').value = ProductPackage.Particulars ? ProductPackage.Particulars : '';
+        document.getElementById('ProductPackageEdit_PackageURL').value = ProductPackage.PackageURL ? ProductPackage.PackageURL : '';
 
 
         ddl.dispose();
@@ -221,6 +226,7 @@
         document.getElementById('ProductPackageEdit_WithSoftware').checked = false;
         document.getElementById('ProductPackageEdit_IsReoccuring').checked = false;
         document.getElementById('ProductPackageEdit_Particulars').value = '';
+        document.getElementById('ProductPackageEdit_PackageURL').value = '';
 
         ddl.dispose();
         ddl = new wijmo.input.AutoComplete('#cboProductPackageEdit_ProductId', {
@@ -272,6 +278,7 @@
             ProductPackage.WithSoftware = document.getElementById('ProductPackageEdit_WithSoftware').checked;
             ProductPackage.IsReoccuring = document.getElementById('ProductPackageEdit_IsReoccuring').checked;
             ProductPackage.Particulars = document.getElementById('ProductPackageEdit_Particulars').value;
+            ProductPackage.PackageURL = document.getElementById('ProductPackageEdit_PackageURL').value;
 
 
             var data = JSON.stringify(ProductPackage);
@@ -379,7 +386,8 @@
                             WithCoupon: Results[i]["WithCoupon"],
                             WithSoftware: Results[i]["WithSoftware"],
                             IsReoccuring: Results[i]["IsReoccuring"],
-                            Particulars: Results[i]["Particulars"]
+                            Particulars: Results[i]["Particulars"],
+                            PackageURL: Results[i]["PackageURL"]
                         });
                     }
                 } else {

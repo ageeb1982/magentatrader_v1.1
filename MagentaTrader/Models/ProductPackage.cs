@@ -18,5 +18,6 @@ namespace MagentaTrader.Models
         public bool WithSoftware { get; set; }
         public bool IsReoccuring { get; set; }
         public string Particulars { get; set; }
+        public string PackageURL { get; set; }
     }
 }

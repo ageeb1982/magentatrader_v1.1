@@ -35,7 +35,8 @@ namespace MagentaTrader.Controllers
                                        WithCoupon = d.WithCoupon,
                                        WithSoftware = d.WithSoftware,
                                        IsReoccuring = d.IsReoccuring,
-                                       Particulars = d.Particulars
+                                       Particulars = d.Particulars,
+                                       PackageURL = d.PackageURL
                                    };
                     if (Packages.Count() > 0)
                     {
@@ -81,6 +82,7 @@ namespace MagentaTrader.Controllers
                 NewProductPackage.WithSoftware = value.WithSoftware;
                 NewProductPackage.IsReoccuring = value.IsReoccuring;
                 NewProductPackage.Particulars = value.Particulars;
+                NewProductPackage.PackageURL = value.PackageURL;
 
                 db.MstProductPackages.InsertOnSubmit(NewProductPackage);
                 db.SubmitChanges();
@@ -117,6 +119,7 @@ namespace MagentaTrader.Controllers
                     UpdatedProductPackage.WithSoftware = value.WithSoftware;
                     UpdatedProductPackage.IsReoccuring = value.IsReoccuring;
                     UpdatedProductPackage.Particulars = value.Particulars;
+                    UpdatedProductPackage.PackageURL = value.PackageURL;
 
                     db.SubmitChanges();
                 }
