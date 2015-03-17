@@ -259,11 +259,14 @@ namespace MagentaTrader.Controllers
         // PUT /api/UpdateEvent/5
         [Authorize]
         [Route("api/UpdateEvent/{Id}")]
-        public HttpResponseMessage Put(int Id, Models.Event value)
+        public HttpResponseMessage Put(String Id, Models.Event value)
         {
+            Id = Id.Replace(",", "");
+            int id = Convert.ToInt32(Id);
+
             try
             {
-                var Events = from d in db.MstEvents where d.Id == Id select d;
+                var Events = from d in db.MstEvents where d.Id == id select d;
 
                 if (Events.Any())
                 {
