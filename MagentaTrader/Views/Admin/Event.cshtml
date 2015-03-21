@@ -186,7 +186,10 @@
     function CmdEventEdit_OnClick() {
         Events.editItem(Events.currentItem);
 
-        $('#EventEdit').modal('show');
+        $('#EventEdit').modal({
+            show: true,
+            backdrop: false
+        });
 
         var Event = Events.currentEditItem;
         document.getElementById('EventEdit_Id').value = Event.Id !== null && typeof (Event.Id) != 'undefined' ? wijmo.Globalize.format(Event.Id) : '';
@@ -210,7 +213,10 @@
         });
     }
     function CmdEventAdd_OnClick() {
-        $('#EventEdit').modal('show');
+        $('#EventEdit').modal({
+            show: true,
+            backdrop: false
+        });
 
         var CurrentDate = new Date();
 

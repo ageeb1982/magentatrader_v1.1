@@ -159,7 +159,10 @@
     function CmdNewsEdit_OnClick() {
         News.editItem(News.currentItem);
 
-        $('#NewsEdit').modal('show');
+        $('#NewsEdit').modal({
+            show: true,
+            backdrop: false
+        });
 
         var Newss = News.currentEditItem;
         document.getElementById('NewsEdit_Id').value = Newss.Id !== null && typeof (Newss.Id) != 'undefined' ? wijmo.Globalize.format(Newss.Id) : '';
@@ -178,7 +181,10 @@
         });
     }
     function CmdNewsAdd_OnClick() {
-        $('#NewsEdit').modal('show');
+        $('#NewsEdit').modal({
+            show: true,
+            backdrop: false
+        });
 
         var CurrentDate = new Date();
 

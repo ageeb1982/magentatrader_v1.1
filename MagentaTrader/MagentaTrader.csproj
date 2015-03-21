@@ -812,6 +812,8 @@
     <Content Include="img\webinar.png" />
     <Content Include="img\workshop1.jpg" />
     <Content Include="img\workshop2.jpg" />
+    <Content Include="js\angular-route.min.js" />
+    <Content Include="js\angular.min.js" />
     <Content Include="js\bootstrap.js" />
     <Content Include="js\bootstrap.min.js" />
     <Content Include="js\date.js" />

@@ -170,7 +170,10 @@
     function CmdUserEdit_OnClick() {
         Users.editItem(Users.currentItem);
 
-        $('#UserEdit').modal('show');
+        $('#UserEdit').modal({
+            show: true,
+            backdrop: false
+        });
 
         var User = Users.currentEditItem;
         document.getElementById('UserEdit_Id').value = User.Id !== null && typeof (User.Id) != 'undefined' ? wijmo.Globalize.format(User.Id) : '';

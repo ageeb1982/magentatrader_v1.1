@@ -148,7 +148,10 @@
     function CmdProductEdit_OnClick() {
         Products.editItem(Products.currentItem);
 
-        $('#ProductEdit').modal('show');
+        $('#ProductEdit').modal({
+            show: true,
+            backdrop: false
+        });
 
         var Product = Products.currentEditItem;
         document.getElementById('ProductEdit_Id').value = Product.Id !== null && typeof (Product.Id) != 'undefined' ? wijmo.Globalize.format(Product.Id) : '';
@@ -156,7 +159,10 @@
 
     }
     function CmdProductAdd_OnClick() {
-        $('#ProductEdit').modal('show');
+        $('#ProductEdit').modal({
+            show: true,
+            backdrop: false
+        });
 
         document.getElementById('ProductEdit_Id').value = 0;
         document.getElementById('ProductEdit_ProductDescription').value = "";

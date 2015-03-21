@@ -188,7 +188,10 @@
     function CmdProductPackageEdit_OnClick() {
         ProductPackages.editItem(ProductPackages.currentItem);
 
-        $('#ProductPackageEdit').modal('show');
+        $('#ProductPackageEdit').modal({
+            show: true,
+            backdrop: false
+        });
 
         var ProductPackage = ProductPackages.currentEditItem;
         document.getElementById('ProductPackageEdit_Id').value = ProductPackage.Id !== null && typeof (ProductPackage.Id) != 'undefined' ? wijmo.Globalize.format(ProductPackage.Id) : '';
@@ -214,7 +217,10 @@
 
     }
     function CmdProductPackageAdd_OnClick() {
-        $('#ProductPackageEdit').modal('show');
+        $('#ProductPackageEdit').modal({
+            show: true,
+            backdrop: false
+        });
 
         document.getElementById('ProductPackageEdit_Id').value = 0;
         document.getElementById('ProductPackageEdit_ProductPackageDescription').value = '';
@@ -459,22 +465,22 @@
                             "isContentHtml": true
                         },
                         {
-                            "header": "Product Package Description",
+                            "header": "Description",
                             "binding": "ProductPackageDescription",
                             "allowSorting": false,
-                            "width": 100
+                            "width": "6*"
                         },
                         {
                             "header": "SKU",
                             "binding": "SKU",
                             "allowSorting": false,
-                            "width": "2*"
+                            "width": "1*"
                         },
                         {
                             "header": "Price",
                             "binding": "Price",
                             "allowSorting": false,
-                            "width": "2*"
+                            "width": "1*"
                         },
                         {
                             "header": "Product",
@@ -486,7 +492,7 @@
                             "header": "Particulars",
                             "binding": "Particulars",
                             "allowSorting": false,
-                            "width": "4*"
+                            "width": "6*"
                         }
             ],
             autoGenerateColumns: false,
