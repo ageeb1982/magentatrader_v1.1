@@ -149,22 +149,63 @@ namespace MagentaTrader.Controllers
         // GET api/GetUser/dpilger
         [Authorize]
         [Route("api/GetUser/{username}")]
-        public List<Models.User> GetUserInfo( String username )
+        public List<Models.User> GetUserInfo( String UserName )
         {
-            List<Models.User> UserInfo = null;
-            var Info = from m in db.MstUsers
-                       where m.UserName == username
-                       select new Models.User
-                       {
-                           UserName = m.UserName,
-                           FirstName = m.FirstName,
-                           LastName = m.LastName,
-                           EmailAddress = m.EmailAddress,
-                           PhoneNumber = m.PhoneNumber
-                       };
+            //List<Models.User> UserInfo = null;
+            //var Info = from m in db.MstUsers
+            //           where m.UserName == username
+            //           select new Models.User
+            //           {
+            //               UserName = m.UserName,
+            //               FirstName = m.FirstName,
+            //               LastName = m.LastName,
+            //               EmailAddress = m.EmailAddress,
+            //               PhoneNumber = m.PhoneNumber
+            //           };
 
-            UserInfo = Info.ToList();
-            return UserInfo;
+            //UserInfo = Info.ToList();
+            //return UserInfo;
+            var retryCounter = 0;
+            List<Models.User> values;
+
+            while (true)
+            {
+                try
+                {
+                    var Info = from m in db.MstUsers
+                               where m.UserName == UserName
+                               select new Models.User
+                               {
+                                   Id = m.Id,
+                                   UserName = m.UserName,
+                                   FirstName = m.FirstName,
+                                   LastName = m.LastName,
+                                   EmailAddress = m.EmailAddress,
+                                   PhoneNumber = m.PhoneNumber
+                               };
+                    if (Info.Count() > 0)
+                    {
+                        values = Info.ToList();
+                    }
+                    else
+                    {
+                        values = new List<Models.User>();
+                    }
+                    break;
+                }
+                catch
+                {
+                    if (retryCounter == 3)
+                    {
+                        values = new List<Models.User>();
+                        break;
+                    }
+
+                    System.Threading.Thread.Sleep(1000);
+                    retryCounter++;
+                }
+            }
+            return values;
         }
     }
 }

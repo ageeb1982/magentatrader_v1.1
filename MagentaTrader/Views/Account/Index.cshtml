@@ -40,47 +40,53 @@
                 </div>
             </div>
             <div class="info-div">
-                <div class="box">
-                    <div class="text">Username:</div>
+                <div class="fieldLabel">
+                    <div class="text" style="margin-top: 8px;">Username</div>
                 </div>
                 <div class="box">
-                    <div class="text" id="username">dpilger</div>
-                </div>
-            </div>
-            <div class="info-div">
-                <div class="box">
-                    <div class="text">First Name:</div>
-                </div>
-                <div class="box">
-                    <div class="text" id="firstname">Loading...</div>
+                    <input class="form-control" id="userinfoId" type="hidden"/>
+                    <input type="text" class="text form-control" id="username" disabled/>
                 </div>
             </div>
             <div class="info-div">
-                <div class="box">
-                    <div class="text">Last Name:</div>
+                <div class="fieldLabel">
+                    <div class="text">First Name</div>
                 </div>
                 <div class="box">
-                    <div class="text" id="lastname">Loading...</div>
-                </div>
-            </div>
-            <div class="info-div">
-                <div class="box">
-                    <div class="text">Phone Number:</div>
-                </div>
-                <div class="box">
-                    <div class="text" id="phonenum">Loading...</div>
+                    <input type="text" class="text form-control" id="firstname" readonly/>
                 </div>
             </div>
             <div class="info-div">
-                <div class="box">
-                    <div class="text">Email Address:</div>
+                <div class="fieldLabel">
+                    <div class="text">Last Name</div>
                 </div>
                 <div class="box">
-                    <div class="text" id="emailadd">Loading...</div>
+                    <input type="text" class="text form-control" id="lastname" readonly/>
                 </div>
             </div>
-            <div class="info-div pull-right">
-                <button class="btn btn-primary" id="CmdAccountEdit_OnClick()">Edit</button>
+            <div class="info-div">
+                <div class="fieldLabel">
+                    <div class="text">Phone Number</div>
+                </div>
+                <div class="box">
+                    <input type="text" class="text form-control" id="phonenum" readonly/>
+                </div>
+            </div>
+            <div class="info-div">
+                <div class="fieldLabel">
+                    <div class="text">Email Address</div>
+                </div>
+                <div class="box">
+                    <input type="text" class="text form-control" id="emailadd" readonly/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="info-div pull-right" style="margin-top: 15px;">
+                        <button class="btn btn-primary editBtn toggleBtn">Edit</button>
+                        <button class="btn btn-danger" id="CancelEditUserInfo">Cancel</button>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-lg-8">
@@ -110,22 +116,9 @@
 
 <script type="text/javascript">
 
-    // Get value from cookie
-    //function readCookie(name) {
-    //    var value = name + "=";
-    //    var cookieValue = document.cookie.split(';');
-    //    for (var i = 0; i < cookieValue.length; i++) {
-    //        var c = cookieValue[i];
-    //        while (c.charAt(0) == ' ')
-    //            c = c.substring(1, c.length);
-    //        if (c.indexOf(value) == 0)
-    //            return c.substring(value.length, c.length);
-    //    }
-    //    return null;
-    //}
+    var UserInfo;
 
     function GetUserInfo() {
-        // var username = readCookie("MagentaTrader_USER");
         var username = '@User.Identity.Name';
         $('#loading').modal('show');
         $.ajax({
@@ -137,19 +130,20 @@
             success: function (Results) {
                 $('#loading').modal('hide');
                 if (Results.length > 0) {
-                    
-                    $('#username').html('<b>' + Results[0].UserName + '</b>');
-                    $('#firstname').html('<b>' + Results[0].FirstName + '</b>');
-                    $('#lastname').html('<b>' + Results[0].LastName + '</b>');
-                    $('#emailadd').html('<b>' + Results[0].EmailAddress + '</b>');
-                    $('#phonenum').html('<b>' + Results[0].PhoneNumber + '</b>');
+
+                    $('#userinfoId').val(Results[0].Id);
+                    $('#username').val(Results[0].UserName);
+                    $('#firstname').val(Results[0].FirstName);
+                    $('#lastname').val(Results[0].LastName);
+                    $('#emailadd').val(Results[0].EmailAddress);
+                    $('#phonenum').val(Results[0].PhoneNumber);
                 }
                 else {
                     // alert("No data.");
                     $('#username, #firstname, #lastname, #emailadd, #phonenum').text("");
                 }
             }
-            
+
         }).fail(
             function (xhr, textStatus, err) {
                 alert(err);
@@ -160,8 +154,6 @@
     function GetUserPurchases() {
         var purchases = new wijmo.collections.ObservableArray();
         var username = '@User.Identity.Name';
-
-            //username = readCookie("MagentaTrader_USER");
 
         $("#loading").modal('show');
         $.ajax({
@@ -180,7 +172,7 @@
                             Amount: Results[i]["Amount"],
                             ProductPackageURL: "<a href='" + Results[i]["ProductPackageURL"] + "'>" + Results[i]["ProductPackageURL"] + "</a>"
                         });
-                    } 
+                    }
                 } else {
                     alert("No data.");
                 }
@@ -193,11 +185,68 @@
         return purchases;
     }
 
+    function EditUserInfo() {
+        if (confirm("Save User?") == true) {
+
+            var Info = new Object();
+            var id = '@User.Identity.Name';
+
+                Info.Id = document.getElementById('userinfoId').value;
+                Info.UserName = document.getElementById('username').value;
+                Info.FirstName = document.getElementById('firstname').value;
+                Info.LastName = document.getElementById('lastname').value;
+                Info.PhoneNumber = document.getElementById('phonenum').value;
+                Info.EmailAddress = document.getElementById('emailadd').value;
+
+                var data = JSON.stringify(Info);
+
+                $.ajax({
+                    type: "PUT",
+                    url: "/api/UpdateUser/" + Info.Id,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: data,
+                    statusCode: {
+                        200: function () {
+                            window.location.reload();
+                        },
+                        404: function () {
+                            alert("Not found");
+                        },
+                        400: function () {
+                            alert("Bad request");
+                        }
+                    }
+                });
+        }
+    }
+
     $(document).ready(function () {
+
+        $('#CancelEditUserInfo').hide();
+
+        $(document).on('click', '.editBtn', function () {
+            $('.toggleBtn').removeClass('btn-primary editBtn').addClass('btn-success saveBtn').text('Ok');
+            $('#firstname, #lastname, #emailadd, #phonenum').prop('readonly', false);
+            $('#CancelEditUserInfo').show();
+        })
+
+        $(document).on('click', '.saveBtn', function () {
+            EditUserInfo();
+            $('#CancelEditUserInfo').hide();
+            $('.toggleBtn').removeClass('btn-success saveBtn').addClass('btn-primary editBtn').text('Edit');
+            $('#firstname, #lastname, #emailadd, #phonenum').prop('readonly', true);
+        })
+
+        $(document).on('click', '#CancelEditUserInfo', function () {
+            $('.toggleBtn').removeClass('btn-success saveBtn').addClass('btn-primary editBtn').text('Edit');
+            $('#firstname, #lastname, #emailadd, #phonenum').prop('readonly', true);
+            $('#CancelEditUserInfo').hide();
+        });
 
         $('#username, #firstname, #lastname, #emailadd, #phonenum').text(". . .");
 
-        GetUserInfo();
+        UserInfo = new wijmo.collections.CollectionView(GetUserInfo());
 
         Purchases = new wijmo.collections.CollectionView(GetUserPurchases());
 

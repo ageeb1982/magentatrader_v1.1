@@ -31,3 +31,10 @@
         max-height: 450px;
         overflow-y: hidden;
     }
+
+    .custom-width {
+        width: 60% !important;
+    }
+    .full-width {
+        width: 100% !important;
+    }

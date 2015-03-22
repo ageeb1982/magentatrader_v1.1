@@ -37,11 +37,18 @@ textarea {
     color: #ffffff;
 }
 
+.panel-green-footer {
+    color : #5cb85c;
+}
 
 .panel-yellow {
     border-color: #f0ad4e;
     background-color: #f0ad4e;
     color: #ffffff;
+}
+
+.panel-yellow-footer {
+    color: #f0ad4e;
 }
 
 .panel-red {
@@ -50,10 +57,18 @@ textarea {
     color: #ffffff;
 }
 
+.panel-red-footer {
+    color: #d9534f;
+}
+
 .panel-violet {
     border-color: #990099;
     background-color: #990099;
     color: #ffffff;
+}
+
+.panel-violet-footer {
+    color: #990099;
 }
 
 .panel-brown {
@@ -61,22 +76,30 @@ textarea {
     background-color: #8B4513;
     color: #ffffff;
 }
+
+.panel-brown-footer {
+    color: #8B4513;
+}
+
 @media screen and (min-width: 991px){
     .marginCenter{
         margin-left: 100px;
         margin-right: 100px;
     }
 }
+
 .info-div {
     white-space:nowrap;
     text-align:center;
 }
+
 .box {
-    width: 30%;
-    display:inline-block;
-    margin:5px 0;
-    border-radius:5px;
+  width: 68%;
+  display: inline-block;
+  margin: 5px 0;
+  border-radius: 5px;
 }
+
 .text {
     padding: 10px 0;
     text-align:center;
@@ -92,4 +115,11 @@ textarea {
 
 #SalesGrid {
     margin-top: 17px;
+}
+
+.fieldLabel {
+  width: 30%;
+  display: inline-block;
+  margin: 5px 0px;
+  border-radius: 5px;
 }
