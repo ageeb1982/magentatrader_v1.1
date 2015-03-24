@@ -619,6 +619,7 @@
     }
 
     $(document).ready(function () {
+
         btnFirstPageSale = document.getElementById('btnMoveToFirstPageSale');
         btnPreviousPageSale = document.getElementById('btnMoveToPreviousPageSale');
         btnNextPageSale = document.getElementById('btnMoveToNextPageSale');
@@ -637,14 +638,15 @@
         });
 
         var filterElement = document.getElementById('SalesDateFilter'),
-            filterText = '';
+            filterText = $('#SalesDateFilter').find('input').val();
+        
 
         $('#SalesDateFilter').on('click', function () {
             var str = $('#SalesDateFilter').find('input').val();
             filterText = str;
             Sales.refresh();
-        })
-        
+        });
+
         Sales.filter = function (item) {
             return !filterText || item.SalesDate.indexOf(filterText) > -1;
         };
@@ -659,7 +661,7 @@
                     "width": 60,
                     "allowSorting": false,
                     "isContentHtml": true
-                },
+                }, 
                 {
                     "header": "Delete",
                     "binding": "DeleteId",
