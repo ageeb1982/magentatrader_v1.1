@@ -93,11 +93,14 @@ namespace MagentaTrader.Controllers
         // PUT /api/UpdateNews/5
         [Authorize]
         [Route("api/UpdateNews/{Id}")]
-        public HttpResponseMessage Put(int Id, Models.News value)
+        public HttpResponseMessage Put(String Id, Models.News value)
         {
+            Id = Id.Replace(",", "");
+            int id = Convert.ToInt32(Id);
+
             try
             {
-                var News = from d in db.MstNews where d.Id == Id select d;
+                var News = from d in db.MstNews where d.Id == id select d;
 
                 if (News.Any())
                 {

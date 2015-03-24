@@ -98,12 +98,15 @@ namespace MagentaTrader.Controllers
         // PUT /api/UpdateProductPackage/5
         [Authorize]
         [Route("api/UpdateProductPackage/{Id}")]
-        public HttpResponseMessage Put(int Id, Models.ProductPackage value)
+        public HttpResponseMessage Put(String Id, Models.ProductPackage value)
         {
+            Id = Id.Replace(",", "");
+            int id = Convert.ToInt32(Id);
+
             try
             {
                 //var Sales = from d in db.TrnSales where d.Id == Id select d;
-                var ProductPackage = from d in db.MstProductPackages where d.Id == Id select d;
+                var ProductPackage = from d in db.MstProductPackages where d.Id == id select d;
 
                 if (ProductPackage.Any())
                 {
