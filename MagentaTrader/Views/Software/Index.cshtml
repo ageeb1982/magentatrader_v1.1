@@ -457,27 +457,27 @@
                         EarningDates.push({
                             date: "<font face='Arial Narrow' size=2>" + result[i].EarningDate + "</font>",
                             time: result[i].EarningTime,
-                            dayB10: prePostEarningPercentage(result[i].EarningDate, -10),
-                            dayB09: prePostEarningPercentage(result[i].EarningDate, -9),
-                            dayB08: prePostEarningPercentage(result[i].EarningDate, -8),
-                            dayB07: prePostEarningPercentage(result[i].EarningDate, -7),
-                            dayB06: prePostEarningPercentage(result[i].EarningDate, -6),
-                            dayB05: prePostEarningPercentage(result[i].EarningDate, -5),
-                            dayB04: prePostEarningPercentage(result[i].EarningDate, -4),
-                            dayB03: prePostEarningPercentage(result[i].EarningDate, -3),
-                            dayB02: prePostEarningPercentage(result[i].EarningDate, -2),
-                            dayB01: prePostEarningPercentage(result[i].EarningDate, -1),
-                            day0: "<font face='Arial Narrow' size=2>" + result[i].EarningTime + "</font>",
-                            dayA01: prePostEarningPercentage(result[i].EarningDate, 1),
-                            dayA02: prePostEarningPercentage(result[i].EarningDate, 2),
-                            dayA03: prePostEarningPercentage(result[i].EarningDate, 3),
-                            dayA04: prePostEarningPercentage(result[i].EarningDate, 4),
-                            dayA05: prePostEarningPercentage(result[i].EarningDate, 5),
-                            dayA06: prePostEarningPercentage(result[i].EarningDate, 6),
-                            dayA07: prePostEarningPercentage(result[i].EarningDate, 7),
-                            dayA08: prePostEarningPercentage(result[i].EarningDate, 8),
-                            dayA09: prePostEarningPercentage(result[i].EarningDate, 9),
-                            dayA10: prePostEarningPercentage(result[i].EarningDate, 10),
+                            dayB10: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, - 10),
+                            dayB09: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, -9),
+                            dayB08: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, -8),
+                            dayB07: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, -7),
+                            dayB06: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, -6),
+                            dayB05: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, -5),
+                            dayB04: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, -4),
+                            dayB03: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, -3),
+                            dayB02: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, -2),
+                            dayB01: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, -1),
+                            day0: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, 0),
+                            dayA01: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, 1),
+                            dayA02: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, 2),
+                            dayA03: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, 3),
+                            dayA04: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, 4),
+                            dayA05: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, 5),
+                            dayA06: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, 6),
+                            dayA07: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, 7),
+                            dayA08: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, 8),
+                            dayA09: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, 9),
+                            dayA10: prePostEarningPercentage(result[i].EarningDate, result[i].EarningTime, 10),
                         })
                         y++;
                         if (y > 9) break;
@@ -497,129 +497,129 @@
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "-10",
+                                        "header": "%",
                                         "binding": "dayB10",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "-9",
+                                        "header": "%",
                                         "binding": "dayB09",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "-8",
+                                        "header": "%",
                                         "binding": "dayB08",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "-7",
+                                        "header": "%",
                                         "binding": "dayB07",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "-6",
+                                        "header": "%",
                                         "binding": "dayB06",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "-5",
+                                        "header": "%",
                                         "binding": "dayB05",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "-4",
+                                        "header": "%",
                                         "binding": "dayB04",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "-3",
+                                        "header": "%",
                                         "binding": "dayB03",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "-2",
+                                        "header": "%",
                                         "binding": "dayB02",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "-1",
+                                        "header": "%",
                                         "binding": "dayB01",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "0",
+                                        "header": "Day 0",
                                         "binding": "day0",
-                                        "width": 80,
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "+1",
+                                        "header": "%",
                                         "binding": "dayA01",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "+2",
+                                        "header": "%",
                                         "binding": "dayA02",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "+3",
+                                        "header": "%",
                                         "binding": "dayA03",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "+4",
+                                        "header": "%",
                                         "binding": "dayA04",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "+5",
+                                        "header": "%",
                                         "binding": "dayA05",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "+6",
+                                        "header": "%",
                                         "binding": "dayA06",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "+7",
+                                        "header": "%",
                                         "binding": "dayA07",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "+8",
+                                        "header": "%",
                                         "binding": "dayA08",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "+9",
+                                        "header": "%",
                                         "binding": "dayA09",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "+10",
+                                        "header": "%",
                                         "binding": "dayA10",
-                                        "width": "10*",
+                                        "width": "11*",
                                         "isContentHtml": true
                                     }
                         ],
@@ -636,7 +636,7 @@
             }
         });
     }
-    function prePostEarningPercentage(earningDate, interval) {
+    function prePostEarningPercentage(earningDate, earningTime, interval) {
         var GreenColor = "#0FB203";
         var RedColor = "#A80008";
 
@@ -649,15 +649,23 @@
         for (var i = 0; i < chartData.length; i++) {
             var chartDate = new Date(chartData[i]["date"]);
             if (parseDate(earningDate).equals(chartDate) == true) {
-                if (interval >= 0) {
-                    startPrice = chartData[i].close;
-                    endPrice = chartData[i - Math.abs(interval)].close;
+
+                if (interval > 0) {
+                    startPrice = chartData[i - 1].close;
+                    endPrice = chartData[i - (Math.abs(interval)+1)].close;
+                } else if (interval == 0) {
+                    if (earningTime == "After Market Close") {
+                        startPrice = chartData[i].close;
+                        endPrice = chartData[i - 1].close;
+                    } else {
+                        startPrice = chartData[i + 1].close;
+                        endPrice = chartData[i].close;
+                    }
                 } else {
-                    //startPrice = chartData[i + Math.abs(interval)].close;
-                    //endPrice = chartData[i].close;
                     startPrice = chartData[i + 11].close;
                     endPrice = chartData[i + Math.abs(interval)].close;
                 }
+
                 if (startPrice > 0) {
                     percentage = ((endPrice - startPrice) / startPrice) * 100;
                 } else {
@@ -668,9 +676,9 @@
         }
 
         if (percentage < 0) {
-            returnPercentage = "<font face='Arial Narrow' size=1 color='red'>" + AmCharts.roundTo(percentage, 2).toString() + "%</font>";
+            returnPercentage = "<font face='Arial Narrow' size=2 color='red'>" + AmCharts.roundTo(percentage, 2).toString() + "</font>";
         } else {
-            returnPercentage = "<font face='Arial Narrow' size=1 color='green'>" + AmCharts.roundTo(percentage, 2).toString() + "%</font>";
+            returnPercentage = "<font face='Arial Narrow' size=2 color='green'>" + AmCharts.roundTo(percentage, 2).toString() + "</font>";
         }
 
         return returnPercentage;
