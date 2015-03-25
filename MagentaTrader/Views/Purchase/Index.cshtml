@@ -30,7 +30,17 @@
 
             <h2 class="section-heading">Purchases</h2>
 
+            <div class="row">
+                <div class="col-lg-2 pull-right">
+                    <button id="CmdCoupon" type="submit" class="btn btn-primary btn-block" onclick="CmdCoupon_OnClick()">Coupons</button>
+                </div>
+            </div>
+
+            <br />
+
             <div id="PurchaseGrid" class="grid"></div>
+
+            <br />
 
         </div>
 
@@ -40,6 +50,34 @@
 
     </div>
 
+</div>
+
+<div class="modal" id="Coupons">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 id="CouponsTitle" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <dl class="dl-horizontal">
+                    <dt>Code</dt>
+                    <dd>
+                        <input class="form-control" id="CouponCode" type="text" />
+                    </dd>
+                </dl>
+                <br />
+                <div id="CouponLink">&nbsp;</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -72,22 +110,51 @@
             Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='bfa29e49-cbc3-4334-b01b-2667d3313990' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
         });
 
-        purchases.push({
-            Product: "Web99 and Realtime",
-            Price: "US$ 169",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='9f79c301-44c4-4a45-876d-d505e51b631d' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
-        });
+        //purchases.push({
+        //    Product: "Web99 and Realtime",
+        //    Price: "US$ 169",
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='9f79c301-44c4-4a45-876d-d505e51b631d' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //});
 
         purchases.push({
-            Product: "<font color='#CC009C'>Annual Subscriptions</font>",
+            Product: "<font color='#CC009C'>Packages</font>",
             Purchase: ""
         });
 
         purchases.push({
-            Product: "Annual Realtime",
-            Price: "US$ 700",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='3754c8b7-89da-43c9-8dc5-3c2879dd98a2' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+            Product: "Platinum - Magenta Charts, Web99 and Realtime",
+            Price: "US$ 249",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='93574ca7-8521-40e9-afe3-9bb7a4c32035' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
         });
+
+        purchases.push({
+            Product: "Gold A - Web99 and Realtime",
+            Price: "US$ 169",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='54ffed1e-f51e-49e9-97f4-0d47c52bb72f' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        });
+
+        purchases.push({
+            Product: "Gold B - Web99 and Magenta Charts",
+            Price: "US$ 169",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='ded0a0e5-c00a-476c-ae7f-328c5fdc3ad0' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        });
+
+        purchases.push({
+            Product: "Gold C - Magenta Charts and Realtime",
+            Price: "US$ 169",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='fc1d1bb1-d809-4e01-a57e-aa6ca394067d' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        });
+
+        //purchases.push({
+        //    Product: "<font color='#CC009C'>Annual Subscriptions</font>",
+        //    Purchase: ""
+        //});
+
+        //purchases.push({
+        //    Product: "Annual Realtime",
+        //    Price: "US$ 700",
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='3754c8b7-89da-43c9-8dc5-3c2879dd98a2' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //});
 
         purchases.push({
             Product: "<font color='#CC009C'>Data Server Fee</font>",
@@ -145,13 +212,26 @@
 
         return purchases;
     }
-
+    function CmdCoupon_OnClick() {
+        $("#CouponsTitle").text("Coupons");
+        $('#Coupons').modal('show');
+    }
+    function CouponCode_OnExit() {
+        var CouponCode = document.getElementById('CouponCode').value;
+        if (CouponCode == "Ron") {
+            $("#CouponLink").empty();
+            $("#CouponLink").append("Platinum - Magenta Charts, Web99 and Realtime for Three (3) Months - $100/Month <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='f4b22f9b-7b4c-4ef0-87ed-c86d87f23f72' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
+        } else if (CouponCode == "1387I1") {
+            $("#CouponLink").empty();
+            $("#CouponLink").append("<a href='https://www2.tuscanylasvegas.com/smsworld/wc.dll?smsWorld~Availbox~&wsi=port' class='btn btn-primary btn-xs'>Tuscany Reservation</a>");
+        } else {
+            $("#CouponLink").empty();
+        }
+    }
 
     $(document).ready(function () {
         Purchases = new wijmo.collections.CollectionView(getPurchases());
-
         PurchaseGrid = new wijmo.grid.FlexGrid('#PurchaseGrid');
-
         PurchaseGrid.initialize({
             columns: [
                         {
@@ -181,11 +261,8 @@
             isReadOnly: true,
             selectionMode: wijmo.grid.SelectionMode.Cell
         });
-
         PurchaseGrid.trackChanges = true;
-
         PurchaseGrid.pageSize = 15;
-
         PurchaseGrid.itemFormatter = function (panel, r, c, cell) {
             if (panel.cellType == wijmo.grid.CellType.Cell) {
                 var flex = panel.grid;
@@ -193,8 +270,12 @@
             }
         };
 
+        document.getElementById('CouponCode').addEventListener("blur", CouponCode_OnExit, true);
+        document.getElementById("CouponCode").addEventListener("keydown", function (e) {
+            if (e.keyCode == 13) { CouponCode_OnExit(); }
+        }, false);
     });
-
+    
 </script>
 
 <script src="/lib/jquery/js/jquery.js"></script>
