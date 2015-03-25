@@ -268,7 +268,7 @@
         ac.dispose();
         ac = new wijmo.input.AutoComplete('#cboSaleEdit_UserId', {
             itemsSource: getUsersList(UserList.items),
-            selectedValue: Sale.FirstName + " " + Sale.LastName,
+            selectedValue: Sale.User,
             onSelectedIndexChanged: function () {
                 $("#SaleEdit_UserId").val(UserList.items[this.selectedIndex].Id);
             }
@@ -499,7 +499,7 @@
 
         for (var i = 0; i < UserList.items.length; i++) {
             if (UserList.items[i].Id == id)
-                retItem = UserList.items[i].FirstName + " " + UserList.items[i].LastName;
+                retItem = UserList.items[i].User;
         }
         return retItem;
     }
@@ -517,7 +517,7 @@
         var retList = new Array();
 
         for (var i = 0; i < items.length; i++) {
-            retList.push(items[i].FirstName + " " + items[i].LastName);
+            retList.push(items[i].UserName);
         }
 
         return retList;
