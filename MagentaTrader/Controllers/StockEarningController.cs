@@ -70,8 +70,9 @@ namespace MagentaTrader.Controllers
 
                 earnings = (from d in db.TrnStockEarnings
                             where (d.Symbol == symbol) &&
-                                  (d.EarningDate < date) &&
-                                  (((d.EarningDate.Month - 1) / 3) == (quarter-1))
+                                  (((d.EarningDate.Month - 1) / 3) == (quarter-1)) &&
+                                  (Math.Abs((date.Month - d.EarningDate.Month))<2) &&
+                                  (date > d.EarningDate)
                             orderby d.EarningDate descending
                             select new Models.StockEarning
                             {
@@ -87,6 +88,40 @@ namespace MagentaTrader.Controllers
 
             return earnings.ToList();
         }
-    
+
+        // GET api/StockEarningHistoryChronologically/FB/2015-01-01
+        [Authorize]
+        [Route("api/StockEarningHistoryChronologically/{Symbol}/{EarningDate}")]
+        public List<Models.StockEarning> GetEarningHistoryChronologically(string symbol, string earningDate)
+        {
+            List<Models.StockEarning> earnings = new List<Models.StockEarning>();
+
+            try
+            {
+                var Symbols = from d in db.MstSymbols where d.Symbol == symbol select d;
+                CultureInfo provider = CultureInfo.InvariantCulture;
+
+                DateTime date = DateTime.ParseExact(earningDate, "yyyy-MM-dd", provider);
+                int quarter = GetQuarter(date);
+
+                earnings = (from d in db.TrnStockEarnings
+                            where (d.Symbol == symbol) &&
+                                  (date > d.EarningDate)
+                            orderby d.EarningDate descending
+                            select new Models.StockEarning
+                            {
+                                Symbol = d.Symbol,
+                                EarningDate = Convert.ToString(d.EarningDate.Year) + "-" + Convert.ToString(d.EarningDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EarningDate.Day + 100).Substring(1, 2),
+                                EarningTime = d.EarningTime
+                            }).ToList();
+            }
+            catch
+            {
+                earnings = new List<Models.StockEarning>();
+            }
+
+            return earnings.ToList();
+        }
+
     }
 }

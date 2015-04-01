@@ -1,0 +1,197 @@
+﻿
+@{
+    ViewBag.Title = "Affiliate";
+    var UserName = Request.QueryString["user"];
+}
+
+<link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
+<script src="/js/jquery-1.10.2.min.js"></script>
+<script src="/js/knockout-3.2.0.js"></script>
+<script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"></span></a>
+        </div>
+    </div>
+</nav>
+
+
+<div id="DivPurchases">
+    <div class="container">
+
+        <div class="row">
+            <h2 class="section-heading">SalesPitch</h2>
+            <div class="col-lg-6">
+                <video controls style="width:520px;height:420px;" poster="/img/logo.png">
+                    <source src="https://mediasvcmg26x4p1t4vmz.blob.core.windows.net/asset-cc1e445d-1500-80bd-b632-f1e4b77a3bb9/2015-02-16_19.mp4?sv=2012-02-12&sr=c&si=95c396b1-58bb-4e8c-ba81-0a4d6dca8891&sig=2BMDckOug7tkP2zOW0HFXo31WF9alj%2FAyZgqlPJmtEs%3D&st=2015-02-18T14%3A27%3A50Z&se=2017-02-17T14%3A27%3A50Z"
+                            type='video/mp4;codecs="avc1.42E01E, mp4a.40.2"' />
+                </video>
+            </div>
+            <div class="col-lg-6">
+                <div class="panel panel-default">
+                    <div class="panel-body"><img class="img-responsive center-block" src="/img/derekportrait-1.png" alt="" /></div>
+                    <div class="panel-footer" style="text-align:center">
+                        Derek Pilger, Founder - Magenta Trader
+                    </div>
+                    <div class="panel-body" style="text-align:center">
+                        "We did not invent cycle, trend, and range trading. The practice has been around for
+                        decades. Take a few minutes and you will see that by using current technology, we made
+                        the charts and information more clear."
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br />
+
+        <div class="row">
+            <div class="col-lg-2 pull-right">
+                <button id="CmdCoupon" type="submit" class="btn btn-primary btn-block" onclick="CmdCoupon_OnClick()">Coupons</button>
+            </div>
+        </div>
+
+        <br />
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="PurchaseGrid" class="grid"></div>
+            </div>
+        </div>
+
+        <br />
+        <br />
+
+    </div>
+</div>
+
+<div class="modal" id="Coupons">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 id="CouponsTitle" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <dl class="dl-horizontal">
+                    <dt>Code</dt>
+                    <dd>
+                        <input class="form-control" id="CouponCode" type="text" />
+                    </dd>
+                </dl>
+                <br />
+                <div id="CouponLink">&nbsp;</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var Purchases;
+    var PurchaseGrid;
+
+    function CmdCoupon_OnClick() {
+        $("#CouponsTitle").text("Coupons");
+        $('#Coupons').modal('show');
+    }
+    function CouponCode_OnExit() {
+        var CouponCode = document.getElementById('CouponCode').value;
+        if (CouponCode == "david") {
+            $("#CouponLink").empty();
+            $("#CouponLink").append("Platinum - Magenta Charts, Web99 and Realtime for Three (3) Months - $100/Month <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='da8e14f0-0439-4d31-a2f7-b1d6d8d201d0' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
+        } else {
+            $("#CouponLink").empty();
+        }
+    }
+
+    $(document).ready(function () {
+        var user = "@UserName";
+        if (user != "") {
+            $.ajax({
+                url: '/api/UserAffiliate/' + user,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (result) {
+                    if (result.length > 0) {
+
+                        var purchases = new wijmo.collections.ObservableArray();
+                        for (var i = 0; i < result.length; i++) {
+                            purchases.push({
+                                Product: result[i].ProductPackage,
+                                Price: "US$ " + result[i].Price,
+                                Purchase: result[i].AffiliateURL
+                            });
+                        }
+
+                        Purchases = new wijmo.collections.CollectionView(purchases);
+                        PurchaseGrid = new wijmo.grid.FlexGrid('#PurchaseGrid');
+                        PurchaseGrid.initialize({
+                            columns: [
+                                        {
+                                            "header": "Purchase",
+                                            "binding": "Purchase",
+                                            "width": 150,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Product",
+                                            "binding": "Product",
+                                            "allowSorting": false,
+                                            "isContentHtml": true,
+                                            "width": "*"
+                                        },
+                                        {
+                                            "header": "Price",
+                                            "binding": "Price",
+                                            "allowSorting": false,
+                                            "align": "right",
+                                            "width": 100
+                                        }
+                            ],
+                            autoGenerateColumns: false,
+                            itemsSource: Purchases,
+                            isReadOnly: true,
+                            selectionMode: wijmo.grid.SelectionMode.Cell
+                        });
+                        PurchaseGrid.trackChanges = true;
+                        PurchaseGrid.pageSize = 15;
+                        PurchaseGrid.itemFormatter = function (panel, r, c, cell) {
+                            if (panel.cellType == wijmo.grid.CellType.Cell) {
+                                var flex = panel.grid;
+                                flex.rows[r].height = 30;
+                            }
+                        };
+                    }
+                }
+            });
+        }
+
+        document.getElementById('CouponCode').addEventListener("blur", CouponCode_OnExit, true);
+        document.getElementById("CouponCode").addEventListener("keydown", function (e) {
+            if (e.keyCode == 13) { CouponCode_OnExit(); }
+        }, false);
+    });
+</script>
+
+<script src="/lib/jquery/js/jquery.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.js"></script>
+<script src="/wijmo/controls/wijmo.input.min.js"></script>
+<script src="/wijmo/interop/knockout/wijmo.knockout.min.js"></script>

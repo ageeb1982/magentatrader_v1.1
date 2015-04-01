@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "UserLedger";
+}
+
+@{
+    ViewBag.Title = "UserLedger";
+}
+
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/styles.css" rel="stylesheet" />
+
+<script src="/js/jquery.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+
+<script src="/js/date.js"></script>
+
+<script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.input.min.js"></script>
+<script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.chart.min.js"></script>
+
+<link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
+
+@*Menu*@
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="~/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"></span></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li role="presentation" class="active"><a href="~/Admin/user">Users</a></li>
+                <li role="presentation"><a href="~/Admin/Event">Event</a></li>
+                <li role="presentation"><a href="~/Admin/Sales">Sales</a></li>
+                <li role="presentation"><a href="~/Admin/Product">Products</a></li>
+                <li role="presentation"><a href="~/Admin/Package">Packages</a></li>
+                <li role="presentation"><a href="~/Admin/News">News</a></li>
+                <li role="presentation"><a href="~/Admin/"><i class="fa fa-home"></i></a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+@*List*@
+<div id="DivUserLedger">
+
+    <div class="container">
+
+        <div class="row">
+            <h2 class="section-heading">UserLeder</h2>
+            <div class="col-lg-11">
+                <h4>User Ledger</h4>
+            </div>
+        </div>
+
+    </div>
+
+</div>

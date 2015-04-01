@@ -33,6 +33,14 @@ namespace MagentaTrader.Controllers
         }
 
         //
+        // GET: /Admin/UserLedger
+        [Authorize]
+        public ActionResult UserLedger()
+        {
+            return View();
+        }
+
+        //
         // GET: /Admin/News
         [Authorize]
         public ActionResult News()

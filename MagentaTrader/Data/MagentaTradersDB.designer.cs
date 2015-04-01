@@ -45,9 +45,6 @@ namespace MagentaTrader.Data
     partial void InsertMstSymbol(MstSymbol instance);
     partial void UpdateMstSymbol(MstSymbol instance);
     partial void DeleteMstSymbol(MstSymbol instance);
-    partial void InsertMstNew(MstNew instance);
-    partial void UpdateMstNew(MstNew instance);
-    partial void DeleteMstNew(MstNew instance);
     partial void InsertMstUser(MstUser instance);
     partial void UpdateMstUser(MstUser instance);
     partial void DeleteMstUser(MstUser instance);
@@ -60,6 +57,12 @@ namespace MagentaTrader.Data
     partial void InsertMstProductPackage(MstProductPackage instance);
     partial void UpdateMstProductPackage(MstProductPackage instance);
     partial void DeleteMstProductPackage(MstProductPackage instance);
+    partial void InsertTrnAffiliate(TrnAffiliate instance);
+    partial void UpdateTrnAffiliate(TrnAffiliate instance);
+    partial void DeleteTrnAffiliate(TrnAffiliate instance);
+    partial void InsertMstNew(MstNew instance);
+    partial void UpdateMstNew(MstNew instance);
+    partial void DeleteMstNew(MstNew instance);
     #endregion
 		
 		public MagentaTradersDBDataContext() : 
@@ -132,14 +135,6 @@ namespace MagentaTrader.Data
 			}
 		}
 		
-		public System.Data.Linq.Table<MstNew> MstNews
-		{
-			get
-			{
-				return this.GetTable<MstNew>();
-			}
-		}
-		
 		public System.Data.Linq.Table<MstUser> MstUsers
 		{
 			get
@@ -169,6 +164,22 @@ namespace MagentaTrader.Data
 			get
 			{
 				return this.GetTable<MstProductPackage>();
+			}
+		}
+		
+		public System.Data.Linq.Table<TrnAffiliate> TrnAffiliates
+		{
+			get
+			{
+				return this.GetTable<TrnAffiliate>();
+			}
+		}
+		
+		public System.Data.Linq.Table<MstNew> MstNews
+		{
+			get
+			{
+				return this.GetTable<MstNew>();
 			}
 		}
 	}
@@ -1722,140 +1733,6 @@ namespace MagentaTrader.Data
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.MstNews")]
-	public partial class MstNew : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _Id;
-		
-		private System.DateTime _NewsDate;
-		
-		private string _News;
-		
-		private string _Particulars;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnIdChanging(int value);
-    partial void OnIdChanged();
-    partial void OnNewsDateChanging(System.DateTime value);
-    partial void OnNewsDateChanged();
-    partial void OnNewsChanging(string value);
-    partial void OnNewsChanged();
-    partial void OnParticularsChanging(string value);
-    partial void OnParticularsChanged();
-    #endregion
-		
-		public MstNew()
-		{
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int Id
-		{
-			get
-			{
-				return this._Id;
-			}
-			set
-			{
-				if ((this._Id != value))
-				{
-					this.OnIdChanging(value);
-					this.SendPropertyChanging();
-					this._Id = value;
-					this.SendPropertyChanged("Id");
-					this.OnIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NewsDate", DbType="DateTime NOT NULL")]
-		public System.DateTime NewsDate
-		{
-			get
-			{
-				return this._NewsDate;
-			}
-			set
-			{
-				if ((this._NewsDate != value))
-				{
-					this.OnNewsDateChanging(value);
-					this.SendPropertyChanging();
-					this._NewsDate = value;
-					this.SendPropertyChanged("NewsDate");
-					this.OnNewsDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_News", DbType="NVarChar(255)")]
-		public string News
-		{
-			get
-			{
-				return this._News;
-			}
-			set
-			{
-				if ((this._News != value))
-				{
-					this.OnNewsChanging(value);
-					this.SendPropertyChanging();
-					this._News = value;
-					this.SendPropertyChanged("News");
-					this.OnNewsChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Particulars", DbType="NVarChar(MAX)")]
-		public string Particulars
-		{
-			get
-			{
-				return this._Particulars;
-			}
-			set
-			{
-				if ((this._Particulars != value))
-				{
-					this.OnParticularsChanging(value);
-					this.SendPropertyChanging();
-					this._Particulars = value;
-					this.SendPropertyChanged("Particulars");
-					this.OnParticularsChanged();
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-	}
-	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.MstUser")]
 	public partial class MstUser : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -1877,6 +1754,8 @@ namespace MagentaTrader.Data
 		private string _AspNetUserId;
 		
 		private EntitySet<TrnSale> _TrnSales;
+		
+		private EntitySet<TrnAffiliate> _TrnAffiliates;
 		
 		private EntityRef<AspNetUser> _AspNetUser;
 		
@@ -1903,6 +1782,7 @@ namespace MagentaTrader.Data
 		public MstUser()
 		{
 			this._TrnSales = new EntitySet<TrnSale>(new Action<TrnSale>(this.attach_TrnSales), new Action<TrnSale>(this.detach_TrnSales));
+			this._TrnAffiliates = new EntitySet<TrnAffiliate>(new Action<TrnAffiliate>(this.attach_TrnAffiliates), new Action<TrnAffiliate>(this.detach_TrnAffiliates));
 			this._AspNetUser = default(EntityRef<AspNetUser>);
 			OnCreated();
 		}
@@ -2064,6 +1944,19 @@ namespace MagentaTrader.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnAffiliate", Storage="_TrnAffiliates", ThisKey="Id", OtherKey="UserId")]
+		public EntitySet<TrnAffiliate> TrnAffiliates
+		{
+			get
+			{
+				return this._TrnAffiliates;
+			}
+			set
+			{
+				this._TrnAffiliates.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="AspNetUser_MstUser", Storage="_AspNetUser", ThisKey="AspNetUserId", OtherKey="Id", IsForeignKey=true)]
 		public AspNetUser AspNetUser
 		{
@@ -2125,6 +2018,18 @@ namespace MagentaTrader.Data
 		}
 		
 		private void detach_TrnSales(TrnSale entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = null;
+		}
+		
+		private void attach_TrnAffiliates(TrnAffiliate entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = this;
+		}
+		
+		private void detach_TrnAffiliates(TrnAffiliate entity)
 		{
 			this.SendPropertyChanging();
 			entity.MstUser = null;
@@ -2546,6 +2451,8 @@ namespace MagentaTrader.Data
 		
 		private EntitySet<TrnSale> _TrnSales;
 		
+		private EntitySet<TrnAffiliate> _TrnAffiliates;
+		
 		private EntityRef<MstProduct> _MstProduct;
 		
     #region Extensibility Method Definitions
@@ -2579,6 +2486,7 @@ namespace MagentaTrader.Data
 		public MstProductPackage()
 		{
 			this._TrnSales = new EntitySet<TrnSale>(new Action<TrnSale>(this.attach_TrnSales), new Action<TrnSale>(this.detach_TrnSales));
+			this._TrnAffiliates = new EntitySet<TrnAffiliate>(new Action<TrnAffiliate>(this.attach_TrnAffiliates), new Action<TrnAffiliate>(this.detach_TrnAffiliates));
 			this._MstProduct = default(EntityRef<MstProduct>);
 			OnCreated();
 		}
@@ -2820,6 +2728,19 @@ namespace MagentaTrader.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstProductPackage_TrnAffiliate", Storage="_TrnAffiliates", ThisKey="Id", OtherKey="ProductPackageId")]
+		public EntitySet<TrnAffiliate> TrnAffiliates
+		{
+			get
+			{
+				return this._TrnAffiliates;
+			}
+			set
+			{
+				this._TrnAffiliates.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstProduct_MstProductPackage", Storage="_MstProduct", ThisKey="ProductId", OtherKey="Id", IsForeignKey=true)]
 		public MstProduct MstProduct
 		{
@@ -2884,6 +2805,392 @@ namespace MagentaTrader.Data
 		{
 			this.SendPropertyChanging();
 			entity.MstProductPackage = null;
+		}
+		
+		private void attach_TrnAffiliates(TrnAffiliate entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstProductPackage = this;
+		}
+		
+		private void detach_TrnAffiliates(TrnAffiliate entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstProductPackage = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.TrnAffiliate")]
+	public partial class TrnAffiliate : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private int _ProductPackageId;
+		
+		private int _UserId;
+		
+		private string _AffiliateURL;
+		
+		private EntityRef<MstProductPackage> _MstProductPackage;
+		
+		private EntityRef<MstUser> _MstUser;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnProductPackageIdChanging(int value);
+    partial void OnProductPackageIdChanged();
+    partial void OnUserIdChanging(int value);
+    partial void OnUserIdChanged();
+    partial void OnAffiliateURLChanging(string value);
+    partial void OnAffiliateURLChanged();
+    #endregion
+		
+		public TrnAffiliate()
+		{
+			this._MstProductPackage = default(EntityRef<MstProductPackage>);
+			this._MstUser = default(EntityRef<MstUser>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ProductPackageId", DbType="Int NOT NULL")]
+		public int ProductPackageId
+		{
+			get
+			{
+				return this._ProductPackageId;
+			}
+			set
+			{
+				if ((this._ProductPackageId != value))
+				{
+					if (this._MstProductPackage.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnProductPackageIdChanging(value);
+					this.SendPropertyChanging();
+					this._ProductPackageId = value;
+					this.SendPropertyChanged("ProductPackageId");
+					this.OnProductPackageIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserId", DbType="Int NOT NULL")]
+		public int UserId
+		{
+			get
+			{
+				return this._UserId;
+			}
+			set
+			{
+				if ((this._UserId != value))
+				{
+					if (this._MstUser.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnUserIdChanging(value);
+					this.SendPropertyChanging();
+					this._UserId = value;
+					this.SendPropertyChanged("UserId");
+					this.OnUserIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AffiliateURL", DbType="NVarChar(MAX) NOT NULL", CanBeNull=false)]
+		public string AffiliateURL
+		{
+			get
+			{
+				return this._AffiliateURL;
+			}
+			set
+			{
+				if ((this._AffiliateURL != value))
+				{
+					this.OnAffiliateURLChanging(value);
+					this.SendPropertyChanging();
+					this._AffiliateURL = value;
+					this.SendPropertyChanged("AffiliateURL");
+					this.OnAffiliateURLChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstProductPackage_TrnAffiliate", Storage="_MstProductPackage", ThisKey="ProductPackageId", OtherKey="Id", IsForeignKey=true)]
+		public MstProductPackage MstProductPackage
+		{
+			get
+			{
+				return this._MstProductPackage.Entity;
+			}
+			set
+			{
+				MstProductPackage previousValue = this._MstProductPackage.Entity;
+				if (((previousValue != value) 
+							|| (this._MstProductPackage.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._MstProductPackage.Entity = null;
+						previousValue.TrnAffiliates.Remove(this);
+					}
+					this._MstProductPackage.Entity = value;
+					if ((value != null))
+					{
+						value.TrnAffiliates.Add(this);
+						this._ProductPackageId = value.Id;
+					}
+					else
+					{
+						this._ProductPackageId = default(int);
+					}
+					this.SendPropertyChanged("MstProductPackage");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnAffiliate", Storage="_MstUser", ThisKey="UserId", OtherKey="Id", IsForeignKey=true)]
+		public MstUser MstUser
+		{
+			get
+			{
+				return this._MstUser.Entity;
+			}
+			set
+			{
+				MstUser previousValue = this._MstUser.Entity;
+				if (((previousValue != value) 
+							|| (this._MstUser.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._MstUser.Entity = null;
+						previousValue.TrnAffiliates.Remove(this);
+					}
+					this._MstUser.Entity = value;
+					if ((value != null))
+					{
+						value.TrnAffiliates.Add(this);
+						this._UserId = value.Id;
+					}
+					else
+					{
+						this._UserId = default(int);
+					}
+					this.SendPropertyChanged("MstUser");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.MstNews")]
+	public partial class MstNew : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private System.DateTime _NewsDate;
+		
+		private string _News;
+		
+		private string _Particulars;
+		
+		private bool _IsActive;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnNewsDateChanging(System.DateTime value);
+    partial void OnNewsDateChanged();
+    partial void OnNewsChanging(string value);
+    partial void OnNewsChanged();
+    partial void OnParticularsChanging(string value);
+    partial void OnParticularsChanged();
+    partial void OnIsActiveChanging(bool value);
+    partial void OnIsActiveChanged();
+    #endregion
+		
+		public MstNew()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NewsDate", DbType="DateTime NOT NULL")]
+		public System.DateTime NewsDate
+		{
+			get
+			{
+				return this._NewsDate;
+			}
+			set
+			{
+				if ((this._NewsDate != value))
+				{
+					this.OnNewsDateChanging(value);
+					this.SendPropertyChanging();
+					this._NewsDate = value;
+					this.SendPropertyChanged("NewsDate");
+					this.OnNewsDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_News", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		public string News
+		{
+			get
+			{
+				return this._News;
+			}
+			set
+			{
+				if ((this._News != value))
+				{
+					this.OnNewsChanging(value);
+					this.SendPropertyChanging();
+					this._News = value;
+					this.SendPropertyChanged("News");
+					this.OnNewsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Particulars", DbType="NVarChar(MAX) NOT NULL", CanBeNull=false)]
+		public string Particulars
+		{
+			get
+			{
+				return this._Particulars;
+			}
+			set
+			{
+				if ((this._Particulars != value))
+				{
+					this.OnParticularsChanging(value);
+					this.SendPropertyChanging();
+					this._Particulars = value;
+					this.SendPropertyChanged("Particulars");
+					this.OnParticularsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsActive", DbType="Bit NOT NULL")]
+		public bool IsActive
+		{
+			get
+			{
+				return this._IsActive;
+			}
+			set
+			{
+				if ((this._IsActive != value))
+				{
+					this.OnIsActiveChanging(value);
+					this.SendPropertyChanging();
+					this._IsActive = value;
+					this.SendPropertyChanged("IsActive");
+					this.OnIsActiveChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 }

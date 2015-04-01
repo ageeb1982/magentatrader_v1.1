@@ -14,5 +14,12 @@ namespace MagentaTrader.Controllers
         {
             return View();
         }
+
+        //
+        // GET: /Purchase/Affiliate
+        public ActionResult Affiliate()
+        {
+            return View();
+        }
 	}
 }

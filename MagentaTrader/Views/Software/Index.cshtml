@@ -203,6 +203,10 @@
                 <h4 id="EarningsTitle" class="modal-title"></h4>
             </div>
             <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-3"><input class="form-control" id="ChronologicalOrder" type="checkbox" onclick="clearEarningChart()" /></div>
+                    <div class="col-lg-9" style="padding-top: 10px;">In Chronological Order.</div>
+                </div>
                 <div id="DateButtons"class="row"></div>
                 <div id="earningChartdiv" style="width: 100%; height: 400px; padding: 20px 10px 10px 10px; "></div>
             </div>
@@ -323,7 +327,7 @@
     // Earnings
 
     function openEarnings() {
-        $("#EarningsTitle").text(dataSymbol + " Earnings");
+        $("#EarningsTitle").text(dataSymbol + " Earnings Percentage (%)");
         $('#Earnings').modal('show');
 
         $("#DateButtons").empty();
@@ -332,12 +336,22 @@
         }
         $("#earningChartdiv").empty();
     }
+    function clearEarningChart() {
+        $("#earningChartdiv").empty();
+    }
     function createEarningChart(button) {
         var GreenColor = "#0FB203";
         var RedColor = "#A80008";
 
+        var url = "";
+        if (document.getElementById('ChronologicalOrder').checked == true) {
+            url = '/api/StockEarningHistoryChronologically/' + dataSymbol + '/' + button.textContent;
+        } else {
+            url = '/api/StockEarningHistory/' + dataSymbol + '/' + button.textContent;
+        }
+
         $.ajax({
-            url: '/api/StockEarningHistory/' + dataSymbol + '/' + button.textContent,
+            url: url,
             cache: false,
             type: 'GET',
             contentType: 'application/json; charset=utf-8',
@@ -432,7 +446,7 @@
     // Pre/Post Earnings
 
     function openPrePostEarnings() {
-        $("#PrePostEarningsTitle").text(dataSymbol + " Pre/Post Earnings");
+        $("#PrePostEarningsTitle").text(dataSymbol + " Pre/Post Earnings Percentage (%)");
         $('#PrePostEarnings').modal('show');
 
         $("#PrePostDateButtons").empty();
@@ -497,127 +511,127 @@
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "-10",
                                         "binding": "dayB10",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "-9",
                                         "binding": "dayB09",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "-8",
                                         "binding": "dayB08",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "-7",
                                         "binding": "dayB07",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "-6",
                                         "binding": "dayB06",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "-5",
                                         "binding": "dayB05",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "-4",
                                         "binding": "dayB04",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "-3",
                                         "binding": "dayB03",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "-2",
                                         "binding": "dayB02",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "-1",
                                         "binding": "dayB01",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "Day 0",
+                                        "header": "E",
                                         "binding": "day0",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "+1",
                                         "binding": "dayA01",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "+2",
                                         "binding": "dayA02",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "+3",
                                         "binding": "dayA03",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "+4",
                                         "binding": "dayA04",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "+5",
                                         "binding": "dayA05",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "+6",
                                         "binding": "dayA06",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "+7",
                                         "binding": "dayA07",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "+8",
                                         "binding": "dayA08",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "+9",
                                         "binding": "dayA09",
                                         "width": "11*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "%",
+                                        "header": "+10",
                                         "binding": "dayA10",
                                         "width": "11*",
                                         "isContentHtml": true
@@ -651,12 +665,24 @@
             if (parseDate(earningDate).equals(chartDate) == true) {
 
                 if (interval > 0) {
-                    startPrice = chartData[i - 1].close;
-                    endPrice = chartData[i - (Math.abs(interval)+1)].close;
+                    if (i - 1 >= 0) {
+                        startPrice = chartData[i - 1].close;
+                    } else {
+                        startPrice = 0;
+                    }
+                    if((i - (Math.abs(interval) + 1)) >= 0) {
+                        endPrice = chartData[i - (Math.abs(interval) + 1)].close;
+                    } else {
+                        endPrice = 0;
+                    }
                 } else if (interval == 0) {
                     if (earningTime == "After Market Close") {
                         startPrice = chartData[i].close;
-                        endPrice = chartData[i - 1].close;
+                        if (i - 1 >= 0) {
+                            endPrice = chartData[i - 1].close;
+                        } else {
+                            endPrice = 0;
+                        }
                     } else {
                         startPrice = chartData[i + 1].close;
                         endPrice = chartData[i].close;
@@ -666,7 +692,7 @@
                     endPrice = chartData[i + Math.abs(interval)].close;
                 }
 
-                if (startPrice > 0) {
+                if (startPrice > 0 && endPrice > 0) {
                     percentage = ((endPrice - startPrice) / startPrice) * 100;
                 } else {
                     percentage = 0;;
