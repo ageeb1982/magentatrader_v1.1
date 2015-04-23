@@ -164,6 +164,121 @@ namespace MagentaTrader.Controllers
             }
         }
 
+        // GET api/GetProduct/1
+        [Authorize]
+        [Route("api/GetProduct/{Id}")]
+        public List<Models.ProductPackage> GetProductInfo(int Id)
+        {
+            var retryCounter = 0;
+            List<Models.ProductPackage> values;
+
+            while (true)
+            {
+                try
+                {
+                    var Info = from p in db.MstProductPackages
+                               where p.Id == Id
+                               select new Models.ProductPackage
+                               {
+                                   Id = p.Id,
+                                   Product = p.ProductPackage,
+                                   SKU = p.SKU,
+                                   Price = p.Price,
+                                   ProductId = p.ProductId,
+                                   IsAvailable = p.IsAvailable,
+                                   WithCoupon = p.WithCoupon,
+                                   WithSoftware = p.WithSoftware,
+                                   IsReoccuring = p.IsReoccuring,
+                                   Particulars = p.Particulars,
+                                   PackageURL = p.PackageURL
+                               };
+                    if (Info.Count() > 0)
+                    {
+                        values = Info.ToList();
+                    }
+                    else
+                    {
+                        values = new List<Models.ProductPackage>();
+                    }
+                    break;
+                }
+                catch
+                {
+                    if (retryCounter == 3)
+                    {
+                        values = new List<Models.ProductPackage>();
+                        break;
+                    }
+                    System.Threading.Thread.Sleep(1000);
+                    retryCounter++;
+                }
+            }
+            return values;
+        }
+
+        // GET api/GetPackageUsers/5
+        [Authorize]
+        [Route("api/GetPackageUsers/{Id}")]
+        public List<Models.User> GetPackageUsers(int id)
+        {
+            var retryCounter = 0;
+            List<Models.User> values;
+
+            while (true)
+            {
+                try
+                {
+                    var Users = from m in db.MstUsers
+                                join s in db.TrnSales
+                                on m.Id equals s.UserId
+                                where s.ProductPackageId == id
+                                select new Models.User
+                                {
+                                    Id = m.Id,
+                                    UserName = m.UserName,
+                                    FirstName = m.FirstName,
+                                    LastName = m.LastName,
+                                    EmailAddress = m.EmailAddress,
+                                    PhoneNumber = m.PhoneNumber,
+                                    SaleId = s.Id,
+                                    Price = s.Price,
+                                    SalesNumber = s.SalesNumber,
+                                    SalesDate = s.SalesDate.ToShortDateString(),
+                                    RenewalDate = s.RenewalDate.ToShortDateString(),
+                                    ExpiryDate = s.ExpiryDate.ToShortDateString(),
+                                    Particulars = s.Particulars,
+                                    Quantity = s.Quantity,
+                                    Amount = s.Amount,
+                                    IsActive = s.IsActive,
+                                    IsRefunded = s.IsRefunded,
+                                    ProductPackageId = s.ProductPackageId,
+                                    ProductPackage = s.MstProductPackage.ProductPackage
+                                };
+                    if (Users.Count() > 0)
+                    {
+                        values = Users.ToList();
+                    }
+                    else
+                    {
+                        values = new List<Models.User>();
+                    }
+                    break;
+                }
+                catch
+                {
+                    if (retryCounter == 3)
+                    {
+                        values = new List<Models.User>();
+                        break;
+                    }
+
+                    System.Threading.Thread.Sleep(1000);
+                    retryCounter++;
+                }
+            }
+            return values;
+        }
+
     }
 
 

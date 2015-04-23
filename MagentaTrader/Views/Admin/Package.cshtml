@@ -330,6 +330,10 @@
         }
     }
 
+    function CmdLedgerView_OnClick(Id) {
+        window.location.href = '/Admin/PackageLedger?product=' + Id;
+    }
+
     function getProductsList(items) {
         var retList = new Array();
 
@@ -381,6 +385,7 @@
                     for (i = 0; i < Results.length; i++) {
                         productPackages.push({
                             EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditProductPackage' onclick='CmdProductPackageEdit_OnClick()'>Edit</button>",
+                            LedgerId: "<button class='btn btn-success btn-xs' data-toggle='modal' id=" + Results[i]["Id"] + " onclick='CmdLedgerView_OnClick(this.id)'>View</button>",
                             DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteProductPackage' onclick='CmdProductPackageDelete_OnClick()'>Delete</button>",
                             Id: Results[i]["Id"],
                             ProductPackageDescription: Results[i]["ProductPackageDescription"],
@@ -460,6 +465,13 @@
                         {
                             "header": "Delete",
                             "binding": "DeleteId",
+                            "width": 60,
+                            "allowSorting": false,
+                            "isContentHtml": true
+                        },
+                        {
+                            "header": "Ledger",
+                            "binding": "LedgerId",
                             "width": 60,
                             "allowSorting": false,
                             "isContentHtml": true

@@ -66,6 +66,14 @@ namespace MagentaTrader.Controllers
         }
 
         //
+        // GET: /Admin/PackageLedger
+        [Authorize]
+        public ActionResult PackageLedger()
+        {
+            return View();
+        }
+
+        //
         // GET: /Admin/Sales
         [Authorize]
         public ActionResult Sales()

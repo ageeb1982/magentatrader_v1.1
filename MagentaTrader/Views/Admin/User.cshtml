@@ -59,7 +59,14 @@
         </div>
 
         <br />
-
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="Filter">
+                    <input id="InputFilter" placeholder="Search User" />
+                </div>
+                <input class="form-control" id="DateFilter_Data" type="hidden" />
+            </div>
+        </div>
         <div class="row">
             <div class="col-lg-12">
                 <div id="UserGrid" class="grid"></div>
@@ -254,11 +261,14 @@
             }
         }
     }
+
+    function CmdLedgerView_OnClick(id) {
+        window.location.href = '/Admin/UserLedger?user=' + id;
+    }
+
     function CmdUserCancel_OnClick() {
         $('#UserEdit').modal('show');
         $('#UserEdit').modal('hide');
-
-
     }
 
     function GetUsers() {
@@ -277,6 +287,7 @@
                     for (i = 0; i < Results.length; i++) {
                         users.push({
                             EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditUser' onclick='CmdUserEdit_OnClick()'>Edit</button>",
+                            LedgerId: "<button class='btn btn-success btn-xs' data-toggle='modal' id=" + Results[i]["UserName"] + " onclick='CmdLedgerView_OnClick(this.id)'>View</button>",
                             DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteUser' onclick='CmdUserDelete_OnClick()'>Delete</button>",
                             Id: Results[i]["Id"],
                             UserName: Results[i]["UserName"],
@@ -361,11 +372,22 @@
 
         UserGrid = new wijmo.grid.FlexGrid('#UserGrid');
 
+        Users.canFilter = true;
+
+        var Filter = new 
+
         UserGrid.initialize({
             columns: [
                         {
                             "header": "Edit",
                             "binding": "EditId",
+                            "width": 60,
+                            "allowSorting": false,
+                            "isContentHtml": true
+                        },
+                        {
+                            "header": "Ledger",
+                            "binding": "LedgerId",
                             "width": 60,
                             "allowSorting": false,
                             "isContentHtml": true

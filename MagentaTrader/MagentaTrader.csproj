@@ -821,9 +821,13 @@
     <Content Include="js\jquery-1.10.2.min.js" />
     <Content Include="js\jquery.js" />
     <Content Include="js\jquery.slimscroll.min.js" />
+    <Content Include="js\jquery.validate.js" />
+    <Content Include="js\jquery.validate.min.js" />
     <Content Include="js\knockout-3.2.0.js" />
     <Content Include="js\morris-data.js" />
+    <Content Include="js\packageledger.js" />
     <Content Include="js\require.js" />
+    <Content Include="js\validateForm.js" />
     <Content Include="lib\bootstrap\css\bootstrap-theme.css" />
     <Content Include="lib\bootstrap\css\bootstrap-theme.min.css" />
     <Content Include="lib\bootstrap\css\bootstrap.css" />
@@ -1337,6 +1341,7 @@
     <Content Include="Views\Account\Index.cshtml" />
     <Content Include="Views\Admin\UserLedger.cshtml" />
     <Content Include="Views\Purchase\Affiliate.cshtml" />
+    <Content Include="Views\Admin\PackageLedger.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
