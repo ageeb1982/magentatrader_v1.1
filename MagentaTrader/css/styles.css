@@ -1,43 +1,91 @@
-﻿    .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover {
-        color: #555 !important;
-    }
-    a {
-        color: #337ab7 !important;
-    }
-    .info-div {
-        white-space:nowrap;
-        text-align:center;
-    }
-    .box {
-        background-color: coral;
-        width: 30%;
-        display:inline-block;
-        margin:10px 0;
-        border-radius:5px;
-    }
-    .text {
-        padding: 20px 0;
-        color:black;
-        font-weight:bold;
-        text-align:center;
-    }
-    dd {
-    margin-bottom: 8px;
-    }
-    dt {
-    margin-top: 5px;
-    }
-    .scroll{
-        max-height: 450px;
-        overflow-y: hidden;
-    }
+﻿.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover {
+    color: #555 !important;
+}
 
-    .custom-width {
-        width: 60% !important;
-    }
-    .full-width {
-        width: 100% !important;
-    }
-    #UserGrid {
-        margin-top: 17px;
-    }
+a {
+    color: #337ab7 !important;
+}
+
+.info-div {
+    white-space:nowrap;
+    text-align:center;
+}
+
+.box {
+    background-color: coral;
+    width: 30%;
+    display:inline-block;
+    margin:10px 0;
+    border-radius:5px;
+}
+
+.text {
+    padding: 20px 0;
+    color:black;
+    font-weight:bold;
+    text-align:center;
+}
+
+dd {
+    margin-bottom: 8px;
+}
+
+dt {
+    margin-top: 5px;
+}
+
+.scroll{
+    max-height: 450px;
+    overflow-y: hidden;
+}
+
+.custom-width {
+    width: 60% !important;
+}
+
+.full-width {
+    width: 100% !important;
+}
+
+#UserGrid {
+    margin-top: 17px;
+}
+
+#PurchasersLedgerGrid {
+    margin-top: 10px;
+}
+
+.info-div-ledger {
+    white-space:nowrap;
+    text-align:center;
+}
+
+.box-ledger {
+  width: 68%;
+  display: inline-block;
+  margin: 5px 0;
+  border-radius: 5px;
+}
+
+.text-ledger {
+    padding: 10px 0;
+    text-align:center;
+}
+
+.fieldLabel-ledger {
+  width: 30%;
+  display: inline-block;
+  margin: 5px 0px;
+  border-radius: 5px;
+}
+
+.user-fieldLabel-ledger {
+  width: 15%;
+  display: inline-block;
+  margin: 5px 0px;
+  border-radius: 5px;
+}
+
+.header {
+    margin-top: 80px;
+}

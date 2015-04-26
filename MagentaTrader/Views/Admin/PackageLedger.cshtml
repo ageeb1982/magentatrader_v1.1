@@ -3,12 +3,13 @@
 }
 
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
-<link href="/css/site.css" rel="stylesheet" />
+<link href="~/css/styles.css" rel="stylesheet" />
 
 <script src="/js/jquery.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
 
 <script src="/js/date.js"></script>
+<script src="/js/jquery.slimscroll.min.js"></script>
 
 <script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
 <script src="/wijmo/controls/wijmo.input.min.js"></script>
@@ -50,90 +51,90 @@
 
         <div class="row">
             <div class="col-lg-11">
-                <h4>Package Ledger</h4>
+                <h4 class="header">Package Ledger</h4>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-6">
-                <div class="info-div">
-                    <div class="fieldLabel">
+                <div class="info-div-ledger">
+                    <div class="fieldLabel-ledger">
                         <div class="text">Product Package</div>
                     </div>
-                    <div class="box">
+                    <div class="box-ledger">
                         <input class="form-control" id="ProductPackage" />
                     </div>
                 </div>
-                <div class="info-div">
-                    <div class="fieldLabel">
-                        <div class="text">SKU</div>
+                <div class="info-di-ledgerv">
+                    <div class="fieldLabel-ledger">
+                        <div class="text-ledger">SKU</div>
                     </div>
-                    <div class="box">
+                    <div class="box-ledger">
                         <input class="form-control" id="SKU" />
                     </div>
                 </div>
-                <div class="info-div">
-                    <div class="fieldLabel">
-                        <div class="text">Price</div>
+                <div class="info-div-ledger">
+                    <div class="fieldLabel-ledger">
+                        <div class="text-ledger">Price</div>
                     </div>
-                    <div class="box">
+                    <div class="box-ledger">
                         <input class="form-control" id="Price" />
                     </div>
                 </div>
-                <div class="info-div">
-                    <div class="fieldLabel">
+                <div class="info-div-ledger">
+                    <div class="fieldLabel-ledger">
                         <div class="text">Product</div>
                     </div>
-                    <div class="box">
+                    <div class="box-ledger">
                         <input class="form-control" id="Product" />
                     </div>
                 </div>
-                <div class="info-div">
-                    <div class="fieldLabel">
-                        <div class="text">Available</div>
+                <div class="info-div-ledger">
+                    <div class="fieldLabel-ledger">
+                        <div class="text-ledger">Available</div>
                     </div>
-                    <div class="box">
+                    <div class="box-ledger">
                         <input id="IsAvailable" type="checkbox" disabled />
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="info-div">
-                    <div class="fieldLabel">
-                        <div class="text">Coupon</div>
+                <div class="info-div-ledger">
+                    <div class="fieldLabel-ledger">
+                        <div class="text-ledger">Coupon</div>
                     </div>
-                    <div class="box">
+                    <div class="box-ledger">
                         <input id="WithCoupon" type="checkbox" disabled />
                     </div>
                 </div>
-                <div class="info-div">
-                    <div class="fieldLabel">
-                        <div class="text">Software</div>
+                <div class="info-div-ledger">
+                    <div class="fieldLabel-ledger">
+                        <div class="text-ledger">Software</div>
                     </div>
-                    <div class="box">
+                    <div class="box-ledger">
                         <input id="WithSoftware" type="checkbox" disabled />
                     </div>
                 </div>
-                <div class="info-div">
-                    <div class="fieldLabel">
-                        <div class="text">Reoccurring</div>
+                <div class="info-div-ledger">
+                    <div class="fieldLabel-ledger">
+                        <div class="text-ledger">Reoccurring</div>
                     </div>
-                    <div class="box">
+                    <div class="box-ledger">
                         <input id="IsReoccuring" type="checkbox" disabled />
                     </div>
                 </div>
-                <div class="info-div">
-                    <div class="fieldLabel">
-                        <div class="text">Particulars</div>
+                <div class="info-div-ledger">
+                    <div class="fieldLabel-ledger">
+                        <div class="text-ledger">Particulars</div>
                     </div>
-                    <div class="box">
+                    <div class="box-ledger">
                         <input class="form-control" id="Particulars" />
                     </div>
                 </div>
-                <div class="info-div">
-                    <div class="fieldLabel">
-                        <div class="text">Package URL</div>
+                <div class="info-div-ledger">
+                    <div class="fieldLabel-ledger">
+                        <div class="text-ledger">Package URL</div>
                     </div>
-                    <div class="box">
+                    <div class="box-ledger">
                         <input class="form-control" id="PackageURL" />
                     </div>
                 </div>
@@ -472,7 +473,9 @@
     }
 
     function CmdSaleAdd_OnClick() {
-
+        
+        console.log(ProductPackageList.items[0].Id);
+        
         $('#SaleEdit').modal({
             show: true,
             backdrop: false
@@ -957,6 +960,10 @@
         btnLastPageUser.addEventListener('click', function () {
             Sales.moveToLastPage();
             UpdateNavigateButtonsUser();
+        });
+
+        $('.scroll').slimscroll({
+            height: '450px'
         });
     });
 

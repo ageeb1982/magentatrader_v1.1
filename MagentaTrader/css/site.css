@@ -105,6 +105,13 @@ textarea {
     text-align:center;
 }
 
+.fieldLabel {
+  width: 30%;
+  display: inline-block;
+  margin: 5px 0px;
+  border-radius: 5px;
+}
+
 .text-center {
     text-align: center;
 }
@@ -115,13 +122,6 @@ textarea {
 
 #SalesGrid {
     margin-top: 17px;
-}
-
-.fieldLabel {
-  width: 30%;
-  display: inline-block;
-  margin: 5px 0px;
-  border-radius: 5px;
 }
 
 /*input[type=checkbox]
