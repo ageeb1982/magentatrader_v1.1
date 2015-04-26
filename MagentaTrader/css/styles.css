@@ -38,3 +38,6 @@
     .full-width {
         width: 100% !important;
     }
+    #UserGrid {
+        margin-top: 17px;
+    }

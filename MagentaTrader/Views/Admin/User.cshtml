@@ -60,11 +60,13 @@
 
         <br />
         <div class="row">
-            <div class="col-lg-12">
-                <div id="Filter">
-                    <input id="InputFilter" placeholder="Search User" />
+            <div class="col-lg-3">
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" readonly><span class="fa fa-search"></span></button>
+                    </span>
+                    <input type="text" class="form-control" id="InputFilter" placeholder="Search User... ">
                 </div>
-                <input class="form-control" id="DateFilter_Data" type="hidden" />
             </div>
         </div>
         <div class="row">
@@ -374,7 +376,17 @@
 
         Users.canFilter = true;
 
-        var Filter = new 
+        var filterText = '';
+        
+        $('#InputFilter').keyup(function() {
+            filterText = this.value.toLowerCase();
+            Users.refresh();
+        });
+
+        Users.filter = function (item) {
+            return !filterText || (item.UserName.toLowerCase().indexOf(filterText) > -1) || (item.FirstName.toLowerCase().indexOf(filterText) > -1) || (item.LastName.toLowerCase().indexOf(filterText) > -1) || (item.EmailAddress.toLowerCase().indexOf(filterText) > -1) || (item.PhoneNumber.toLowerCase().indexOf(filterText) > -1);
+        }
+
 
         UserGrid.initialize({
             columns: [
