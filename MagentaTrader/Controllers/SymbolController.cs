@@ -94,10 +94,10 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
-        // GET api/SymbolCalendar/NYSE/10/1000000
+        // GET api/SymbolCalendar/NYSE/10/1000000/100
         [Authorize]
-        [Route("api/SymbolScreener/{Exchange}/{Price}/{Volume}")]
-        public List<Models.Symbol> GetSymbolScreener(string Exchange, decimal Price, decimal Volume)
+        [Route("api/SymbolScreener/{Exchange}/{Price}/{Volume}/{GrowthDecayRate}")]
+        public List<Models.Symbol> GetSymbolScreener(string Exchange, decimal Price, decimal Volume, decimal GrowthDecayRate)
         {
             var retryCounter = 0;
 

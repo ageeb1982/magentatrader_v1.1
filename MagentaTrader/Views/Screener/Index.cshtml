@@ -43,6 +43,10 @@
             <p>Volume</p>
             <input type="text" class="form-control" id="Volume" placeholder="Volume - [1M]">
         </div>
+        <div class="col-lg-2">
+            <p>Growth(Decay) Rate</p>
+            <input type="text" class="form-control" id="GrowthDecayRate" placeholder="Growth(Decay) - [100]">
+        </div>
     </div>
     <br />
     <div class="row">
@@ -102,11 +106,11 @@
     var btnLastPageEvent;
     var btnCurrentPageEvent;
 
-    function GetData(Exchange, Price, Volume) {
+    function GetData(Exchange, Price, Volume, GrowthDecayRate) {
         $('#loading').modal('show');
         var d = new wijmo.collections.ObservableArray();
         $.ajax({
-            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume,
+            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume + '/' + GrowthDecayRate,
             type: 'GET',
             dataType: 'json',
             success: function (result) {
@@ -215,11 +219,13 @@
         var $exchange = document.getElementById('Exchange').value;
         var $closePrice = parseFloat(document.getElementById('ClosePrice').value);
         var $volume = parseFloat(document.getElementById('Volume').value);
+        var $growthDecayRate = parseFloat(document.getElementById('GrowthDecayRate').value);
 
         $closePrice = !$closePrice ? 10 : $closePrice;
         $volume = !$volume ? 1000000 : $volume;
+        $growthDecayRate = !$growthDecayRate ? 100 : $growthDecayRate;
 
-        GetData($exchange, $closePrice, $volume);
+        GetData($exchange, $closePrice, $volume, $growthDecayRate);
     }
 
     $(document).ready(function () {
