@@ -5,10 +5,11 @@
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/css/styles.css" rel="stylesheet" />
 
-<script src="/js/jquery.js"></script>
+<script src="/js/jquery-1.10.2.min.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.js"></script>
 
 <script src="/js/date.js"></script>
+@*<script src="/js/jquery.validate.js"></script>*@
 
 <script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
 <script src="/wijmo/controls/wijmo.input.min.js"></script>
@@ -99,55 +100,57 @@
                 <h4 class="modal-title">Event Edit</h4>
             </div>
             <div class="modal-body">
-                <dl class="dl-horizontal">
-                    <dt>Date</dt>
-                    <dd>
-                        <input class="form-control" id="EventEdit_Id" type="hidden" />
-                        <div id="EventEdit_EventDate"></div>
-                        <input class="form-control" id="EventEdit_EventDate_Data" type="hidden" />
-                    </dd>
-                    <dt>Event</dt>
-                    <dd>
-                        <input class="form-control" id="EventEdit_EventDescription" type="text" />
-                    </dd>
-                    <dt>Particulars</dt>
-                    <dd>
-                        <input class="form-control" id="EventEdit_Particulars" type="text" />
-                    </dd>
-                    <dt>URL</dt>
-                    <dd>
-                        <input class="form-control" id="EventEdit_URL" type="text" />
-                    </dd>
-                    <dt>Video URL</dt>
-                    <dd>
-                        <input class="form-control" id="EventEdit_VideoURL" type="text" />
-                    </dd>
-                    <dt>Type</dt>
-                    <dd>
-                        <select class="form-control custom-width" id="EventEdit_EventType">
-                            <option value="WEBINAR">WEBINAR</option>
-                            <option value="USER">USER</option>
-                            <option value="WEB99">WEB99</option>
-                            <option value="REALTIMEBETA">REALTIMEBETA</option>
-                            <option value="WORKSHOP">WORKSHOP</option>
-                            <option value="OTHER">OTHER</option>
-                        </select>
-                    </dd>
-                    <dt>Resticted</dt>
-                    <dd>
-                        <input class="form-control" id="EventEdit_IsRestricted" type="checkbox" />
-                    </dd>
-                    <dt>Archived</dt>
-                    <dd>
-                        <input class="form-control" id="EventEdit_IsArchived" type="checkbox" />
-                    </dd>
-                </dl>
+                <form id="eventForm">
+                    <dl class="dl-horizontal">
+                        <dt>Date</dt>
+                        <dd>
+                            <input class="form-control required" id="EventEdit_Id" type="hidden" />
+                            <div id="EventEdit_EventDate" name="EventEdit_EventDate"></div>
+                            <input class="form-control" id="EventEdit_EventDate_Data" type="hidden" />
+                        </dd>
+                        <dt>Event</dt>
+                        <dd>
+                            <input class="form-control" id="EventEdit_EventDescription" name="EventEdit_EventDescription" type="text" @*required*@ />
+                        </dd>
+                        <dt>Particulars</dt>
+                        <dd>
+                            <input class="form-control" id="EventEdit_Particulars" name="EventEdit_Particulars" type="text" @*required*@ />
+                        </dd>
+                        <dt>URL</dt>
+                        <dd>
+                            <input class="form-control" id="EventEdit_URL" name="EventEdit_URL" type="url" @*required*@ />
+                        </dd>
+                        <dt>Video URL</dt>
+                        <dd>
+                            <input class="form-control" id="EventEdit_VideoURL" name="EventEdit_VideoURL" type="url" @*required*@ />
+                        </dd>
+                        <dt>Type</dt>
+                        <dd>
+                            <select class="form-control custom-width" id="EventEdit_EventType" name="EventEdit_EventType" @*required*@>
+                                <option value="WEBINAR">WEBINAR</option>
+                                <option value="USER">USER</option>
+                                <option value="WEB99">WEB99</option>
+                                <option value="REALTIMEBETA">REALTIMEBETA</option>
+                                <option value="WORKSHOP">WORKSHOP</option>
+                                <option value="OTHER">OTHER</option>
+                            </select>
+                        </dd>
+                        <dt>Resticted</dt>
+                        <dd>
+                            <input class="form-control" id="EventEdit_IsRestricted" name="EventEdit_IsRestricted" type="checkbox" />
+                        </dd>
+                        <dt>Archived</dt>
+                        <dd>
+                            <input class="form-control" id="EventEdit_IsArchived" name="EventEdit_IsArchived" type="checkbox" />
+                        </dd>
+                    </dl>
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="CmdEventEditOk" onclick="CmdEventEditOk_OnClick()">
+                <button type="submit" class="btn btn-primary" id="CmdEventEditOk" @*onclick="CmdEventEditOk_OnClick()"*@ >
                     Ok
                 </button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal" id="CmdEventEditCancel">
+                <button type="button" class="btn btn-danger" id="CmdEventEditCancel">
                     Cancel
                 </button>
             </div>
@@ -266,9 +269,10 @@
             });
         }
     }
-    function CmdEventEditOk_OnClick() {
-        if (confirm("Save Event?") == true) {
 
+    function CmdEventEditOkFunction() {
+        //console.log('hello');
+        if (confirm("Save Event?") == true) {
             var Event = new Object();
 
             Event.Id = document.getElementById('EventEdit_Id').value;
@@ -283,7 +287,7 @@
 
             var data = JSON.stringify(Event);
 
-            // Add New
+            //Add New
             if (Event.Id == 0) {
                 $.ajax({
                     type: "POST",
@@ -300,7 +304,7 @@
                     }
                 });
 
-                // Edit
+                //Edit
             } else {
                 $.ajax({
                     type: "PUT",
@@ -323,6 +327,7 @@
             }
         }
     }
+    
 
     function GetEvents() {
         var events = new wijmo.collections.ObservableArray();
@@ -408,7 +413,55 @@
         btnCurrentPageEvent.innerHTML = (Events.pageIndex + 1) + ' / ' + Events.pageCount;
     }
 
-    $(document).ready(function () {
+   // function FormValidator() {
+   //     console.log("hello");
+   //     $('form').validate({
+   //         debug: true,
+   //         rules: {
+   //             "EventEdit_EventDescription": "required"
+   //         },
+   //         messages: {
+   //             "EventEdit_EventDescription": "Please enter a valid Description"
+   //         },
+   //         submitHandler: function (form) {
+   //             form.submit();
+   //         }
+   //     });
+   //}
+
+   function FormValidate() {
+       var validator = $('form').validate({
+           rules: {
+               "EventEdit_EventDescription": "required"
+           },
+           messages: {
+               "EventEdit_EventDescription": "Please enter a valid Description"
+           },
+           submitHandler: function (form) {
+               form.submit();
+           }
+       });
+       var x = validator.form();
+       console.log(x);
+       return x;
+   }
+
+   $(document).ready(function () {
+
+       $('#CmdEventEditOk').click(function () {
+           if (FormValidate() == true) {
+               CmdEventEditOkFunction();
+               $('#EventEdit').modal('hide');
+           }
+       });
+
+       $('#CmdEventEditCancel').click(function () {
+           $("form div").removeClass("error");
+           $("form label").removeClass("error");
+           $('form')[0].reset();
+           $('#EventEdit').modal('hide');
+       });
+
         btnFirstPageEvent = document.getElementById('btnMoveToFirstPageEvent');
         btnPreviousPageEvent = document.getElementById('btnMoveToPreviousPageEvent');
         btnNextPageEvent = document.getElementById('btnMoveToNextPageEvent');
