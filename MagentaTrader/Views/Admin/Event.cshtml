@@ -9,7 +9,7 @@
 <script src="/lib/bootstrap/js/bootstrap.js"></script>
 
 <script src="/js/date.js"></script>
-@*<script src="/js/jquery.validate.js"></script>*@
+<script src="/js/jquery.validate.js"></script>
 
 <script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
 <script src="/wijmo/controls/wijmo.input.min.js"></script>
@@ -94,7 +94,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                <button type="button" class="close" @*data-dismiss="modal"*@ aria-hidden="true">
                     &times;
                 </button>
                 <h4 class="modal-title">Event Edit</h4>
@@ -105,24 +105,24 @@
                         <dt>Date</dt>
                         <dd>
                             <input class="form-control required" id="EventEdit_Id" type="hidden" />
-                            <div id="EventEdit_EventDate" name="EventEdit_EventDate"></div>
+                            <div id="EventEdit_EventDate" name="EventEdit_EventDate" ></div>
                             <input class="form-control" id="EventEdit_EventDate_Data" type="hidden" />
                         </dd>
                         <dt>Event</dt>
                         <dd>
-                            <input class="form-control" id="EventEdit_EventDescription" name="EventEdit_EventDescription" type="text" @*required*@ />
+                            <input class="form-control" id="EventEdit_EventDescription" name="EventEdit_EventDescription" type="text" required />
                         </dd>
                         <dt>Particulars</dt>
                         <dd>
-                            <input class="form-control" id="EventEdit_Particulars" name="EventEdit_Particulars" type="text" @*required*@ />
+                            <input class="form-control" id="EventEdit_Particulars" name="EventEdit_Particulars" type="text" />
                         </dd>
                         <dt>URL</dt>
                         <dd>
-                            <input class="form-control" id="EventEdit_URL" name="EventEdit_URL" type="url" @*required*@ />
+                            <input class="form-control" id="EventEdit_URL" name="EventEdit_URL" type="url" required/>
                         </dd>
                         <dt>Video URL</dt>
                         <dd>
-                            <input class="form-control" id="EventEdit_VideoURL" name="EventEdit_VideoURL" type="url" @*required*@ />
+                            <input class="form-control" id="EventEdit_VideoURL" name="EventEdit_VideoURL" type="url" />
                         </dd>
                         <dt>Type</dt>
                         <dd>
@@ -145,6 +145,24 @@
                         </dd>
                     </dl>
                 </form>
+                @*<div class="col-lg-6">
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                DropdownMenu
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Action</a></li>
+                                <li><a href="#">Another action</a></li>
+                                <li><a href="#">Something else here</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">Separated link</a></li>
+                            </ul>
+                        </div><!-- /btn-group -->
+                        <input type="text" class="form-control">
+                    </div><!-- /input-group -->
+                </div><!-- /.col-lg-6 --><br>*@
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary" id="CmdEventEditOk" @*onclick="CmdEventEditOk_OnClick()"*@ >
@@ -413,38 +431,36 @@
         btnCurrentPageEvent.innerHTML = (Events.pageIndex + 1) + ' / ' + Events.pageCount;
     }
 
-   // function FormValidator() {
-   //     console.log("hello");
-   //     $('form').validate({
-   //         debug: true,
-   //         rules: {
-   //             "EventEdit_EventDescription": "required"
-   //         },
-   //         messages: {
-   //             "EventEdit_EventDescription": "Please enter a valid Description"
-   //         },
-   //         submitHandler: function (form) {
-   //             form.submit();
-   //         }
-   //     });
-   //}
-
    function FormValidate() {
        var validator = $('form').validate({
-           rules: {
-               "EventEdit_EventDescription": "required"
-           },
-           messages: {
-               "EventEdit_EventDescription": "Please enter a valid Description"
+           rules : {
+               "EventEdit_EventDate_Data" : "required"
            },
            submitHandler: function (form) {
                form.submit();
            }
        });
+
        var x = validator.form();
        console.log(x);
        return x;
    }
+
+   $.validator.setDefaults({
+       errorPlacement: function (error, element) {
+           $(element).attr({ "title": error.append() });
+       },
+       highlight: function (element) {
+           //$(element).css({"border": "2px solid #CC0000"});
+           $(element).removeClass("textinput");
+           $(element).addClass("errorHighlight");
+       },
+       unhighlight: function (element) {
+           //$(element).css({"border": "2px solid #CC0000"});
+           $(element).removeClass("errorHighlight");
+           $(element).addClass("textinput");
+       }
+   });
 
    $(document).ready(function () {
 
@@ -455,12 +471,13 @@
            }
        });
 
-       $('#CmdEventEditCancel').click(function () {
-           $("form div").removeClass("error");
-           $("form label").removeClass("error");
+       $('#CmdEventEditCancel, .close').click(function () {
+           $("form input").removeClass("errorHighlight");
            $('form')[0].reset();
            $('#EventEdit').modal('hide');
        });
+
+       $('.close-btn').hide();
 
         btnFirstPageEvent = document.getElementById('btnMoveToFirstPageEvent');
         btnPreviousPageEvent = document.getElementById('btnMoveToPreviousPageEvent');

@@ -7,6 +7,7 @@
 
 <script src="/js/jquery.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.js"></script>
+<script src="~/js/jquery.validate.js"></script>
 
 <script src="/js/date.js"></script>
 
@@ -93,34 +94,36 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                <button type="button" class="close" @*data-dismiss="modal"*@ aria-hidden="true">
                     &times;
                 </button>
                 <h4 class="modal-title">News Edit</h4>
             </div>
             <div class="modal-body">
-                <dl class="dl-horizontal">
-                    <dt>Date</dt>
-                    <dd>
-                        <input class="form-control" id="NewsEdit_Id" type="hidden" />
-                        <input class="form-control" id="NewsEdit_NewsDate" type="text" />
-                        <input class="form-control" id="NewsEdit_NewsDate_Data" type="hidden" />
-                    </dd>
-                    <dt>News Description</dt>
-                    <dd>
-                        <input class="form-control" id="NewsEdit_NewsDescription" type="text" />
-                    </dd>
-                    <dt>Particulars</dt>
-                    <dd>
-                        <input class="form-control" id="NewsEdit_Particulars" type="text" />
-                    </dd>
-                </dl>
+                <form id="newsForm">
+                    <dl class="dl-horizontal">
+                        <dt>Date</dt>
+                        <dd>
+                            <input class="form-control" id="NewsEdit_Id" type="hidden" />
+                            <input class="form-control" id="NewsEdit_NewsDate" name="NewsEdit_NewsDate" type="text" required />
+                            <input class="form-control" id="NewsEdit_NewsDate_Data" type="hidden" />
+                        </dd>
+                        <dt>News Description</dt>
+                        <dd>
+                            <input class="form-control" id="NewsEdit_NewsDescription" name="NewsEdit_NewsDescription" type="text" required />
+                        </dd>
+                        <dt>Particulars</dt>
+                        <dd>
+                            <input class="form-control" id="NewsEdit_Particulars" name="NewsEdit_Particulars" type="text" required />
+                        </dd>
+                    </dl>
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="CmdNewsEditOk" onclick="CmdNewsEditOk_OnClick()">
+                <button type="button" class="btn btn-primary" @*data-dismiss="modal"*@ id="CmdNewsEditOk" @*onclick="CmdNewsEditOk_OnClick()"*@>
                     Ok
                 </button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal" id="CmdNewsEditCancel">
+                <button type="button" class="btn btn-danger" @*data-dismiss="modal"*@ id="CmdNewsEditCancel">
                     Cancel
                 </button>
             </div>
@@ -229,7 +232,7 @@
             });
         }
     }
-    function CmdNewsEditOk_OnClick() {
+    function CmdNewsEditOkFunction() {
         if (confirm("Save News?") == true) {
 
             var Newss = new Object();
@@ -344,7 +347,51 @@
         btnCurrentPageNews.innerHTML = (News.pageIndex + 1) + ' / ' + News.pageCount;
     }
 
+    function FormValidate() {
+        var validator = $('form').validate({
+            submitHandler: function (form) {
+                form.submit();
+            }
+        });
+
+        var x = validator.form();
+        console.log(x);
+        return x;
+    }
+
+    $.validator.setDefaults({
+        errorPlacement: function (error, element) {
+            $(element).attr({ "title": error.append() });
+        },
+        highlight: function (element) {
+            //$(element).css({"border": "2px solid #CC0000"});
+            $(element).removeClass("textinput");
+            $(element).addClass("errorHighlight");
+        },
+        unhighlight: function (element) {
+            //$(element).css({"border": "2px solid #CC0000"});
+            $(element).removeClass("errorHighlight");
+            $(element).addClass("textinput");
+        }
+    });
+
     $(document).ready(function () {
+
+        $('#CmdNewsEditOk').click(function () {
+            if (FormValidate() == true) {
+                CmdNewsEditOkFunction();
+                $('#NewsEdit').modal('hide');
+            }
+        });
+
+        $('#CmdNewsEditCancel, .close').click(function () {
+            $("form input").removeClass("errorHighlight");
+            $('form')[0].reset();
+            $('#NewsEdit').modal('hide');
+        });
+
+        $('.close-btn').hide();
+
         btnFirstPageNews = document.getElementById('btnMoveToFirstPageNews');
         btnPreviousPageNews = document.getElementById('btnMoveToPreviousPageNews');
         btnNextPageNews = document.getElementById('btnMoveToNextPageNews');

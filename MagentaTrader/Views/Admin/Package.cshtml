@@ -7,6 +7,7 @@
 
 <script src="/js/jquery.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.js"></script>
+<script src="/js/jquery.validate.js"></script>
 
 <script src="/js/date.js"></script>
 
@@ -93,62 +94,64 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                <button type="button" class="close" @*data-dismiss="modal"*@ aria-hidden="true">
                     &times;
                 </button>
                 <h4 class="modal-title">Product Package Edit</h4>
             </div>
             <div class="modal-body">
-                <dl class="dl-horizontal">
-                    <dt>Product Package </dt>
-                    <dd>
-                        <input class="form-control" id="ProductPackageEdit_Id" type="hidden" />
-                        <input class="form-control" id="ProductPackageEdit_ProductPackageDescription" type="text" />
-                    </dd>
-                    <dt>SKU</dt>
-                    <dd>
-                        <input class="form-control custom-width" id="ProductPackageEdit_SKU" type="text" />
-                    </dd>
-                    <dt>Price</dt>
-                    <dd>
-                        <input class="form-control custom-width" id="ProductPackageEdit_Price" type="text" />
-                    </dd>
-                    <dt>Product</dt>
-                    <dd>
-                        <div id="cboProductPackageEdit_ProductId" class="full-width"></div>
-                        <input class="form-control" id="ProductPackageEdit_ProductId" type="hidden" readonly="true" />
-                    </dd>
-                    <dt>Is Available</dt>
-                    <dd>
-                        <input class="form-control" id="ProductPackageEdit_IsAvailable" type="checkbox" />
-                    </dd>
-                    <dt>With Coupon</dt>
-                    <dd>
-                        <input class="form-control" id="ProductPackageEdit_WithCoupon" type="checkbox" />
-                    </dd>
-                    <dt>With Software</dt>
-                    <dd>
-                        <input class="form-control" id="ProductPackageEdit_WithSoftware" type="checkbox" />
-                    </dd>
-                    <dt>Is Reoccuring</dt>
-                    <dd>
-                        <input class="form-control" id="ProductPackageEdit_IsReoccuring" type="checkbox" />
-                    </dd>
-                    <dt>Particulars</dt>
-                    <dd>
-                        <input class="form-control" id="ProductPackageEdit_Particulars" type="text" />
-                    </dd>
-                    <dt>Package URL</dt>
-                    <dd>
-                        <input class="form-control" id="ProductPackageEdit_PackageURL" type="text" />
-                    </dd>   
-                </dl>
+                <form id="ProductPackageForm">
+                    <dl class="dl-horizontal">
+                        <dt>Product Package </dt>
+                        <dd>
+                            <input class="form-control" id="ProductPackageEdit_Id" type="hidden" />
+                            <input class="form-control" id="ProductPackageEdit_ProductPackageDescription" type="text" required />
+                        </dd>
+                        <dt>SKU</dt>
+                        <dd>
+                            <input class="form-control custom-width" id="ProductPackageEdit_SKU" name="ProductPackageEdit_SKU" type="text" required />
+                        </dd>
+                        <dt>Price</dt>
+                        <dd>
+                            <input class="form-control custom-width" id="ProductPackageEdit_Price" name="ProductPackageEdit_Price" type="text" required />
+                        </dd>
+                        <dt>Product</dt>
+                        <dd>
+                            <div id="cboProductPackageEdit_ProductId" class="full-width"></div>
+                            <input class="form-control" id="ProductPackageEdit_ProductId" type="hidden" readonly="true" />
+                        </dd>
+                        <dt>Is Available</dt>
+                        <dd>
+                            <input class="form-control" id="ProductPackageEdit_IsAvailable" type="checkbox" />
+                        </dd>
+                        <dt>With Coupon</dt>
+                        <dd>
+                            <input class="form-control" id="ProductPackageEdit_WithCoupon" type="checkbox" />
+                        </dd>
+                        <dt>With Software</dt>
+                        <dd>
+                            <input class="form-control" id="ProductPackageEdit_WithSoftware" type="checkbox" />
+                        </dd>
+                        <dt>Is Reoccuring</dt>
+                        <dd>
+                            <input class="form-control" id="ProductPackageEdit_IsReoccuring" type="checkbox" />
+                        </dd>
+                        <dt>Particulars</dt>
+                        <dd>
+                            <input class="form-control" id="ProductPackageEdit_Particulars" name="ProductPackageEdit_Particulars" type="text" required />
+                        </dd>
+                        <dt>Package URL</dt>
+                        <dd>
+                            <input class="form-control" id="ProductPackageEdit_PackageURL" type="text" />
+                        </dd>
+                    </dl>
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="CmdProductPackageEditOk" onclick="CmdProductPackageEditOk_OnClick()">
+                <button type="button" class="btn btn-primary" @*data-dismiss="modal"*@ id="CmdProductPackageEditOk" @*onclick="CmdProductPackageEditOk_OnClick()"*@>
                     Ok
                 </button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal" id="CmdProductPackageEditCancel">
+                <button type="button" class="btn btn-danger" @*data-dismiss="modal"*@ id="CmdProductPackageEditCancel">
                     Cancel
                 </button>
             </div>
@@ -269,7 +272,7 @@
             });
         }
     }
-    function CmdProductPackageEditOk_OnClick() {
+    function CmdProductPackageEditOkFunction() {
         if (confirm("Save Product Package?") == true) {
 
             var ProductPackage = new Object();
@@ -385,7 +388,7 @@
                     for (i = 0; i < Results.length; i++) {
                         productPackages.push({
                             EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditProductPackage' onclick='CmdProductPackageEdit_OnClick()'>Edit</button>",
-                            LedgerId: "<button class='btn btn-success btn-xs' data-toggle='modal' id=" + Results[i]["Id"] + " onclick='CmdLedgerView_OnClick(this.id)'>View</button>",
+                            LedgerId: "<button class='btn btn-success btn-xs' data-toggle='modal' id=" + Results[i]["Id"] + " onclick='CmdLedgerView_OnClick(this.id)'>Ledger</button>",
                             DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteProductPackage' onclick='CmdProductPackageDelete_OnClick()'>Delete</button>",
                             Id: Results[i]["Id"],
                             ProductPackageDescription: Results[i]["ProductPackageDescription"],
@@ -440,7 +443,51 @@
         btnCurrentPageProductPackage.innerHTML = (ProductPackages.pageIndex + 1) + ' / ' + ProductPackages.pageCount;
     }
 
+    function FormValidate() {
+        var validator = $('form').validate({
+            submitHandler: function (form) {
+                form.submit();
+            }
+        });
+
+        var x = validator.form();
+        console.log(x);
+        return x;
+    }
+
+    $.validator.setDefaults({
+        errorPlacement: function (error, element) {
+            $(element).attr({ "title": error.append() });
+        },
+        highlight: function (element) {
+            //$(element).css({"border": "2px solid #CC0000"});
+            $(element).removeClass("textinput");
+            $(element).addClass("errorHighlight");
+        },
+        unhighlight: function (element) {
+            //$(element).css({"border": "2px solid #CC0000"});
+            $(element).removeClass("errorHighlight");
+            $(element).addClass("textinput");
+        }
+    });
+
     $(document).ready(function () {
+
+        $('#CmdProductPackageEditOk').click(function () {
+            if (FormValidate() == true) {
+                CmdProductPackageEditOkFunction();
+                $('#ProductPackageEdit').modal('hide');
+            }
+        });
+
+        $('#CmdProductPackageEditCancel, .close').click(function () {
+            $("form input").removeClass("errorHighlight");
+            $('form')[0].reset();
+            $('#ProductPackageEdit').modal('hide');
+        });
+
+        $('.close-btn').hide();
+
         btnFirstPageProductPackage = document.getElementById('btnMoveToFirstPageProductPackage');
         btnPreviousPageProductPackage = document.getElementById('btnMoveToPreviousPageProductPackage');
         btnNextPageProductPackage = document.getElementById('btnMoveToNextPageProductPackage');
