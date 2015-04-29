@@ -111,7 +111,7 @@
     }
     function CouponCode_OnExit() {
         var CouponCode = document.getElementById('CouponCode').value;
-        if (CouponCode == "david") {
+        if (CouponCode.toUpperCase() == "DAVID") {
             $("#CouponLink").empty();
             $("#CouponLink").append("Platinum - Magenta Charts, Web99 and Realtime for Three (3) Months - $100/Month <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='da8e14f0-0439-4d31-a2f7-b1d6d8d201d0' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
         } else {

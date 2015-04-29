@@ -7,6 +7,8 @@ namespace MagentaTrader.Models
 {
     public class StockEarning
     {
+        public int Id { get; set; }
+        public int SymbolId { get; set; }
         public string Symbol { get; set; }
         public string EarningDate { get; set; }
         public string EarningTime { get; set; }
