@@ -18,10 +18,10 @@ namespace MagentaTrader.Models
         public decimal average_volume { get; set; }
         public decimal last_volume { get; set; }
         public string trade_date { get; set; }
-        public decimal open { get; set; }
-        public decimal high { get; set; }
-        public decimal low { get; set; }
-        public decimal close { get; set; }
+        //public decimal open { get; set; }
+        //public decimal high { get; set; }
+        //public decimal low { get; set; }
+        //public decimal close { get; set; }
         public decimal prevclose { get; set; }
         public decimal week_52_high { get; set; }
         public decimal week_52_low { get; set; }

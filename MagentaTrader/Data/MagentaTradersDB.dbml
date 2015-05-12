@@ -106,28 +106,6 @@
       <Association Name="MstProduct_MstProductPackage" Member="MstProduct" ThisKey="ProductId" OtherKey="Id" Type="MstProduct" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="dbo.MstSymbol" Member="MstSymbols">
-    <Type Name="MstSymbol">
-      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="Symbol" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="Description" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
-      <Column Name="Exchange" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="LatestQuoteDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
-      <Column Name="CalendarUpDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
-      <Column Name="CalendarUpParticulars" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
-      <Column Name="CalendarUpDelta" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
-      <Column Name="CalendarUpPercentage" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
-      <Column Name="CalendarDownDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
-      <Column Name="CalendarDownParticulars" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
-      <Column Name="CalendarDownDelta" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
-      <Column Name="CalendarDownPercentage" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
-      <Column Name="ClosePrice" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
-      <Column Name="Volume" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
-      <Column Name="GrowthDecayRate" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
-      <Association Name="MstSymbol_TrnStockPrice" Member="TrnStockPrices" ThisKey="Id" OtherKey="SymbolId" Type="TrnStockPrice" />
-      <Association Name="MstSymbol_TrnStockEarning" Member="TrnStockEarnings" ThisKey="Id" OtherKey="SymbolId" Type="TrnStockEarning" />
-    </Type>
-  </Table>
   <Table Name="dbo.MstUser" Member="MstUsers">
     <Type Name="MstUser">
       <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -179,6 +157,35 @@
       <Column Name="EarningDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="EarningTime" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
       <Association Name="MstSymbol_TrnStockEarning" Member="MstSymbol" ThisKey="SymbolId" OtherKey="Id" Type="MstSymbol" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MstSymbol" Member="MstSymbols">
+    <Type Name="MstSymbol">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Symbol" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="Exchange" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="LatestQuoteDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="CalendarUpDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="CalendarUpParticulars" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="CalendarUpDelta" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="CalendarUpPercentage" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="CalendarDownDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="CalendarDownParticulars" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="CalendarDownDelta" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="CalendarDownPercentage" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="ClosePrice" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="Volume" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="GrowthDecayRate" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="GrowthDecayRateW1" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="GrowthDecayRateW2" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="GrowthDecayRateW3" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="GrowthDecayRateM1" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="GrowthDecayRateM2" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="GrowthDecayRateM3" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="NoOfYears" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="MstSymbol_TrnStockPrice" Member="TrnStockPrices" ThisKey="Id" OtherKey="SymbolId" Type="TrnStockPrice" />
+      <Association Name="MstSymbol_TrnStockEarning" Member="TrnStockEarnings" ThisKey="Id" OtherKey="SymbolId" Type="TrnStockEarning" />
     </Type>
   </Table>
 </Database>

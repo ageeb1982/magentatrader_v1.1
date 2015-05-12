@@ -94,10 +94,10 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
-        // GET api/SymbolCalendar/NYSE/10/1000000/100
+        // GET api/SymbolScreener/NYSE/10/1000000/100/C0
         [Authorize]
-        [Route("api/SymbolScreener/{Exchange}/{Price}/{Volume}/{GrowthDecayRate}")]
-        public List<Models.Symbol> GetSymbolScreener(string Exchange, decimal Price, decimal Volume, decimal GrowthDecayRate)
+        [Route("api/SymbolScreener/{Exchange}/{Price}/{Volume}/{GrowthDecayRate}/{GrowthDecayTime}")]
+        public List<Models.Symbol> GetSymbolScreener(string Exchange, decimal Price, decimal Volume, decimal GrowthDecayRate, string GrowthDecayTime)
         {
             var retryCounter = 0;
 
@@ -105,17 +105,41 @@ namespace MagentaTrader.Controllers
 
             while (true)
             {
-                try
+                try 
                 {
                     var Symbols = from d in db.MstSymbols
                                   where (Exchange == "All" ? true : d.Exchange == Exchange) &&
                                         (d.ClosePrice >= Price) &&
-                                        (d.Volume >= Volume)
+                                        (d.Volume >= Volume) &&
+                                        (GrowthDecayTime == "C0" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value) >= GrowthDecayRate ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "C0" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value) ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "W1" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRateW1.Value == null ? 0 : d.GrowthDecayRateW1.Value) >= GrowthDecayRate ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "W1" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRateW1.Value == null ? 0 : d.GrowthDecayRateW1.Value) ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "W2" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRateW2.Value == null ? 0 : d.GrowthDecayRateW2.Value) >= GrowthDecayRate ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "W2" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRateW2.Value == null ? 0 : d.GrowthDecayRateW2.Value) ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "W3" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRateW3.Value == null ? 0 : d.GrowthDecayRateW3.Value) >= GrowthDecayRate ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "W3" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRateW3.Value == null ? 0 : d.GrowthDecayRateW3.Value) ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "M1" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRateM1.Value == null ? 0 : d.GrowthDecayRateM1.Value) >= GrowthDecayRate ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "M1" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRateM1.Value == null ? 0 : d.GrowthDecayRateM1.Value) ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "M2" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRateM2.Value == null ? 0 : d.GrowthDecayRateM2.Value) >= GrowthDecayRate ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "M2" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRateM2.Value == null ? 0 : d.GrowthDecayRateM2.Value) ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "M3" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value) >= GrowthDecayRate ? true : false) : true) == true &&
+                                        (GrowthDecayTime == "M3" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value) ? true : false) : true) == true
                                   select new Models.Symbol
                                   {
-                                        SymbolDescription = d.Symbol,
-                                        Description = d.Description,
-                                        Exchange = d.Exchange
+                                      SymbolDescription = d.Symbol,
+                                      Description = d.Description,
+                                      Exchange = d.Exchange,
+                                      ClosePrice = d.ClosePrice.Value,
+                                      Volume = d.Volume.Value,
+                                      GrowthDecayRate = d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value,
+                                      GrowthDecayRateW1 = d.GrowthDecayRateW1.Value == null ? 0 : d.GrowthDecayRateW1.Value,
+                                      GrowthDecayRateW2 = d.GrowthDecayRateW2.Value == null ? 0 : d.GrowthDecayRateW2.Value,
+                                      GrowthDecayRateW3 = d.GrowthDecayRateW3.Value == null ? 0 : d.GrowthDecayRateW3.Value,
+                                      GrowthDecayRateM1 = d.GrowthDecayRateM1.Value == null ? 0 : d.GrowthDecayRateM1.Value,
+                                      GrowthDecayRateM2 = d.GrowthDecayRateM2.Value == null ? 0 : d.GrowthDecayRateM2.Value,
+                                      GrowthDecayRateM3 = d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value,
+                                      NoOfYears = d.NoOfYears.Value == null ? 0 : d.NoOfYears.Value
                                   };
                     if (Symbols.Count() > 0)
                     {
@@ -125,7 +149,6 @@ namespace MagentaTrader.Controllers
                     {
                         Values = new List<Models.Symbol>();
                     }
-
                     break;
                 }
                 catch

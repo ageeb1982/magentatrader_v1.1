@@ -396,15 +396,29 @@
                     <dd>
                         <input class="form-control custom-width" id="TradierOrder_Stop" type="text" />
                     </dd>
-                </dl>
+                </dl> 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="placeTradierOrder" onclick="placeTradierOrder()">
-                    Ok
-                </button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">
-                    Close
-                </button>
+                <span class='pull-left'>
+                    <span>
+                        <button type="button" class="btn btn-danger" id="cancelTradierEquity" onclick="cancelTradierEquity()">
+                            Cancel
+                        </button>
+                        <button type="button" class="btn btn-primary" id="confirmTradierEquity" onclick="confirmTradierEquity()">
+                            Confirm
+                        </button>
+                    </span>
+                    <span id="equityEstimatedCost">
+                    </span>
+                </span>
+                <span class='pull-right'>
+                    <button type="button" class="btn btn-info" id="previewTradierEquity" onclick="previewTradierEquity()">
+                        Preview
+                    </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        Close
+                    </button>
+                </span>
             </div>
         </div>
     </div>
@@ -528,6 +542,7 @@
         location.href = "https://api.tradier.com/v1/oauth/authorize?client_id=DxO1T2KQLG1KoGMu0FT1bTiBXYbmor8B&scope=read,write,market,trade&state=magenta";
     }
     function viewTradierAccount() {
+        TradierAccessToken = getCookie("TradierAccessToken");
         if (TradierAccessToken != "") {
             $('#Tradier').modal({
                 show: true,
@@ -753,63 +768,25 @@
             });
         }
     }
-    function buyTradierEquity() {
-        var GreenColor = "#0FB203";
-        var RedColor = "#A80008";
-
-        //if (TradierAccessToken != "") {
-            $('#TradierOrder').modal({
-                show: true,
-                backdrop: false
-            });
-            
-            $("#TradierOrderTitle").html("<font color='" + GreenColor + "'><b>BUY: " + dataSymbol + "</b></font>");
-            getTradierQuote();
-
-            document.getElementById('TradierOrder_Class').value = 'equity';
-            document.getElementById('TradierOrder_Class').disabled = true;
-            
-            document.getElementById('TradierOrder_Symbol').value = dataSymbol;
-            document.getElementById('TradierOrder_Symbol').disabled = true;
-
-            document.getElementById('TradierOrder_OptionSymbol').disabled = true;
-            document.getElementById('TradierOrder_OptionSymbol').style.visibility = 'hidden';
-            document.getElementById('TradierOrder_OptionSymbol_Label').style.visibility = 'hidden';
-            
-            document.getElementById('TradierOrder_Side').value = 'buy';
-            document.getElementById('TradierOrder_Side').disabled = true;
-
-            document.getElementById('TradierOrder_Type').value = 'market';
-
-            document.getElementById('TradierOrder_Price').style.visibility = 'hidden';
-            document.getElementById('TradierOrder_Price_Label').style.visibility = 'hidden';
-
-            document.getElementById('TradierOrder_Stop').style.visibility = 'hidden';
-            document.getElementById('TradierOrder_Stop_Label').style.visibility = 'hidden';
-            
-        //} else {
-
-        //    alert("No Tradier connection.");
-
-        //}
+    function getTradierAccountNumber(token) {
+        $.ajax({
+            url: '/api/GetTradierUserProfile/' + token,
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            data: {},
+            success: function (result) {
+                if (result) {
+                    setCookie("TradierAccountNumber", result.profile.account.account_number, 1);
+                }
+            }
+        });
     }
-    function openTradierOptionChain() {
-        if (TradierAccessToken != "") {
-            $('#TradierOptionChain').modal({
-                show: true,
-                backdrop: false
-            });
-            $("#TradierOptionChainTitle").text(dataSymbol + " Option Chain");
-        } else {
-            alert("No Tradier connection.");
-        }
-    }
-    function placeTradierOrder() {
-        $('#TradierOrder').modal('hide');
-    }
+
+    // Tradier Buy Equity
     function changeTradierOrderType() {
         var type = event.target.value;
-        switch(type) {
+        switch (type) {
             case "market":
                 document.getElementById('TradierOrder_Price').style.visibility = 'hidden';
                 document.getElementById('TradierOrder_Price_Label').style.visibility = 'hidden';
@@ -855,7 +832,7 @@
                 success: function (result) {
 
                     var TradierQuoteData = {
-                        "description" : result.quotes.quote.description,
+                        "description": result.quotes.quote.description,
                         "last": result.quotes.quote.last,
                         "change": result.quotes.quote.change,
                         "bid": result.quotes.quote.bid,
@@ -875,6 +852,207 @@
                     $("#TradierOrderSubtitle").html("Bid: " + TradierQuoteData.bid + " x " + TradierQuoteData.bidsize + "<span style='padding: 0 40px'>&nbsp;</span>" + "Ask: " + TradierQuoteData.ask + " x " + TradierQuoteData.asksize);
                 }
             });
+        }
+    }
+    function openTradierEquity() {
+        var GreenColor = "#0FB203";
+        var RedColor = "#A80008";
+
+        if (TradierAccessToken != "") {
+            $('#TradierOrder').modal({
+                show: true,
+                backdrop: false
+            });
+            
+            $("#TradierOrderTitle").html("<font color='" + GreenColor + "'><b>BUY: " + dataSymbol + "</b></font>");
+            getTradierQuote();
+
+            document.getElementById('TradierOrder_Class').value = 'equity';
+            document.getElementById('TradierOrder_Class').disabled = true;
+            
+            document.getElementById('TradierOrder_Symbol').value = dataSymbol;
+            document.getElementById('TradierOrder_Symbol').disabled = true;
+
+            document.getElementById('TradierOrder_OptionSymbol').disabled = true;
+            document.getElementById('TradierOrder_OptionSymbol').style.visibility = 'hidden';
+            document.getElementById('TradierOrder_OptionSymbol_Label').style.visibility = 'hidden';
+            
+            document.getElementById('TradierOrder_Side').value = 'buy';
+            document.getElementById('TradierOrder_Side').disabled = true;
+
+            document.getElementById('TradierOrder_Type').value = 'market';
+
+            document.getElementById('TradierOrder_Price').style.visibility = 'hidden';
+            document.getElementById('TradierOrder_Price_Label').style.visibility = 'hidden';
+
+            document.getElementById('TradierOrder_Stop').style.visibility = 'hidden';
+            document.getElementById('TradierOrder_Stop_Label').style.visibility = 'hidden';
+
+            disableConfirm(true);
+        } else {
+
+            alert("No Tradier connection.");
+
+        }
+    }
+    function previewTradierEquity() {
+        var TradierAccountNumber = getCookie("TradierAccountNumber");
+        if (TradierAccessToken != "" && TradierAccountNumber != "") {
+            var order = new Object();
+
+            order.token = TradierAccessToken;
+            order.account = TradierAccountNumber;
+            order.symbol = document.getElementById('TradierOrder_Symbol').value;
+            order.duration = document.getElementById('TradierOrder_Duration').value;
+            order.side = document.getElementById('TradierOrder_Side').value;
+            order.quantity = document.getElementById('TradierOrder_Quantity').value;
+            order.type = document.getElementById('TradierOrder_Type').value;
+            order.price = document.getElementById('TradierOrder_Price').value;
+            order.stop = document.getElementById('TradierOrder_Stop').value;
+            order.option_symbol = document.getElementById('TradierOrder_OptionSymbol').value;
+
+            var verified = false;
+            switch(order.type) {
+                case "market":
+                    verified = true;
+                    break;
+                case "limit":
+                    if (order.price > 0) verified = true;
+                    break;
+                case "stop":
+                    if (order.stop > 0) verified = true;
+                    break;
+                case "stop_limit":
+                    if (order.price > 0 && order.stop > 0) verified = true;
+                    break;
+                default:
+                    verified = false;
+                    break;
+            }
+
+            if (verified == true) {
+                var data = JSON.stringify(order);
+
+                disableConfirm(true);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/GetTradierPreviewEquity",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: data,
+                    success: function (result) {
+                        if (!!result.order.cost) {
+                            disableConfirm(false);
+                            $("#equityEstimatedCost").append("Est. Total Cost: $" + result.order.cost);
+                        } else {
+                            alert("Invalid data.");
+                        }
+                    }
+                });
+            } else {
+                alert("Invalid order.");
+            }
+
+        } else {
+            alert("No Tradier connection.");
+        }
+    }
+    function confirmTradierEquity() {
+        if (confirm("Confirm transaction?") == true) {
+            var TradierAccountNumber = getCookie("TradierAccountNumber");
+            if (TradierAccessToken != "" && TradierAccountNumber != "") {
+                var order = new Object();
+
+                order.token = TradierAccessToken;
+                order.account = TradierAccountNumber;
+                order.symbol = document.getElementById('TradierOrder_Symbol').value;
+                order.duration = document.getElementById('TradierOrder_Duration').value;
+                order.side = document.getElementById('TradierOrder_Side').value;
+                order.quantity = document.getElementById('TradierOrder_Quantity').value;
+                order.type = document.getElementById('TradierOrder_Type').value;
+                order.price = document.getElementById('TradierOrder_Price').value;
+                order.stop = document.getElementById('TradierOrder_Stop').value;
+                order.option_symbol = document.getElementById('TradierOrder_OptionSymbol').value;
+
+                var verified = false;
+                switch (order.type) {
+                    case "market":
+                        verified = true;
+                        break;
+                    case "limit":
+                        if (order.price > 0) verified = true;
+                        break;
+                    case "stop":
+                        if (order.stop > 0) verified = true;
+                        break;
+                    case "stop_limit":
+                        if (order.price > 0 && order.stop > 0) verified = true;
+                        break;
+                    default:
+                        verified = false;
+                        break;
+                }
+
+                if (verified == true) {
+                    var data = JSON.stringify(order);
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/GetTradierBuyEquity",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: data,
+                        success: function (result) {
+                            if (result.order.status=="ok") {
+                                alert("Order successful.");
+                            } else {
+                                alert("Order cancelled.");
+                            }
+                        }
+                    });
+                } else {
+                    alert("Invalid order.");
+                }
+
+            } else {
+                alert("No Tradier connection.");
+            }
+        } 
+    }
+    function disableConfirm(disable) {
+        $('#confirmTradierEquity').prop('disabled', disable);
+        $('#cancelTradierEquity').prop('disabled', disable);
+        $('#equityEstimatedCost').empty();
+
+        if (disable == false) {
+            document.getElementById('TradierOrder_Duration').disabled = true;
+            document.getElementById('TradierOrder_Quantity').disabled = true;
+            document.getElementById('TradierOrder_Type').disabled = true;
+            document.getElementById('TradierOrder_Price').disabled = true;
+            document.getElementById('TradierOrder_Stop').disabled = true;
+        } else {
+            document.getElementById('TradierOrder_Duration').disabled = false;
+            document.getElementById('TradierOrder_Quantity').disabled = false;
+            document.getElementById('TradierOrder_Type').disabled = false;
+            document.getElementById('TradierOrder_Price').disabled = false;
+            document.getElementById('TradierOrder_Stop').disabled = false;
+        }
+    }
+    function cancelTradierEquity() {
+        disableConfirm(true);
+    }
+
+    // Tradier Buy Option
+    function openTradierOptionChain() {
+        if (TradierAccessToken != "") {
+            $('#TradierOptionChain').modal({
+                show: true,
+                backdrop: false
+            });
+            $("#TradierOptionChainTitle").text(dataSymbol + " Option Chain");
+        } else {
+            alert("No Tradier connection.");
         }
     }
 
@@ -2432,7 +2610,7 @@
         $("#symbolInfoRange").empty();
 
         //$("#symbol").html("<span><b>" + chartSymbol + "</b></span>");
-        $("#symbol").html("<span><b>" + chartSymbol + ":</b>&nbsp;<button class='btn btn-success btn-xs' data-toggle='modal' id='buyTradierEquity' onclick='buyTradierEquity()'>Buy</button>&nbsp;<button class='btn btn-info btn-xs' data-toggle='modal' id='openTradierOptionChain' onclick='openTradierOptionChain()'>Option Chain</button></span>");
+        $("#symbol").html("<span><b>" + chartSymbol + ":</b>&nbsp;<button class='btn btn-success btn-xs' data-toggle='modal' id='openTradierEquity' onclick='openTradierEquity()'>Buy</button>&nbsp;<button class='btn btn-info btn-xs' data-toggle='modal' id='openTradierOptionChain' onclick='openTradierOptionChain()'>Option Chain</button></span>");
         $("#symbolInfoChart").html("<a href='#' style='padding: 2px 20px'><span>Chart:</span><span class='pull-right'>" + chartNoOfDays + "</span></a>");
         $("#symbolInfoChannel").html("<a href='#' style='padding: 2px 20px'><span>Channel:</span><span class='pull-right'>" + chartChannelNoOfDays + "</span></a>");
         if (chartSlopePercentage >= 0) {
@@ -2797,7 +2975,6 @@
         TradierPositionsGrid = new wijmo.grid.FlexGrid('#TradierPositionsGrid');
 
         // Tradier Authorization Code
-
         TradierAccessToken = getCookie("TradierAccessToken");
         if (TradierAccessToken == "") {
             var code = "@TradierCode";
@@ -2808,9 +2985,13 @@
                     success: function (Result) {
                         TradierAccessToken = Result.access_token == null ? '' : Result.access_token;
                         setCookie("TradierAccessToken", TradierAccessToken, 1);
+
+                        getTradierAccountNumber(TradierAccessToken);
                     }
                 });
             }
+        } else {
+            getTradierAccountNumber(TradierAccessToken);
         }
 
 

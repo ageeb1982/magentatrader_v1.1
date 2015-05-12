@@ -167,10 +167,174 @@ namespace MagentaTrader.Controllers
                     return q;
                 }
             }
-            catch(Exception e)
+            catch
             {
                 return new Models.TradierQuoteSymbolQuotes();
             }
         }
+
+        // GET api/GetTradierPreviewEquity
+        [Authorize]
+        [HttpPost]
+        [Route("api/GetTradierPreviewEquity")]
+        public Models.TradierPreviewEquityOrder GetTradierPreviewEquity(Models.TradierAddOrder order)
+        {
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.tradier.com/v1/accounts/" + order.account + "/orders");
+            string postString = "";
+
+            switch (order.type)
+            {
+                case "market":
+                    postString = "class=equity" +
+                                "&symbol=" + order.symbol +
+                                "&duration=" + order.duration +
+                                "&side=" + order.side +
+                                "&quantity=" + order.quantity +
+                                "&type=" + order.type +
+                                "&preview=true";
+                    break;
+                case "limit":
+                    postString = "class=equity" +
+                                "&symbol=" + order.symbol +
+                                "&duration=" + order.duration +
+                                "&side=" + order.side +
+                                "&quantity=" + order.quantity +
+                                "&type=" + order.type +
+                                "&price=" + order.price +
+                                "&preview=true";
+                    break;
+                case "stop":
+                    postString = "class=equity" +
+                                "&symbol=" + order.symbol +
+                                "&duration=" + order.duration +
+                                "&side=" + order.side +
+                                "&quantity=" + order.quantity +
+                                "&type=" + order.type +
+                                "&stop=" + order.stop +
+                                "&preview=true";
+                    break;
+                case "stop_limit":
+                    postString = "class=equity" +
+                                "&symbol=" + order.symbol +
+                                "&duration=" + order.duration +
+                                "&side=" + order.side +
+                                "&quantity=" + order.quantity +
+                                "&type=" + order.type +
+                                "&price=" + order.price +
+                                "&stop=" + order.stop +
+                                "&preview=true";
+                    break;
+            }
+
+            byte[] bytedata = Encoding.UTF8.GetBytes(postString);
+
+            httpWebRequest.Method = "POST";
+            httpWebRequest.Accept = "application/json";
+            httpWebRequest.Headers.Add("Authorization", "Bearer " + order.token);
+
+            httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+            httpWebRequest.ContentLength = bytedata.Length;
+
+            Stream requestStream = httpWebRequest.GetRequestStream();
+            requestStream.Write(bytedata, 0, bytedata.Length);
+            requestStream.Close();
+
+            try
+            {
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    var result = streamReader.ReadToEnd();
+                    JavaScriptSerializer js = new JavaScriptSerializer();
+                    Models.TradierPreviewEquityOrder p = (Models.TradierPreviewEquityOrder)js.Deserialize(result, typeof(Models.TradierPreviewEquityOrder));
+                    return p;
+                }
+            }
+            catch
+            {
+                return new Models.TradierPreviewEquityOrder();
+            } 
+        }
+
+        // GET api/GetTradierBuyEquity
+        [Authorize]
+        [HttpPost]
+        [Route("api/GetTradierBuyEquity")]
+        public Models.TradierAddOrderStatusOrder GetTradierBuyEquity(Models.TradierAddOrder order)
+        {
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.tradier.com/v1/accounts/" + order.account + "/orders");
+            string postString = "";
+
+            switch (order.type)
+            {
+                case "market":
+                    postString = "class=equity" +
+                                "&symbol=" + order.symbol +
+                                "&duration=" + order.duration +
+                                "&side=" + order.side +
+                                "&quantity=" + order.quantity +
+                                "&type=" + order.type;
+                    break;
+                case "limit":
+                    postString = "class=equity" +
+                                "&symbol=" + order.symbol +
+                                "&duration=" + order.duration +
+                                "&side=" + order.side +
+                                "&quantity=" + order.quantity +
+                                "&type=" + order.type +
+                                "&price=" + order.price;
+                    break;
+                case "stop":
+                    postString = "class=equity" +
+                                "&symbol=" + order.symbol +
+                                "&duration=" + order.duration +
+                                "&side=" + order.side +
+                                "&quantity=" + order.quantity +
+                                "&type=" + order.type +
+                                "&stop=" + order.stop;
+                    break;
+                case "stop_limit":
+                    postString = "class=equity" +
+                                "&symbol=" + order.symbol +
+                                "&duration=" + order.duration +
+                                "&side=" + order.side +
+                                "&quantity=" + order.quantity +
+                                "&type=" + order.type +
+                                "&price=" + order.price +
+                                "&stop=" + order.stop;
+                    break;
+            }
+
+            byte[] bytedata = Encoding.UTF8.GetBytes(postString);
+
+            httpWebRequest.Method = "POST";
+            httpWebRequest.Accept = "application/json";
+            httpWebRequest.Headers.Add("Authorization", "Bearer " + order.token);
+
+            httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+            httpWebRequest.ContentLength = bytedata.Length;
+
+            Stream requestStream = httpWebRequest.GetRequestStream();
+            requestStream.Write(bytedata, 0, bytedata.Length);
+            requestStream.Close();
+
+            try
+            {
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    var result = streamReader.ReadToEnd();
+                    JavaScriptSerializer js = new JavaScriptSerializer();
+                    Models.TradierAddOrderStatusOrder p = (Models.TradierAddOrderStatusOrder)js.Deserialize(result, typeof(Models.TradierAddOrderStatusOrder));
+                    return p;
+                }
+            }
+            catch
+            {
+                return new Models.TradierAddOrderStatusOrder();
+            }
+        }
+
+
     }
 }

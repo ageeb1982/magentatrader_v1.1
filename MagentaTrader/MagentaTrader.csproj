@@ -220,12 +220,17 @@
     <Compile Include="Models\StockPriceWrapper.cs" />
     <Compile Include="Models\Symbol.cs" />
     <Compile Include="Models\TradierAccessToken.cs" />
+    <Compile Include="Models\TradierAddOrder.cs" />
+    <Compile Include="Models\TradierAddOrderStatus.cs" />
+    <Compile Include="Models\TradierAddOrderStatusOrder.cs" />
     <Compile Include="Models\TradierOrder.cs" />
     <Compile Include="Models\TradierOrderAccount.cs" />
     <Compile Include="Models\TradierOrderAccountOrders.cs" />
     <Compile Include="Models\TradierPosition.cs" />
     <Compile Include="Models\TradierPositionAccount.cs" />
     <Compile Include="Models\TradierPositionAccountPositions.cs" />
+    <Compile Include="Models\TradierPreviewEquity.cs" />
+    <Compile Include="Models\TradierPreviewEquityOrder.cs" />
     <Compile Include="Models\TradierQuote.cs" />
     <Compile Include="Models\TradierQuoteSymbol.cs" />
     <Compile Include="Models\TradierQuoteSymbolQuotes.cs" />

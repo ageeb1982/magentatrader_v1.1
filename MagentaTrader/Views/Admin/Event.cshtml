@@ -429,30 +429,30 @@
    //     });
    //}
 
-   function FormValidate() {
-       var validator = $('form').validate({
-           rules: {
-               "EventEdit_EventDescription": "required"
-           },
-           messages: {
-               "EventEdit_EventDescription": "Please enter a valid Description"
-           },
-           submitHandler: function (form) {
-               form.submit();
-           }
-       });
-       var x = validator.form();
-       console.log(x);
-       return x;
-   }
+   //function FormValidate() {
+   //    var validator = $('form').validate({
+   //        rules: {
+   //            "EventEdit_EventDescription": "required"
+   //        },
+   //        messages: {
+   //            "EventEdit_EventDescription": "Please enter a valid Description"
+   //        },
+   //        submitHandler: function (form) {
+   //            form.submit();
+   //        }
+   //    });
+   //    var x = validator.form();
+   //    console.log(x);
+   //    return x;
+   //}
 
    $(document).ready(function () {
 
        $('#CmdEventEditOk').click(function () {
-           if (FormValidate() == true) {
+           //if (FormValidate() == true) {
                CmdEventEditOkFunction();
-               $('#EventEdit').modal('hide');
-           }
+               //$('#EventEdit').modal('hide');
+           //}
        });
 
        $('#CmdEventEditCancel').click(function () {

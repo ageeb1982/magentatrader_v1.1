@@ -10,6 +10,9 @@ namespace MagentaTrader.Models
         public string SymbolDescription { get; set; }
 	    public string Description { get; set; }
 	    public string Exchange { get; set; }
+        public decimal ClosePrice { get; set; }
+        public decimal Volume { get; set; }
+        public decimal GrowthDecayRate { get; set; }
 	    public string LatestQuoteDate { get; set; }
 	    public string CalendarUpDate { get; set; }
         public int CalendarUpDay { get; set; }
@@ -21,5 +24,12 @@ namespace MagentaTrader.Models
 	    public string CalendarDownParticulars { get; set; }
         public decimal CalendarDownDelta { get; set; }
         public decimal CalendarDownPercentage { get; set; }
+        public decimal GrowthDecayRateW1 { get; set; }
+        public decimal GrowthDecayRateW2 { get; set; }
+        public decimal GrowthDecayRateW3 { get; set; }
+        public decimal GrowthDecayRateM1 { get; set; }
+        public decimal GrowthDecayRateM2 { get; set; }
+        public decimal GrowthDecayRateM3 { get; set; }
+        public int NoOfYears { get; set; }
     }
 }

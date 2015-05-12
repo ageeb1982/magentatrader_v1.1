@@ -1,7 +1,7 @@
 ﻿@{
     //ViewBag.Title = "Index";
 
-    var Version = "v.Beta.1.20150216";
+    var Version = "v.Beta.1.20150502";
 }
 
 <link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
@@ -46,6 +46,18 @@
         <div class="col-lg-2">
             <p>Growth(Decay) Rate</p>
             <input type="text" class="form-control" id="GrowthDecayRate" placeholder="Growth(Decay) - [100]">
+        </div>
+        <div class="col-lg-2">
+            <p>Growth(Decay) Time</p>
+            <select id="GrowthDecayTime" class="form-control">
+                <option value="C0">Current Trend</option>
+                <option value="W1">One Week</option>
+                <option value="W2">Two Weeks</option>
+                <option value="W3">Three Weeks</option>
+                <option value="M1">One Month</option>
+                <option value="M2">Two Months</option>
+                <option value="M3">Three Months</option>
+            </select>
         </div>
     </div>
     <br />
@@ -100,28 +112,81 @@
     var ScreenerData;
     var ScreenerGrid;
 
+    var ScreenerSaveData = [];
+
     var btnFirstPageEvent;
     var btnPreviousPageEvent;
     var btnNextPageEvent;
     var btnLastPageEvent;
     var btnCurrentPageEvent;
 
-    function GetData(Exchange, Price, Volume, GrowthDecayRate) {
+    function GetRateColor(Rate) {
+        var GreenColor = "#0FB203";
+        var RedColor = "#A80008";
+        return Rate >= 0 ? GreenColor : RedColor;
+    }
+    function GetRate(GrowthDecayTime, Result) {
+        var returnResult = 0;
+        switch (GrowthDecayTime) {
+            case "C0":
+                returnResult = Result.GrowthDecayRate;
+                break;
+            case "W1":
+                returnResult = Result.GrowthDecayRateW1;
+                break;
+            case "W2":
+                returnResult = Result.GrowthDecayRateW2;
+                break;
+            case "W3":
+                returnResult = Result.GrowthDecayRateW3;
+                break;
+            case "M1":
+                returnResult = Result.GrowthDecayRateM1;
+                break;
+            case "M2":
+                returnResult = Result.GrowthDecayRateM2;
+                break;
+            case "M3":
+                returnResult = Result.GrowthDecayRateM3;
+                break;
+            default:
+                returnResult = 0;
+                break;
+        }
+        return Math.round(returnResult);
+    }
+    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime) {
         $('#loading').modal('show');
         var d = new wijmo.collections.ObservableArray();
         $.ajax({
-            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume + '/' + GrowthDecayRate,
+            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume + '/' + GrowthDecayRate + '/' + GrowthDecayTime,
             type: 'GET',
             dataType: 'json',
             success: function (result) {
                 for (i = 0; i < result.length; i++) {
                     d.push({
                         Symbol: "<a  href='/Software?symbol=" + result[i].SymbolDescription + "' target='_blank'>" + result[i].SymbolDescription + "</a>",
+                        SymbolRaw: result[i].SymbolDescription,
                         Description: result[i].Description,
-                        Exchange: result[i].Exchange
+                        Exchange: result[i].Exchange,
+                        ClosePrice: result[i].ClosePrice,
+                        Volume: result[i].Volume,
+                        Rate: GetRate(GrowthDecayTime, result[i]),
+                        GrowthDecayRate: Math.round(result[i].GrowthDecayRate),
+                        GrowthDecayRateW1: Math.round(result[i].GrowthDecayRateW1),
+                        GrowthDecayRateW2: Math.round(result[i].GrowthDecayRateW2),
+                        GrowthDecayRateW3: Math.round(result[i].GrowthDecayRateW3),
+                        GrowthDecayRateM1: Math.round(result[i].GrowthDecayRateM1),
+                        GrowthDecayRateM2: Math.round(result[i].GrowthDecayRateM2),
+                        GrowthDecayRateM3: Math.round(result[i].GrowthDecayRateM3),
+                        NoOfYears: result[i].NoOfYears
                     });
                 }
-                ScreenerData = new wijmo.collections.CollectionView(d);
+
+                while (ScreenerSaveData.length > 0) ScreenerSaveData.pop();
+                ScreenerSaveData = d;
+
+                ScreenerData = new wijmo.collections.CollectionView(d);               
                 ScreenerData.pageSize = 15;
                 $('#loading').modal('hide');
                 MakeScreenerGrid();
@@ -168,24 +233,100 @@
                         {
                             "header": "Symbol",
                             "binding": "Symbol",
-                            "width": 100,
-                            "allowSorting": false,
+                            "width": 80,
+                            "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
-                        },
-                        {
-                            "header": "Description",
-                            "binding": "Description",
-                            "width": "*",
-                            "allowSorting": false,
+                        },{
+                            "header": "Price",
+                            "binding": "ClosePrice",
+                            "width": "9*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        },{
+                            "header": "Volume",
+                            "binding": "Volume",
+                            "width": "9*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        },{
+                            "header": "Years",
+                            "binding": "NoOfYears",
+                            "width": 40,
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        },{
+                            "header": "Rate-Trend",
+                            "binding": "GrowthDecayRate",
+                            "width": "9*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "Rate-W1",
+                            "binding": "GrowthDecayRateW1",
+                            "width": "9*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "Rate-W2",
+                            "binding": "GrowthDecayRateW2",
+                            "width": "9*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "Rate-W3",
+                            "binding": "GrowthDecayRateW3",
+                            "width": "9*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "Rate-M1",
+                            "binding": "GrowthDecayRateM1",
+                            "width": "9*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "Rate-M2",
+                            "binding": "GrowthDecayRateM2",
+                            "width": "9*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "Rate-M3",
+                            "binding": "GrowthDecayRateM3",
+                            "width": "9*",
+                            "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }
+
             ],
             autoGenerateColumns: false,
             itemsSource: ScreenerData,
             isReadOnly: true,
-            selectionMode: wijmo.grid.SelectionMode.Row
+            selectionMode: wijmo.grid.SelectionMode.Row,
+            itemFormatter: function (panel, r, c, cell) {
+                if (wijmo.grid.CellType.Cell == panel.cellType && 
+                   (panel.columns[c].binding == 'GrowthDecayRate' || 
+                    panel.columns[c].binding == 'GrowthDecayRateW1' || 
+                    panel.columns[c].binding == 'GrowthDecayRateW2' ||
+                    panel.columns[c].binding == 'GrowthDecayRateW3' ||
+                    panel.columns[c].binding == 'GrowthDecayRateM1' ||
+                    panel.columns[c].binding == 'GrowthDecayRateM2' ||
+                    panel.columns[c].binding == 'GrowthDecayRateM3')) {
+                    var cellData = panel.getCellData(r, c);
+                    cell.style.color = GetRateColor(cellData);
+                }
+            }
         });
         ScreenerGrid.trackChanges = true;
 
@@ -220,12 +361,101 @@
         var $closePrice = parseFloat(document.getElementById('ClosePrice').value);
         var $volume = parseFloat(document.getElementById('Volume').value);
         var $growthDecayRate = parseFloat(document.getElementById('GrowthDecayRate').value);
-
+        var $growthDecayTime = document.getElementById('GrowthDecayTime').value;
+        
         $closePrice = !$closePrice ? 10 : $closePrice;
         $volume = !$volume ? 1000000 : $volume;
         $growthDecayRate = !$growthDecayRate ? 100 : $growthDecayRate;
+        $growthDecayTime = !$growthDecayTime ? "C0" : $growthDecayTime;
 
-        GetData($exchange, $closePrice, $volume, $growthDecayRate);
+        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime);
+    }
+    function CmdSaveXLS_OnClick() {
+        var CSV = '';
+        var screener = [];
+
+        for (i = 0; i < ScreenerSaveData.length; i++) {
+            screener.push({
+                Symbol: ScreenerSaveData[i].SymbolRaw,
+                Description: ScreenerSaveData[i].Description,
+                Exchange: ScreenerSaveData[i].Exchange,
+                ClosePrice: ScreenerSaveData[i].ClosePrice,
+                Volume: ScreenerSaveData[i].Volume,
+                NoOfYears: ScreenerSaveData[i].NoOfYears,
+                GrowthDecayRate: ScreenerSaveData[i].GrowthDecayRate,
+                GrowthDecayRateW1: ScreenerSaveData[i].GrowthDecayRateW1,
+                GrowthDecayRateW2: ScreenerSaveData[i].GrowthDecayRateW2,
+                GrowthDecayRateW3: ScreenerSaveData[i].GrowthDecayRateW3,
+                GrowthDecayRateM1: ScreenerSaveData[i].GrowthDecayRateM1,
+                GrowthDecayRateM2: ScreenerSaveData[i].GrowthDecayRateM2,
+                GrowthDecayRateM3: ScreenerSaveData[i].GrowthDecayRateM3
+            });
+        }
+
+        CSV += 'Screener Data' + '\r\n\n';
+
+        var screenerLabelRow = '';
+        for (var s in screener[0]) {
+            screenerLabelRow += s + ',';
+        }
+        screenerLabelRow = screenerLabelRow.slice(0, -1);
+        CSV += screenerLabelRow + '\r\n';
+
+        for (var i = 0; i < screener.length; i++) {
+            var screenerRow = '';
+            for (var s in screener[i]) {
+                screenerRow += '"' + screener[i][s] + '",';
+            }
+            screenerRow.slice(0, screenerRow.length - 1);
+            CSV += screenerRow + '\r\n';
+        }
+
+        if (CSV == '') {
+            alert("No data");
+            return;
+        }
+
+        // Create filename
+
+        var $exchange = parseInt(document.getElementById('Exchange').value);
+        var $closePrice = parseInt(document.getElementById('ClosePrice').value);
+        var $volume = parseInt(document.getElementById('Volume').value);
+        var $growthdecayrate = parseInt(document.getElementById('GrowthDecayRate').value);
+        var $growthdecaytime = document.getElementById('GrowthDecayTime').value;
+
+        $exchange = !$exchange ? "All" : $exchange;
+        $closePrice = !$closePrice ? 10 : $closePrice;
+        $volume = !$volume ? 1000000 : $volume;
+        $growthdecayrate = !$growthdecayrate ? 100 : $growthdecayrate;
+        $growthdecaytime = !$growthdecaytime ? "C0" : $growthdecaytime;
+
+        var fileName = 'magenta_screener_' + $exchange + '_' + $closePrice + '_' + $volume + '_' + $growthdecayrate + '_' + $growthdecaytime + '.CSV';
+
+        // Download via <a> link
+
+        var link = document.createElement("a");
+
+        if (link.download !== undefined) {
+            var blob = new Blob([CSV], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style = "visibility:hidden";
+        }
+
+        if (navigator.msSaveBlob) {
+            link.addEventListener("click", function (event) {
+                var blob = new Blob([CSV], {
+                    "type": "text/csv;charset=utf-8;"
+                });
+                navigator.msSaveBlob(blob, fileName);
+            }, false);
+        }
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
     }
 
     $(document).ready(function () {
