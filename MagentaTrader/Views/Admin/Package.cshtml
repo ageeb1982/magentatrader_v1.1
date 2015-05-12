@@ -4,10 +4,12 @@
 
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/css/styles.css" rel="stylesheet" />
+<link href="~/css/toastr.css" rel="stylesheet" />
 
 <script src="/js/jquery.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.js"></script>
 <script src="/js/jquery.validate.js"></script>
+<script src="~/js/toastr.js"></script>
 
 <script src="/js/date.js"></script>
 
@@ -273,7 +275,7 @@
         }
     }
     function CmdProductPackageEditOkFunction() {
-        if (confirm("Save Product Package?") == true) {
+        //if (confirm("Save Product Package?") == true) {
 
             var ProductPackage = new Object();
 
@@ -302,9 +304,10 @@
                     data: data,
                     success: function (id) {
                         if (id > 0) {
-                            window.location.reload();
+                            toastr.success("Successfully Added!");
+                            window.setTimeout(function () { location.erdload() }, 3000);
                         } else {
-                            alert("Not added");
+                            toastr.error("Not Added!");
                         }
                     }
                 });
@@ -319,18 +322,19 @@
                     data: data,
                     statusCode: {
                         200: function () {
-                            window.location.reload();
+                            toastr.success('Successfully Modified!');
+                            window.setTimeout(function () { location.reload() }, 3000);
                         },
                         404: function () {
-                            alert("Not found");
+                            toastr.error("Not found!");
                         },
                         400: function () {
-                            alert("Bad request");
+                            toastr.error("Bad Request!");
                         }
                     }
                 });
             }
-        }
+        //}
     }
 
     function CmdLedgerView_OnClick(Id) {
@@ -445,6 +449,14 @@
 
     function FormValidate() {
         var validator = $('form').validate({
+            rules: {
+                ProductPackageEdit_Price: {
+                    number: true
+                }
+            },
+            messages: {
+                number: toastr.error('Price should be numeric.', 'Fill in all the required fields!')
+            },
             submitHandler: function (form) {
                 form.submit();
             }
@@ -472,6 +484,8 @@
     });
 
     $(document).ready(function () {
+
+        toastr.options.preventDuplicates = true;
 
         $('#CmdProductPackageEditOk').click(function () {
             if (FormValidate() == true) {

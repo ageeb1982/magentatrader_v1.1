@@ -4,10 +4,12 @@
 
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/css/styles.css" rel="stylesheet" />
+<link href="~/css/toastr.css" rel="stylesheet" />
 
 <script src="/js/jquery.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.js"></script>
 <script src="~/js/jquery.validate.js"></script>
+<script src="~/js/toastr.js"></script>
 
 <script src="/js/date.js"></script>
 
@@ -220,20 +222,21 @@
                 dataType: "json",
                 statusCode: {
                     200: function () {
-                        window.location.reload();
+                        toastr.success('Successfully Deleted!');
+                        window.setTimeout(function () { location.reload() }, 3000);
                     },
                     404: function () {
-                        alert("Not found");
+                        toastr.error("Not found!");
                     },
                     400: function () {
-                        alert("Bad request");
+                        toastr.error("Bad request");
                     }
                 }
             });
         }
     }
     function CmdNewsEditOkFunction() {
-        if (confirm("Save News?") == true) {
+        //if (confirm("Save News?") == true) {
 
             var Newss = new Object();
 
@@ -255,9 +258,10 @@
                     data: data,
                     success: function (id) {
                         if (id > 0) {
-                            window.location.reload();
+                            toastr.success('Successfully Added!');
+                            window.setTimeout(function () { location.reload() }, 3000);
                         } else {
-                            alert("Not added");
+                            toastr.error("Not added!");
                         }
                     }
                 });
@@ -272,18 +276,19 @@
                     data: data,
                     statusCode: {
                         200: function () {
-                            window.location.reload();
+                            toastr.success('Successfully Modified!');
+                            window.setTimeout(function () { location.reload() }, 3000);
                         },
                         404: function () {
-                            alert("Not found");
+                            toastr.error("Not found!");
                         },
                         400: function () {
-                            alert("Bad request");
+                            toastr.error("Bad Request!");
                         }
                     }
                 });
             }
-        }
+        //}
     }
 
     function GetNews() {
@@ -382,6 +387,8 @@
                 CmdNewsEditOkFunction();
                 $('#NewsEdit').modal('hide');
             }
+            else
+                toastr.error("Fill in the required fields!");
         });
 
         $('#CmdNewsEditCancel, .close').click(function () {

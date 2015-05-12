@@ -4,12 +4,14 @@
 
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/css/styles.css" rel="stylesheet" />
+<link href="~/css/toastr.css" rel="stylesheet" />
 
 <script src="/js/jquery-1.10.2.min.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.js"></script>
 
 <script src="/js/date.js"></script>
 <script src="/js/jquery.validate.js"></script>
+<script src="~/js/toastr.js"></script>
 
 <script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
 <script src="/wijmo/controls/wijmo.input.min.js"></script>
@@ -118,7 +120,7 @@
                         </dd>
                         <dt>URL</dt>
                         <dd>
-                            <input class="form-control" id="EventEdit_URL" name="EventEdit_URL" type="url" required/>
+                            <input class="form-control" id="EventEdit_URL" name="EventEdit_URL" type="url" required placeholder="https://sample.com"/>
                         </dd>
                         <dt>Video URL</dt>
                         <dd>
@@ -145,24 +147,6 @@
                         </dd>
                     </dl>
                 </form>
-                @*<div class="col-lg-6">
-                    <div class="input-group">
-                        <div class="input-group-btn">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                DropdownMenu
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a href="#">Action</a></li>
-                                <li><a href="#">Another action</a></li>
-                                <li><a href="#">Something else here</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#">Separated link</a></li>
-                            </ul>
-                        </div><!-- /btn-group -->
-                        <input type="text" class="form-control">
-                    </div><!-- /input-group -->
-                </div><!-- /.col-lg-6 --><br>*@
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary" id="CmdEventEditOk" @*onclick="CmdEventEditOk_OnClick()"*@ >
@@ -275,13 +259,14 @@
                 dataType: "json",
                 statusCode: {
                     200: function () {
-                        window.location.reload();
+                        toastr.success('Successfully Deleted!');
+                        window.setTimeout(function () { location.reload() }, 3000);
                     },
                     404: function () {
-                        alert("Not found");
+                        toastr.error("Not found!");
                     },
                     400: function () {
-                        alert("Bad request");
+                        toastr.error("Bad request");
                     }
                 }
             });
@@ -289,8 +274,7 @@
     }
 
     function CmdEventEditOkFunction() {
-        //console.log('hello');
-        if (confirm("Save Event?") == true) {
+        //if (confirm("Save Event?") == true) {
             var Event = new Object();
 
             Event.Id = document.getElementById('EventEdit_Id').value;
@@ -315,7 +299,8 @@
                     data: data,
                     success: function (id) {
                         if (id > 0) {
-                            window.location.reload();
+                            toastr.success('Successfully Added!');
+                            window.setTimeout(function () { location.reload() }, 3000);
                         } else {
                             alert("Not added");
                         }
@@ -332,18 +317,19 @@
                     data: data,
                     statusCode: {
                         200: function () {
-                            window.location.reload();
+                            toastr.success('Successfully Modified!');
+                            window.setTimeout(function () { location.reload() }, 3000);
                         },
                         404: function () {
-                            alert("Not found");
+                            toastr.error("Not found!");
                         },
                         400: function () {
-                            alert("Bad request");
+                            toastr.error("Bad Request!");
                         }
                     }
                 });
             }
-        }
+        //}
     }
     
 
@@ -394,11 +380,11 @@
             dataType: "json",
             data: { Id: EventId },
             success: function (response) {
-                alert("Event deleted.");
-                window.location.reload();
+                toastr.success('Successfully Deleted!');
+                window.setTimeout(function () { location.reload() }, 3000);
             },
             failure: function (response) {
-                alert("Error - " + response.d);
+                toastr.error("Error - " + response.d);
             },
             error: function (e) { }
         });
@@ -433,9 +419,6 @@
 
    function FormValidate() {
        var validator = $('form').validate({
-           rules : {
-               "EventEdit_EventDate_Data" : "required"
-           },
            submitHandler: function (form) {
                form.submit();
            }
@@ -469,6 +452,8 @@
                CmdEventEditOkFunction();
                $('#EventEdit').modal('hide');
            }
+           else
+               toastr.error("URL must contain <i>https://</i> and <i>.com</i> ", 'Fill in the required fields.')
        });
 
        $('#CmdEventEditCancel, .close').click(function () {

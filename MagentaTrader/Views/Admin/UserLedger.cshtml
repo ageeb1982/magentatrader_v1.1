@@ -4,11 +4,14 @@
 
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/css/styles.css" rel="stylesheet" />
+<link href="~/css/toastr.css" rel="stylesheet" />
 
 <script src="/js/jquery.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
 
 <script src="/js/date.js"></script>
+<script src="/js/jquery.validate.js"></script>
+<script src="~/js/toastr.js"></script>
 
 <script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
 <script src="/wijmo/controls/wijmo.input.min.js"></script>
@@ -59,7 +62,7 @@
                     <div class="text-ledger">Username</div>
                 </div>
                 <div class="box-ledger">
-                    <input class="form-control" id="Username" />
+                    <input class="form-control" id="Username" disabled />
                 </div>
             </div>
             <div class="info-div-ledger">
@@ -67,7 +70,7 @@
                     <div class="text-ledger">First Name</div>
                 </div>
                 <div class="box-ledger">
-                    <input class="form-control" id="FirstName" />
+                    <input class="form-control" id="FirstName" disabled />
                 </div>
             </div>
             <div class="info-div-ledger">
@@ -75,7 +78,7 @@
                     <div class="text-ledger">Last Name</div>
                 </div>
                 <div class="box-ledger">
-                    <input class="form-control" id="LastName" />
+                    <input class="form-control" id="LastName" disabled />
                 </div>
             </div>
             <div class="info-div-ledger">
@@ -83,7 +86,7 @@
                     <div class="text-ledger">Email Address</div>
                 </div>
                 <div class="box-ledger">
-                    <input class="form-control" id="EmailAdd" />
+                    <input class="form-control" id="EmailAdd" disabled />
                 </div>
             </div>
             <div class="info-div-ledger">
@@ -91,7 +94,7 @@
                     <div class="text-ledger">Phone Number</div>
                 </div>
                 <div class="box-ledger">
-                    <input class="form-control" id="PhoneNum" />
+                    <input class="form-control" id="PhoneNum" disabled />
                 </div>
             </div>
         </div>
