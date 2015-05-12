@@ -73,19 +73,27 @@ dt {
 }
 
 .fieldLabel-ledger {
-  width: 30%;
-  display: inline-block;
-  margin: 5px 0px;
-  border-radius: 5px;
+      width: 30%;
+      display: inline-block;
+      margin: 5px 0px;
+      border-radius: 5px;
 }
 
 .user-fieldLabel-ledger {
-  width: 15%;
-  display: inline-block;
-  margin: 5px 0px;
-  border-radius: 5px;
+      width: 15%;
+      display: inline-block;
+      margin: 5px 0px;
+      border-radius: 5px;
 }
 
 .header {
     margin-top: 80px;
+}
+
+.errorHighlight { 
+    border: 1px solid #CC0000; 
+} 
+
+.textinput { 
+    border: 1px silver solid;
 }

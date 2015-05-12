@@ -4,12 +4,15 @@
 
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <link href="~/css/styles.css" rel="stylesheet" />
+<link href="~/css/toastr.css" rel="stylesheet" />
 
 <script src="/js/jquery.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
 
 <script src="/js/date.js"></script>
 <script src="/js/jquery.slimscroll.min.js"></script>
+<script src="/js/jquery.validate.js"></script>
+<script src="~/js/toastr.js"></script>
 
 <script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
 <script src="/wijmo/controls/wijmo.input.min.js"></script>
@@ -61,7 +64,7 @@
                         <div class="text">Product Package</div>
                     </div>
                     <div class="box-ledger">
-                        <input class="form-control" id="ProductPackage" />
+                        <input class="form-control" id="ProductPackage" disabled/>
                     </div>
                 </div>
                 <div class="info-di-ledgerv">
@@ -69,7 +72,7 @@
                         <div class="text-ledger">SKU</div>
                     </div>
                     <div class="box-ledger">
-                        <input class="form-control" id="SKU" />
+                        <input class="form-control" id="SKU" disabled />
                     </div>
                 </div>
                 <div class="info-div-ledger">
@@ -77,7 +80,7 @@
                         <div class="text-ledger">Price</div>
                     </div>
                     <div class="box-ledger">
-                        <input class="form-control" id="Price" />
+                        <input class="form-control" id="Price" disabled />
                     </div>
                 </div>
                 <div class="info-div-ledger">
@@ -85,7 +88,7 @@
                         <div class="text">Product</div>
                     </div>
                     <div class="box-ledger">
-                        <input class="form-control" id="Product" />
+                        <input class="form-control" id="Product" disabled />
                     </div>
                 </div>
                 <div class="info-div-ledger">
@@ -127,7 +130,7 @@
                         <div class="text-ledger">Particulars</div>
                     </div>
                     <div class="box-ledger">
-                        <input class="form-control" id="Particulars" />
+                        <input class="form-control" id="Particulars" disabled />
                     </div>
                 </div>
                 <div class="info-div-ledger">
@@ -135,7 +138,7 @@
                         <div class="text-ledger">Package URL</div>
                     </div>
                     <div class="box-ledger">
-                        <input class="form-control" id="PackageURL" />
+                        <input class="form-control" id="PackageURL" disabled />
                     </div>
                 </div>
             </div>
@@ -191,65 +194,67 @@
                 <h4 class="modal-title">Sale Edit</h4>
             </div>
             <div class="modal-body scroll">
-                <dl class="dl-horizontal">
-                    <dt>Product Package</dt>
-                    <dd>
-                        <input class="form-control" id="SaleEdit_Id" type="hidden" />
-                        <div id="cboSaleEdit_ProductPackageId" class="full-width"></div>
-                        <input class="form-control" id="SaleEdit_ProductPackageId" type="hidden" disabled />
-                    </dd>
-                    <dt>Username</dt>
-                    <dd>
-                        <div id="cboSaleEdit_UserId"></div>
-                        <input class="form-control" id="SaleEdit_UserId" type="hidden" readonly="true" />
-                    </dd>
-                    <dt>Sales Number</dt>
-                    <dd>
-                        <input class="form-control custom-width" id="SaleEdit_SalesNumber" type="text" />
-                    </dd>
-                    <dt>Sales Date</dt>
-                    <dd>
-                        <div id="SaleEdit_SaleDate"></div>
-                        <input class="form-control" id="SaleEdit_SaleDate_Data" type="hidden" />
-                    </dd>
-                    <dt>Renewal Date</dt>
-                    <dd>
-                        <div id="SaleEdit_RenewalDate"></div>
-                        <input class="form-control" id="SaleEdit_RenewalDate_Data" type="hidden" />
-                    </dd>
-                    <dt>Expiry Date</dt>
-                    <dd>
-                        <div id="SaleEdit_ExpiryDate"></div>
-                        <input class="form-control" id="SaleEdit_ExpiryDate_Data" type="hidden" />
-                    </dd>
-                    <dt>Particulars</dt>
-                    <dd>
-                        <input class="form-control" id="SaleEdit_Particulars" type="text" />
-                    </dd>
-                    <dt>Quantity</dt>
-                    <dd>
-                        <input class="form-control custom-width" id="SaleEdit_Quantity" type="text" />
-                    </dd>
-                    <dt>Price</dt>
-                    <dd>
-                        <input class="form-control custom-width" id="SaleEdit_Price" type="text" />
-                    </dd>
-                    <dt>Amount</dt>
-                    <dd>
-                        <input class="form-control custom-width" id="SaleEdit_Amount" type="text" disabled />
-                    </dd>
-                    <dt>Active</dt>
-                    <dd>
-                        <input class="form-control" id="SaleEdit_IsActive" type="checkbox" />
-                    </dd>
-                    <dt>Refunded</dt>
-                    <dd>
-                        <input class="form-control" id="SaleEdit_IsRefunded" type="checkbox" />
-                    </dd>
-                </dl>
+                <form id="saleForm">
+                    <dl class="dl-horizontal">
+                        <dt>Product Package</dt>
+                        <dd>
+                            <input class="form-control" id="SaleEdit_Id" type="hidden" />
+                            <div id="cboSaleEdit_ProductPackageId" class="full-width"></div>
+                            <input class="form-control" id="SaleEdit_ProductPackageId" type="hidden" disabled />
+                        </dd>
+                        <dt>Username</dt>
+                        <dd>
+                            <div id="cboSaleEdit_UserId"></div>
+                            <input class="form-control" id="SaleEdit_UserId" type="hidden" readonly="true" required />
+                        </dd>
+                        <dt>Sales Number</dt>
+                        <dd>
+                            <input class="form-control custom-width" id="SaleEdit_SalesNumber" type="text" required />
+                        </dd>
+                        <dt>Sales Date</dt>
+                        <dd>
+                            <div id="SaleEdit_SaleDate"></div>
+                            <input class="form-control" id="SaleEdit_SaleDate_Data" type="hidden" />
+                        </dd>
+                        <dt>Renewal Date</dt>
+                        <dd>
+                            <div id="SaleEdit_RenewalDate"></div>
+                            <input class="form-control" id="SaleEdit_RenewalDate_Data" type="hidden" />
+                        </dd>
+                        <dt>Expiry Date</dt>
+                        <dd>
+                            <div id="SaleEdit_ExpiryDate"></div>
+                            <input class="form-control" id="SaleEdit_ExpiryDate_Data" type="hidden" />
+                        </dd>
+                        <dt>Particulars</dt>
+                        <dd>
+                            <input class="form-control" id="SaleEdit_Particulars" type="text" />
+                        </dd>
+                        <dt>Quantity</dt>
+                        <dd>
+                            <input class="form-control custom-width" id="SaleEdit_Quantity" type="text" required />
+                        </dd>
+                        <dt>Price</dt>
+                        <dd>
+                            <input class="form-control custom-width" id="SaleEdit_Price" type="text" required />
+                        </dd>
+                        <dt>Amount</dt>
+                        <dd>
+                            <input class="form-control custom-width" id="SaleEdit_Amount" type="text" disabled />
+                        </dd>
+                        <dt>Active</dt>
+                        <dd>
+                            <input class="form-control" id="SaleEdit_IsActive" type="checkbox" />
+                        </dd>
+                        <dt>Refunded</dt>
+                        <dd>
+                            <input class="form-control" id="SaleEdit_IsRefunded" type="checkbox" />
+                        </dd>
+                    </dl>
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="CmdSaleEditOk" onclick="CmdSaleEditOk_OnClick()">
+                <button type="button" class="btn btn-primary" @*data-dismiss="modal"*@ id="CmdSaleEditOk" @*onclick="CmdSaleEditOk_OnClick()"*@>
                     Ok
                 </button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal" id="CmdSaleEditCancel">
@@ -567,21 +572,22 @@
                 dataType: "json",
                 statusCode: {
                     200: function () {
-                        window.location.reload();
+                        toastr.success('Successfully Deleted!');
+                        window.setTimeout(function () { location.reload() }, 3000);
                     },
                     404: function () {
-                        alert("Not found");
+                        toastr.error("Not found!");
                     },
                     400: function () {
-                        alert("Bad request");
+                        toastr.error("Bad request");
                     }
                 }
             });
         }
     }
 
-    function CmdSaleEditOk_OnClick() {
-        if (confirm("Save Sales?") == true) {
+    function CmdSaleEditOkFunction() {
+        //if (confirm("Save Sales?") == true) {
 
             var Sale = new Object();
 
@@ -611,9 +617,10 @@
                     data: data,
                     success: function (id) {
                         if (id > 0) {
-                            window.location.reload();
+                            toastr.success('Successfully Added!');
+                            window.setTimeout(function () { location.reload() }, 3000);
                         } else {
-                            alert("Not added");
+                            toastr.error("Not added!");
                         }
                     }
                 });
@@ -628,18 +635,19 @@
                     data: data,
                     statusCode: {
                         200: function () {
-                            window.location.reload();
+                            toastr.success('Successfully Modified!');
+                            window.setTimeout(function () { location.reload() }, 3000);
                         },
                         404: function () {
-                            alert("Not found");
+                            toastr.error("Not found!");
                         },
                         400: function () {
-                            alert("Bad request");
+                            toastr.error("Bad Request!");
                         }
                     }
                 });
             }
-        }
+        //}
     }
 
     function getProductPackageList(items) {
@@ -818,8 +826,71 @@
         btnCurrentPageUser.innerHTML = (Sales.pageIndex + 1) + ' / ' + Sales.pageCount;
     }
 
+    function FormValidate() {
+        var validator = $('form').validate({
+            submitHandler: function (form) {
+                form.submit();
+            }
+        });
+
+        var x = validator.form();
+        return x;
+    }
+
+    $.validator.setDefaults({
+        errorPlacement: function (error, element) {
+            $(element).attr({ "title": error.append() });
+        },
+        highlight: function (element) {
+            //$(element).css({"border": "2px solid #CC0000"});
+            $(element).removeClass("textinput");
+            $(element).addClass("errorHighlight");
+        },
+        unhighlight: function (element) {
+            //$(element).css({"border": "2px solid #CC0000"});
+            $(element).removeClass("errorHighlight");
+            $(element).addClass("textinput");
+        }
+    });
+
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "3000",
+        "extendedTimeOut": 0,
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut",
+        "tapToDismiss": false
+    }
+
     $(document).ready(function () {
         GetProductLedger();
+
+        toastr.options.preventDuplicates = true;
+
+        $('#CmdSaleEditOk').click(function () {
+            if (FormValidate() == true) {
+                CmdSaleEditOkFunction();
+                $('#SaleEdit').modal('hide');
+            }
+            else
+                toastr.error('Sales Number, Quantity, and Price should be numeric.', 'Fill in all the required fields!');
+        });
+
+        $('#CmdSaleEditCancel, .close').click(function () {
+            $("form input").removeClass("errorHighlight");
+            $('form')[0].reset();
+            $('#SaleEdit').modal('hide');
+        });
 
         Sales = new wijmo.collections.CollectionView(GetPackageUsers());
         UserList = new wijmo.collections.CollectionView(getUsers());

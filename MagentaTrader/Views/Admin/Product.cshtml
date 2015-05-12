@@ -4,9 +4,12 @@
 
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/css/styles.css" rel="stylesheet" />
+<link href="~/css/toastr.css" rel="stylesheet" />
 
 <script src="/js/jquery.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.js"></script>
+<script src="/js/jquery.validate.js"></script>
+<script src="~/js/toastr.js"></script>
 
 <script src="/js/date.js"></script>
 
@@ -93,25 +96,27 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                <button type="button" class="close" @*data-dismiss="modal"*@ aria-hidden="true">
                     &times;
                 </button>
                 <h4 class="modal-title">Product Edit</h4>
             </div>
             <div class="modal-body">
-                <dl class="dl-horizontal">
-                    <dt>Product Description</dt>
-                    <dd>
-                        <input class="form-control" id="ProductEdit_Id" type="hidden" />
-                        <input class="form-control" id="ProductEdit_ProductDescription" type="text" />
-                    </dd>
-                </dl>
+                <form id="productForm">
+                    <dl class="dl-horizontal">
+                        <dt>Product Description</dt>
+                        <dd>
+                            <input class="form-control" id="ProductEdit_Id" type="hidden" />
+                            <input class="form-control" id="ProductEdit_ProductDescription" type="text" required />
+                        </dd>
+                    </dl>
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="CmdProductEditOk" onclick="CmdProductEditOk_OnClick()">
+                <button type="button" class="btn btn-primary" @*data-dismiss="modal"*@ id="CmdProductEditOk" @*onclick="CmdProductEditOk_OnClick()"*@>
                     Ok
                 </button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal" id="CmdProductEditCancel">
+                <button type="button" class="btn btn-danger" @*data-dismiss="modal"*@ id="CmdProductEditCancel">
                     Cancel
                 </button>
             </div>
@@ -182,20 +187,21 @@
                 dataType: "json",
                 statusCode: {
                     200: function () {
-                        window.location.reload();
+                        toastr.success('Successfully Deleted!');
+                        window.setTimeout(function () { location.reload() }, 3000);
                     },
                     404: function () {
-                        alert("Not found");
+                        toastr.error("Not found!");
                     },
                     400: function () {
-                        alert("Bad request");
+                        toastr.error("Bad request");
                     }
                 }
             });
         }
     }
-    function CmdProductEditOk_OnClick() {
-        if (confirm("Save Product?") == true) {
+    function CmdProductEditOkFunction() {
+        //if (confirm("Save Product?") == true) {
 
             var Product = new Object();
 
@@ -214,9 +220,10 @@
                     data: data,
                     success: function (id) {
                         if (id > 0) {
-                            window.location.reload();
+                            toastr.success('Successfully Added!');
+                            window.setTimeout(function () { location.reload() }, 3000);
                         } else {
-                            alert("Not added");
+                            toastr.error("Not added!");
                         }
                     }
                 });
@@ -231,18 +238,19 @@
                     data: data,
                     statusCode: {
                         200: function () {
-                            window.location.reload();
+                            toastr.success('Successfully Modified!');
+                            window.setTimeout(function () { location.reload() }, 3000);
                         },
                         404: function () {
-                            alert("Not found");
+                            toastr.error("Not found!");
                         },
                         400: function () {
-                            alert("Bad request");
+                            toastr.error("Bad request");
                         }
                     }
                 });
             }
-        }
+        //}
     }
 
     function GetProducts() {
@@ -304,7 +312,54 @@
         btnCurrentPageProduct.innerHTML = (Products.pageIndex + 1) + ' / ' + Products.pageCount;
     }
 
+    function FormValidate() {
+        var validator = $('form').validate({
+            submitHandler: function (form) {
+                form.submit();
+            }
+        });
+
+        var x = validator.form();
+        console.log(x);
+        return x;
+    }
+
+    $.validator.setDefaults({
+        errorPlacement: function (error, element) {
+            $(element).attr({ "title": error.append() });
+        },
+        highlight: function (element) {
+            //$(element).css({"border": "2px solid #CC0000"});
+            $(element).removeClass("textinput");
+            $(element).addClass("errorHighlight");
+        },
+        unhighlight: function (element) {
+            //$(element).css({"border": "2px solid #CC0000"});
+            $(element).removeClass("errorHighlight");
+            $(element).addClass("textinput");
+        }
+    });
+
     $(document).ready(function () {
+
+        $('#CmdProductEditOk').click(function () {
+            if (FormValidate() == true) {
+                CmdProductEditOkFunction();
+                $('#ProductEdit').modal('hide');
+            }
+            else {
+                toastr.error("Fill the required field!");
+            }
+        });
+
+        $('#CmdProductEditCancel, .close').click(function () {
+            $("form input").removeClass("errorHighlight");
+            $('form')[0].reset();
+            $('#ProductEdit').modal('hide');
+        });
+
+        $('.close-btn').hide();
+
         btnFirstPageProduct = document.getElementById('btnMoveToFirstPageProduct');
         btnPreviousPageProduct = document.getElementById('btnMoveToPreviousPageProduct');
         btnNextPageProduct = document.getElementById('btnMoveToNextPageProduct');

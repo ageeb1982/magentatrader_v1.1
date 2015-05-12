@@ -4,12 +4,14 @@
 
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/css/styles.css" rel="stylesheet" />
+<link href="~/css/toastr.css" rel="stylesheet" />
 
 <script src="/js/jquery-1.10.2.min.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.js"></script>
 
 <script src="/js/date.js"></script>
-@*<script src="/js/jquery.validate.js"></script>*@
+<script src="/js/jquery.validate.js"></script>
+<script src="~/js/toastr.js"></script>
 
 <script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
 <script src="/wijmo/controls/wijmo.input.min.js"></script>
@@ -94,7 +96,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                <button type="button" class="close" @*data-dismiss="modal"*@ aria-hidden="true">
                     &times;
                 </button>
                 <h4 class="modal-title">Event Edit</h4>
@@ -105,24 +107,24 @@
                         <dt>Date</dt>
                         <dd>
                             <input class="form-control required" id="EventEdit_Id" type="hidden" />
-                            <div id="EventEdit_EventDate" name="EventEdit_EventDate"></div>
+                            <div id="EventEdit_EventDate" name="EventEdit_EventDate" ></div>
                             <input class="form-control" id="EventEdit_EventDate_Data" type="hidden" />
                         </dd>
                         <dt>Event</dt>
                         <dd>
-                            <input class="form-control" id="EventEdit_EventDescription" name="EventEdit_EventDescription" type="text" @*required*@ />
+                            <input class="form-control" id="EventEdit_EventDescription" name="EventEdit_EventDescription" type="text" required />
                         </dd>
                         <dt>Particulars</dt>
                         <dd>
-                            <input class="form-control" id="EventEdit_Particulars" name="EventEdit_Particulars" type="text" @*required*@ />
+                            <input class="form-control" id="EventEdit_Particulars" name="EventEdit_Particulars" type="text" />
                         </dd>
                         <dt>URL</dt>
                         <dd>
-                            <input class="form-control" id="EventEdit_URL" name="EventEdit_URL" type="url" @*required*@ />
+                            <input class="form-control" id="EventEdit_URL" name="EventEdit_URL" type="url" required placeholder="https://sample.com"/>
                         </dd>
                         <dt>Video URL</dt>
                         <dd>
-                            <input class="form-control" id="EventEdit_VideoURL" name="EventEdit_VideoURL" type="url" @*required*@ />
+                            <input class="form-control" id="EventEdit_VideoURL" name="EventEdit_VideoURL" type="url" />
                         </dd>
                         <dt>Type</dt>
                         <dd>
@@ -257,13 +259,14 @@
                 dataType: "json",
                 statusCode: {
                     200: function () {
-                        window.location.reload();
+                        toastr.success('Successfully Deleted!');
+                        window.setTimeout(function () { location.reload() }, 3000);
                     },
                     404: function () {
-                        alert("Not found");
+                        toastr.error("Not found!");
                     },
                     400: function () {
-                        alert("Bad request");
+                        toastr.error("Bad request");
                     }
                 }
             });
@@ -271,8 +274,7 @@
     }
 
     function CmdEventEditOkFunction() {
-        //console.log('hello');
-        if (confirm("Save Event?") == true) {
+        //if (confirm("Save Event?") == true) {
             var Event = new Object();
 
             Event.Id = document.getElementById('EventEdit_Id').value;
@@ -297,7 +299,8 @@
                     data: data,
                     success: function (id) {
                         if (id > 0) {
-                            window.location.reload();
+                            toastr.success('Successfully Added!');
+                            window.setTimeout(function () { location.reload() }, 3000);
                         } else {
                             alert("Not added");
                         }
@@ -314,18 +317,19 @@
                     data: data,
                     statusCode: {
                         200: function () {
-                            window.location.reload();
+                            toastr.success('Successfully Modified!');
+                            window.setTimeout(function () { location.reload() }, 3000);
                         },
                         404: function () {
-                            alert("Not found");
+                            toastr.error("Not found!");
                         },
                         400: function () {
-                            alert("Bad request");
+                            toastr.error("Bad Request!");
                         }
                     }
                 });
             }
-        }
+        //}
     }
     
 
@@ -376,11 +380,11 @@
             dataType: "json",
             data: { Id: EventId },
             success: function (response) {
-                alert("Event deleted.");
-                window.location.reload();
+                toastr.success('Successfully Deleted!');
+                window.setTimeout(function () { location.reload() }, 3000);
             },
             failure: function (response) {
-                alert("Error - " + response.d);
+                toastr.error("Error - " + response.d);
             },
             error: function (e) { }
         });
@@ -413,54 +417,52 @@
         btnCurrentPageEvent.innerHTML = (Events.pageIndex + 1) + ' / ' + Events.pageCount;
     }
 
-   // function FormValidator() {
-   //     console.log("hello");
-   //     $('form').validate({
-   //         debug: true,
-   //         rules: {
-   //             "EventEdit_EventDescription": "required"
-   //         },
-   //         messages: {
-   //             "EventEdit_EventDescription": "Please enter a valid Description"
-   //         },
-   //         submitHandler: function (form) {
-   //             form.submit();
-   //         }
-   //     });
-   //}
+   function FormValidate() {
+       var validator = $('form').validate({
+           submitHandler: function (form) {
+               form.submit();
+           }
+       });
 
-   //function FormValidate() {
-   //    var validator = $('form').validate({
-   //        rules: {
-   //            "EventEdit_EventDescription": "required"
-   //        },
-   //        messages: {
-   //            "EventEdit_EventDescription": "Please enter a valid Description"
-   //        },
-   //        submitHandler: function (form) {
-   //            form.submit();
-   //        }
-   //    });
-   //    var x = validator.form();
-   //    console.log(x);
-   //    return x;
-   //}
+       var x = validator.form();
+       console.log(x);
+       return x;
+   }
+
+   $.validator.setDefaults({
+       errorPlacement: function (error, element) {
+           $(element).attr({ "title": error.append() });
+       },
+       highlight: function (element) {
+           //$(element).css({"border": "2px solid #CC0000"});
+           $(element).removeClass("textinput");
+           $(element).addClass("errorHighlight");
+       },
+       unhighlight: function (element) {
+           //$(element).css({"border": "2px solid #CC0000"});
+           $(element).removeClass("errorHighlight");
+           $(element).addClass("textinput");
+       }
+   });
 
    $(document).ready(function () {
 
        $('#CmdEventEditOk').click(function () {
-           //if (FormValidate() == true) {
+           if (FormValidate() == true) {
                CmdEventEditOkFunction();
-               //$('#EventEdit').modal('hide');
-           //}
+               $('#EventEdit').modal('hide');
+           }
+           else
+               toastr.error("URL must contain <i>https://</i> and <i>.com</i> ", 'Fill in the required fields.')
        });
 
-       $('#CmdEventEditCancel').click(function () {
-           $("form div").removeClass("error");
-           $("form label").removeClass("error");
+       $('#CmdEventEditCancel, .close').click(function () {
+           $("form input").removeClass("errorHighlight");
            $('form')[0].reset();
            $('#EventEdit').modal('hide');
        });
+
+       $('.close-btn').hide();
 
         btnFirstPageEvent = document.getElementById('btnMoveToFirstPageEvent');
         btnPreviousPageEvent = document.getElementById('btnMoveToPreviousPageEvent');
