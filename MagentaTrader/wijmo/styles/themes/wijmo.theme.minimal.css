@@ -20,6 +20,9 @@ div[wj-part='cells'] {
   background: #e8e8e8;
   color: #999999;
 }
+.wj-flexgrid .wj-marker {
+  background: #a2bdeb;
+}
 /* -- Grid -- */
 div[wj-part='root'] {
   background: #f2f2f2;
@@ -40,9 +43,12 @@ div[wj-part='root'] {
 div[wj-part='rhcells'] .wj-header {
   background: #dddddd;
 }
-.wj-cell {
+.wj-cell:not(.wj-frozen-col):not(.wj-frozen-row):not(.wj-frozen) {
   border-right: 0px solid rgba(0, 0, 0, 0.2);
   border-bottom: 0px solid rgba(0, 0, 0, 0.2);
+}
+[dir="rtl"] .wj-cell {
+  border-left: 0px solid rgba(0, 0, 0, 0.2);
 }
 .wj-cell:not(.wj-header):not(.wj-group):not(.wj-alt):not(.wj-state-selected):not(.wj-state-multi-selected) {
   /* Default grid cell color */
@@ -54,11 +60,21 @@ div[wj-part='rhcells'] .wj-header {
 }
 .wj-frozen:not(.wj-header):not(.wj-group):not(.wj-alt):not(.wj-state-selected):not(.wj-state-multi-selected) {
   /* Default frozen cell color */
-  background: #f2f2f2;
+  background: #e4ecf2;
+  color: #666666;
 }
 .wj-frozen.wj-alt:not(.wj-header):not(.wj-group):not(.wj-state-selected):not(.wj-state-multi-selected) {
   /* Alternate frozen cell color */
-  background: #f2f2f2;
+  background: #d3e0ea;
+  color: #666666;
+}
+.wj-frozen-row {
+  border-bottom-color: #666666;
+  border-width: 0px;
+}
+.wj-frozen-col {
+  border-right-color: #666666;
+  border-width: 0px;
 }
 /* -- Buttons -- */
 .wj-content:not(.customEdit) .wj-input-group-btn > .wj-btn,

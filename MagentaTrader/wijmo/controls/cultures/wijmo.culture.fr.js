@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -46,7 +46,53 @@ var wijmo;
             }
         },
         FlexGrid: {
-            groupHeaderFormat: '{name}: <b>{value} </b>({count} articles)'
+            groupHeaderFormat: '{name}: <b>{value} </b>({count:n0} articles)'
+        },
+        FlexGridFilter: {
+            // filter
+            ascending: '\u2191 Croissant',
+            descending: '\u2193 Decroissant',
+            apply: 'Appliquer',
+            clear: 'Supprimer',
+            conditions: 'Conditions',
+            values: 'Valeurs',
+            // value filter
+            search: 'Filtre',
+            selectAll: 'Sélectionner tous',
+            null: '(nul)',
+            // condition filter
+            header: 'Afficher articles où la valeur',
+            and: 'Et',
+            or: 'Ou',
+            stringOperators: [
+                { name: '(Non définie)', op: null },
+                { name: 'Est égale à', op: 0 },
+                { name: 'N\'est pas égale à', op: 1 },
+                { name: 'Commence par', op: 6 },
+                { name: 'Se termine par', op: 7 },
+                { name: 'Contient', op: 8 },
+                { name: 'Ne contient pas', op: 9 }
+            ],
+            numberOperators: [
+                { name: '(Non définie)', op: null },
+                { name: 'Est égale à', op: 0 },
+                { name: 'N\'est pas égale à', op: 1 },
+                { name: 'Est supérieure à', op: 2 },
+                { name: 'Est supérieure ou égale à', op: 3 },
+                { name: 'Est inférieure à', op: 4 },
+                { name: 'Est inférieure ou égale à', op: 5 }
+            ],
+            dateOperators: [
+                { name: '(Non définie)', op: null },
+                { name: 'Est égale à', op: 0 },
+                { name: 'Est avant', op: 4 },
+                { name: 'Est après', op: 3 }
+            ],
+            booleanOperators: [
+                { name: '(Non définie)', op: null },
+                { name: 'Est égale à', op: 0 },
+                { name: 'N\'est pas égale à', op: 1 }
+            ]
         }
     };
 })(wijmo || (wijmo = {}));

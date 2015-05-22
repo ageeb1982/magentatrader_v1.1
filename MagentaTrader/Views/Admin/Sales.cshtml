@@ -6,11 +6,10 @@
 <link href="/css/styles.css" rel="stylesheet" />
 <link href="~/css/toastr.css" rel="stylesheet" />
 
-<script src="/js/jquery.js"></script>
+<script src="/js/jquery-1.10.2.min.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.js"></script>
 
 <script src="/js/date.js"></script>
-<script src="/js/jquery.slimscroll.min.js"></script>
 <script src="/js/jquery.validate.js"></script>
 <script src="~/js/toastr.js"></script>
 
@@ -498,6 +497,7 @@
                             IsRefunded: Results[i]["IsRefunded"]
                         });
                     }
+                    debugger;
                     $("#AmountTotal").text("Total Amount: " + (Amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
                 } else {
                     alert("No data.");
@@ -508,6 +508,7 @@
                 alert(err);
             }
         );
+        debugger;
         return sales;
     }
     function getUsersInfo(id) {
@@ -709,8 +710,8 @@
         UserList = new wijmo.collections.CollectionView(getUsers());
         ProductPackageList = new wijmo.collections.CollectionView(getProductPackage());
 
-        Sales.canFilter = true;
-
+        //Sales.canFilter = true;
+        //debugger;
         var DateFilter = new wijmo.input.InputDate('#SalesDateFilter', {
             format: 'M/d/yyyy',
             value: new Date()
@@ -720,17 +721,22 @@
             filterText = $('#SalesDateFilter').find('input').val(),
             filterPrice = 169;
 
-
         $('#SalesDateFilter').on('click', function () {
             var str = $('#SalesDateFilter').find('input').val();
             filterText = str;
             Sales.refresh();
         });
 
-        Sales.filter = function (item) {
-            //console.log(item.SaleEdit_Price.indexOf(filterText));
-            return !filterText || item.SalesDate.indexOf(filterText) > -1;
-        };
+        var input = document.querySelector('#my-text-box');
+        var messages = document.querySelector('#messages');
+        input.addEventListener('input', function () {
+            messages.textContent += 'input changed to: ' + input.value + '\n';
+        });
+
+        //Sales.filter = function (item) {
+        //    //console.log(item.SaleEdit_Price.indexOf(filterText));
+        //    return !filterText || item.SalesDate.indexOf(filterText) > -1;
+        //};
 
         SalesGrid = new wijmo.grid.FlexGrid('#SalesGrid');
 

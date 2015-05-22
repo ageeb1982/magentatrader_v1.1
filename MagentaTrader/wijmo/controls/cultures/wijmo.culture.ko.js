@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -46,7 +46,53 @@ var wijmo;
             }
         },
         FlexGrid: {
-            groupHeaderFormat: '{name}: <b>{value} </b>({count} 항목)'
+            groupHeaderFormat: '{name}: <b>{value} </b>({count:n0} 항목)'
+        },
+        FlexGridFilter: {
+            // filter
+            ascending: '\u2191 오름차순',
+            descending: '\u2193 내림차순',
+            apply: '적용',
+            clear: '확인',
+            conditions: '조건',
+            values: '값',
+            // value filter
+            search: '검색',
+            selectAll: '모든 선택',
+            null: '(제로)',
+            // condition filter
+            header: '자료 행 보기',
+            and: '그리고',
+            or: '또는',
+            stringOperators: [
+                { name: '(설정되지 않음)', op: null },
+                { name: '같음', op: 0 },
+                { name: '같지 않음', op: 1 },
+                { name: '로 시작', op: 6 },
+                { name: '로 엔드', op: 7 },
+                { name: '포함', op: 8 },
+                { name: '포함하지 않음', op: 9 }
+            ],
+            numberOperators: [
+                { name: '(설정되지 않음)', op: null },
+                { name: '같음', op: 0 },
+                { name: '같지 않음', op: 1 },
+                { name: '보다 큼', op: 2 },
+                { name: '크거나 같음', op: 3 },
+                { name: '보다 작음', op: 4 },
+                { name: '작거나 같음', op: 5 }
+            ],
+            dateOperators: [
+                { name: '(설정되지 않음)', op: null },
+                { name: '같음', op: 0 },
+                { name: '전에', op: 4 },
+                { name: '후', op: 3 }
+            ],
+            booleanOperators: [
+                { name: '(설정되지 않음)', op: null },
+                { name: '같음', op: 0 },
+                { name: '같지 않음', op: 1 }
+            ]
         }
     };
 })(wijmo || (wijmo = {}));

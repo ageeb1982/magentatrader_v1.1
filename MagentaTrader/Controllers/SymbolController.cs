@@ -94,10 +94,10 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
-        // GET api/SymbolScreener/NYSE/10/1000000/100/C0
+        // GET api/SymbolScreener/NYSE/10/1000000/100/C0/8
         [Authorize]
-        [Route("api/SymbolScreener/{Exchange}/{Price}/{Volume}/{GrowthDecayRate}/{GrowthDecayTime}")]
-        public List<Models.Symbol> GetSymbolScreener(string Exchange, decimal Price, decimal Volume, decimal GrowthDecayRate, string GrowthDecayTime)
+        [Route("api/SymbolScreener/{Exchange}/{Price}/{Volume}/{GrowthDecayRate}/{GrowthDecayTime}/{NoOfYears}")]
+        public List<Models.Symbol> GetSymbolScreener(string Exchange, decimal Price, decimal Volume, decimal GrowthDecayRate, string GrowthDecayTime, int NoOfYears)
         {
             var retryCounter = 0;
 
@@ -111,6 +111,7 @@ namespace MagentaTrader.Controllers
                                   where (Exchange == "All" ? true : d.Exchange == Exchange) &&
                                         (d.ClosePrice >= Price) &&
                                         (d.Volume >= Volume) &&
+                                        (d.NoOfYears >= NoOfYears) &&
                                         (GrowthDecayTime == "C0" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value) >= GrowthDecayRate ? true : false) : true) == true &&
                                         (GrowthDecayTime == "C0" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value) ? true : false) : true) == true &&
                                         (GrowthDecayTime == "W1" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRateW1.Value == null ? 0 : d.GrowthDecayRateW1.Value) >= GrowthDecayRate ? true : false) : true) == true &&
@@ -139,7 +140,16 @@ namespace MagentaTrader.Controllers
                                       GrowthDecayRateM1 = d.GrowthDecayRateM1.Value == null ? 0 : d.GrowthDecayRateM1.Value,
                                       GrowthDecayRateM2 = d.GrowthDecayRateM2.Value == null ? 0 : d.GrowthDecayRateM2.Value,
                                       GrowthDecayRateM3 = d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value,
-                                      NoOfYears = d.NoOfYears.Value == null ? 0 : d.NoOfYears.Value
+                                      NoOfYears = d.NoOfYears.Value == null ? 0 : d.NoOfYears.Value,
+                                      TrendNoOfDays = d.TrendNoOfDays == null ? 0 : d.TrendNoOfDays.Value,
+                                      WinLossCurrent30 = d.WinLossCurrent30 == null ? "NA" : d.WinLossCurrent30,
+                                      WinLossAverageCurrent30 = d.WinLossAverageCurrent30.Value == null ? 0 : d.WinLossAverageCurrent30.Value,
+                                      WinLoss20 = d.WinLoss20 == null ? "NA" : d.WinLoss20,
+                                      WinLossAverage20 = d.WinLossAverage20.Value == null ? 0 : d.WinLossAverage20.Value,
+                                      WinLoss40 = d.WinLoss40 == null ? "NA" : d.WinLoss40,
+                                      WinLossAverage40 = d.WinLossAverage40.Value == null ? 0 : d.WinLossAverage40.Value,
+                                      WinLoss60 = d.WinLoss60 == null ? "NA" : d.WinLoss60,
+                                      WinLossAverage60 = d.WinLossAverage60.Value == null ? 0 : d.WinLossAverage60.Value
                                   };
                     if (Symbols.Count() > 0)
                     {

@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -39,6 +39,10 @@ declare module wijmo.input {
         */
         constructor(element: any, options?: any);
         /**
+        * Checks whether this control or its drop-down contain the focused element.
+        */
+        public containsFocus(): boolean;
+        /**
         * Gets or sets the text shown on the control.
         */
         public text : string;
@@ -57,6 +61,11 @@ declare module wijmo.input {
         * Gets or sets a value indicating whether the drop down is currently visible.
         */
         public isDroppedDown : boolean;
+        /**
+        * Gets the drop down element shown when the @see:isDroppedDown
+        * property is set to true.
+        */
+        public dropDown : HTMLElement;
         /**
         * Gets or sets a value indicating whether the control should display a drop-down button.
         */
@@ -177,7 +186,8 @@ declare module wijmo.input {
         * If specified, the function takes two parameters:
         * <ul>
         *     <li>the date being formatted </li>
-        *     <li>the HTML element that represents the date</li></ul>
+        *     <li>the HTML element that represents the date</li>
+        * </ul>
         *
         * For example, the code below shows weekends in a disabled state:
         * <pre>
@@ -334,6 +344,7 @@ declare module wijmo.input {
         public _itemFormatter: Function;
         public _pathDisplay: string;
         public _pathValue: string;
+        public _pathChecked: string;
         public _html: boolean;
         /**
         * Gets or sets the template used to instantiate @see:ListBox controls.
@@ -346,6 +357,10 @@ declare module wijmo.input {
         * @param options The JavaScript object containing initialization data for the control.
         */
         constructor(element: any, options?: any);
+        /**
+        * Refreshes the list.
+        */
+        public refresh(): void;
         /**
         * Gets or sets the array or @see:ICollectionView object that contains the list items.
         */
@@ -382,9 +397,19 @@ declare module wijmo.input {
         */
         public displayMemberPath : string;
         /**
-        * Gets or sets the name of the property used to get the @see:selectedValue from the @see:selectedItem.
+        * Gets or sets the name of the property used to get the @see:selectedValue
+        * from the @see:selectedItem.
         */
         public selectedValuePath : string;
+        /**
+        * Gets or sets the name of the property used to control checkboxes placed next
+        * to each item.
+        *
+        * Use this property to create multi-select lisboxes.
+        * When an item is checked or unchecked, the control raises the @see:itemChecked event.
+        * Use the @see:selectedItem property to retrieve the item that was checked or unchecked.
+        */
+        public checkedMemberPath : string;
         /**
         * Gets the string displayed for the item at a given index.
         *
@@ -436,10 +461,24 @@ declare module wijmo.input {
         * Raises the @see:itemsChanged event.
         */
         public onItemsChanged(e?: EventArgs): void;
+        /**
+        * Occurs when the current item is checked or unchecked.
+        *
+        * This event is raised when the @see:checkedMemberPath is set to the name of a
+        * property to add checkboxes to each item in the control.
+        *
+        * Use the @see:selectedItem property to retrieve the item that was checked or
+        * unchecked.
+        */
+        public itemChecked: Event;
+        /**
+        * Raises the @see:itemCheched event.
+        */
+        public onItemChecked(e?: EventArgs): void;
         private _cvCollectionChanged(sender, e);
         private _cvCurrentChanged(sender, e);
         private _populateList();
-        private _mousedown(e);
+        private _click(e);
         private _keydown(e);
         private _keypress(e);
         public _populateSelectElement(hostElement: HTMLElement): void;
@@ -474,6 +513,7 @@ declare module wijmo.input {
         public _lbx: ListBox;
         public _required: boolean;
         public _editable: boolean;
+        public _composing: boolean;
         public _deleting: boolean;
         public _settingText: boolean;
         /**
@@ -578,9 +618,10 @@ declare module wijmo.input {
         public _updateBtn(): void;
         public _createDropDown(): void;
         public _setText(text: string, fullMatch: boolean): void;
-        public _findNext(text: string, step: number): number;
+        private _findNext(text, step);
         public _handleKeyDown(e: KeyboardEvent): void;
-        public _setSelectionRange(start: number, end: number): void;
+        private _setSelectionRange(start, end);
+        private _getSelStart();
     }
 }
 
@@ -606,6 +647,7 @@ declare module wijmo.input {
         private _itemsSourceFn;
         private _minLength;
         private _maxItems;
+        private _itemCount;
         private _delay;
         private _cssMatch;
         private _toSearch;
@@ -640,7 +682,8 @@ declare module wijmo.input {
         * <ul>
         *     <li>the query string typed by the user</li>
         *     <li>the maximum number of items to return</li>
-        *     <li>the callback function to call when the results become available</li></ul>
+        *     <li>the callback function to call when the results become available</li>
+        * </ul>
         *
         * For example:
         * <pre>
@@ -721,6 +764,7 @@ declare module wijmo.input {
         public _command: any;
         public _cmdPath: string;
         public _cmdParamPath: string;
+        public _isButton: boolean;
         /**
         * Initializes a new instance of a @see:Menu control.
         *
@@ -766,6 +810,46 @@ declare module wijmo.input {
         */
         public commandParameterPath : string;
         /**
+        * Gets or sets a value that determines whether this @see:Menu should act
+        * as a split button instead of a regular menu.
+        *
+        * The difference between regular menus and split buttons is what happens
+        * when the user clicks the menu header.
+        * In regular menus, clicking the header shows or hides the menu options.
+        * In split buttons, clicking the header raises the @see:menuItemClicked event
+        * and/or invokes the command associated with the last option selected by
+        * the user as if the user had picked the item from the drop-down list.
+        *
+        * If you want to differentiate between clicks on menu items and the button
+        * part of a split button, check the value of the @see:isDroppedDown property
+        * of the event sender. If that is true, then a menu item was clicked; if it
+        * is false, then the button was clicked.
+        *
+        * For example, the code below implements a split button that uses the drop-down
+        * list only to change the default item/command, and triggers actions only when
+        * the button is clicked:
+        *
+        * <pre>&lt;-- view --&gt;
+        * &lt;wj-menu is-button="true" header="Run" value="browser"
+        *   item-clicked="menuItemClicked(s, e)"&gt;
+        *   &lt;wj-menu-item value="'Internet Explorer'"&gt;Internet Explorer&lt;/wj-menu-item&gt;
+        *   &lt;wj-menu-item value="'Chrome'"&gt;Chrome&lt;/wj-menu-item&gt;
+        *   &lt;wj-menu-item value="'FireFox'"&gt;FireFox&lt;/wj-menu-item&gt;
+        *   &lt;wj-menu-item value="'Safari'"&gt;Safari&lt;/wj-menu-item&gt;
+        *   &lt;wj-menu-item value="'Opera'"&gt;Opera&lt;/wj-menu-item&gt;
+        * &lt;/wj-menu&gt;
+        *
+        * // controller
+        * $scope.browser = 'Internet Explorer';
+        * $scope.menuItemClicked = function (s, e) {
+        *   // if not dropped down, click was on the button
+        *   if (!s.isDroppedDown) {
+        *     alert('running ' + $scope.browser);
+        *   }
+        *}</pre>
+        */
+        public isButton : boolean;
+        /**
         * Occurs when the user picksk an item from the menu.
         *
         * The handler can determine which item was picked by reading the event sender's
@@ -778,6 +862,7 @@ declare module wijmo.input {
         public onItemClicked(e?: EventArgs): void;
         public onTextChanged(e?: EventArgs): void;
         public onIsDroppedDownChanged(e?: EventArgs): void;
+        public _raiseCommand(e?: EventArgs): void;
         public _getCommand(item: any): any;
         public _executeCommand(cmd: any, parm: any): void;
         public _canExecuteCommand(cmd: any, parm: any): boolean;
@@ -1106,6 +1191,7 @@ declare module wijmo.input {
         private _keypress(e);
         private _keydown(e);
         private _input(e);
+        private _getSelStart();
     }
 }
 

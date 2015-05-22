@@ -31,5 +31,14 @@ namespace MagentaTrader.Models
         public decimal GrowthDecayRateM2 { get; set; }
         public decimal GrowthDecayRateM3 { get; set; }
         public int NoOfYears { get; set; }
+        public int TrendNoOfDays { get; set; }
+        public string WinLossCurrent30 { get; set; }
+        public decimal WinLossAverageCurrent30 { get; set; }
+        public string WinLoss20 { get; set; }
+        public decimal WinLossAverage20 { get; set; }
+        public string WinLoss40 { get; set; }
+        public decimal WinLossAverage40 { get; set; }
+        public string WinLoss60 { get; set; }
+        public decimal WinLossAverage60 { get; set; }
     }
 }

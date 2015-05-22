@@ -6,6 +6,11 @@
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	border-radius: 4px;
 	background-color: #fff;
+	outline: none;
+}
+
+.wj-control {
+	outline: none;
 }
 
 .wj-header {
@@ -36,12 +41,7 @@
 	/* HTML disabled controls */
 	background-color: #eeeeee;
 	opacity: .5;
-	cursor: not-allowed;
 }
-
-	.wj-control[disabled] * {
-		cursor: not-allowed;
-	}
 
 /* Button Styles */
 
@@ -56,7 +56,7 @@ button, html input[type=button], input[type=reset], input[type=submit] {
 .wj-btn {
 	/* Global base button style */
 	display: block;
-	padding: 5px 10px;
+	padding: 4px 10px;
 	height: 100%;
 	vertical-align: middle;
 	text-align: center;
@@ -138,6 +138,11 @@ button, html input[type=button], input[type=reset], input[type=submit] {
 		background-color: rgba(0,0,0,.05);
 	}
 
+	.wj-listbox .wj-listbox-item label {
+		font-weight: normal;
+		margin: 0px;
+	}
+
 .wj-dropdown .wj-listbox {
 	padding: 0;
 	white-space: nowrap;
@@ -160,7 +165,8 @@ button, html input[type=button], input[type=reset], input[type=submit] {
 .wj-dropdown-panel {
 	outline: none;
 	box-shadow: 0 6px 13px rgba(0,0,0,0.2);
-	z-index: 200 !important;
+	/* Boostrap modals have zIndex 1050, so go higher */
+	z-index: 1500 !important;
 }
 
 
@@ -258,7 +264,6 @@ button, input, optgroup, select, textarea {
 /* Pager Styles */
 
 .wj-pager {
-
 	vertical-align: middle;
 	margin-left: 5px;
 	margin-right: 5px;
@@ -293,7 +298,7 @@ button, input, optgroup, select, textarea {
 	text-align: center;
 }
 
-.wj-dropdown-menu .wj-calendar-outer {
+.wj-dropdown-panel .wj-calendar-outer {
 	/* Remove background, border when in dropdown */
 	border: 0;
 	background: none;
@@ -382,6 +387,11 @@ button, input, optgroup, select, textarea {
 	border-bottom: 1px solid #c6c6c6;
 }
 
+.wj-cell.wj-state-selected .wj-control, .wj-cell.wj-state-multi-selected .wj-control {
+	/* Text color for nested controls in a selected row */
+	color: #444;
+}
+
 [dir="rtl"] .wj-cell {
 	border-left: 1px solid #c6c6c6;
 	border-right: none;
@@ -412,9 +422,11 @@ button, input, optgroup, select, textarea {
 .wj-frozen-row {
     border-bottom: 1px solid #666;
 }
+
 .wj-frozen-col {
     border-right: 1px solid #666;
 }
+
 [dir="rtl"] .wj-frozen-col {
     border-left: 1px solid #666;
     border-right: none;
@@ -424,12 +436,63 @@ button, input, optgroup, select, textarea {
 	background-color: #dddddd;
 }
 
+.wj-flexgrid .wj-marker {
+	position: absolute;
+	background-color: #0085c7;
+	opacity: 0.5;
+}
+
 /* remove spinner buttons from InputNumber control */
 .wj-inputnumber input[type=number]::-webkit-inner-spin-button,
 .wj-inputnumber input[type=number]::-webkit-outer-spin-button {
 	-webkit-appearance: none;
 	margin: 0;
 }
+
+/* FlexGrid Filter extension */
+
+.wj-columnfiltereditor {
+	padding: 10px;
+	min-width: 230px;
+}
+
+	.wj-columnfiltereditor .wj-control {
+		margin-bottom: 6px;
+		width: 100%;
+	}
+
+	.wj-columnfiltereditor a[wj-part^="btn-"] {
+		background: #e6e6e6;
+		padding: 6px 20px;
+		color: #444;
+		display: inline-block;
+		margin-top: 5px;
+		text-decoration: none;
+		font-size: 12px;
+		font-weight: bold;
+	}
+
+		.wj-columnfiltereditor a[wj-part^="btn-"]:hover {
+			text-decoration: none;
+			background: #e0e0e0;
+		}
+
+/* FlexGrid GroupPanel extension */
+.wj-grouppanel {
+	background-color: #f4f4f4;
+	padding: 15px;
+}
+
+	.wj-grouppanel .wj-cell {
+		margin-right: 10px;
+		padding: 6px 16px;
+		border: 1px solid #e6e6e6;
+		cursor: pointer;
+	}
+
+		.wj-grouppanel .wj-cell:hover {
+			background: #e0e0e0;
+		}
 
 /* WJ Tooltip */
 
@@ -482,6 +545,14 @@ button, input, optgroup, select, textarea {
 
 	.wj-flexchart .wj-legend .wj-label {
 		fill: #666;
+	}
+
+  	.wj-flexchart .wj-data-label {
+		fill: #666;
+	}
+
+    .wj-flexchart .wj-data-label-border {
+        stroke: rgba(128, 128, 128, 0.5);
 	}
 
 	.wj-flexchart .wj-axis-x .wj-title,
@@ -586,8 +657,9 @@ button, input, optgroup, select, textarea {
 	}
      
 /* range selector */     
-.wj-flexchart .wj-rangeselector{     
+.wj-flexchart .wj-rangeselector {
    visibility: hidden;
+   position: relative;
 }     
 
 .wj-flexchart .wj-rangeselector .wj-scroller {     
@@ -596,7 +668,7 @@ button, input, optgroup, select, textarea {
    display: block;     
    background-color: whitesmoke;
    opacity: 0.6;
-   border-radius:0.5em;
+		border-radius: 0.5em;
    touch-action: none;
 }
 
@@ -615,24 +687,39 @@ button, input, optgroup, select, textarea {
    touch-action: none;
 }
 
-/* marker */   
+/* chart marker */
 
-.wj-flexchart .wj-chart-marker {     
+.wj-flexchart .wj-chart-linemarker {     
    background: rgba(128, 128, 128, 0.3);     
    position: absolute;     
+   padding: 2px;
 }
 
-.wj-flexchart .wj-chart-marker .wj-chart-marker-hline {     
+.wj-flexchart .wj-chart-linemarker-container {
+	position: relative;
+}
+
+.wj-flexchart .wj-chart-linemarker .wj-chart-linemarker-hline {     
     height: 2px;
     background: rgba(128, 128, 128, 1);
     touch-action: none;
+	position: absolute;
 }
 
-.wj-flexchart .wj-chart-marker .wj-chart-marker-vline {     
+.wj-flexchart .wj-chart-linemarker .wj-chart-linemarker-vline {     
     width: 2px;   
     background: rgba(128, 128, 128, 1);   
     touch-action: none;
+	position: absolute;
 }
+
+.wj-flexchart.wj-chart-linemarker-draggable,
+.wj-flexchart .wj-chart-linemarker .wj-chart-linemarker-draggable {     
+    -moz-user-select:none;
+	-khtml-user-drag:element;
+	cursor:move;
+}
+
 /* Gauges */
 
 .wj-gauge {
@@ -670,12 +757,43 @@ button, input, optgroup, select, textarea {
 /* ColorPicker */
 
 .wj-colorpicker {
-    width:420px;
-    height:200px;
-    padding:4px;
+	width: 420px;
+	height: 200px;
+	padding: 4px;
 }
+
 .wj-colorbox {
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+/* TreeView*/
+
+/*.wj-treeview-path {
+    height: 1em;
+}*/
+
+.wj-treenode {
+    display: block;
+}
+
+.wj-treenode .wj-treenode {
+    margin-left: 2em;
+}
+
+.wj-treenode-label {
+    cursor: pointer;
+    margin: 0.5em;
+}
+
+/* CheckBox */
+.wj-checkbox {
+    font-weight: bold;
+    text-align: center;
+    line-height: 1em;
+    width: 1em;
+    height: 1em;
+    border: 1px solid gray;
+    cursor: pointer;
 }
 
 /* Glyphs */
@@ -752,7 +870,6 @@ button, input, optgroup, select, textarea {
 	display: inline-block;
 	border: .25em solid;
 	border-radius: 1em;
-	-webkit-transform: translateY(-.1em);
 	transform: translateY(-.1em);
 	opacity: 0.75;
 	cursor: pointer;
@@ -768,11 +885,47 @@ button, input, optgroup, select, textarea {
 .wj-glyph-diamond {
 	display: inline-block;
 	border: .25em solid;
-	-webkit-transform: rotate(45deg);
-	-webkit-transform-origin: 50% 50%;
 	transform: rotate(45deg);
 	transform-origin: 50% 50%;
 	opacity: 0.75;
 	cursor: pointer;
 }
+
+.wj-glyph-check {
+	position: relative;
+	display: inline-block;
+	width: .75em;
+	height: .75em;
+	border-right: .3em solid;
+	border-bottom: .22em solid;
+	transform: rotate(35deg) scaleX(.5);
+	opacity: 0.75;
+	cursor: pointer;
+}
+
+.wj-glyph-filter {
+	position: relative;
+	box-sizing: border-box;
+	display: inline-block;
+	top: -.1em;
+	width: .5em;
+	border-top: .5em solid;
+	border-right: .4em solid transparent;
+	border-left: .4em solid transparent;
+	opacity: 0.75;
+	cursor: pointer;
+}
+.wj-glyph-filter:after {
+	position: absolute;
+	    box-sizing: border-box;
+	border: .12em solid;
+	width: .12em;
+	height: .4em;
+	transform: translateX(-50%);
+	top: -.2em;
+	content: "";
+}
+    [dir="rtl"] .wj-glyph-filter:after {
+	    transform: translateX(50%);
+    }
 

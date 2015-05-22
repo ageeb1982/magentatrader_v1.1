@@ -536,6 +536,11 @@
 
     // Tradier
 
+    function getGainLossColor(gainLoss) {
+        var GreenColor = "#0FB203";
+        var RedColor = "#A80008";
+        return gainLoss >= 0 ? GreenColor : RedColor;
+    }
     function connectTradier() {
         TradierAccessToken == ""
         document.cookie = "TradierAccessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
@@ -714,14 +719,20 @@
 
                     for (i = 0; i < result.positions.position.length; i++) {
                         TradierPositionData.push({
+                            sell_id: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='sellTradierEquity' onclick='sellTradierEquity()'>Sell</button>",
                             id: result.positions.position[i].id,
                             cost_basis: result.positions.position[i].cost_basis,
                             date_acquired: result.positions.position[i].date_acquired,
                             quantity: result.positions.position[i].quantity,
-                            symbol: result.positions.position[i].symbol
+                            last: 0,
+                            change: 0,
+                            value: 0,
+                            gain_loss: 0,
+                            symbol: result.positions.position[i].symbol,
+                            description: ""
                         });
                     }
-
+                   
                     var TradierPositionDataCollection = new wijmo.collections.CollectionView(TradierPositionData);
 
                     $('.nav-tabs a[href="#TradierPositions"]').tab('show');
@@ -729,41 +740,99 @@
                     TradierPositionsGrid = new wijmo.grid.FlexGrid('#TradierPositionsGrid');
 
                     TradierPositionsGrid.initialize({
-                        columns: [
-                                    {
-                                        "header": "Date of acquisition",
-                                        "binding": "date_acquired",
-                                        "width": "2*",
+                        columns: [  {
+                                        "header": "Sell",
+                                        "binding": "sell_id",
+                                        "width": 60,
                                         "isContentHtml": true
                                     },
                                     {
                                         "header": "Symbol",
                                         "binding": "symbol",
-                                        "width": "1*",
+                                        "width": 200,
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "Number of shares held",
+                                        "header": "Quantity",
                                         "binding": "quantity",
-                                        "width": "1*",
+                                        "width": "6*",
                                         "isContentHtml": true
                                     },
                                     {
-                                        "header": "Cost basis",
+                                        "header": "Last (US$)",
+                                        "binding": "last",
+                                        "width": "6*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Change",
+                                        "binding": "change",
+                                        "width": "6*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Value (US$)",
+                                        "binding": "value",
+                                        "width": "6*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Cost Basis (US$)",
                                         "binding": "cost_basis",
-                                        "width": "1*",
+                                        "width": "6*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Gain/Loss (US$)",
+                                        "binding": "gain_loss",
+                                        "width": "6*",
                                         "isContentHtml": true
                                     }
                         ],
                         autoGenerateColumns: false,
                         itemsSource: TradierPositionDataCollection,
                         isReadOnly: true,
-                        selectionMode: wijmo.grid.SelectionMode.Row
+                        selectionMode: wijmo.grid.SelectionMode.Row,
+                        itemFormatter: function (panel, r, c, cell) {
+                            if (wijmo.grid.CellType.Cell == panel.cellType && panel.columns[c].binding == 'gain_loss') {
+                                var cellData = panel.getCellData(r, c);
+                                cell.style.color = getGainLossColor(cellData);
+                            } 
+                        }
                     });
 
                     TradierPositionsGrid.trackChanges = true;
 
                     TradierPositionDataCollection.pageSize = 10;
+
+                    TradierPositionDataCollection.moveCurrentToFirst();
+                    for (var i = 0; i < TradierPositionDataCollection.itemCount; i++) {
+                        var item = TradierPositionDataCollection.currentItem;
+                        TradierPositionDataCollection.editItem(item);
+                        var editItem = TradierPositionDataCollection.currentEditItem;
+                        $.ajax({
+                            url: '/api/GetTradierQuote/' + editItem["symbol"] + '/' + TradierAccessToken,
+                            cache: false,
+                            type: 'GET',
+                            contentType: 'application/json; charset=utf-8',
+                            data: {},
+                            async: false,
+                            success: function (result) {
+                                var last = result.quotes.quote.last;
+                                var change = result.quotes.quote.change;
+                                var value = result.quotes.quote.last * editItem["quantity"];
+                                var gain_loss = value - editItem["cost_basis"];
+
+                                editItem["last"] = last;
+                                editItem["change"] = change;
+                                editItem["value"] = value;
+                                editItem["gain_loss"] = gain_loss;
+
+                                TradierPositionDataCollection.commitEdit();
+                            }
+                        });
+                        TradierPositionDataCollection.moveCurrentToNext();
+                    }
                 }
             });
         }
@@ -1764,7 +1833,6 @@
         }
 
         // Fill the Chart Data and First Closing Price each year
-
         var symbolDescription = dataSymbolDescription;
 
         dayIndex = 126;
@@ -1796,7 +1864,11 @@
                 season: 0,
                 season5Year: 0,
                 seasonCount: dayIndex,
-                volume: volume
+                volume: volume,
+                ema1: 0,
+                ema2: 0,
+                macd: 0,
+                macdSignal: 0
             });
 
             dayIndex--;
@@ -1816,8 +1888,64 @@
             }
         }
 
-        // Compute for the yearly data, e.g., closing price, seasonality, etc.
+        // MACD Computation
+        var macd_index = 0;
 
+        var ema1_closePrices = 0;
+        var ema1_previous = 0;
+        var ema1 = 0;
+        
+        var ema2_closePrices = 0;
+        var ema2_previous = 0;
+        var ema2 = 0;
+
+        var macd_values = 0;
+        var macd_sginal = 0;
+        var macd_sginal_previous = 0;
+
+        for (var i = chartData.length - 1; i >= 0; i--) {
+            if (macd_index < 11) {
+                ema1_closePrices = ema1_closePrices + chartData[i].close;
+            } else if(macd_index == 11) {
+                ema1 = ema1_closePrices / 12;
+                ema1_previous = ema1;
+                chartData[i].ema1 = ema1;
+            } else if (macd_index > 11) {
+                ema1 = (chartData[i].close * (2 / (12 + 1)) + ema1_previous * (1 - (2 / (12 + 1))));
+                ema1_previous = ema1;
+                chartData[i].ema1 = ema1;
+            }
+
+            if (macd_index < 25) {
+                ema2_closePrices = ema2_closePrices + chartData[i].close;
+            } else if (macd_index == 25) {
+                ema2 = ema2_closePrices / 26;
+                ema2_previous = ema2;
+                chartData[i].ema2 = ema2;
+                chartData[i].macd = chartData[i].ema1 - ema2;
+            } else if (macd_index > 11) {
+                ema2 = (chartData[i].close * (2 / (26 + 1)) + ema2_previous * (1 - (2 / (26 + 1))));
+                ema2_previous = ema2;
+                chartData[i].ema2 = ema2;
+                chartData[i].macd = chartData[i].ema1 - ema2;
+            }
+
+            if (macd_index < 34) {
+                macd_values = macd_values + chartData[i].macd;
+            } else if (macd_index == 34) {
+                macd_sginal = macd_values / 9;
+                macd_sginal_previous = macd_sginal;
+                chartData[i].macdSignal = macd_sginal;
+            } else if (macd_index > 34) {
+                macd_sginal = (chartData[i].macd * (2 / (9 + 1)) + macd_sginal * (1 - (2 / (9 + 1))));
+                macd_sginal_previous = macd_sginal;
+                chartData[i].macdSignal = macd_sginal;
+            }
+
+            macd_index++;
+        }
+        debugger;
+        // Compute for the yearly data, e.g., closing price, seasonality, etc.
         var season = 0;
         var season5Year = 0;
 
@@ -1919,7 +2047,9 @@
                     seasonY8: seasonYearData[8][i].toFixed(2),
                     seasonY9: seasonYearData[9][i].toFixed(2),
                     earnings: earning == 0 ? 'NaN' : earning,
-                    volume: chartData[125 - i]["volume"]
+                    volume: chartData[125 - i]["volume"],
+                    macd: AmCharts.roundTo(chartData[125 - i]["macd"], 2),
+                    macdSignal: AmCharts.roundTo(chartData[125 - i]["macdSignal"], 2)
                 });
             }
         }
@@ -1983,6 +2113,12 @@
         }, {
             fromField: "earnings",
             toField: "earnings"
+        }, {
+            fromField: "macd",
+            toField: "macd"
+        }, {
+            fromField: "macdSignal",
+            toField: "macdSignal"
         }];
         dataSet.dataProvider = plotData;
         dataSet.categoryField = "date";
@@ -1994,13 +2130,13 @@
         stockPanel1 = new AmCharts.StockPanel();
         stockPanel1.showCategoryAxis = false;
         stockPanel1.title = symbolDescription;
-        stockPanel1.percentHeight = 80;
+        stockPanel1.percentHeight = 70;
         stockPanel1.recalculateToPercents = "never";
 
         stockPanel2 = new AmCharts.StockPanel();
-        stockPanel2.title = "Volume";
+        //stockPanel2.title = "Volume";
         stockPanel2.allowTurningOff = true;
-        stockPanel2.percentHeight = 20;
+        stockPanel2.percentHeight = 30;
 
         // Current date (middle date) guide
 
@@ -2100,6 +2236,20 @@
         valueAxisFiveYearSeasonality.axisThickness = 0;
         stockPanel1.addValueAxis(valueAxisFiveYearSeasonality);
 
+        var valueAxisVolume = new AmCharts.ValueAxis();
+        valueAxisVolume.labelsEnabled = false;
+        valueAxisVolume.position = "right";
+        valueAxisVolume.gridThickness = 0;
+        valueAxisVolume.axisThickness = 0;
+        stockPanel1.addValueAxis(valueAxisVolume);
+
+        var valueAxisMACD = new AmCharts.ValueAxis();
+        valueAxisMACD.labelsEnabled = false;
+        valueAxisMACD.position = "right";
+        valueAxisMACD.gridThickness = 0;
+        valueAxisMACD.axisThickness = 0;
+        stockPanel2.addValueAxis(valueAxisMACD);
+
         // AMChart Visible Graphs, Price, 10-Year Seasonality, 5-Year Seasonality
 
         var graphPrice = new AmCharts.StockGraph();
@@ -2159,13 +2309,41 @@
 
         var graphVolume = new AmCharts.StockGraph();
         graphVolume.id = "graphVolume";
+        graphVolume.title = "Vol";
         graphVolume.valueField = "volume";
         graphVolume.type = "column";
         graphVolume.useDataSetColors = false;
-        graphVolume.color = "#9C0063";
-        graphVolume.lineColor = "#9C0063";
+        //graphVolume.color = "#9C0063";
+        //graphVolume.lineColor = "#9C0063";
+        graphVolume.color = "#FAD3EF";
+        graphVolume.lineColor = "#FAD3EF";
         graphVolume.showBalloon = false;
         graphVolume.fillAlphas = 1;
+        graphVolume.valueAxis = valueAxisVolume;
+
+        var graphMACD = new AmCharts.StockGraph();
+        graphMACD.id = "graphMACD";
+        graphMACD.title = "MACD";
+        graphMACD.valueField = "macd";
+        graphMACD.useDataSetColors = false;
+        graphMACD.color = "#2922B7";
+        graphMACD.type = "line";
+        graphMACD.lineThickness = 1;
+        graphMACD.lineColor = "#2922B7";
+        graphMACD.showBalloon = false;
+        graphMACD.valueAxis = valueAxisMACD;
+
+        var graphMACDSignal = new AmCharts.StockGraph();
+        graphMACDSignal.id = "graphMACDSignal";
+        graphMACDSignal.title = "Signal";
+        graphMACDSignal.valueField = "macdSignal";
+        graphMACDSignal.useDataSetColors = false;
+        graphMACDSignal.color = "#C20303";
+        graphMACDSignal.type = "line";
+        graphMACDSignal.lineThickness = 1;
+        graphMACDSignal.lineColor = "#C20303";
+        graphMACDSignal.showBalloon = false;
+        graphMACDSignal.valueAxis = valueAxisMACD;
 
         // AMChart Invisible Graphs, Yearly Seasonality
 
@@ -2216,9 +2394,12 @@
         stockPanel1.addStockGraph(graphEarnings);
         stockPanel1.addStockGraph(graphSeason);
         stockPanel1.addStockGraph(graphSeason5Year);
+        stockPanel1.addStockGraph(graphVolume);
         stockPanel1.stockLegend = new AmCharts.StockLegend();
 
-        stockPanel2.addStockGraph(graphVolume);
+        //stockPanel1.addStockGraph(graphVolume);
+        stockPanel2.addStockGraph(graphMACD);
+        stockPanel2.addStockGraph(graphMACDSignal);
         stockPanel2.stockLegend = new AmCharts.StockLegend();
 
         chart.panels = [stockPanel1, stockPanel2];
@@ -2886,7 +3067,7 @@
 
                         }
                     }
-                    // debugger;
+
                     // Plot result
                     if (highestUp > 0) {
                         if (!varScannerUp) varScannerUp = new AmCharts.Guide();

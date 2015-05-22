@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -386,10 +386,6 @@ declare module wijmo {
     */
     function toggleClass(e: HTMLElement, className: string, addOrRemove: boolean): void;
     /**
-    * Determines whether the current device is touch-enabled.
-    */
-    function isTouchDevice(): boolean;
-    /**
     * Gets an element from a jQuery-style selector.
     *
     * @param selector An element, a selector string, or a jQuery object.
@@ -405,10 +401,11 @@ declare module wijmo {
     /**
     * Checks whether an HTML element contains another.
     *
-    * @param parent Element to check.
-    * @param child Child element to test.
+    * @param parent Parent element.
+    * @param child Child element.
+    * @return True if the parent element contains the child element.
     */
-    function contains(parent: HTMLElement, child: HTMLElement): boolean;
+    function contains(parent: any, child: any): boolean;
     /**
     * Gets the bounding rectangle of an element in page coordinates.
     *
@@ -674,11 +671,11 @@ declare module wijmo {
     /**
     * Provides binding to complex properties (e.g. 'customer.address.city')
     */
-    class _Binding {
+    class Binding {
         public _path: string;
         public _parts: string[];
         /**
-        * Initializes a new instance of a _Binding.
+        * Initializes a new instance of a @see:Binding object.
         *
         * @param path Name of the property to bind to.
         */
@@ -742,9 +739,9 @@ declare module wijmo {
         *      Custom Date and Time Format Strings</a></li>
         * </ul>
         *
-        * @param value Number or Date to format.
+        * @param value Number or Date to format (all other types are converted to strings).
         * @param format Format string to use when formatting numbers or dates.
-        * @return A string representation of the given number or date.
+        * @return A string representation of the given value.
         */
         static format(value: any, format: string): string;
         /**
@@ -851,12 +848,12 @@ declare module wijmo {
     *
     * Wijmo events are similar to .NET events. Any class may define events by
     * declaring them as fields. Any class may subscribe to events using the
-    * event's @see:addHandler method, or unsubscribe using the @see:removeHandler
+    * event's @see:addHandler method and unsubscribe using the @see:removeHandler
     * method.
     *
     * Wijmo event handlers take two parameters: <i>sender</i> and <i>args</i>.
     * The first is the object that raised the event, and the second is an object
-    * that contains the the event parameters.
+    * that contains the event parameters.
     *
     * Classes that define events follow the .NET pattern where for every event
     * there is an <i>on[EVENTNAME]</i> method that raises the event. This pattern
@@ -908,6 +905,10 @@ declare module wijmo {
         * @param args Event parameters.
         */
         public raise(sender: any, args?: EventArgs): void;
+        /**
+        * Gets a value that indicates whether this event has any handlers.
+        */
+        public hasHandlers : boolean;
     }
     /**
     * Base class for event arguments.
@@ -969,14 +970,11 @@ declare module wijmo {
     * The @see:Control class also provides a common pattern for invalidating and
     * refreshing controls, for updating the control layout when its size changes,
     * and for handling the HTML templates that define the control structure.
-    *
-    * @see controlTemplate
-    * @see invalidate
-    * @see refresh
     */
     class Control {
         private static _DATA_KEY;
         private static _REFRESH_INTERVAL;
+        private static _wme;
         private _updating;
         private _toInvalidate;
         private _szCtl;
@@ -987,9 +985,7 @@ declare module wijmo {
         public _orgAtts: NamedNodeMap;
         private _ehDisabled;
         private _ehResize;
-        private _ehTouchStart;
-        private _ehTouchEnd;
-        private _touching;
+        static _touching: boolean;
         /**
         * Initializes a new instance of a @see:Control and attaches it to a DOM element.
         *
@@ -1008,7 +1004,7 @@ declare module wijmo {
         */
         public getTemplate(): string;
         /**
-        * Applies the template to a new instance of a control.
+        * Applies the template to a new instance of a control, and returns the root element.
         *
         * This method should be called by constructors of templated controls.
         * It is responsible for binding the template parts to the
@@ -1032,7 +1028,7 @@ declare module wijmo {
         * @param namePart Name of the part to be named after the host element. This
         * determines how the control submits data when used in forms.
         */
-        public applyTemplate(classNames: string, template: string, parts: Object, namePart?: string): void;
+        public applyTemplate(classNames: string, template: string, parts: Object, namePart?: string): HTMLElement;
         /**
         * Disposes of the control by removing its association with the host element.
         */
@@ -1074,7 +1070,7 @@ declare module wijmo {
         * the control's visibility or dimensions. For example, splitters, accordions,
         * and tab controls usually change the visibility of its content elements.
         * In this case, failing to notify the controls contained in the element
-        * may cause them to update their layouts and to stop working properly.
+        * may cause them to stop working properly.
         *
         * If this happens, you must handle the appropriate event in the dynamic
         * container and call the @see:Control.invalidateAll method so the contained
@@ -1110,6 +1106,12 @@ declare module wijmo {
         */
         public deferUpdate(fn: Function): void;
         /**
+        * Gets or sets whether the control is disabled.
+        *
+        * Disabled controls cannot get mouse or keyboard events.
+        */
+        public disabled : boolean;
+        /**
         * Initializes the control by copying the properties from a given object.
         *
         * This method allows you to initialize controls using plain data objects
@@ -1138,9 +1140,9 @@ declare module wijmo {
         * @param options Object that contains the initialization data.
         */
         public initialize(options: any): void;
-        private _handleResize();
-        private _handleTouchStart();
-        private _handleTouchEnd();
+        public _handleResize(): void;
+        private _handleTouchStart(e);
+        private _handleTouchEnd(e);
         private _handleDisabled(e);
         private _replaceWithDiv(element);
         public _copyOriginalAttributes(e: HTMLElement): void;
@@ -1224,7 +1226,7 @@ declare module wijmo.collections {
     * Describes a sorting criterion.
     */
     class SortDescription {
-        public _bnd: _Binding;
+        public _bnd: Binding;
         public _asc: boolean;
         /**
         * Initializes a new instance of a @see:SortDescription.
@@ -1593,7 +1595,7 @@ declare module wijmo.collections {
     * </pre>
     */
     class PropertyGroupDescription extends GroupDescription {
-        public _bnd: _Binding;
+        public _bnd: Binding;
         public _converter: Function;
         /**
         * Initializes a new instance of a @see:PropertyGroupDescription.
@@ -1718,6 +1720,12 @@ declare module wijmo.collections {
     */
     class ObservableArray extends ArrayBase implements INotifyCollectionChanged {
         private _updating;
+        /**
+        * Initializes a new instance of an @see:ObservableArray.
+        *
+        * @param data Array containing items used to populate the @see:ObservableArray.
+        */
+        constructor(data?: any[]);
         /**
         * Appends an item to the array.
         *
@@ -1871,9 +1879,10 @@ declare module wijmo.collections {
         public _view: any[];
         public _pgView: any[];
         public _groups: CollectionViewGroup[];
+        public _fullGroups: CollectionViewGroup[];
         public _idx: number;
         public _filter: IPredicate;
-        public _srtDesc: ObservableArray;
+        public _srtDsc: ObservableArray;
         public _grpDesc: ObservableArray;
         public _newItem: any;
         public _edtItem: any;
@@ -1893,6 +1902,7 @@ declare module wijmo.collections {
         public _chgAdded: ObservableArray;
         public _chgRemoved: ObservableArray;
         public _chgEdited: ObservableArray;
+        public _srtCvt: Function;
         /**
         * Initializes a new instance of a @see:CollectionView.
         *
@@ -1911,6 +1921,30 @@ declare module wijmo.collections {
         * type for the collection.
         */
         public newItemCreator : Function;
+        /**
+        * Gets or sets a function used to convert values when sorting.
+        *
+        * If provided, the function should take as parameters a
+        * @see:SortDescription, a data item, and a value to convert,
+        * and should return the converted value.
+        *
+        * This property provides a way to customize sorting. For example,
+        * the @see:FlexGrid control uses it to sort mapped columns by
+        * display value instead of by raw value.
+        *
+        * For example, the code below causes a @see:CollectionView to
+        * sort the 'country' property, which contains country code integers,
+        * using the corresponding country names:
+        *
+        * <pre>var countries = 'US,Germany,UK,Japan,Italy,Greece'.split(',');
+        * collectionView.sortConverter = function (sd, item, value) {
+        *   if (sd.property == 'countryMapped') {
+        *     value = countries[value]; // convert country id into name
+        *   }
+        *   return value;
+        * }</pre>
+        */
+        public sortConverter : Function;
         /**
         * Returns true if the caller queries for a supported interface.
         *
@@ -2073,8 +2107,8 @@ declare module wijmo.collections {
         * Re-creates the view using the current sort, filter, and group parameters.
         */
         public refresh(): void;
-        private _performRefresh();
-        private _compareItems();
+        public _performRefresh(): void;
+        public _compareItems(): (a: any, b: any) => number;
         /**
         * Occurs after the current item changes.
         */
@@ -2294,8 +2328,10 @@ declare module wijmo.collections {
         * @param e @see:PageChangingEventArgs that contains the event data.
         */
         public onPageChanging(e: PageChangingEventArgs): boolean;
+        public _getFullGroup(g: CollectionViewGroup): CollectionViewGroup;
+        public _getGroupByPath(groups: CollectionViewGroup[], level: number, path: string): CollectionViewGroup;
         public _getPageView(): any[];
-        public _createGroups(): CollectionViewGroup[];
+        public _createGroups(items: any[]): CollectionViewGroup[];
         private _getGroupsDigest(groups);
         private _mergeGroupItems(groups);
         private _getGroup(gd, groups, name, level, isBottomLevel);
@@ -2307,6 +2343,7 @@ declare module wijmo.collections {
     class CollectionViewGroup {
         public _gd: GroupDescription;
         public _name: string;
+        public _path: string;
         public _level: number;
         public _isBottomLevel: boolean;
         public _groups: CollectionViewGroup[];
@@ -2331,9 +2368,10 @@ declare module wijmo.collections {
         *
         * @param aggType Type of aggregate to calculate.
         * @param binding Property to aggregate on.
+        * @param view CollectionView that owns this group.
         * @return The aggregate value.
         */
-        public getAggregate(aggType: Aggregate, binding: string): any;
+        public getAggregate(aggType: Aggregate, binding: string, view?: ICollectionView): any;
     }
 }
 
@@ -2446,7 +2484,6 @@ declare module wijmo {
         private _showAutoTip(evt);
         private _hideAutoTip();
         private _clearTimeouts();
-        private _getOuterSize(e);
         private _getContent(content);
         private _setContent(content);
     }
@@ -2694,6 +2731,33 @@ declare module wijmo {
 
 declare module wijmo {
     /**
+    * Shows an element as a popup.
+    *
+    * The popup element becomes a child of the body element,
+    * and is positioned using a reference that may be a
+    * @see:MouseEvent, an @see:HTMLElement, or a @see:Rect.
+    *
+    * To hide the popup, either call the @see:hidePopup method
+    * or simply remove the popup element from the document body.
+    *
+    * @param popup Element to show as a popup.
+    * @param ref Reference used to position the popup.
+    * @param above Position popup above the reference if possible.
+    */
+    function showPopup(popup: HTMLElement, ref: any, above?: boolean): void;
+    /**
+    * Hides a popup element previously displayed with the @see:showPopup
+    * method.
+    *
+    * @param popup Popup element to hide.
+    * @param remove Whether to remove the popup from the DOM or just
+    * to hide it.
+    */
+    function hidePopup(popup: HTMLElement, remove?: boolean): void;
+}
+
+declare module wijmo {
+    /**
     * Class that provides masking services to an HTMLInputElement.
     */
     class _MaskProvider {
@@ -2703,6 +2767,7 @@ declare module wijmo {
         public _mskArr: _MaskElement[];
         public _firstPos: number;
         public _lastPos: number;
+        public _backSpace: boolean;
         public _full: boolean;
         public _hbInput: any;
         public _hbKeyPress: any;

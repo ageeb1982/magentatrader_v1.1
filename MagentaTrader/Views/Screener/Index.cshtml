@@ -1,7 +1,7 @@
 ﻿@{
     //ViewBag.Title = "Index";
 
-    var Version = "v.Beta.1.20150502";
+    var Version = "v.Beta.1.20150515";
 }
 
 <link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
@@ -33,6 +33,7 @@
                 <option value="All">All</option>
                 <option value="NASDAQ">NASDAQ</option>
                 <option value="NYSE">NYSE</option>
+                <option value="AMEX">AMEX</option>
             </select>
         </div>
         <div class="col-lg-2">
@@ -57,6 +58,21 @@
                 <option value="M1">One Month</option>
                 <option value="M2">Two Months</option>
                 <option value="M3">Three Months</option>
+            </select>
+        </div>
+        <div class="col-lg-2">
+            <p>No. of Years</p>
+            <select id="NoOfYears" class="form-control">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8" selected="selected">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
             </select>
         </div>
     </div>
@@ -155,11 +171,11 @@
         }
         return Math.round(returnResult);
     }
-    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime) {
+    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears) {
         $('#loading').modal('show');
         var d = new wijmo.collections.ObservableArray();
         $.ajax({
-            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume + '/' + GrowthDecayRate + '/' + GrowthDecayTime,
+            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume + '/' + GrowthDecayRate + '/' + GrowthDecayTime + '/' + NoOfYears,
             type: 'GET',
             dataType: 'json',
             success: function (result) {
@@ -170,7 +186,7 @@
                         Description: result[i].Description,
                         Exchange: result[i].Exchange,
                         ClosePrice: result[i].ClosePrice,
-                        Volume: result[i].Volume,
+                        Volume: Math.round(result[i].Volume / 10000) / 100,
                         Rate: GetRate(GrowthDecayTime, result[i]),
                         GrowthDecayRate: Math.round(result[i].GrowthDecayRate),
                         GrowthDecayRateW1: Math.round(result[i].GrowthDecayRateW1),
@@ -179,7 +195,16 @@
                         GrowthDecayRateM1: Math.round(result[i].GrowthDecayRateM1),
                         GrowthDecayRateM2: Math.round(result[i].GrowthDecayRateM2),
                         GrowthDecayRateM3: Math.round(result[i].GrowthDecayRateM3),
-                        NoOfYears: result[i].NoOfYears
+                        NoOfYears: result[i].NoOfYears,
+                        TrendNoOfDays: result[i].TrendNoOfDays,
+                        WinLossCurrent30: result[i].WinLossCurrent30,
+                        WinLossAverageCurrent30: result[i].WinLossAverageCurrent30,
+                        WinLoss20: result[i].WinLoss20,
+                        WinLossAverage20: result[i].WinLossAverage20,
+                        WinLoss40: result[i].WinLoss40,
+                        WinLossAverage40: result[i].WinLossAverage40,
+                        WinLoss60: result[i].WinLoss60,
+                        WinLossAverage60: result[i].WinLossAverage60
                     });
                 }
 
@@ -240,14 +265,14 @@
                         },{
                             "header": "Price",
                             "binding": "ClosePrice",
-                            "width": "9*",
+                            "width": "11*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         },{
-                            "header": "Volume",
+                            "header": "Vol (M)",
                             "binding": "Volume",
-                            "width": "9*",
+                            "width": 60,
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
@@ -259,51 +284,100 @@
                             "isContentHtml": true,
                             "wordWrap": true
                         },{
-                            "header": "Rate-Trend",
+                            "header": "Trend",
+                            "binding": "TrendNoOfDays",
+                            "width": 40,
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "Rate-T",
                             "binding": "GrowthDecayRate",
-                            "width": "9*",
+                            "width": "11*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-W1",
                             "binding": "GrowthDecayRateW1",
-                            "width": "9*",
+                            "width": "11*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-W2",
                             "binding": "GrowthDecayRateW2",
-                            "width": "9*",
+                            "width": "11*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-W3",
                             "binding": "GrowthDecayRateW3",
-                            "width": "9*",
+                            "width": "11*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-M1",
                             "binding": "GrowthDecayRateM1",
-                            "width": "9*",
+                            "width": "11*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-M2",
                             "binding": "GrowthDecayRateM2",
-                            "width": "9*",
+                            "width": "11*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-M3",
                             "binding": "GrowthDecayRateM3",
-                            "width": "9*",
+                            "width": "11*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "20 W/L %",
+                            "binding": "WinLossAverage20",
+                            "width": "11*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "20 W/L",
+                            "binding": "WinLoss20",
+                            "width": 60,
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "40 W/L %",
+                            "binding": "WinLossAverage40",
+                            "width": "11*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "40 W/L",
+                            "binding": "WinLoss40",
+                            "width": 60,
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "60 W/L %",
+                            "binding": "WinLossAverage60",
+                            "width": "11*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "60 W/L",
+                            "binding": "WinLoss60",
+                            "width": 60,
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
@@ -322,9 +396,15 @@
                     panel.columns[c].binding == 'GrowthDecayRateW3' ||
                     panel.columns[c].binding == 'GrowthDecayRateM1' ||
                     panel.columns[c].binding == 'GrowthDecayRateM2' ||
-                    panel.columns[c].binding == 'GrowthDecayRateM3')) {
+                    panel.columns[c].binding == 'GrowthDecayRateM3' ||
+                    panel.columns[c].binding == 'WinLossAverage20' ||
+                    panel.columns[c].binding == 'WinLossAverage40' ||
+                    panel.columns[c].binding == 'WinLossAverage60')) {
                     var cellData = panel.getCellData(r, c);
                     cell.style.color = GetRateColor(cellData);
+                } else if (wijmo.grid.CellType.ColumnHeader == panel.cellType) {
+                    var cellData = panel.getCellData(r, c);
+                    cell.style.fontSize = "90%";
                 }
             }
         });
@@ -362,13 +442,15 @@
         var $volume = parseFloat(document.getElementById('Volume').value);
         var $growthDecayRate = parseFloat(document.getElementById('GrowthDecayRate').value);
         var $growthDecayTime = document.getElementById('GrowthDecayTime').value;
+        var $noOfYears = document.getElementById('NoOfYears').value;
         
         $closePrice = !$closePrice ? 10 : $closePrice;
         $volume = !$volume ? 1000000 : $volume;
         $growthDecayRate = !$growthDecayRate ? 100 : $growthDecayRate;
         $growthDecayTime = !$growthDecayTime ? "C0" : $growthDecayTime;
+        $noOfYears = !$noOfYears ? 8 : $noOfYears;
 
-        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime);
+        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears);
     }
     function CmdSaveXLS_OnClick() {
         var CSV = '';
@@ -382,13 +464,22 @@
                 ClosePrice: ScreenerSaveData[i].ClosePrice,
                 Volume: ScreenerSaveData[i].Volume,
                 NoOfYears: ScreenerSaveData[i].NoOfYears,
+                TrendNoOfDays: ScreenerSaveData[i].TrendNoOfDays,
                 GrowthDecayRate: ScreenerSaveData[i].GrowthDecayRate,
                 GrowthDecayRateW1: ScreenerSaveData[i].GrowthDecayRateW1,
                 GrowthDecayRateW2: ScreenerSaveData[i].GrowthDecayRateW2,
                 GrowthDecayRateW3: ScreenerSaveData[i].GrowthDecayRateW3,
                 GrowthDecayRateM1: ScreenerSaveData[i].GrowthDecayRateM1,
                 GrowthDecayRateM2: ScreenerSaveData[i].GrowthDecayRateM2,
-                GrowthDecayRateM3: ScreenerSaveData[i].GrowthDecayRateM3
+                GrowthDecayRateM3: ScreenerSaveData[i].GrowthDecayRateM3,
+                WinLossCurrent30: ScreenerSaveData[i].WinLossCurrent30,
+                WinLossAverageCurrent30: ScreenerSaveData[i].WinLossAverageCurrent30,
+                WinLoss20: ScreenerSaveData[i].WinLoss20,
+                WinLossAverage20: ScreenerSaveData[i].WinLossAverage20,
+                WinLoss40: ScreenerSaveData[i].WinLoss40,
+                WinLossAverage40: ScreenerSaveData[i].WinLossAverage40,
+                WinLoss60: ScreenerSaveData[i].WinLoss60,
+                WinLossAverage60: ScreenerSaveData[i].WinLossAverage60
             });
         }
 

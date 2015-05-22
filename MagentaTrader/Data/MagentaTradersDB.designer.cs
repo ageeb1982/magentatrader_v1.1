@@ -3528,6 +3528,24 @@ namespace MagentaTrader.Data
 		
 		private System.Nullable<int> _NoOfYears;
 		
+		private System.Nullable<int> _TrendNoOfDays;
+		
+		private string _WinLossCurrent30;
+		
+		private System.Nullable<decimal> _WinLossAverageCurrent30;
+		
+		private string _WinLoss20;
+		
+		private System.Nullable<decimal> _WinLossAverage20;
+		
+		private string _WinLoss40;
+		
+		private System.Nullable<decimal> _WinLossAverage40;
+		
+		private string _WinLoss60;
+		
+		private System.Nullable<decimal> _WinLossAverage60;
+		
 		private EntitySet<TrnStockPrice> _TrnStockPrices;
 		
 		private EntitySet<TrnStockEarning> _TrnStockEarnings;
@@ -3582,6 +3600,24 @@ namespace MagentaTrader.Data
     partial void OnGrowthDecayRateM3Changed();
     partial void OnNoOfYearsChanging(System.Nullable<int> value);
     partial void OnNoOfYearsChanged();
+    partial void OnTrendNoOfDaysChanging(System.Nullable<int> value);
+    partial void OnTrendNoOfDaysChanged();
+    partial void OnWinLossCurrent30Changing(string value);
+    partial void OnWinLossCurrent30Changed();
+    partial void OnWinLossAverageCurrent30Changing(System.Nullable<decimal> value);
+    partial void OnWinLossAverageCurrent30Changed();
+    partial void OnWinLoss20Changing(string value);
+    partial void OnWinLoss20Changed();
+    partial void OnWinLossAverage20Changing(System.Nullable<decimal> value);
+    partial void OnWinLossAverage20Changed();
+    partial void OnWinLoss40Changing(string value);
+    partial void OnWinLoss40Changed();
+    partial void OnWinLossAverage40Changing(System.Nullable<decimal> value);
+    partial void OnWinLossAverage40Changed();
+    partial void OnWinLoss60Changing(string value);
+    partial void OnWinLoss60Changed();
+    partial void OnWinLossAverage60Changing(System.Nullable<decimal> value);
+    partial void OnWinLossAverage60Changed();
     #endregion
 		
 		public MstSymbol()
@@ -4047,6 +4083,186 @@ namespace MagentaTrader.Data
 					this._NoOfYears = value;
 					this.SendPropertyChanged("NoOfYears");
 					this.OnNoOfYearsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TrendNoOfDays", DbType="Int")]
+		public System.Nullable<int> TrendNoOfDays
+		{
+			get
+			{
+				return this._TrendNoOfDays;
+			}
+			set
+			{
+				if ((this._TrendNoOfDays != value))
+				{
+					this.OnTrendNoOfDaysChanging(value);
+					this.SendPropertyChanging();
+					this._TrendNoOfDays = value;
+					this.SendPropertyChanged("TrendNoOfDays");
+					this.OnTrendNoOfDaysChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossCurrent30", DbType="NVarChar(50)")]
+		public string WinLossCurrent30
+		{
+			get
+			{
+				return this._WinLossCurrent30;
+			}
+			set
+			{
+				if ((this._WinLossCurrent30 != value))
+				{
+					this.OnWinLossCurrent30Changing(value);
+					this.SendPropertyChanging();
+					this._WinLossCurrent30 = value;
+					this.SendPropertyChanged("WinLossCurrent30");
+					this.OnWinLossCurrent30Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossAverageCurrent30", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> WinLossAverageCurrent30
+		{
+			get
+			{
+				return this._WinLossAverageCurrent30;
+			}
+			set
+			{
+				if ((this._WinLossAverageCurrent30 != value))
+				{
+					this.OnWinLossAverageCurrent30Changing(value);
+					this.SendPropertyChanging();
+					this._WinLossAverageCurrent30 = value;
+					this.SendPropertyChanged("WinLossAverageCurrent30");
+					this.OnWinLossAverageCurrent30Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLoss20", DbType="NVarChar(50)")]
+		public string WinLoss20
+		{
+			get
+			{
+				return this._WinLoss20;
+			}
+			set
+			{
+				if ((this._WinLoss20 != value))
+				{
+					this.OnWinLoss20Changing(value);
+					this.SendPropertyChanging();
+					this._WinLoss20 = value;
+					this.SendPropertyChanged("WinLoss20");
+					this.OnWinLoss20Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossAverage20", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> WinLossAverage20
+		{
+			get
+			{
+				return this._WinLossAverage20;
+			}
+			set
+			{
+				if ((this._WinLossAverage20 != value))
+				{
+					this.OnWinLossAverage20Changing(value);
+					this.SendPropertyChanging();
+					this._WinLossAverage20 = value;
+					this.SendPropertyChanged("WinLossAverage20");
+					this.OnWinLossAverage20Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLoss40", DbType="NVarChar(50)")]
+		public string WinLoss40
+		{
+			get
+			{
+				return this._WinLoss40;
+			}
+			set
+			{
+				if ((this._WinLoss40 != value))
+				{
+					this.OnWinLoss40Changing(value);
+					this.SendPropertyChanging();
+					this._WinLoss40 = value;
+					this.SendPropertyChanged("WinLoss40");
+					this.OnWinLoss40Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossAverage40", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> WinLossAverage40
+		{
+			get
+			{
+				return this._WinLossAverage40;
+			}
+			set
+			{
+				if ((this._WinLossAverage40 != value))
+				{
+					this.OnWinLossAverage40Changing(value);
+					this.SendPropertyChanging();
+					this._WinLossAverage40 = value;
+					this.SendPropertyChanged("WinLossAverage40");
+					this.OnWinLossAverage40Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLoss60", DbType="NVarChar(50)")]
+		public string WinLoss60
+		{
+			get
+			{
+				return this._WinLoss60;
+			}
+			set
+			{
+				if ((this._WinLoss60 != value))
+				{
+					this.OnWinLoss60Changing(value);
+					this.SendPropertyChanging();
+					this._WinLoss60 = value;
+					this.SendPropertyChanged("WinLoss60");
+					this.OnWinLoss60Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossAverage60", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> WinLossAverage60
+		{
+			get
+			{
+				return this._WinLossAverage60;
+			}
+			set
+			{
+				if ((this._WinLossAverage60 != value))
+				{
+					this.OnWinLossAverage60Changing(value);
+					this.SendPropertyChanging();
+					this._WinLossAverage60 = value;
+					this.SendPropertyChanged("WinLossAverage60");
+					this.OnWinLossAverage60Changed();
 				}
 			}
 		}

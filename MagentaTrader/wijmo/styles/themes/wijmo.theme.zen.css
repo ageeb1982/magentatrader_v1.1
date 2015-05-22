@@ -20,6 +20,9 @@ div[wj-part='cells'] {
   background: #a9a9a9;
   color: #dddddd;
 }
+.wj-flexgrid .wj-marker {
+  background: #7bb5ae;
+}
 /* -- Grid -- */
 div[wj-part='root'] {
   background: #f2f2f2;

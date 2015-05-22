@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -52,7 +52,53 @@ var wijmo;
             }
         },
         FlexGrid: {
-            groupHeaderFormat: '{name}: <b>{value} </b>({count} 項目)'
+            groupHeaderFormat: '{name}: <b>{value} </b>({count:n0} 項目)'
+        },
+        FlexGridFilter: {
+            // filter
+            ascending: '\u2191 昇順',
+            descending: '\u2193 降順',
+            apply: '適用',
+            clear: 'リセット',
+            conditions: '条件',
+            values: '値',
+            // value filter
+            search: 'フィルタ',
+            selectAll: '全て選択',
+            null: '(ゼロ)',
+            // condition filter
+            header: '抽出条件の指定',
+            and: 'AND',
+            or: 'OR',
+            stringOperators: [
+                { name: '(設定しない)', op: null },
+                { name: '指定の値に等しい', op: 0 },
+                { name: '指定の値に等しくない', op: 1 },
+                { name: '指定の値で始まる', op: 6 },
+                { name: '指定の値で終わる', op: 7 },
+                { name: '指定の値を含む', op: 8 },
+                { name: '指定の値を含まない', op: 9 }
+            ],
+            numberOperators: [
+                { name: '(設定しない)', op: null },
+                { name: '指定の値に等しい', op: 0 },
+                { name: '指定の値に等しくない', op: 1 },
+                { name: '指定の値より大きい', op: 2 },
+                { name: '指定の値以上', op: 3 },
+                { name: '指定の値より小さい', op: 4 },
+                { name: '指定の値以下', op: 5 }
+            ],
+            dateOperators: [
+                { name: '(設定しない)', op: null },
+                { name: '指定の値に等しい', op: 0 },
+                { name: '前である', op: 4 },
+                { name: 'の後である', op: 3 }
+            ],
+            booleanOperators: [
+                { name: '(設定しない)', op: null },
+                { name: '指定の値に等しい', op: 0 },
+                { name: '指定の値に等しくない', op: 1 }
+            ]
         }
     };
 })(wijmo || (wijmo = {}));

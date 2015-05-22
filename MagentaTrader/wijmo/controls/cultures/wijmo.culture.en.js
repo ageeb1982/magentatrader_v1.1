@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -46,7 +46,53 @@ var wijmo;
             }
         },
         FlexGrid: {
-            groupHeaderFormat: '{name}: <b>{value} </b>({count} items)'
+            groupHeaderFormat: '{name}: <b>{value} </b>({count:n0} items)'
+        },
+        FlexGridFilter: {
+            // filter
+            ascending: '\u2191 Ascending',
+            descending: '\u2193 Descending',
+            apply: 'Apply',
+            clear: 'Clear',
+            conditions: 'Filter by Condition',
+            values: 'Filter by Value',
+            // value filter
+            search: 'Search',
+            selectAll: 'Select All',
+            null: '(nothing)',
+            // condition filter
+            header: 'Show items where the value',
+            and: 'And',
+            or: 'Or',
+            stringOperators: [
+                { name: '(not set)', op: null },
+                { name: 'Equals', op: 0 },
+                { name: 'Does not equal', op: 1 },
+                { name: 'Begins with', op: 6 },
+                { name: 'Ends with', op: 7 },
+                { name: 'Contains', op: 8 },
+                { name: 'Does not contain', op: 9 }
+            ],
+            numberOperators: [
+                { name: '(not set)', op: null },
+                { name: 'Equals', op: 0 },
+                { name: 'Does not equal', op: 1 },
+                { name: 'Is Greater than', op: 2 },
+                { name: 'Is Greater than or equal to', op: 3 },
+                { name: 'Is Less than', op: 4 },
+                { name: 'Is Less than or equal to', op: 5 }
+            ],
+            dateOperators: [
+                { name: '(not set)', op: null },
+                { name: 'Equals', op: 0 },
+                { name: 'Is Before', op: 4 },
+                { name: 'Is After', op: 3 }
+            ],
+            booleanOperators: [
+                { name: '(not set)', op: null },
+                { name: 'Equals', op: 0 },
+                { name: 'Does not equal', op: 1 }
+            ]
         }
     };
 })(wijmo || (wijmo = {}));

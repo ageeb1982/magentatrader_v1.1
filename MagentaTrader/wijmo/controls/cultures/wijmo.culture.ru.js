@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -46,7 +46,53 @@ var wijmo;
             }
         },
         FlexGrid: {
-            groupHeaderFormat: '{name}: <b>{value} </b>({count} наименований)'
+            groupHeaderFormat: '{name}: <b>{value} </b>({count:n0} наименований)'
+        },
+        FlexGridFilter: {
+            // filter
+            ascending: '\u2191 По возрастанию',
+            descending: '\u2193 По убыванию',
+            apply: 'Применить',
+            clear: 'Очистить',
+            conditions: 'Фильтр по условию',
+            values: 'Фильтр по значению',
+            // value filter
+            search: 'Поиск',
+            selectAll: 'Выбрать все',
+            null: '(пустой)',
+            // condition filter
+            header: 'Показать строки, где значение',
+            and: 'И',
+            or: 'Или',
+            stringOperators: [
+                { name: '(Не задано)', op: null },
+                { name: 'равно', op: 0 },
+                { name: 'не равно', op: 1 },
+                { name: 'начинается с', op: 6 },
+                { name: 'заканчивается на', op: 7 },
+                { name: 'содержит', op: 8 },
+                { name: 'не содержит', op: 9 }
+            ],
+            numberOperators: [
+                { name: '(Не задано)', op: null },
+                { name: 'равно', op: 0 },
+                { name: 'не равно', op: 1 },
+                { name: 'больше чем', op: 2 },
+                { name: 'больше или равно', op: 3 },
+                { name: 'меньше чем', op: 4 },
+                { name: 'меньше или равно', op: 5 }
+            ],
+            dateOperators: [
+                { name: '(Не задано)', op: null },
+                { name: 'равно', op: 0 },
+                { name: 'до', op: 4 },
+                { name: 'после', op: 3 }
+            ],
+            booleanOperators: [
+                { name: '(Не задано)', op: null },
+                { name: 'равно', op: 0 },
+                { name: 'не равно', op: 1 }
+            ]
         }
     };
 })(wijmo || (wijmo = {}));

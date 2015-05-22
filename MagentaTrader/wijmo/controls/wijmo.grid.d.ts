@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -56,19 +56,16 @@ declare module wijmo.grid {
         private _gpCHdr;
         private _gpRHdr;
         private _gpTL;
-        private static _maxCssHeight;
         private _maxOffsetY;
         private _heightBrowser;
         private _szClient;
-        private _ptScrl;
         private _offsetY;
         private _rcBounds;
         private _lastCount;
+        public _ptScrl: Point;
         public _rtl: boolean;
-        private _isChrome;
-        public _isIE: boolean;
         private _keyHdl;
-        private _mouseHdl;
+        public _mouseHdl: _MouseHandler;
         public _edtHdl: _EditHandler;
         public _selHdl: _SelectionHandler;
         private _addHdl;
@@ -78,6 +75,7 @@ declare module wijmo.grid {
         private _readOnly;
         private _indent;
         private _allowResizing;
+        private _autoSizeMode;
         private _allowDragging;
         private _hdrVis;
         private _alSorting;
@@ -96,6 +94,9 @@ declare module wijmo.grid {
         private _items;
         private _cv;
         private _childItemsPath;
+        private _sortRowIndex;
+        private _deferResizing;
+        private _bndSortConverter;
         /**
         * Gets or sets the template used to instantiate @see:FlexGrid controls.
         */
@@ -107,6 +108,7 @@ declare module wijmo.grid {
         * @param options JavaScript object containing initialization data for the control.
         */
         constructor(element: any, options?: any);
+        public _handleResize(): void;
         /**
         * Gets or sets a value that determines whether the row and column headers
         * are visible.
@@ -148,9 +150,41 @@ declare module wijmo.grid {
         */
         public isReadOnly : boolean;
         /**
-        * Gets or sets whether users are allowed to resize rows and/or columns with the mouse.
+        * Gets or sets whether users may resize rows and/or columns
+        * with the mouse.
+        *
+        * If resizing is enabled, users can resize columns by dragging
+        * the right edge of column header cells, or rows by dragging the
+        * bottom edge of row header cells.
+        *
+        * Users may also double-click the edge of the header cells to
+        * automatically resize rows and columns to fit their content.
+        * The autosize behavior can be customized using the @see:autoSizeMode
+        * property.
         */
         public allowResizing : AllowResizing;
+        /**
+        * Gets or sets whether row and column resizing should be deferred until
+        * the user releases the mouse button.
+        *
+        * By default, @see:deferResizing is set to false, causing rows and columns
+        * to be resized as the user drags the mouse. Setting this property to true
+        * causes the grid to show a resizing marker and to resize the row or column
+        * only when the user releases the mouse button.
+        */
+        public deferResizing : boolean;
+        /**
+        * Gets or sets which cells should be taken into account when auto-sizing a
+        * row or column.
+        *
+        * This property controls what happens when users double-click the edge of
+        * a column header.
+        *
+        * By default, the grid will automatically set the column width based on the
+        * content of the header and data cells in the column. This property allows
+        * you to change that to include only the headers or only the data.
+        */
+        public autoSizeMode : AutoSizeMode;
         /**
         * Gets or sets whether users are allowed to sort columns by clicking the column header cells.
         */
@@ -201,7 +235,7 @@ declare module wijmo.grid {
         * </ul>
         *
         * The default value for this property is
-        * '{name}: &lt;b&gt;{value}&lt;/b&gt;({count} items)',
+        * '{name}: &lt;b&gt;{value}&lt;/b&gt;({count:n0} items)',
         * which creates group headers similar to
         * 'Country: <b>UK</b> (12 items)' or 'Country: <b>Japan</b> (8 items)'.
         */
@@ -260,6 +294,14 @@ declare module wijmo.grid {
         * may be selected and edited.
         */
         public frozenColumns : number;
+        /**
+        * Gets or sets the index of row in the column header panel that
+        * shows and changes the current sort.
+        *
+        * This property is set to null by default, causing the last row
+        * in the @see:columnHeaders panel to act as the sort row.
+        */
+        public sortRowIndex : number;
         /**
         * Gets or sets a @see:Point that represents the value of the grid's scrollbars.
         */
@@ -322,16 +364,39 @@ declare module wijmo.grid {
         *   ...
         * }
         * </pre>
+        *
+        * If you have a scenario where multiple clients may want to customize the
+        * grid rendering (for example when creating directives or re-usable libraries),
+        * consider using the @see:formatItem event instead. The event allows multiple
+        * clients to attach their own handlers.
         */
         public itemFormatter : Function;
         /**
         * Gets the value stored in a cell in the scrollable area of the grid.
         *
-        * @param r Row index of the cell.
-        * @param c Column index of the cell.
+        * @param r Index of the row that contains the cell.
+        * @param c Index of the column that contains the cell.
         * @param formatted Whether to format the value for display.
         */
         public getCellData(r: number, c: number, formatted: boolean): any;
+        /**
+        * Gets a the bounds of a cell element in viewport coordinates.
+        *
+        * This method returns the bounds of cells in the @see:cells
+        * panel (scrollable data cells). To get the bounds of cells
+        * in other panels, use the @see:getCellBoundingRect method
+        * in the appropriate @see:GridPanel object.
+        *
+        * The returned value is a @see:Rect object which contains the
+        * position and dimensions of the cell in viewport coordinates.
+        * The viewport coordinates are the same used by the
+        * <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element.getBoundingClientRect">getBoundingClientRect</a>
+        * method.
+        *
+        * @param r Index of the row that contains the cell.
+        * @param c Index of the column that contains the cell.
+        */
+        public getCellBoundingRect(r: number, c: number): Rect;
         /**
         * Sets the value of a cell in the scrollable area of the grid.
         *
@@ -357,9 +422,9 @@ declare module wijmo.grid {
         * });
         * </pre>
         *
-        * @param pt Point to investigate, in window coordinates, or a MoueEvent object, or x coordinate of the point.
-        * @param y Y coordinate of the point (if the first parameter is a number).
-        * @return HitTestInfo object with information about the point.
+        * @param pt @see:Point to investigate, in page coordinates, or a MouseEvent object, or x coordinate of the point.
+        * @param y Y coordinate of the point in page coordinates (if the first parameter is a number).
+        * @return A @see:HitTestInfo object with information about the point.
         */
         public hitTest(pt: any, y?: number): HitTestInfo;
         /**
@@ -410,8 +475,8 @@ declare module wijmo.grid {
         * not currently in view. If the grid contains a large amount of data (say 50,000 rows),
         * then not all rows will be measured since that could potentially take a long time.
         *
-        * @param firstColumn Index of the first column to resize.
-        * @param lastColumn Index of the last column to resize.
+        * @param firstColumn Index of the first column to resize (defaults to the first column).
+        * @param lastColumn Index of the last column to resize (defaults to the last column).
         * @param header Whether the column indices refer to regular or header columns.
         * @param extra Extra spacing, in pixels.
         */
@@ -599,7 +664,7 @@ declare module wijmo.grid {
         */
         public onResizingColumn(e: CellRangeEventArgs): boolean;
         /**
-        * Occurs when the user finishes resizing columns.
+        * Occurs when the user finishes resizing a column.
         */
         public resizedColumn: Event;
         /**
@@ -608,6 +673,28 @@ declare module wijmo.grid {
         * @param e @see:CellRangeEventArgs that contains the event data.
         */
         public onResizedColumn(e: CellRangeEventArgs): void;
+        /**
+        * Occurs before the user auto-sizes a column by double-clicking the
+        * right edge of a column header cell.
+        */
+        public autoSizingColumn: Event;
+        /**
+        * Raises the @see:autoSizingColumn event.
+        *
+        * @param e @see:CellRangeEventArgs that contains the event data.
+        */
+        public onAutoSizingColumn(e: CellRangeEventArgs): boolean;
+        /**
+        * Occurs after the user auto-sizes a column by double-clicking the
+        * right edge of a column header cell.
+        */
+        public autoSizedColumn: Event;
+        /**
+        * Raises the @see:autoSizedColumn event.
+        *
+        * @param e @see:CellRangeEventArgs that contains the event data.
+        */
+        public onAutoSizedColumn(e: CellRangeEventArgs): void;
         /**
         * Occurs when the user starts dragging a column.
         */
@@ -650,6 +737,28 @@ declare module wijmo.grid {
         * @param e @see:CellRangeEventArgs that contains the event data.
         */
         public onResizedRow(e: CellRangeEventArgs): void;
+        /**
+        * Occurs before the user auto-sizes a row by double-clicking the
+        * bottom edge of a row header cell.
+        */
+        public autoSizingRow: Event;
+        /**
+        * Raises the @see:autoSizingRow event.
+        *
+        * @param e @see:CellRangeEventArgs that contains the event data.
+        */
+        public onAutoSizingRow(e: CellRangeEventArgs): boolean;
+        /**
+        * Occurs after the user auto-sizes a row by double-clicking the
+        * bottom edge of a row header cell.
+        */
+        public autoSizedRow: Event;
+        /**
+        * Raises the @see:autoSizedRow event.
+        *
+        * @param e @see:CellRangeEventArgs that contains the event data.
+        */
+        public onAutoSizedRow(e: CellRangeEventArgs): void;
         /**
         * Occurs when the user starts dragging a row.
         */
@@ -746,15 +855,14 @@ declare module wijmo.grid {
         * do not contain the letter 'a'. The code demonstrates how you can obtain
         * the old and new values before the edits are applied.
         *
-        * <pre>
-        * function cellEditEnding (sender, e) {
+        * <pre>function cellEditEnding (sender, e) {
         *   // get old and new values
         *   var flex = sender,
         *   oldVal = flex.getCellData(e.row, e.col),
         *   newVal = flex.activeEditor.value;
         *   // cancel edits if newVal doesn't contain 'a'
         *   e.cancel = newVal.indexOf('a') &lt; 0;
-        * }
+        * }</pre>
         *
         * @param e @see:CellRangeEventArgs that contains the event data.
         * @return True if the event was not canceled.
@@ -871,6 +979,34 @@ declare module wijmo.grid {
         * @param e @see:CellRangeEventArgs that contains the event data.
         */
         public onPasted(e: CellRangeEventArgs): void;
+        /**
+        * Occurs when an element representing a cell has been created.
+        *
+        * This event can be used to format cells for display. It is similar
+        * in purpose to the @see:itemFormatter property, but has the advantage
+        * of allowing multiple independent handlers.
+        *
+        * For example, this code removes the 'wj-wrap' class from cells in
+        * group rows:
+        *
+        * <pre>flex.formatItem.addHandler(function (s, e) {
+        *   if (flex.rows[e.row] instanceof wijmo.grid.GroupRow) {
+        *     wijmo.removeClass(e.cell, 'wj-wrap');
+        *   }
+        * });</pre>
+        */
+        public formatItem: Event;
+        /**
+        * Raises the @see:formatItem event.
+        *
+        * @param e @see:FormatItemEventArgs that contains the event data.
+        */
+        public onFormatItem(e: FormatItemEventArgs): void;
+        public _getDesiredWidth(p: GridPanel, r: number, c: number, e: HTMLElement): number;
+        public _getDesiredHeight(p: GridPanel, r: number, c: number, e: HTMLElement): number;
+        public _getSortRowIndex(): number;
+        public _mappedColumns: any;
+        private _sortConverter(sd, item, value, init);
         public _bindGrid(full: boolean): void;
         private _cvCollectionChanged(sender, e);
         private _cvCurrentChanged(sender, e);
@@ -879,16 +1015,20 @@ declare module wijmo.grid {
         private _findRow(data);
         private _createChildren();
         private _updateLayout();
+        private _updateScrollPosition();
         private _updateContent(recycle, cells?);
         private _bindColumns();
         private _updateColumnTypes();
         private _bindRows();
         private _addGroup(g);
         private _addTreeNode(item, level);
-        private static _getMaxSupportedCssHeight();
         private static _getSerializableProperties(obj);
         public _copy(key: string, value: any): boolean;
         public _hasAttribute(e: any, att: string): boolean;
+        private static _maxCssHeight;
+        private static _getMaxSupportedCssHeight();
+        static _rtlMode: string;
+        private static _getRtlMode();
     }
 }
 
@@ -923,6 +1063,24 @@ declare module wijmo.grid {
         */
         public col : number;
     }
+    /**
+    * Provides arguments for the @see:formatItem event.
+    */
+    class FormatItemEventArgs extends CellRangeEventArgs {
+        public _cell: HTMLElement;
+        /**
+        * Initializes a new instance of a @see:FormatItemEventArgs.
+        *
+        * @param panel @see:GridPanel that contains the range.
+        * @param rng Range of cells affected by the event.
+        * @param cell Element that represents the grid cell to be formatted.
+        */
+        constructor(panel: GridPanel, rng: CellRange, cell: HTMLElement);
+        /**
+        * Gets a reference to the element that represents the grid cell to be formatted.
+        */
+        public cell : HTMLElement;
+    }
 }
 
 declare module wijmo.grid {
@@ -930,7 +1088,7 @@ declare module wijmo.grid {
     * Identifies the type of cell in a @see:GridPanel.
     */
     enum CellType {
-        /** Unknown/invalid cell type. */
+        /** Unknown or invalid cell type. */
         None = 0,
         /** Regular data cell. */
         Cell = 1,
@@ -956,19 +1114,19 @@ declare module wijmo.grid {
         /**
         * Initializes a new instance of a @see:GridPanel.
         *
-        * @param grid @see:FlexGrid that owns this panel.
-        * @param cellType Type of cell in this panel.
-        * @param rows rows displayed in this panel.
-        * @param cols columns displayed in this panel.
-        * @param element HTMLElement that will host the cells in the control.
+        * @param grid The @see:FlexGrid object that owns the panel.
+        * @param cellType The type of cell in the panel.
+        * @param rows The rows displayed in the panel.
+        * @param cols The columns displayed in the panel.
+        * @param element The HTMLElement that hosts the cells in the control.
         */
         constructor(grid: FlexGrid, cellType: CellType, rows: RowCollection, cols: ColumnCollection, element: HTMLElement);
         /**
-        * Gets the grid that owns this panel.
+        * Gets the grid that owns the panel.
         */
         public grid : FlexGrid;
         /**
-        * Gets the type of cell contained in this panel.
+        * Gets the type of cell contained in the panel.
         */
         public cellType : CellType;
         /**
@@ -976,7 +1134,7 @@ declare module wijmo.grid {
         */
         public viewRange : CellRange;
         /**
-        * Gets the total width of the content in this panel.
+        * Gets the total width of the content in the panel.
         */
         public width : number;
         /**
@@ -992,30 +1150,44 @@ declare module wijmo.grid {
         */
         public columns : ColumnCollection;
         /**
-        * Gets the value stored in a cell in this panel.
+        * Gets the value stored in a cell in the panel.
         *
-        * @param r Row index of the cell.
-        * @param c Column index of the cell.
-        * @param formatted Whether to format the value for display.
+        * @param r The row index of the cell.
+        * @param c The column index of the cell.
+        * @param formatted A value indicating whether to format the value for display.
         */
         public getCellData(r: number, c: number, formatted: boolean): any;
         /**
-        * Sets the content of a cell in this panel.
+        * Sets the content of a cell in the panel.
         *
-        * @param r Index of the row that contains the cell.
-        * @param c Index, name, or binding of the column that contains the cell.
-        * @param value Value to store in the cell.
-        * @param coerce Whether to change the value automatically to match the column's data type.
-        * @return True if the value was stored successfully, false otherwise (failed cast).
+        * @param r The index of the row that contains the cell.
+        * @param c The index, name, or binding of the column that contains the cell.
+        * @param value The value to store in the cell.
+        * @param coerce A value indicating whether to change the value automatically to match the column's data type.
+        * @return Returns true if the value is stored successfully, false otherwise (failed cast).
         */
         public setCellData(r: number, c: any, value: any, coerce?: boolean): boolean;
         /**
-        * Gets the host element for this panel.
+        * Gets a cell's bounds in viewport coordinates.
+        *
+        * The returned value is a @see:Rect object which contains the
+        * position and dimensions of the cell in viewport coordinates.
+        * The viewport coordinates are the same as those used by the
+        * <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element.getBoundingClientRect"
+        * target="_blank">getBoundingClientRect</a> method.
+        *
+        * @param r The index of the row that contains the cell.
+        * @param c The index of the column that contains the cell.
+        */
+        public getCellBoundingRect(r: number, c: number): Rect;
+        /**
+        * Gets the host element for the panel.
         */
         public hostElement : HTMLElement;
         public _getOffsetY(): number;
         public _updateContent(recycle: boolean, offsetY: number, cells?: CellRange[]): void;
-        public _renderRow(r: number, rng: CellRange, cells: CellRange[], ctr: number): number;
+        public _reorderCells(newRange: CellRange, oldRange: CellRange): void;
+        public _renderRow(r: number, rng: CellRange, frozen: boolean, cells: CellRange[], ctr: number): number;
         public _renderCell(r: number, c: number, rng: CellRange, cells: CellRange[], ctr: number): number;
         public _getViewRange(buffer: boolean): CellRange;
         public _getFrozenPos(): Point;
@@ -1024,19 +1196,21 @@ declare module wijmo.grid {
 
 declare module wijmo.grid {
     /**
-    * Creates HTML elements that represents cells within a @see:FlexGrid control.
+    * Creates HTML elements that represent cells within a @see:FlexGrid control.
     */
     class CellFactory {
         static _WJA_COLLAPSE: string;
         static _WJA_DROPDOWN: string;
+        static _ddIcon: HTMLElement;
         /**
         * Creates or updates a cell in the grid.
         *
-        * @param panel Part of the grid that owns this cell.
-        * @param r Index of this cell's row.
-        * @param c Index of this cell's column.
-        * @param cell Element that represents the cell.
-        * @param rng @see:CellRange that contains the cell's merged range, or null if the cell is not merged.
+        * @param panel The part of the grid that owns the cell.
+        * @param r The index of the row containing the cell.
+        * @param c The index of the column containing the cell.
+        * @param cell The element that represents the cell.
+        * @param rng The @see:CellRange object that contains the cell's
+        * merged range, or null if the cell is not merged.
         */
         public updateCell(panel: GridPanel, r: number, c: number, cell: HTMLElement, rng?: CellRange): void;
         private _isEditingCell(g, r, c);
@@ -1059,99 +1233,101 @@ declare module wijmo.grid {
         /**
         * Initializes a new instance of a @see:CellRange.
         *
-        * @param r Index of the first row in this range.
-        * @param c Index of the first column in this range.
-        * @param r2 Index of the last row in this range.
-        * @param c2 Index of the first column in this range.
+        * @param r The index of the first row in the range.
+        * @param c The index of the first column in the range.
+        * @param r2 The index of the last row in the range.
+        * @param c2 The index of the first column in the range.
         */
         constructor(r?: number, c?: number, r2?: number, c2?: number);
         /**
-        * Gets or sets the index of the first row in this range.
+        * Gets or sets the index of the first row in the range.
         */
         public row : number;
         /**
-        * Gets or sets the index of the first column in this range.
+        * Gets or sets the index of the first column in the range.
         */
         public col : number;
         /**
-        * Gets or sets the index of the second row in this range.
+        * Gets or sets the index of the second row in the range.
         */
         public row2 : number;
         /**
-        * Gets or sets the index of the second column in this range.
+        * Gets or sets the index of the second column in the range.
         */
         public col2 : number;
         /**
-        * Creates a copy of this range.
+        * Creates a copy of the range.
         */
         public clone(): CellRange;
         /**
-        * Gets the number of rows in this range.
+        * Gets the number of rows in the range.
         */
         public rowSpan : number;
         /**
-        * Gets the number of columns in this range.
+        * Gets the number of columns in the range.
         */
         public columnSpan : number;
         /**
-        * Gets the index of the top row in this range.
+        * Gets the index of the top row in the range.
         */
         public topRow : number;
         /**
-        * Gets the index of the bottom row in this range.
+        * Gets the index of the bottom row in the range.
         */
         public bottomRow : number;
         /**
-        * Gets the index of the leftmost column in this range.
+        * Gets the index of the leftmost column in the range.
         */
         public leftCol : number;
         /**
-        * Gets the index of the rightmost column in this range.
+        * Gets the index of the rightmost column in the range.
         */
         public rightCol : number;
         /**
-        * Checks whether this range contains valid row and column indices (> -1).
+        * Checks whether the range contains valid row and column indices
+        * (row and column values are zero or greater).
         */
         public isValid : boolean;
         /**
-        * Checks whether this range corresponds to a single cell (row == row2 && col == col2).
+        * Checks whether this range corresponds to a single cell (beginning and ending rows have
+        * the same index, and beginning and ending columns have the same index).
         */
         public isSingleCell : boolean;
         /**
-        * Checks whether this range contains another range or a specific cell.
+        * Checks whether the range contains another range or a specific cell.
         *
-        * @param r CellRange or row index.
-        * @param c column index (required if the r parameter is not a CellRange).
+        * @param r The CellRange object or row index to find.
+        * @param c The column index (required if the r parameter is not a CellRange object).
         */
         public contains(r: any, c?: number): boolean;
         /**
-        * Checks whether this range contains a given row.
+        * Checks whether the range contains a given row.
         *
-        * @param r Index of the row to check.
+        * @param r The index of the row to find.
         */
         public containsRow(r: number): boolean;
         /**
-        * Checks whether this range contains a given column.
+        * Checks whether the range contains a given column.
         *
-        * @param c Index of the column to check.
+        * @param c The index of the column to find.
         */
         public containsColumn(c: number): boolean;
         /**
-        * Checks whether this range intersects another range.
+        * Checks whether the range intersects another range.
         *
-        * @param rng CellRange to check.
+        * @param rng The CellRange object to check.
         */
         public intersects(rng: CellRange): boolean;
         /**
-        * Gets the render size of this range.
+        * Gets the rendered size of this range.
         *
-        * @param panel @see:GridPanel that contains the range.
-        * @return A @see:Size that represents the sum of row heights and column widths in the range.
+        * @param panel The @see:GridPanel object that contains the range.
+        * @return A @see:Size object that represents the sum of row heights and column widths in the range.
         */
         public getRenderSize(panel: GridPanel): Size;
         /**
-        * Checks whether this range equals another range.
-        * @param rng CellRange to compare to this range.
+        * Checks whether the range equals another range.
+        * @param rng The CellRange object to compare to this range.
         */
         public equals(rng: CellRange): boolean;
     }
@@ -1162,29 +1338,29 @@ declare module wijmo.grid {
     * Flags that specify the state of a grid row or column.
     */
     enum RowColFlags {
-        /** Row/Column is visible. */
+        /** The row or column is visible. */
         Visible = 1,
-        /** Row/Column can be resized. */
+        /** The row or column can be resized. */
         AllowResizing = 2,
-        /** Row/Column can be dragged to a new position with the mouse. */
+        /** The row or column can be dragged to a new position with the mouse. */
         AllowDragging = 4,
-        /** Row/Column can contain merged cells. */
+        /** The row or column can contain merged cells. */
         AllowMerging = 8,
-        /** Column can be sorted by clicking its header with the mouse. */
+        /** The column can be sorted by clicking its header with the mouse. */
         AllowSorting = 16,
-        /** Column was generated automatically. */
+        /** The column was generated automatically. */
         AutoGenerated = 32,
-        /** Group row is collapsed. */
+        /** The group row is collapsed. */
         Collapsed = 64,
-        /** Row has a parent group in collapsed state. */
+        /** The row has a parent group that is collapsed. */
         ParentCollapsed = 128,
-        /** Row/Column is selected. */
+        /** The row or column is selected. */
         Selected = 256,
-        /** Row/Column is read-only (cannot be edited). */
+        /** The row or column is read-only (cannot be edited). */
         ReadOnly = 512,
-        /** Cells in this row/column contain HTML text. */
+        /** Cells in this row or column contain HTML text. */
         HtmlContent = 1024,
-        /** Cells in this row/column may contain wrapped text. */
+        /** Cells in this row or column may contain wrapped text. */
         WordWrap = 2048,
         /** Default settings for new rows. */
         RowDefault,
@@ -1192,7 +1368,7 @@ declare module wijmo.grid {
         ColumnDefault,
     }
     /**
-    * Abstract class that serves as a base for the @see:Row and @see:Column classes.
+    * An abstract class that serves as a base for the @see:Row and @see:Column classes.
     */
     class RowCol {
         public _sz: number;
@@ -1204,67 +1380,70 @@ declare module wijmo.grid {
         public _pos: number;
         public _idx: number;
         /**
-        * Gets or sets whether this row or column is visible.
+        * Gets or sets a value indicating whether the row or column is visible.
         */
         public visible : boolean;
         /**
-        * Gets or sets whether this row or column is visible and not collapsed.
+        * Gets a value indicating whether the row or column is visible and not collapsed.
+        *
+        * This property is read-only. To change the visibility of a
+        * row or column, use the @see:visible property instead.
         */
         public isVisible : boolean;
         /**
-        * Gets the position of this row or column.
+        * Gets the position of the row or column.
         */
         public pos : number;
         /**
-        * Gets the index of this row or column in the parent collection.
+        * Gets the index of the row or column in the parent collection.
         */
         public index : number;
         /**
-        * Gets or sets the size of this row or column.
+        * Gets or sets the size of the row or column.
         * Setting this property to null or negative values causes the element to use the
         * parent collection's default size.
         */
         public size : number;
         /**
-        * Gets the render size of this row or column.
-        * This property accounts for visibility, default size, and min/max sizes.
+        * Gets the render size of the row or column.
+        * This property accounts for visibility, default size, and min and max sizes.
         */
         public renderSize : number;
         /**
-        * Gets or sets a whether the user can resize this row or column with the mouse.
+        * Gets or sets a value indicating whether the user can resize the row or column with the mouse.
         */
         public allowResizing : boolean;
         /**
-        * Gets or sets whether the user can move this row or column to a new position with the mouse.
+        * Gets or sets a value indicating whether the user can move the row or column to a new position with the mouse.
         */
         public allowDragging : boolean;
         /**
-        * Gets or sets whether cells in this row or column can be merged.
+        * Gets or sets a value indicating whether cells in the row or column can be merged.
         */
         public allowMerging : boolean;
         /**
-        * Gets or sets whether this row or column is selected.
+        * Gets or sets a value indicating whether the row or column is selected.
         */
         public isSelected : boolean;
         /**
-        * Gets or sets whether cells in this row or column can be edited.
+        * Gets or sets a value indicating whether cells in the row or column can be edited.
         */
         public isReadOnly : boolean;
         /**
-        * Gets or sets whether cells in this row or column contain HTML content rather than plain text.
+        * Gets or sets a value indicating whether cells in the row or column contain HTML content rather than plain text.
         */
         public isContentHtml : boolean;
         /**
-        * Gets or sets whether cells in this row or column should wrap their content.
+        * Gets or sets a value indicating whether cells in the row or column wrap their content.
         */
         public wordWrap : boolean;
         /**
-        * Gets or sets a CSS class name to be used when rendering
-        * non-header cells in this row or column.
+        * Gets or sets a CSS class name to use when rendering
+        * non-header cells in the row or column.
         */
         public cssClass : string;
         /**
-        * Gets the FlexGrid that owns this row or column.
+        * Gets the FlexGrid that owns the row or column.
         */
         public grid : FlexGrid;
         /**
@@ -1272,7 +1451,7 @@ declare module wijmo.grid {
         */
         public onPropertyChanged(): void;
         public _getFlag(flag: RowColFlags): boolean;
-        public _setFlag(flag: RowColFlags, value: boolean): boolean;
+        public _setFlag(flag: RowColFlags, value: boolean, quiet?: boolean): boolean;
     }
     /**
     * Represents a column on the grid.
@@ -1290,7 +1469,8 @@ declare module wijmo.grid {
         private _mask;
         private _required;
         private _showDropDown;
-        public _binding: _Binding;
+        public _binding: Binding;
+        public _bindingSort: Binding;
         public _szStar: string;
         public _hash: string;
         /**
@@ -1300,19 +1480,19 @@ declare module wijmo.grid {
         */
         constructor(options?: any);
         /**
-        * Gets or sets the name of this column.
+        * Gets or sets the name of the column.
         *
         * The column name can be used to retrieve the column using the @see:getColumn method.
         */
         public name : string;
         /**
-        * Gets or sets the type of value stored in this column.
+        * Gets or sets the type of value stored in the column.
         *
         * Values are coerced into the proper type when editing the grid.
         */
         public dataType : DataType;
         /**
-        * Gets or sets whether values in this column are required.
+        * Gets or sets whether values in the column are required.
         *
         * By default, this property is set to null, which means values
         * are required, but string columns may contain empty strings.
@@ -1324,7 +1504,7 @@ declare module wijmo.grid {
         */
         public required : boolean;
         /**
-        * Gets or sets whether the grid should add drop-down buttons to the
+        * Gets or sets a value indicating whether the grid adds drop-down buttons to the
         * cells in this column.
         *
         * The drop-down buttons are shown only if the column has a @see:dataMap
@@ -1344,29 +1524,39 @@ declare module wijmo.grid {
         *
         * Use this property to change the default setting if the default does not work well
         * for the current culture, device, or application. In these cases, try setting the
-        * property to "number" or simply "text".
+        * property to "number" or simply "text."
         */
         public inputType : string;
         /**
-        * Gets or sets a mask to be used while editing values in this column.
+        * Gets or sets a mask to use while editing values in this column.
         *
         * The mask format is the same used by the @see:wijmo.input.InputMask
         * control.
         *
-        * If specified, the mask should be compatible with the value of
+        * If specified, the mask must be compatible with the value of
         * the @see:format property. For example, the mask '99/99/9999' can
         * be used for entering dates formatted as 'MM/dd/yyyy'.
         */
         public mask : string;
         /**
-        * Gets or sets the name of the property this column is bound to.
+        * Gets or sets the name of the property the column is bound to.
         */
         public binding : string;
         /**
-        * Gets or sets the width of this column.
+        * Gets or sets the name of the property to use when sorting this column.
         *
-        * Column widths may be positive numbers (column width in pixels),
-        * null or negative numbers (use the collection's default column width), or
+        * Use this property in cases where you want the sorting to be performed
+        * based on values other than the ones speficied by the @see:binding property.
+        *
+        * Setting this property is null causes the grid to use the value of the
+        * @see:binding property to sort the column.
+        */
+        public sortMemberPath : string;
+        /**
+        * Gets or sets the width of the column.
+        *
+        * Column widths may be positive numbers (sets the column width in pixels),
+        * null or negative numbers (uses the collection's default column width), or
         * strings in the format '{number}*' (star sizing).
         *
         * The star-sizing option performs a XAML-style dynamic sizing where column
@@ -1382,36 +1572,35 @@ declare module wijmo.grid {
         * to prevent the column from getting too narrow.
         */
         public width : any;
-        static _parseStarSize(value: any): number;
         /**
-        * Gets or sets the minimum width of this column.
+        * Gets or sets the minimum width of the column.
         */
         public minWidth : number;
         /**
-        * Gets or sets the maximum width of this column.
+        * Gets or sets the maximum width of the column.
         */
         public maxWidth : number;
         /**
-        * Gets the render width of this column.
+        * Gets the render width of the column.
         *
-        * The value returned takes into account the column's visibility, default size, and min/max sizes.
+        * The value returned takes into account the column's visibility, default size, and min and max sizes.
         */
         public renderWidth : number;
         /**
-        * Gets or sets the horizontal alignment of items in this column.
+        * Gets or sets the horizontal alignment of items in the column.
         *
         * The default value for this property is null, which causes the grid to select
-        * the alignment automatically based on column's @see:dataType (numbers are
-        * right-aligned, boolean values are centered, other types are left-aligned).
+        * the alignment automatically based on the column's @see:dataType (numbers are
+        * right-aligned, Boolean values are centered, and other types are left-aligned).
         *
         * If you want to override the default alignment, set this property
-        * to 'left', 'right', or 'center'.
+        * to 'left,' 'right,' or 'center,'
         */
         public align : string;
         /**
         * Gets the actual column alignment.
         *
-        * Returns the value of the @see:align property if that is not null, or
+        * Returns the value of the @see:align property if it is not null, or
         * selects the alignment based on the column's @see:dataType.
         */
         public getAlignment(): string;
@@ -1421,10 +1610,10 @@ declare module wijmo.grid {
         public header : string;
         /**
         * Gets or sets the @see:DataMap used to convert raw values into display
-        * values for this column.
+        * values for the column.
         *
         * Columns with an associated @see:dataMap show drop-down buttons that
-        * can be used for quick editing. If you don't want to show the drop-down
+        * can be used for quick editing. If you do not want to show the drop-down
         * buttons, set the column's @see:showDropDown property to false.
         *
         * Cell drop-downs require the wijmo.input module to be loaded.
@@ -1432,24 +1621,26 @@ declare module wijmo.grid {
         public dataMap : DataMap;
         /**
         * Gets or sets the format string used to convert raw values into display
-        * values for this column (see @see:wijmo.Globalize).
+        * values for the column (see @see:wijmo.Globalize).
         */
         public format : string;
         /**
-        * Gets or sets whether the user can sort this column by clicking its header.
+        * Gets or sets a value indicating whether the user can sort the column by clicking its header.
         */
         public allowSorting : boolean;
         /**
-        * Gets a string that describes the current sorting applied to this column.
+        * Gets a string that describes the current sorting applied to the column.
         * Possible values are '+' for ascending order, '-' for descending order, or
         * null for unsorted columns.
         */
         public currentSort : string;
         /**
         * Gets or sets the @see:Aggregate to display in the group header rows
-        * for this column.
+        * for the column.
         */
         public aggregate : Aggregate;
+        private _getBindingSort();
+        static _parseStarSize(value: any): number;
     }
     /**
     * Represents a row in the grid.
@@ -1460,23 +1651,23 @@ declare module wijmo.grid {
         /**
         * Initializes a new instance of a @see:Row.
         *
-        * @param dataItem Data item that this row is bound to.
+        * @param dataItem The data item that this row is bound to.
         */
         constructor(dataItem?: any);
         /**
-        * Gets or sets the item in the data collection that this item is bound to.
+        * Gets or sets the item in the data collection that the item is bound to.
         */
         public dataItem : any;
         /**
-        * Gets or sets the height of this row.
+        * Gets or sets the height of the row.
         * Setting this property to null or negative values causes the element to use the
         * parent collection's default size.
         */
         public height : number;
         /**
-        * Gets the render height of this row.
+        * Gets the render height of the row.
         *
-        * The value returned takes into account the row's visibility, default size, and min/max sizes.
+        * The value returned takes into account the row's visibility, default size, and min and max sizes.
         */
         public renderHeight : number;
     }
@@ -1490,22 +1681,22 @@ declare module wijmo.grid {
         */
         constructor();
         /**
-        * Gets or sets the hierarchical level of the group associated with this GroupRow.
+        * Gets or sets the hierarchical level of the group associated with the GroupRow.
         */
         public level : number;
         /**
-        * Gets a value that indicates whether this group row has child rows.
+        * Gets a value that indicates whether the group row has child rows.
         */
         public hasChildren : boolean;
         /**
-        * Gets or sets a value that indicates whether this GroupRow is collapsed
+        * Gets or sets a value that indicates whether the GroupRow is collapsed
         * (child rows are hidden) or expanded (child rows are visible).
         */
         public isCollapsed : boolean;
         public _setCollapsed(collapsed: boolean): void;
         /**
-        * Gets a CellRange object that contains all the rows in the group represented
-        * by this GroupRow and all columns in the grid.
+        * Gets a CellRange object that contains all of the rows in the group represented
+        * by the GroupRow and all of the columns in the grid.
         */
         public getCellRange(): CellRange;
     }
@@ -1523,32 +1714,38 @@ declare module wijmo.grid {
         /**
         * Initializes a new instance of a @see:_RowColCollection.
         *
-        * @param grid @see:FlexGrid that owns this collection.
-        * @param defaultSize Default size of the elements in this collection.
+        * @param grid The @see:FlexGrid that owns the collection.
+        * @param defaultSize The default size of the elements in the collection.
         */
         constructor(grid: FlexGrid, defaultSize: number);
         /**
-        * Gets or sets the default size of elements in this collection.
+        * Gets or sets the default size of elements in the collection.
         */
         public defaultSize : number;
         /**
         * Gets or sets the number of frozen rows or columns in the collection.
         *
-        * Frozen rows and columns do not scroll and remain at the top/left of
+        * Frozen rows and columns do not scroll, and instead remain at the top or left of
         * the grid, next to the fixed cells. Unlike fixed cells, however, frozen
-        * calls may be selected and edited like regular cells.
+        * cells may be selected and edited like regular cells.
         */
         public frozen : number;
         /**
-        * Gets or sets the minimum size of elements in this collection.
+        * Checks whether a row or column is frozen.
+        *
+        * @param index The index of the row or column to check.
+        */
+        public isFrozen(index: number): boolean;
+        /**
+        * Gets or sets the minimum size of elements in the collection.
         */
         public minSize : number;
         /**
-        * Gets or sets the maximum size of elements in this collection.
+        * Gets or sets the maximum size of elements in the collection.
         */
         public maxSize : number;
         /**
-        * Gets the total size of the elements in this collection.
+        * Gets the total size of the elements in the collection.
         */
         public getTotalSize(): number;
         /**
@@ -1566,9 +1763,9 @@ declare module wijmo.grid {
         /**
         * Checks whether an element can be moved from one position to another.
         *
-        * @param src Index of the element to move.
-        * @param dst Position where the element should be moved to (-1 to append).
-        * @return True if the move is valid, false otherwise.
+        * @param src The index of the element to move.
+        * @param dst The position to which to move the element, or specify -1 to append the element.
+        * @return Returns true if the move is valid, false otherwise.
         */
         public canMoveElement(src: number, dst: number): boolean;
         /**
@@ -1582,9 +1779,25 @@ declare module wijmo.grid {
         */
         public onCollectionChanged(e?: collections.NotifyCollectionChangedEventArgs): void;
         /**
-        * Overridden to clear list reference from child elements.
+        * Appends an item to the array.
+        *
+        * @param item Item to add to the array.
+        * @return The new length of the array.
         */
-        public clear(): void;
+        public push(item: any): number;
+        /**
+        * Removes or adds items to the array.
+        *
+        * @param index Position where items are added or removed.
+        * @param count Number of items to remove from the array.
+        * @param item Item to add to the array.
+        * @return An array containing the removed elements.
+        */
+        public splice(index: number, count: number, item?: any): any[];
+        /**
+        * Suspends notifications until the next call to @see:endUpdate.
+        */
+        public beginUpdate(): void;
         public _update(): boolean;
     }
     /**
@@ -1598,8 +1811,8 @@ declare module wijmo.grid {
         * The method searches the column by name. If a column with the given name
         * is not found, it searches by binding. The searches are case-sensitive.
         *
-        * @param name Name or binding to look for.
-        * @return The column with the specified name/binding, or null if not found.
+        * @param name The name or binding to find.
+        * @return The column with the specified name or binding, or null if not found.
         */
         public getColumn(name: string): Column;
         /**
@@ -1608,10 +1821,10 @@ declare module wijmo.grid {
         * The method searches the column by name. If a column with the given name
         * is not found, it searches by binding. The searches are case-sensitive.
         *
-        * @param name Name or binding to look for.
-        * @return The index of column with the specified name/binding, or -1 if not found.
+        * @param name The name or binding to find.
+        * @return The index of column with the specified name or binding, or -1 if not found.
         */
-        public indexOf(name: string): number;
+        public indexOf(name: any): number;
         /**
         * Gets the index of the first visible column (where the outline tree is displayed).
         */
@@ -1636,7 +1849,7 @@ declare module wijmo.grid {
 
 declare module wijmo.grid {
     /**
-    * Contains information about a part of a @see:FlexGrid control at
+    * Contains information about the part of a @see:FlexGrid control that exists at
     * a specified page coordinate.
     */
     class HitTestInfo {
@@ -1646,16 +1859,17 @@ declare module wijmo.grid {
         public _row: number;
         public _col: number;
         public _edge: number;
-        public _EDGESIZE: number;
+        static _EDGESIZE: number;
+        static _BADANDROID: boolean;
         /**
-        * Initializes a new instance of a @see:HitTestInfo.
+        * Initializes a new instance of a @see:HitTestInfo object.
         *
-        * @param grid @see:FlexGrid control or @see:GridPanel to investigate.
-        * @param pt @see:Point in page coordinates to investigate.
+        * @param grid The @see:FlexGrid control or @see:GridPanel to investigate.
+        * @param pt The @see:Point object in page coordinates to investigate.
         */
         constructor(grid: any, pt: any);
         /**
-        * Gets the point in control coordinates that this HitTestInfo refers to.
+        * Gets the point in control coordinates that the HitTestInfo refers to.
         */
         public point : Point;
         /**
@@ -1679,21 +1893,22 @@ declare module wijmo.grid {
         */
         public cellRange : CellRange;
         /**
-        * Gets whether the mouse is near the left edge of the cell.
+        * Gets a value indicating whether the mouse is near the left edge of the cell.
         */
         public edgeLeft : boolean;
         /**
-        * Gets whether the mouse is near the top edge of the cell.
+        * Gets a value indicating whether the mouse is near the top edge of the cell.
         */
         public edgeTop : boolean;
         /**
-        * Gets whether the mouse is near the right edge of the cell.
+        * Gets a value indicating whether the mouse is near the right edge of the cell.
         */
         public edgeRight : boolean;
         /**
-        * Gets whether the mouse is near the bottom edge of the cell.
+        * Gets a value indicating whether the mouse is near the bottom edge of the cell.
         */
         public edgeBottom : boolean;
+        public _isBadAndroid(): boolean;
     }
 }
 
@@ -1728,18 +1943,18 @@ declare module wijmo.grid {
     class MergeManager {
         public _g: FlexGrid;
         /**
-        * Initializes a new instance of a @see:MergeManager.
+        * Initializes a new instance of a @see:MergeManager object.
         *
-        * @param grid @see:FlexGrid that owns this @see:MergeManager.
+        * @param grid The @see:FlexGrid object that owns this @see:MergeManager.
         */
         constructor(grid: FlexGrid);
         /**
         * Gets a @see:CellRange that specifies the merged extent of a cell
         * in a @see:GridPanel.
         *
-        * @param panel @see:GridPanel that contains the range.
-        * @param r Index of the row that contains the cell.
-        * @param c Index of the column that contains the cell.
+        * @param panel The @see:GridPanel that contains the range.
+        * @param r The index of the row that contains the cell.
+        * @param c The index of the column that contains the cell.
         * @return A @see:CellRange that specifies the merged range, or null if the cell is not merged.
         */
         public getMergedRange(panel: GridPanel, r: number, c: number): CellRange;
@@ -1754,9 +1969,9 @@ declare module wijmo.grid {
     * you may want to display a customer name instead of his ID, or a color name
     * instead of its RGB value.
     *
-    * For example, the code below creates binds a grid to a collection of products,
-    * then assigns a @see:DataMap to the grid's 'CategoryID' column so the grid will
-    * display the category names rather than the raw IDs.
+    * The code below binds a grid to a collection of products,
+    * then assigns a @see:DataMap to the grid's 'CategoryID' column so that the grid
+    * displays the category names rather than the raw IDs.
     *
     * <pre>
     * // bind grid to products
@@ -1774,39 +1989,43 @@ declare module wijmo.grid {
         /**
         * Initializes a new instance of a @see:DataMap.
         *
-        * @param itemsSource Array or or @see:ICollectionView that contains the map items.
-        * @param selectedValuePath Name of the property that contains the keys (data values).
-        * @param displayMemberPath Name of the property to use as the visual representation of the items.
+        * @param itemsSource An array or @see:ICollectionView that contains the items to map.
+        * @param selectedValuePath The name of the property that contains the keys (data values).
+        * @param displayMemberPath The name of the property to use as the visual representation of the items.
         */
         constructor(itemsSource: any, selectedValuePath: string, displayMemberPath: string);
         /**
-        * Gets the @see:ICollectionView that contains the map data.
+        * Gets the @see:ICollectionView object that contains the map data.
         */
         public collectionView : collections.ICollectionView;
         /**
-        * Gets the name of the property to use as a key for the item (data values).
+        * Gets the name of the property to use as a key for the item (data value).
         */
         public selectedValuePath : string;
         /**
-        * Gets the name of the property to use as the visual representation of the items.
+        * Gets the name of the property to use as the visual representation of the item.
         */
         public displayMemberPath : string;
         /**
         * Gets the key that corresponds to a given display value.
         *
-        * @param displayValue Display value of the item to retrieve.
+        * @param displayValue The display value of the item to retrieve.
         */
         public getKeyValue(displayValue: string): any;
         /**
         * Gets the display value that corresponds to a given key.
         *
-        * @param key Key of the item to retrieve.
+        * @param key The key of the item to retrieve.
         */
         public getDisplayValue(key: any): any;
         /**
-        * Gets an array with all possible display values on this map.
+        * Gets an array with all of the display values on the map.
         */
         public getDisplayValues(): string[];
+        /**
+        * Gets an array with all of the keys on the map.
+        */
+        public getKeyValues(): string[];
         /**
         * Occurs when the map data changes.
         */
@@ -1952,6 +2171,19 @@ declare module wijmo.grid {
         Both,
     }
     /**
+    * Specifies constants that define the row/column auto-sizing behavior.
+    */
+    enum AutoSizeMode {
+        /** Autosizing is disabled. */
+        None = 0,
+        /** Autosizing accounts for header cells. */
+        Headers = 1,
+        /** Autosizing accounts for data cells. */
+        Cells = 2,
+        /** Autosizing accounts for header and data cells. */
+        Both,
+    }
+    /**
     * Specifies constants that define the row/column dragging behavior.
     */
     enum AllowDragging {
@@ -1977,6 +2209,8 @@ declare module wijmo.grid {
         public _szStart: number;
         public _szArgs: CellRangeEventArgs;
         public _dragSource: any;
+        public _dvMarker: HTMLElement;
+        public _rngTarget: CellRange;
         /**
         * Initializes a new instance of a @see:_MouseHandler.
         *
@@ -1998,7 +2232,9 @@ declare module wijmo.grid {
         private _dragEnd(e);
         private _dragOver(e);
         private _drop(e);
-        private _finishResizing();
+        private _showResizeMarker(sz);
+        private _showDragMarker(ht);
+        private _finishResizing(e);
         private _startListBoxSelection(row);
         private _handleSelection(ht, extend);
         private _handleSort(e);
@@ -2030,9 +2266,10 @@ declare module wijmo.grid {
         * @param fullEdit Whether to stay in edit mode when the user presses the cursor keys. Defaults to false.
         * @param r Index of the row to be edited. Defaults to the currently selected row.
         * @param c Index of the column to be edited. Defaults to the currently selected column.
+        * @param focus Whether to give the editor the focus. Defaults to true.
         * @return True if the edit operation started successfully.
         */
-        public startEditing(fullEdit?: boolean, r?: number, c?: number): boolean;
+        public startEditing(fullEdit?: boolean, r?: number, c?: number, focus?: boolean): boolean;
         public finishEditing(cancel?: boolean): boolean;
         public activeEditor : HTMLInputElement;
         public editRange : CellRange;

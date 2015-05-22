@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -46,7 +46,53 @@ var wijmo;
             }
         },
         FlexGrid: {
-            groupHeaderFormat: '{name}: <b>{value} </b>({count} Titel)'
+            groupHeaderFormat: '{name}: <b>{value} </b>({count:n0} Titel)'
+        },
+        FlexGridFilter: {
+            // filter
+            ascending: '\u2191 Aufsteigend',
+            descending: '\u2193 Absteigend',
+            apply: 'Anwenden',
+            clear: 'Löschen',
+            conditions: 'Bedingungen',
+            values: 'Werte',
+            // value filter
+            search: 'Suche',
+            selectAll: 'Alles auswählen',
+            null: '(null)',
+            // condition filter
+            header: 'Zeige Artikel mit Wert',
+            and: 'Und',
+            or: 'Oder',
+            stringOperators: [
+                { name: '(Nicht festgelegt)', op: null },
+                { name: 'Gleich', op: 0 },
+                { name: 'Ist Nicht gleich', op: 1 },
+                { name: 'Beginnt mit', op: 6 },
+                { name: 'Endet mit', op: 7 },
+                { name: 'Enthält', op: 8 },
+                { name: 'Enthält nicht', op: 9 }
+            ],
+            numberOperators: [
+                { name: '(Nicht festgelegt)', op: null },
+                { name: 'Gleich', op: 0 },
+                { name: 'Ist Nicht gleich', op: 1 },
+                { name: 'Größer als', op: 2 },
+                { name: 'Größer oder gleich', op: 3 },
+                { name: 'Kleiner als', op: 4 },
+                { name: 'Kleiner oder gleich', op: 5 }
+            ],
+            dateOperators: [
+                { name: '(Nicht festgelegt)', op: null },
+                { name: 'Gleich', op: 0 },
+                { name: 'Vor', op: 4 },
+                { name: 'Nach', op: 3 }
+            ],
+            booleanOperators: [
+                { name: '(Nicht festgelegt)', op: null },
+                { name: 'Gleich', op: 0 },
+                { name: 'Ist Nicht gleich', op: 1 }
+            ]
         }
     };
 })(wijmo || (wijmo = {}));

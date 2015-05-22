@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -46,7 +46,53 @@ var wijmo;
             }
         },
         FlexGrid: {
-            groupHeaderFormat: '{name}: <b>{value} </b>({count} itens)'
+            groupHeaderFormat: '{name}: <b>{value} </b>({count:n0} itens)'
+        },
+        FlexGridFilter: {
+            // filter
+            ascending: '\u2191 Crescente',
+            descending: '\u2193 Decrescente',
+            apply: 'Aplicar',
+            clear: 'Remover',
+            conditions: 'Condições',
+            values: 'Valores',
+            // value filter
+            search: 'Filtro',
+            selectAll: 'Selecionar todos',
+            null: '(nulo)',
+            // condition filter
+            header: 'Mostrar items com valor',
+            and: 'E',
+            or: 'Ou',
+            stringOperators: [
+                { name: '(nenhum)', op: null },
+                { name: 'Igual a', op: 0 },
+                { name: 'Diferente de', op: 1 },
+                { name: 'Que inicia com', op: 6 },
+                { name: 'Que termina em', op: 7 },
+                { name: 'Que contém', op: 8 },
+                { name: 'Que não contém', op: 9 }
+            ],
+            numberOperators: [
+                { name: '(nenhum)', op: null },
+                { name: 'Igual a', op: 0 },
+                { name: 'Diferente de', op: 1 },
+                { name: 'Maior que', op: 2 },
+                { name: 'Maior ou igual a', op: 3 },
+                { name: 'Menor que', op: 4 },
+                { name: 'Menor ou igual a', op: 5 }
+            ],
+            dateOperators: [
+                { name: '(nenhum)', op: null },
+                { name: 'Igual a', op: 0 },
+                { name: 'Antes de', op: 4 },
+                { name: 'Depois de', op: 3 }
+            ],
+            booleanOperators: [
+                { name: '(nenhum)', op: null },
+                { name: 'Igual a', op: 0 },
+                { name: 'Diferente de', op: 1 }
+            ]
         }
     };
 })(wijmo || (wijmo = {}));

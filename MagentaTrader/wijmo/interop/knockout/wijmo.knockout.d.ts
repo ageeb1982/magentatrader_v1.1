@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -21,6 +21,7 @@ declare module wijmo {
             static findComplexProp(propName: string, props: ComplexPropDescBase[]): ComplexPropDescBase;
             static getMetaData(metaDataId: any): MetaDataBase;
             static getClassName(classRef: any): string;
+            static toCamelCase(s: any): any;
             private static findInArr(arr, propName, value);
         }
         class PropDescBase {
@@ -76,11 +77,14 @@ declare module wijmo {
             public parentProperty: string;
             public isParentPropertyArray: boolean;
             public ownsObject: boolean;
-            constructor(props: PropDescBase[], events?: EventDescBase[], complexProps?: ComplexPropDescBase[], parentProperty?: string, isParentPropertyArray?: boolean, ownsObject?: boolean);
+            public parentReferenceProperty: string;
+            public ngModelProperty: string;
+            constructor(props: PropDescBase[], events?: EventDescBase[], complexProps?: ComplexPropDescBase[], parentProperty?: string, isParentPropertyArray?: boolean, ownsObject?: boolean, parentReferenceProperty?: string, ngModelProperty?: string);
             public props : PropDescBase[];
             public events : EventDescBase[];
             public complexProps : ComplexPropDescBase[];
-            public add(props: PropDescBase[], events?: EventDescBase[], complexProps?: ComplexPropDescBase[], parentProperty?: string, isParentPropertyArray?: boolean, ownsObject?: boolean): MetaDataBase;
+            public add(props: PropDescBase[], events?: EventDescBase[], complexProps?: ComplexPropDescBase[], parentProperty?: string, isParentPropertyArray?: boolean, ownsObject?: boolean, parentReferenceProperty?: string, ngModelProperty?: string): MetaDataBase;
+            public addOptions(options: any): MetaDataBase;
             public prepare(): void;
         }
     }
@@ -318,6 +322,8 @@ declare module wijmo.knockout {
         public _createControl(element: any): any;
         public _createWijmoContext(): WjContext;
         public _isChild(): boolean;
+        public _isParentInitializer(): boolean;
+        public _isParentReferencer(): boolean;
         private _initImpl(element, valueAccessor, allBindings, viewModel, bindingContext);
         private _updateImpl;
     }
@@ -352,9 +358,13 @@ declare module wijmo.knockout {
         public _safeUpdateSrcAttr(attrName: string, value: any): void;
         public _safeNotifySrcAttr(attrName: string): void;
         private _isChild();
+        private _isParentInitializer();
+        private _isParentReferencer();
         private _getParentProp();
+        private _getParentReferenceProperty();
         private _useParentObj();
         private _isParentArray();
+        private _parentInCtor();
     }
 }
 
@@ -932,6 +942,80 @@ declare module wijmo.knockout {
         static quoteString(s: string): string;
         static unquoteString(s: string): string;
     }
+    /**
+    * KnockoutJS binding for the @see:FlexGrid @see:FlexGridFilter object.
+    *
+    * The @see:wjFlexGridFilter binding must be contained in a @see:wjFlexGrid binding. For example:
+    *
+    * <pre>&lt;p&gt;Here is a FlexGrid control with column filters:&lt;/p&gt;
+    * &lt;div data-bind="wjFlexGrid: { itemsSource: data }"&gt;
+    *     &lt;div data-bind="wjFlexGridFilter: { filterColumns: ['country', 'amount']  }"&gt;&lt;/div&gt;
+    * &nbsp;
+    *     &lt;div data-bind="wjFlexGridColumn: {
+    *         header: 'Country',
+    *         binding: 'country',
+    *         width: '*' }"&gt;
+    *     &lt;/div&gt;
+    *     &lt;div data-bind="wjFlexGridColumn: {
+    *         header: 'Date',
+    *         binding: 'date' }"&gt;
+    *     &lt;/div&gt;
+    *     &lt;div data-bind="wjFlexGridColumn: {
+    *         header: 'Revenue',
+    *         binding: 'amount',
+    *         format: 'n0' }"&gt;
+    *     &lt;/div&gt;
+    *     &lt;div data-bind="wjFlexGridColumn: {
+    *         header: 'Active',
+    *         binding: 'active' }"&gt;
+    *     &lt;/div&gt;
+    * &lt;/div&gt;</pre>
+    *
+    * The <b>wjFlexGridFilter</b> binding supports all read-write properties and events of
+    * the @see:FlexGridFilter class.
+    *
+    */
+    class wjFlexGridFilter extends WjBinding {
+        public _getControlConstructor(): any;
+    }
+    /**
+    * KnockoutJS binding for the @see:FlexGrid @see:GroupPanel control.
+    *
+    * The <b>wjGroupPanel</b> binding should be connected to the <b>FlexGrid</b> control using the <b>grid</b> property.
+    * For example:
+    *
+    * <pre>&lt;p&gt;Here is a FlexGrid control with GroupPanel:&lt;/p&gt;
+    * &nbsp;
+    * &lt;div data-bind="wjGroupPanel: { grid: flex(), placeholder: 'Drag columns here to create groups.' }"&gt;&lt;/div&gt;
+    * &nbsp;
+    * &lt;div data-bind="wjFlexGrid: { control: flex, itemsSource: data }"&gt;
+    *     &lt;div data-bind="wjFlexGridColumn: {
+    *         header: 'Country',
+    *         binding: 'country',
+    *         width: '*' }"&gt;
+    *     &lt;/div&gt;
+    *     &lt;div data-bind="wjFlexGridColumn: {
+    *         header: 'Date',
+    *         binding: 'date' }"&gt;
+    *     &lt;/div&gt;
+    *     &lt;div data-bind="wjFlexGridColumn: {
+    *         header: 'Revenue',
+    *         binding: 'amount',
+    *         format: 'n0' }"&gt;
+    *     &lt;/div&gt;
+    *     &lt;div data-bind="wjFlexGridColumn: {
+    *         header: 'Active',
+    *         binding: 'active' }"&gt;
+    *     &lt;/div&gt;
+    * &lt;/div&gt;</pre>
+    *
+    * The <b>wjGroupPanel</b> binding supports all read-write properties and events of
+    * the @see:GroupPanel class.
+    *
+    */
+    class wjGroupPanel extends WjBinding {
+        public _getControlConstructor(): any;
+    }
 }
 
 declare module wijmo.knockout {
@@ -983,6 +1067,7 @@ declare module wijmo.knockout {
     */
     class wjFlexChart extends WjFlexChartBaseBinding {
         public _getControlConstructor(): any;
+        public _initialize(): void;
     }
     /**
     * KnockoutJS binding for the @see:FlexPie control.
@@ -1006,6 +1091,7 @@ declare module wijmo.knockout {
     */
     class wjFlexPie extends WjFlexChartBaseBinding {
         public _getControlConstructor(): any;
+        public _initialize(): void;
     }
     /**
     * KnockoutJS binding for the @see:FlexChart @see:Axis object.
@@ -1203,7 +1289,6 @@ declare module wijmo.knockout {
         private _delegate(node);
         private _isWjTag(name);
         private _isWjProp(name, metaData);
-        private _toCamelCase(s);
     }
 }
 

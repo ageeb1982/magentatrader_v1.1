@@ -20,6 +20,9 @@ div[wj-part='cells'] {
   background: #abcd77;
   color: #333333;
 }
+.wj-flexgrid .wj-marker {
+  background: #2a9fd6;
+}
 /* -- Grid -- */
 div[wj-part='root'] {
   background: #f2f2f2;
@@ -43,6 +46,9 @@ div[wj-part='rhcells'] .wj-header {
 .wj-cell:not(.wj-frozen-col):not(.wj-frozen-row):not(.wj-frozen) {
   border-right: 0px solid rgba(0, 0, 0, 0.2);
   border-bottom: 0px solid rgba(0, 0, 0, 0.2);
+}
+[dir="rtl"] .wj-cell {
+  border-left: 0px solid rgba(0, 0, 0, 0.2);
 }
 .wj-cell:not(.wj-header):not(.wj-group):not(.wj-alt):not(.wj-state-selected):not(.wj-state-multi-selected) {
   /* Default grid cell color */

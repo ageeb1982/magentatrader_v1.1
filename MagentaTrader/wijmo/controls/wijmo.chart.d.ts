@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -160,15 +160,15 @@ declare module wijmo.chart {
         /**
         * Raises the @see:rendered event.
         *
-        * @param engine The @see:IRenderEngine object used to render the chart.
+        * @param e The @see:RenderEventArgs object used to render the chart.
         */
-        public onRendered(engine: IRenderEngine): void;
+        public onRendered(e: RenderEventArgs): void;
         /**
         * Raises the @see:rendering event.
         *
-        * @param engine The @see:IRenderEngine object used to render the chart.
+        * @param e The @see:RenderEventArgs object used to render the chart.
         */
-        public onRendering(engine: IRenderEngine): void;
+        public onRendering(e: RenderEventArgs): void;
         /**
         * Refreshes the chart.
         *
@@ -248,6 +248,7 @@ declare module wijmo.chart {
         private _selectedIndex;
         private _angles;
         private _selectionAnimationID;
+        private _lbl;
         public _values: number[];
         public _labels: string[];
         public _pels: any[];
@@ -321,6 +322,10 @@ declare module wijmo.chart {
         */
         public tooltip : ChartTooltip;
         /**
+        * Gets the point data label.
+        */
+        public dataLabel : PieDataLabel;
+        /**
         * Gets a @see:HitTestInfo object with information about the specified point.
         *
         * @param pt The point to investigate, in window coordinates.
@@ -331,10 +336,11 @@ declare module wijmo.chart {
         public _performBind(): void;
         public _render(engine: IRenderEngine): void;
         public _renderData(engine: IRenderEngine, rect: Rect, g: any): void;
+        public _renderLabels(engine: IRenderEngine): void;
         public _drawSilce(engine: IRenderEngine, i: number, reversed: boolean, cx: number, cy: number, r: number, irad: number, angle: number, sweep: number): void;
         public _measureLegendItem(engine: IRenderEngine, name: string): Size;
         public _drawLegendItem(engine: IRenderEngine, rect: Rect, i: number, name: string): void;
-        private _getTooltipContent(ht);
+        private _getLabelContent(ht, content);
         private _select(pointIndex, animate?);
         private _highlightCurrent();
         private _highlight(selected, pointIndex, animate?);
@@ -342,53 +348,7 @@ declare module wijmo.chart {
     }
 }
 
-/**
-* Defines the @see:FlexChart control and its associated classes.
-*
-* The example below creates a @see:FlexChart control and binds it to a data array.
-* The chart has three series, each corresponding to a property in the objects
-* contained in the source array. The last series in the example uses the
-* <a href="http://wijmo.com/5/docs/topic/wijmo.chart.ChartType.Enum.html"
-* target="_blank">chartType property</a> to override the default chart type used
-* by the other series.
-*
-* @fiddle:6GB66
-*/
 declare module wijmo.chart {
-    /**
-    * Specifies the chart type.
-    */
-    enum ChartType {
-        /** Column charts show vertical bars and allow you to compare values of items across categories. */
-        Column = 0,
-        /** Bar charts show horizontal bars. */
-        Bar = 1,
-        /** Scatter charts use X and Y coordinates to show patterns within the data. */
-        Scatter = 2,
-        /** Line charts show trends over a period of time or across categories. */
-        Line = 3,
-        /** Line and symbol charts are line charts with a symbol on each data point. */
-        LineSymbols = 4,
-        /** Area charts are line charts with the area below the line filled with color. */
-        Area = 5,
-        /** Bubble charts are Scatter charts with a
-        * third data value that determines the size of the symbol. */
-        Bubble = 6,
-        /** Candlestick charts present items with high, low, open, and close values.
-        * The size of the wick line is determined by the High and Low values, while the size of the bar is
-        * determined by the Open and Close values. The bar is displayed using different colors, depending on
-        * whether the close value is higher or lower than the open value. */
-        Candlestick = 7,
-        /** High-low-open-close charts display the same information as a candlestick chart, except that opening
-        * values are displayed using lines to the left, while lines to the right indicate closing values.  */
-        HighLowOpenClose = 8,
-        /** Spline charts are line charts that plot curves rather than angled lines through the data points. */
-        Spline = 9,
-        /** Spline and symbol charts are spline charts with symbols on each data point. */
-        SplineSymbols = 10,
-        /** Spline area charts are spline charts with the area below the line filled with color. */
-        SplineArea = 11,
-    }
     /**
     * Specifies whether and how to stack the chart's data values.
     */
@@ -415,21 +375,10 @@ declare module wijmo.chart {
         Point = 2,
     }
     /**
-    * The @see:FlexChart control provides a powerful and flexible way to visualize
-    * data.
+    * The core charting control for @see:FlexChart.
     *
-    * You can use the @see:FlexChart control to create charts that display data in
-    * several formats, including bar, line, symbol, bubble, and others.
-    *
-    * To use the @see:FlexChart control, set the @see:itemsSource property to an
-    * array containing the data, then add one or more @see:Series objects
-    * to the @see:series property.
-    *
-    * Use the @see:chartType property to define the @see:ChartType used for all series.
-    * You may override the chart type for each series by setting the @see:chartType
-    * property on each @see:Series object.
     */
-    class FlexChart extends FlexChartBase {
+    class FlexChartCore extends FlexChartBase {
         static _CSS_AXIS_X: string;
         static _CSS_AXIS_Y: string;
         static _CSS_LINE: string;
@@ -444,11 +393,11 @@ declare module wijmo.chart {
         static _CSS_TITLE: string;
         static _CSS_SELECTION: string;
         static _CSS_PLOT_AREA: string;
+        static _FG: string;
         private _series;
         private _axes;
         private _axisX;
         private _axisY;
-        private _chartType;
         private _selection;
         private _interpolateNulls;
         private _legendToggle;
@@ -460,9 +409,11 @@ declare module wijmo.chart {
         private __areaPlotter;
         private __bubblePlotter;
         private __financePlotter;
+        private _plotters;
         private _bindingX;
         private _rotated;
-        private _stacking;
+        public _stacking: Stacking;
+        private _lbl;
         public _xlabels: string[];
         public _xvals: number[];
         public _xDataType: DataType;
@@ -484,10 +435,6 @@ declare module wijmo.chart {
         */
         public axes : collections.ObservableArray;
         /**
-        * Gets or sets the type of chart to create.
-        */
-        public chartType : ChartType;
-        /**
         * Gets the main X axis.
         */
         public axisX : Axis;
@@ -499,10 +446,6 @@ declare module wijmo.chart {
         * Gets or sets the name of the property that contains the X data values.
         */
         public bindingX : string;
-        /**
-        * Gets or sets whether and how series objects are stacked.
-        */
-        public stacking : Stacking;
         /**
         * Gets or sets the size of the symbols used for all Series objects in this @see:FlexChart.
         *
@@ -585,9 +528,13 @@ declare module wijmo.chart {
         */
         public tooltip : ChartTooltip;
         /**
+        * Gets the point data label.
+        */
+        public dataLabel : DataLabel;
+        /**
         * Gets or sets the selected chart series.
         */
-        public selection : Series;
+        public selection : SeriesBase;
         /**
         * Occurs after the selection changes, whether programmatically
         * or when the user clicks the chart. This is useful, for example,
@@ -627,14 +574,15 @@ declare module wijmo.chart {
         */
         public pointToData(pt: any, y?: number): Point;
         /**
-        * Converts a @see:Point from data coordinates to page coordinates.
+        * Converts a @see:Point from data coordinates to control coordinates.
         *
         * @param pt @see:Point in data coordinates, or X coordinate of a point in data coordinates.
         * @param y Y coordinate of the point (if the first parameter is a number).
-        * @return The @see:Point in page coordinates.
+        * @return The @see:Point in control coordinates.
         */
         public dataToPoint(pt: any, y?: number): Point;
         public _copy(key: string, value: any): boolean;
+        public _createSeries(): SeriesBase;
         public _clearCachedValues(): void;
         public _performBind(): void;
         public _hitTestSeries(pt: Point, seriesIndex: number): HitTestInfo;
@@ -644,20 +592,22 @@ declare module wijmo.chart {
         static _distToSegmentSquared(p: Point, v: Point, w: Point): number;
         private _isRotated();
         public _plotrectId: string;
+        public _getChartType(): ChartType;
         public _render(engine: IRenderEngine): void;
+        private _renderLabels(engine);
         private _getAxes();
         private _clearPlotters();
-        private _initPlotter(plotter);
+        public _initPlotter(plotter: _IPlotter): void;
         private _barPlotter;
         private _linePlotter;
         private _areaPlotter;
         private _bubblePlotter;
         private _financePlotter;
-        private _getPlotter(series);
+        public _getPlotter(series: SeriesBase): _IPlotter;
         private _layout(rect, size, engine);
         private _convertX(x, left, right);
         private _convertY(y, top, bottom);
-        private _getTooltipContent(ht);
+        private _getLabelContent(ht, content);
         private _select(newSelection, pointIndex);
         private _highlightCurrent();
         private _highlight(series, selected, pointIndex);
@@ -668,8 +618,38 @@ declare module wijmo.chart {
         static _msPerDay: number;
         static _toOADate(date: Date): number;
         static _fromOADate(val: number): Date;
-        static _renderText(engine: IRenderEngine, text: string, pos: Point, halign: any, valign: any, className?: string, groupName?: string, test?: any): Rect;
-        static _renderRotatedText(engine: IRenderEngine, text: string, pos: Point, halign: any, valign: any, center: Point, angle: number, className: string): void;
+        static _renderText(engine: IRenderEngine, text: string, pos: Point, halign: any, valign: any, className?: string, groupName?: string, style?: any, test?: any): Rect;
+        static _renderRotatedText(engine: IRenderEngine, text: string, pos: Point, halign: any, valign: any, center: Point, angle: number, className: string, style?: any): void;
+    }
+    /**
+    * Analyzes chart data.
+    */
+    class _DataInfo {
+        private minY;
+        private maxY;
+        private minX;
+        private maxX;
+        private minXp;
+        private minYp;
+        private dataTypeX;
+        private dataTypeY;
+        private stackAbs;
+        private _xvals;
+        private dx;
+        constructor();
+        public analyse(seriesList: any, isRotated: boolean, stacking: Stacking, xvals: number[], logx: boolean, logy: boolean): void;
+        public getMinY(): number;
+        public getMaxY(): number;
+        public getMinX(): number;
+        public getMaxX(): number;
+        public getMinXp(): number;
+        public getMinYp(): number;
+        public getDeltaX(): number;
+        public getDataTypeX(): DataType;
+        public getDataTypeY(): DataType;
+        public getStackedAbsSum(key: number): number;
+        public getXVals(): number[];
+        static isValid(value: number): boolean;
     }
     /**
     * Represents the chart palette.
@@ -699,6 +679,89 @@ declare module wijmo.chart {
     }
 }
 
+/**
+* Defines the @see:FlexChart control and its associated classes.
+*
+* The example below creates a @see:FlexChart control and binds it to a data array.
+* The chart has three series, each corresponding to a property in the objects
+* contained in the source array. The last series in the example uses the
+* <a href="http://wijmo.com/5/docs/topic/wijmo.chart.ChartType.Enum.html"
+* target="_blank">chartType property</a> to override the default chart type used
+* by the other series.
+*
+* @fiddle:6GB66
+*/
+declare module wijmo.chart {
+    /**
+    * Specifies the chart type.
+    */
+    enum ChartType {
+        /** Column charts show vertical bars and allow you to compare values of items across categories. */
+        Column = 0,
+        /** Bar charts show horizontal bars. */
+        Bar = 1,
+        /** Scatter charts use X and Y coordinates to show patterns within the data. */
+        Scatter = 2,
+        /** Line charts show trends over a period of time or across categories. */
+        Line = 3,
+        /** Line and symbol charts are line charts with a symbol on each data point. */
+        LineSymbols = 4,
+        /** Area charts are line charts with the area below the line filled with color. */
+        Area = 5,
+        /** Bubble charts are Scatter charts with a
+        * third data value that determines the size of the symbol. */
+        Bubble = 6,
+        /** Candlestick charts present items with high, low, open, and close values.
+        * The size of the wick line is determined by the High and Low values, while the size of the bar is
+        * determined by the Open and Close values. The bar is displayed using different colors, depending on
+        * whether the close value is higher or lower than the open value. */
+        Candlestick = 7,
+        /** High-low-open-close charts display the same information as a candlestick chart, except that opening
+        * values are displayed using lines to the left, while lines to the right indicate closing values.  */
+        HighLowOpenClose = 8,
+        /** Spline charts are line charts that plot curves rather than angled lines through the data points. */
+        Spline = 9,
+        /** Spline and symbol charts are spline charts with symbols on each data point. */
+        SplineSymbols = 10,
+        /** Spline area charts are spline charts with the area below the line filled with color. */
+        SplineArea = 11,
+    }
+    /**
+    * The @see:FlexChart control provides a powerful and flexible way to visualize
+    * data.
+    *
+    * You can use the @see:FlexChart control to create charts that display data in
+    * several formats, including bar, line, symbol, bubble, and others.
+    *
+    * To use the @see:FlexChart control, set the @see:itemsSource property to an
+    * array containing the data, then add one or more @see:Series objects
+    * to the @see:series property.
+    *
+    * Use the @see:chartType property to define the @see:ChartType used for all series.
+    * You may override the chart type for each series by setting the @see:chartType
+    * property on each @see:Series object.
+    */
+    class FlexChart extends FlexChartCore {
+        private _chartType;
+        /**
+        * Initializes a new instance of the @see:FlexChart control.
+        *
+        * @param element The DOM element that will host the control, or a selector for the host element (e.g. '#theCtrl').
+        * @param options A JavaScript object containing initialization data for the control.
+        */
+        constructor(element: any, options?: any);
+        public _getChartType(): ChartType;
+        /**
+        * Gets or sets the type of chart to create.
+        */
+        public chartType : ChartType;
+        /**
+        * Gets or sets whether and how series objects are stacked.
+        */
+        public stacking : Stacking;
+    }
+}
+
 declare module wijmo.chart {
     /**
     * Specifies the position of an axis or legend on the chart.
@@ -725,15 +788,15 @@ declare module wijmo.chart {
         Y = 1,
     }
     /**
-    * Specifies how to handle overlapped labels.
+    * Specifies how to handle overlapping labels.
     */
     enum OverlappingLabels {
         /**
-        * The overlapped labels are hidden.
+        * Hide overlapping labels.
         */
         Auto = 0,
         /**
-        * Show all labels, including overlapped.
+        * Show all labels, including overlapping ones.
         */
         Show = 1,
     }
@@ -768,7 +831,7 @@ declare module wijmo.chart {
         private _TICK_HEIGHT;
         private _TICK_OVERLAP;
         private _TICK_LABEL_DISTANCE;
-        public _chart: FlexChart;
+        public _chart: FlexChartCore;
         private _type;
         private _min;
         private _max;
@@ -793,7 +856,6 @@ declare module wijmo.chart {
         private _plotrect;
         private _szTitle;
         private _isTimeAxis;
-        private _fgColor;
         private _lbls;
         private _values;
         private _rects;
@@ -902,17 +964,17 @@ declare module wijmo.chart {
         */
         public labelAngle : number;
         /**
-        * Gets or sets the value at which the axis crosses perpendicular axis.
+        * Gets or sets the value at which the axis crosses the perpendicular axis.
         **/
         public origin : number;
         /**
-        * Gets or sets a value indicating how to handle overlapped axis labels.
+        * Gets or sets a value indicating how to handle overlapping axis labels.
         */
         public overlappingLabels : OverlappingLabels;
         /**
         * Gets or sets the items source for axis labels.
         *
-        * The names of properties are specified by @see:wijmo.chart.Axis.binding.
+        * The names of properties are specified by the @see:wijmo.chart.Axis.binding.
         *
         * For example:
         *
@@ -923,24 +985,32 @@ declare module wijmo.chart {
         */
         public itemsSource : any;
         /**
-        * Gets or sets the comma-separated property names for @see:wijmo.chart.Axis.itemsSource.
+        * Gets or sets the comma-separated property names for the @see:wijmo.chart.Axis.itemsSource
+        * property to use in axis labels.
         *
-        * The first name specifies value on axis, the second represents corresponding axis label.
-        * The default value is 'value,text'.
+        * The first name specifies the value on the axis, the second represents the corresponding
+        * axis label. The default value is 'value,text.'
         */
         public binding : string;
         /**
         * Gets or sets the itemFormatter function for axis labels.
         *
-        * If specified, the function should take 2 parameters:
-        * render engine @see:wijmo.chart.IRenderEngine
-        * and current label with the following properties:
-        * 'value' - value on axis,
-        * 'text' - text of label,
-        * 'pos' - position on axis in control coordinates,
-        * 'cls' - css class.
+        * If specified, the function takes two parameters:
+        * <ul>
+        * <li><b>render engine</b>: The @see:wijmo.chart.IRenderEngine object to use
+        * in formatting the labels.</li>
+        * <li><b>current label</b>: A string value with the following properties:
+        *   <ul>
+        *     <li><b>value</b>: The value of the axis label to format.</li>
+        *     <li><b>text</b>: The text to use in the label.</li>
+        *     <li><b>pos</b>: The position in control coordinates at which to
+        *       render the label.</li>
+        *     <li><b>cls</b>: The CSS class to apply to the label.</li>
+        *   </ul></li>
+        * </ul>
         *
-        * The function should return the label parameter with modified properties.
+        * The function returns the label parameters for labels on which to
+        * modify properties.
         *
         * For example:
         * <pre>
@@ -957,11 +1027,11 @@ declare module wijmo.chart {
         /**
         * Gets or sets the logarithmic base of the axis.
         *
-        * If the base is not specified the axis has normal scale.
+        * If the base is not specified the axis uses the normal scale.
         */
         public logBase : number;
         /**
-        * Occurs when axis range changed.
+        * Occurs when the axis range changes.
         */
         public rangeChanged: Event;
         /**
@@ -1086,7 +1156,6 @@ declare module wijmo.chart {
         symbolStyle: any;
         getValues: (dim: number) => number[];
         getDataType: (dim: number) => DataType;
-        chartType: ChartType;
         drawLegendItem(engine: IRenderEngine, rect: Rect): any;
         measureLegendItem(engine: IRenderEngine): Size;
         _setPointIndex(pointIndex: number, elementIndex: number): any;
@@ -1101,25 +1170,22 @@ declare module wijmo.chart {
         *
         * @param series Specifies the @see:Series object affected by this event.
         */
-        constructor(series: Series);
+        constructor(series: SeriesBase);
         /**
         * Gets the @see:Series object affected by this event.
         */
-        public series : Series;
+        public series : SeriesBase;
     }
     /**
     * Represents a series of data points to display in the chart.
     *
-    * The @see:Series class supports all basic chart types. You may define
-    * additional chart types by creating classes that derive from the @see:Series
-    * class and override the @see:renderSeries method.
     */
-    class Series implements _ISeries {
+    class SeriesBase implements _ISeries {
         static _LEGEND_ITEM_WIDTH: number;
         static _LEGEND_ITEM_HEIGHT: number;
         static _LEGEND_ITEM_MARGIN: number;
         private static _DEFAULT_SYM_SIZE;
-        private _chart;
+        public _chart: FlexChartCore;
         private _name;
         private _binding;
         private _showValues;
@@ -1130,7 +1196,7 @@ declare module wijmo.chart {
         private _itemsSource;
         private _values;
         private _valueDataType;
-        private _chartType;
+        public _chartType: ChartType;
         private _symbolMarker;
         private _bindingX;
         private _xvalues;
@@ -1164,11 +1230,6 @@ declare module wijmo.chart {
         */
         public symbolMarker : Marker;
         /**
-        * Gets or sets the chart type for a specific series, overriding the chart type
-        * set on the overall chart.
-        */
-        public chartType : ChartType;
-        /**
         * Gets or sets the name of the property that contains Y values for the series.
         */
         public binding : string;
@@ -1194,7 +1255,7 @@ declare module wijmo.chart {
         /**
         * Gets the @see:FlexChart object that owns this series.
         */
-        public chart : FlexChart;
+        public chart : FlexChartCore;
         /**
         * Gets the series host element.
         */
@@ -1211,6 +1272,16 @@ declare module wijmo.chart {
         * Gets or sets an enumerated value indicating whether and where the series appears.
         */
         public visibility : SeriesVisibility;
+        /**
+        * Occurs when series is rendering.
+        */
+        public rendering: Event;
+        /**
+        * Raises the @see:rendering event.
+        *
+        * @param engine The @see:IRenderEngine object used to render the series.
+        */
+        public onRendering(engine: IRenderEngine): void;
         /**
         * Gets a @see:HitTestInfo object with information about the specified point.
         *
@@ -1248,7 +1319,14 @@ declare module wijmo.chart {
         */
         public measureLegendItem(engine: IRenderEngine): Size;
         /**
-        * Clears any cashed data values.
+        * Returns series bounding rectangle in data coordinates.
+        *
+        * If getDataRect() returns null the limits are calculated automatically based on data values.
+        */
+        public getDataRect(): Rect;
+        public _getChartType(): ChartType;
+        /**
+        * Clears any cached data values.
         */
         public _clearValues(): void;
         public _getBinding(index: number): string;
@@ -1259,12 +1337,34 @@ declare module wijmo.chart {
         private _getDataRect();
         public _isCustomAxisX(): boolean;
         public _isCustomAxisY(): boolean;
+        public _getAxisX(): Axis;
         public _getAxisY(): Axis;
         private _cvCollectionChanged(sender, e);
         private _cvCurrentChanged(sender, e);
         private _bindValues(items, binding, isX?);
-        private _invalidate();
+        public _invalidate(): void;
         public _indexToPoint(pointIndex: number): Point;
+        public _getSymbolFill(seriesIndex?: number): string;
+        public _getSymbolStroke(seriesIndex?: number): string;
+    }
+}
+
+declare module wijmo.chart {
+    /**
+    * Represents a series of data points to display in the chart.
+    *
+    * The @see:Series class supports all basic chart types. You may define
+    * a different chart type on each @see:Series object that you add to the
+    * @see:FlexChart series collection, and it overrides the @see:chartType
+    * property set on the chart that is the default for all @see:Series objects
+    * in its collection.
+    */
+    class Series extends SeriesBase {
+        /**
+        * Gets or sets the chart type for a specific series, overriding the chart type
+        * set on the overall chart.
+        */
+        public chartType : ChartType;
     }
 }
 
@@ -1320,9 +1420,10 @@ declare module wijmo.chart {
         drawPolygon(xs: number[], ys: number[], className?: string, style?: any, clipPath?: string): any;
         drawPieSegment(cx: number, cy: number, radius: number, startAngle: number, sweepAngle: number, className?: string, style?: any, clipPath?: string): any;
         drawDonutSegment(cx: number, cy: number, radius: number, innerRadius: number, startAngle: number, sweepAngle: number, className?: string, style?: any, clipPath?: string): any;
-        drawString(s: string, pt: Point, className?: string): any;
-        drawStringRotated(label: string, pt: Point, center: Point, angle: number, className?: string): any;
-        measureString(s: string, className?: string, groupName?: string): Size;
+        drawString(s: string, pt: Point, className?: string, style?: any): any;
+        drawStringRotated(label: string, pt: Point, center: Point, angle: number, className?: string, style?: any): any;
+        drawImage(imageHref: string, x: number, y: number, w: number, h: number): any;
+        measureString(s: string, className?: string, groupName?: string, style?: any): Size;
         startGroup(className?: string, clipPath?: string, createTransform?: boolean): any;
         endGroup(): any;
         addClipRect(clipRect: Rect, id: string): any;
@@ -1335,6 +1436,7 @@ declare module wijmo.chart {
     */
     class _SvgRenderEngine implements IRenderEngine {
         private static svgNS;
+        private static xlinkNS;
         private _element;
         private _svg;
         private _text;
@@ -1367,11 +1469,12 @@ declare module wijmo.chart {
         public drawPolygon(xs: number[], ys: number[], className?: string, style?: any, clipPath?: string): void;
         public drawPieSegment(cx: number, cy: number, r: number, startAngle: number, sweepAngle: number, className?: string, style?: any, clipPath?: string): void;
         public drawDonutSegment(cx: number, cy: number, radius: number, innerRadius: number, startAngle: number, sweepAngle: number, className?: string, style?: any, clipPath?: string): void;
-        public drawString(s: string, pt: Point, className?: string): void;
-        public drawStringRotated(s: string, pt: Point, center: Point, angle: number, className?: string): void;
-        public measureString(s: string, className?: string, groupName?: string): Size;
+        public drawString(s: string, pt: Point, className?: string, style?: any): void;
+        public drawStringRotated(s: string, pt: Point, center: Point, angle: number, className?: string, style?: any): void;
+        public measureString(s: string, className?: string, groupName?: string, style?: any): Size;
         public startGroup(className?: string, clipPath?: string, createTransform?: boolean): SVGGElement;
         public endGroup(): void;
+        public drawImage(imageHref: string, x: number, y: number, w: number, h: number): void;
         private _appendChild(element);
         private _create();
         private _setText(element, s);
@@ -1439,7 +1542,7 @@ declare module wijmo.chart {
     class HitTestInfo {
         private _chart;
         private _pt;
-        public _series: Series;
+        public _series: SeriesBase;
         public _pointIndex: number;
         public _chartElement: ChartElement;
         public _dist: number;
@@ -1462,7 +1565,7 @@ declare module wijmo.chart {
         /**
         * Gets the chart series at the specified coordinates.
         */
-        public series : Series;
+        public series : SeriesBase;
         /**
         * Gets the data point index at the specified coordinates.
         */
@@ -1519,6 +1622,7 @@ declare module wijmo.chart {
     *   <li>modern</li>
     *   <li>organic</li>
     *   <li>slate</li>
+    * </ul>
     */
     class Palettes {
         static standard: string[];
@@ -1528,10 +1632,15 @@ declare module wijmo.chart {
         static highcontrast: string[];
         static light: string[];
         static midnight: string[];
-        static minimal: string[];
         static modern: string[];
         static organic: string[];
         static slate: string[];
+        static zen: string[];
+        static cyborg: string[];
+        static superhero: string[];
+        static flatly: string[];
+        static darkly: string[];
+        static cerulan: string[];
     }
 }
 
@@ -1555,6 +1664,528 @@ declare module wijmo.chart {
             xs: any;
             ys: any;
         };
+    }
+}
+
+declare module wijmo.chart {
+    /**
+    * Specifies the position of data labels on the chart.
+    */
+    enum LabelPosition {
+        /** No data labels appear. */
+        None = 0,
+        /** The labels appear to the left of the data points. */
+        Left = 1,
+        /** The labels appear above the data points. */
+        Top = 2,
+        /** The labels appear to the right of the data points. */
+        Right = 3,
+        /** The labels appear below the data points. */
+        Bottom = 4,
+        /** The labels appear centered on the data points. */
+        Center = 5,
+    }
+    /**
+    * Specifies the position of data labels on the pie chart.
+    */
+    enum PieLabelPosition {
+        /** No data labels. */
+        None = 0,
+        /** The label appears inside the pie slice. */
+        Inside = 1,
+        /** The item appears at the center of the pie slice. */
+        Center = 2,
+        /** The item appears outside the pie slice. */
+        Outside = 3,
+    }
+    /**
+    * Base abstract class for the @see:DataLabel and @see:PieDataLabel classes.
+    */
+    class DataLabelBase {
+        private _content;
+        public _chart: FlexChartBase;
+        private _bdr;
+        /**
+        * Gets or sets the content of data labels.
+        *
+        * The content can be specified as a string or as a function that
+        * takes a @see:HitTestInfo object as a parameter.
+        *
+        * When the label content is a string, it can contain any of the following
+        * parameters:
+        *
+        * <ul>
+        *  <li><b>seriesName</b>: The name of the series that contains the data point (FlexChart only).</li>
+        *  <li><b>pointIndex</b>: The index of the data point.</li>
+        *  <li><b>value</b>: The <b>value</b> of the data point.</li>
+        *  <li><b>x</b>: The <b>x</b>-value of the data point (FlexChart only).</li>
+        *  <li><b>y</b>: The <b>y</b>-value of the data point (FlexChart only).</li>
+        *  <li><b>name</b>: The <b>name</b> of the data point.</li>
+        * </ul>
+        *
+        * The parameter must be enclosed in curly brackets, for example 'x={x}, y={y}'.
+        *
+        * In the following example, we show the y value of the data point in the labels.
+        *
+        * <pre>
+        *  // Create a chart and show y data in labels positioned above the data point.
+        *  var chart = new wijmo.chart.FlexChart('#theChart');
+        *  chart.initialize({
+        *      itemsSource: data,
+        *      bindingX: 'country',
+        *      series: [
+        *          { name: 'Sales', binding: 'sales' },
+        *          { name: 'Expenses', binding: 'expenses' },
+        *          { name: 'Downloads', binding: 'downloads' }],
+        *  });
+        *  chart.dataLabel.position = "Top";
+        *  chart.dataLabel.content = "{y}";
+        * </pre>
+        *
+        * The next example shows how to set data label content using a function.
+        *
+        * <pre>
+        *  // Set data label content
+        *  chart.dataLabel.content = function (ht) {
+        *    return ht.name + ":" + ht.value.toFixed();
+        *  }
+        * </pre>
+        *
+        */
+        public content : any;
+        /**
+        * Gets or sets a value indicating whether data labels have borders.
+        */
+        public border : boolean;
+        public _invalidate(): void;
+    }
+    /**
+    * The point data label for FlexChart.
+    */
+    class DataLabel extends DataLabelBase {
+        private _pos;
+        /**
+        * Gets or sets the position of data labels.
+        */
+        public position : LabelPosition;
+    }
+    /**
+    * The point data label for FlexPie.
+    */
+    class PieDataLabel extends DataLabelBase {
+        private _pos;
+        /**
+        * Gets or sets the position of the data labels.
+        */
+        public position : PieLabelPosition;
+    }
+}
+
+declare module wijmo.chart {
+    /**
+    * Specifies the line type for the LineMarker.
+    */
+    enum LineMarkerLines {
+        /** Show no lines. */
+        None = 0,
+        /** Show a vertical line. */
+        Vertical = 1,
+        /** Show a horizontal line. */
+        Horizontal = 2,
+        /** Show both vertical and horizontal lines. */
+        Both = 3,
+    }
+    /**
+    * Specifies how the LineMarker interacts with the user.
+    */
+    enum LineMarkerInteraction {
+        /** No interaction, the user specifies the position by clicking. */
+        None = 0,
+        /** The LineMarker moves with the pointer. */
+        Move = 1,
+        /** The LineMarker moves when the user drags the line. */
+        Drag = 2,
+    }
+    /**
+    * Specifies the alignment of the LineMarker.
+    */
+    enum LineMarkerAlignment {
+        /**
+        * The LineMarker alignment adjusts automatically so that it stays inside the
+        * boundaries of the plot area. */
+        Auto = 2,
+        /** The LineMarker aligns to the right of the pointer. */
+        Right = 0,
+        /** The LineMarker aligns to the left of the pointer. */
+        Left = 1,
+        /** The LineMarker aligns to the bottom of the pointer. */
+        Bottom = 4,
+        /** The LineMarker aligns to the top of the pointer. */
+        Top = 6,
+    }
+    /**
+    * Represents an extension of the LineMarker for the FlexChart.
+    *
+    * The LineMarker consists of a text area with content reflecting data point
+    * values, and an optional vertical or horizontal line (or both for a cross-hair
+    * effect) positioned over the plot area. It can be static (interaction = None),
+    * follow the mouse or touch position (interaction = Move), or move when the user
+    * drags the line (interaction = Drag).
+    * For example:
+    * <pre>
+    *   // create an interactive marker with a horizontal line and y-value
+    *   var lm = new wijmo.chart.LineMarker($scope.ctx.chart, {
+    *       lines: wijmo.chart.LineMarkerLines.Horizontal,
+    *       interaction: wijmo.chart.LineMarkerInteraction.Move,
+    *       alignment : wijmo.chart.LineMarkerAlignment.Top
+    *   });
+    *   lm.content = function (ht) {
+    *       // show y-value
+    *       return lm.y.toFixed(2);
+    *   }
+    * </pre>
+    */
+    class LineMarker {
+        static _CSS_MARKER: string;
+        static _CSS_MARKER_HLINE: string;
+        static _CSS_MARKER_VLINE: string;
+        static _CSS_MARKER_CONTENT: string;
+        static _CSS_MARKER_CONTAINER: string;
+        static _CSS_LINE_DRAGGABLE: string;
+        private _chart;
+        private _plot;
+        private _marker;
+        private _markerContainer;
+        private _markerContent;
+        private _dragEle;
+        private _hLine;
+        private _vLine;
+        private _plotRect;
+        private _targetPoint;
+        private _wrapperMoveMarker;
+        private _capturedEle;
+        private _wrapperMousedown;
+        private _wrapperMouseup;
+        private _contentDragStartPoint;
+        private _mouseDownCrossPoint;
+        private _isVisible;
+        private _horizontalPosition;
+        private _verticalPosition;
+        private _alignment;
+        private _content;
+        private _seriesIndex;
+        private _lines;
+        private _interaction;
+        private _dragThreshold;
+        private _dragContent;
+        private _dragLines;
+        /**
+        * Initializes a new instance of a @see:LineMarker object.
+        *
+        * @param chart The chart on which the LineMarker appears.
+        * @param options A JavaScript object containing initialization data for the control.
+        */
+        constructor(chart: FlexChart, options?: any);
+        /**
+        * Gets the @see:FlexChart object that owns the LineMarker.
+        */
+        public chart : FlexChart;
+        /**
+        * Gets or sets the visibility of the LineMarker.
+        */
+        public isVisible : boolean;
+        /**
+        * Gets or sets the index of the series in the chart in which the LineMarker appears.
+        * This takes effect when the @see:interaction property is set to
+        * wijmo.chart.LineMarkerInteraction.Move or wijmo.chart.LineMarkerInteraction.Drag.
+        */
+        public seriesIndex : number;
+        /**
+        * Gets or sets the horizontal position of the LineMarker relative to the plot area.
+        *
+        * Its value range is (0, 1).
+        * If the value is null or undefined and @see:interaction is set to wijmo.chart.LineMarkerInteraction.Move
+        * or wijmo.chart.LineMarkerInteraction.Drag, the horizontal position of the marker is calculated automatically based on the pointer's position.
+        */
+        public horizontalPosition : number;
+        /**
+        * Gets the current x-value as chart data coordinates.
+        */
+        public x : number;
+        /**
+        * Gets the current y-value as chart data coordinates.
+        */
+        public y : number;
+        /**
+        * Gets or sets the content function that allows you to customize the text content of the LineMarker.
+        */
+        public content : Function;
+        /**
+        * Gets or sets the vertical position of the LineMarker relative to the plot area.
+        *
+        * Its value range is (0, 1).
+        * If the value is null or undefined and @see:interaction is set to wijmo.chart.LineMarkerInteraction.Move
+        * or wijmo.chart.LineMarkerInteraction.Drag, the vertical position of the LineMarker is calculated automatically based on the pointer's position.
+        */
+        public verticalPosition : number;
+        /**
+        * Gets or sets the alignment of the LineMarker content.
+        *
+        * By default, the LineMarker shows to the right, at the bottom of the target point.
+        * Use '|' to combine alignment values.
+        *
+        * <pre>
+        * // set the alignment to the left.
+        * marker.alignment = wijmo.chart.LineMarkerAlignment.Left;
+        * // set the alignment to the left top.
+        * marker.alignment = wijmo.chart.LineMarkerAlignment.Left | wijmo.chart.LineMarkerAlignment.Top;
+        * </pre>
+        */
+        public alignment : LineMarkerAlignment;
+        /**
+        * Gets or sets the visibility of the LineMarker lines.
+        */
+        public lines : LineMarkerLines;
+        /**
+        * Gets or sets the interaction mode of the LineMarker.
+        */
+        public interaction : LineMarkerInteraction;
+        /**
+        Gets or sets the maximum distance from the horizontal or vertical line that the marker can be dragged.
+        */
+        public dragThreshold : number;
+        /**
+        Gets or sets a value indicating whether the content of the marker is draggable when the interaction mode is "Drag."
+        */
+        public dragContent : boolean;
+        /**
+        Gets or sets a value indicating whether the lines are linked when the horizontal or vertical line is dragged when the interaction mode is "Drag."
+        */
+        public dragLines : boolean;
+        /**
+        * Occurs after the LineMarker's position changes.
+        */
+        public positionChanged: Event;
+        /**
+        * Raises the @see:positionChanged event.
+        *
+        * @param point The target point at which to show the LineMarker.
+        */
+        public onPositionChanged(point: Point): void;
+        /**
+        * Removes the LineMarker from the chart.
+        */
+        public remove(): void;
+        private _attach();
+        private _attachDrag();
+        private _detach();
+        private _detachDrag();
+        private _toggleDragEventAttach(isAttach);
+        private _onMousedown(e);
+        private _onMouseup(e);
+        public _moveMarker(e: any): void;
+        private _show(ele?);
+        private _hide(ele?);
+        private _toggleVisibility();
+        private _resetDefaultValue();
+        private _initialize();
+        private _createMarker();
+        private _removeMarker();
+        private _getContainer();
+        private _createContainer();
+        private _createChildren();
+        private _toggleElesDraggableClass(draggable);
+        private _updateMarkerSize();
+        private _updateLinesSize();
+        private _resetLinesVisibility();
+        private _updateMarkerPosition(point?);
+        private _updateContent();
+        private _raisePositionChanged(x, y);
+        private _updatePositionByAlignment(isMarkerMoved?);
+        private _getEventPoint(e);
+        private _pointInRect(pt, rect);
+    }
+}
+
+declare module wijmo.chart {
+    class _DataPoint {
+        private _seriesIndex;
+        private _pointIndex;
+        private _dataX;
+        private _dataY;
+        constructor(seriesIndex: number, pointIndex: number, dataX: number, dataY: number);
+        public seriesIndex : number;
+        public pointIndex : number;
+        public dataX : number;
+        public dataY : number;
+    }
+    enum _MeasureOption {
+        X = 0,
+        Y = 1,
+        XY = 2,
+    }
+    class _RectArea implements _IHitArea {
+        private _rect;
+        constructor(rect: Rect);
+        public rect : Rect;
+        public tag: any;
+        public contains(pt: Point): boolean;
+        public pointDistance(pt1: Point, pt2: Point, option: _MeasureOption): number;
+        public distance(pt: Point): number;
+    }
+    class _CircleArea implements _IHitArea {
+        private _center;
+        private _rad;
+        private _rad2;
+        public tag: any;
+        constructor(center: Point, radius: number);
+        public center : Point;
+        public contains(pt: Point): boolean;
+        public distance(pt: Point): number;
+    }
+    class _LinesArea implements _IHitArea {
+        private _x;
+        private _y;
+        public tag: any;
+        constructor(x: any, y: any);
+        public contains(pt: Point): boolean;
+        public distance(pt: Point): number;
+    }
+    class _HitResult {
+        public area: _IHitArea;
+        public distance: number;
+    }
+    class _HitTester {
+        public _chart: FlexChartCore;
+        public _map: {
+            [key: number]: _IHitArea[];
+        };
+        constructor(chart: FlexChartCore);
+        public add(area: _IHitArea, seriesIndex: number): void;
+        public clear(): void;
+        public hitTest(pt: Point, testLines?: boolean): _HitResult;
+        public hitTestSeries(pt: Point, seriesIndex: any): _HitResult;
+    }
+}
+
+declare module wijmo.chart {
+    /**
+    * Plots data series.
+    */
+    interface _IPlotter {
+        chart: FlexChartCore;
+        dataInfo: _DataInfo;
+        hitTester: _HitTester;
+        seriesIndex: number;
+        seriesCount: number;
+        clipping: boolean;
+        stacking: Stacking;
+        rotated: boolean;
+        adjustLimits(dataInfo: _DataInfo, plotRect: Rect): Rect;
+        plotSeries(engine: IRenderEngine, ax: _IAxis, ay: _IAxis, series: _ISeries, palette: _IPalette, iser: number, nser: number): any;
+    }
+    /**
+    * Base class for chart plotters of all types (bar, line, area).
+    */
+    class _BasePlotter {
+        public _DEFAULT_WIDTH: number;
+        public _DEFAULT_SYM_SIZE: number;
+        public clipping: boolean;
+        public chart: FlexChart;
+        public hitTester: _HitTester;
+        public dataInfo: _DataInfo;
+        public seriesIndex: number;
+        public seriesCount: number;
+        public clear(): void;
+        public getNumOption(name: string, parent?: string): number;
+        public cloneStyle(style: any, ignore: string[]): any;
+        public isValid(datax: number, datay: number, ax: _IAxis, ay: _IAxis): boolean;
+    }
+}
+
+declare module wijmo.chart {
+    /**
+    * Bar/column chart plotter.
+    */
+    class _BarPlotter extends _BasePlotter implements _IPlotter {
+        public origin: number;
+        public width: number;
+        private stackPosMap;
+        private stackNegMap;
+        public stacking: Stacking;
+        public rotated: boolean;
+        public clear(): void;
+        public adjustLimits(dataInfo: _DataInfo, plotRect: Rect): Rect;
+        public plotSeries(engine: IRenderEngine, ax: _IAxis, ay: _IAxis, series: _ISeries, palette: _IPalette, iser: number, nser: number): void;
+        private drawSymbol(engine, rect, series, pointIndex, point);
+        private drawDefaultSymbol(engine, rect, series);
+    }
+}
+
+declare module wijmo.chart {
+    /**
+    * Line/scatter chart plotter.
+    */
+    class _LinePlotter extends _BasePlotter implements _IPlotter {
+        public hasSymbols: boolean;
+        public hasLines: boolean;
+        public isSpline: boolean;
+        public rotated: boolean;
+        public stacking: Stacking;
+        private stackPos;
+        private stackNeg;
+        constructor();
+        public clear(): void;
+        public adjustLimits(dataInfo: _DataInfo, plotRect: Rect): Rect;
+        public plotSeries(engine: IRenderEngine, ax: _IAxis, ay: _IAxis, series: _ISeries, palette: _IPalette, iser: number, nser: number): void;
+        public _drawLines(engine: IRenderEngine, xs: number[], ys: number[], className?: string, style?: any, clipPath?: string): void;
+        public _drawSymbol(engine: IRenderEngine, x: number, y: number, sz: number, series: SeriesBase, pointIndex: number): void;
+        public _drawDefaultSymbol(engine: IRenderEngine, x: number, y: number, sz: number, marker: Marker, style?: any): void;
+    }
+}
+
+declare module wijmo.chart {
+    /**
+    * Area chart plotter.
+    */
+    class _AreaPlotter extends _BasePlotter implements _IPlotter {
+        public stacking: Stacking;
+        public isSpline: boolean;
+        public rotated: boolean;
+        private stackPos;
+        private stackNeg;
+        constructor();
+        public adjustLimits(dataInfo: _DataInfo, plotRect: Rect): Rect;
+        public clear(): void;
+        public plotSeries(engine: IRenderEngine, ax: _IAxis, ay: _IAxis, series: _ISeries, palette: _IPalette, iser: number, nser: number): void;
+        public _convertToSpline(x: number[], y: number[]): {
+            xs: any;
+            ys: any;
+        };
+        public _drawSymbols(engine: IRenderEngine, series: _ISeries, seriesIndex: number): void;
+    }
+}
+
+declare module wijmo.chart {
+    class _BubblePlotter extends _LinePlotter {
+        private _MIN_SIZE;
+        private _MAX_SIZE;
+        private _minSize;
+        private _maxSize;
+        private _minValue;
+        private _maxValue;
+        constructor();
+        public adjustLimits(dataInfo: _DataInfo, plotRect: Rect): Rect;
+        public _drawSymbol(engine: IRenderEngine, x: number, y: number, sz: number, series: Series, pointIndex: number): void;
+    }
+}
+
+declare module wijmo.chart {
+    class _FinancePlotter extends _BasePlotter {
+        public isCandle: boolean;
+        public adjustLimits(dataInfo: _DataInfo, plotRect: Rect): Rect;
+        public plotSeries(engine: IRenderEngine, ax: _IAxis, ay: _IAxis, series: _ISeries, palette: _IPalette, iser: number, nser: number): void;
+        public _drawSymbol(engine: IRenderEngine, ax: _IAxis, ay: _IAxis, si: number, pi: number, fill: any, w: number, x: number, hi: number, lo: number, open: number, close: number): void;
     }
 }
 

@@ -1,6 +1,6 @@
 /*
     *
-    * Wijmo Library 5.20143.27
+    * Wijmo Library 5.20151.48
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -46,7 +46,53 @@ var wijmo;
             }
         },
         FlexGrid: {
-            groupHeaderFormat: '{name}: <b>{value} </b>({count} articoli)'
+            groupHeaderFormat: '{name}: <b>{value} </b>({count:n0} articoli)'
+        },
+        FlexGridFilter: {
+            // filter
+            ascending: '\u2191 Crescente',
+            descending: '\u2193 Decrescente',
+            apply: 'Applica',
+            clear: 'Rimuovi',
+            conditions: 'Condizioni',
+            values: 'Valori',
+            // value filter
+            search: 'Filtro',
+            selectAll: 'Selezionare tutte',
+            null: '(nulla)',
+            // condition filter
+            header: 'Mostra elementi in cui il valore',
+            and: 'E',
+            or: 'O',
+            stringOperators: [
+                { name: '(Non impostato)', op: null },
+                { name: 'È uguale a', op: 0 },
+                { name: 'Non è uguale a', op: 1 },
+                { name: 'Inizia con', op: 6 },
+                { name: 'Finisce per', op: 7 },
+                { name: 'Contiene', op: 8 },
+                { name: 'Non contiene', op: 9 }
+            ],
+            numberOperators: [
+                { name: '(Non impostato)', op: null },
+                { name: 'È uguale a', op: 0 },
+                { name: 'Non è uguale a', op: 1 },
+                { name: 'È maggiore di', op: 2 },
+                { name: 'È maggiore di o uguale a', op: 3 },
+                { name: 'È minore di', op: 4 },
+                { name: 'È minore di o uguale a', op: 5 }
+            ],
+            dateOperators: [
+                { name: '(Non impostato)', op: null },
+                { name: 'È uguale a', op: 0 },
+                { name: 'Prima di', op: 4 },
+                { name: 'Dopo', op: 3 }
+            ],
+            booleanOperators: [
+                { name: '(Non impostato)', op: null },
+                { name: 'È uguale a', op: 0 },
+                { name: 'Non è uguale a', op: 1 }
+            ]
         }
     };
 })(wijmo || (wijmo = {}));
