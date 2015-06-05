@@ -372,6 +372,10 @@
 
         Users = new wijmo.collections.CollectionView(GetUsers());
 
+        Users.sortDescriptions.push(new wijmo.collections.SortDescription("UserName", 'true'));
+        Users.sortDescriptions.push(new wijmo.collections.SortDescription("FirstName", 'true'));
+        Users.sortDescriptions.push(new wijmo.collections.SortDescription("LastName", 'true'));
+        
         UserGrid = new wijmo.grid.FlexGrid('#UserGrid');
 
         Users.canFilter = true;
@@ -407,38 +411,39 @@
                         {
                             "header": "User Name",
                             "binding": "UserName",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         },
                         {
                             "header": "First Name",
                             "binding": "FirstName",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         },
                         {
                             "header": "Last Name",
                             "binding": "LastName",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         },
                         {
                             "header": "Email Address",
                             "binding": "EmailAddress",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         },
                         {
                             "header": "Phone Number",
                             "binding": "PhoneNumber",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         }
             ],
             autoGenerateColumns: false,
             itemsSource: Users,
             isReadOnly: true,
-            selectionMode: wijmo.grid.SelectionMode.Row
+            selectionMode: wijmo.grid.SelectionMode.Row,
+            allowSorting: true
         });
 
         UserGrid.trackChanges = true;

@@ -30,5 +30,8 @@ namespace MagentaTrader.Models
         public int ProductPackageId { get; set; }
         public string ProductPackage { get; set; }
         public string ProductPackageURL { get; set; }
+
+        // Variables for Roles
+        public string Roles { get; set; }
     }
 }

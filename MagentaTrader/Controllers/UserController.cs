@@ -210,5 +210,142 @@ namespace MagentaTrader.Controllers
             }
             return values;
         }
+
+        // GET api/AddUserRole/dpilger/1/1
+        [Authorize]
+        [Route("api/ModifyUserRole/{username}/{role}/{change}")]
+        public int AddUserRole(string Username, string Role, bool Change)
+        {
+            try
+            {
+                var id = (from m in db.MstUsers
+                          join n in db.AspNetUsers on m.AspNetUserId equals n.Id
+                          where m.UserName == Username
+                          select new Models.User
+                          {
+                              AspNetUserId = m.AspNetUserId
+                          }).ToList();
+
+                var AspNetUserId = id[0].AspNetUserId;
+                
+                Data.AspNetUserRole NewRole = new Data.AspNetUserRole();
+
+                NewRole.UserId = AspNetUserId;
+                NewRole.RoleId = Role;
+                
+                if(Change)
+                    db.AspNetUserRoles.InsertOnSubmit(NewRole);                
+                try
+                {
+                    db.SubmitChanges();
+                    return 1;
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        [Authorize]
+        [Route("api/GetRoles/{username}")]
+        public List<Models.User> GetRoles(string userName)
+        {
+            try
+            {
+                try
+                {
+                    var id = (from m in db.MstUsers
+                              join n in db.AspNetUsers on m.AspNetUserId equals n.Id
+                              where m.UserName == userName
+                              select new Models.User
+                              {
+                                  AspNetUserId = m.AspNetUserId
+                              }).ToList();
+
+                    var AspNetUserId = id[0].AspNetUserId;
+
+                    try
+                    {
+                        var x = (from m in db.AspNetUserRoles
+                                 where m.UserId == AspNetUserId
+                                 select new Models.User
+                                 {
+                                    Roles = m.RoleId
+                                 }).Distinct().ToList();
+
+                        var y = x;
+                        return y;
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }
+                catch
+                {
+                    return null;
+                }
+                                        
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
+        
+        private string getAspNetUserId( string username )
+        {
+            try
+            {
+               var x = (from m in db.MstUsers
+                        join n in db.AspNetUsers on m.AspNetUserId equals n.Id
+                        where m.UserName == username
+                        select new Models.User
+                        {
+                            AspNetUserId = m.AspNetUserId
+                        }).ToList();
+
+               return x[0].AspNetUserId;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
+        // DELETE api/DeleteUser/5
+        [Authorize]
+        [Route("api/DeleteUserRole/{username}/{role}")]
+        public HttpResponseMessage Delete(string Username, string Role)
+        {
+            var UserId = getAspNetUserId(Username);
+            Data.AspNetUserRole DeleteRole = db.AspNetUserRoles.Where(d => d.RoleId == Role && d.UserId == UserId).First();
+            
+            if (DeleteRole != null)
+            {
+                db.AspNetUserRoles.DeleteOnSubmit(DeleteRole);
+                try
+                {
+                    db.SubmitChanges();
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                }
+                catch
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest);
+                }
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+        }
     }
 }

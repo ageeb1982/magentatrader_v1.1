@@ -710,6 +710,17 @@
         UserList = new wijmo.collections.CollectionView(getUsers());
         ProductPackageList = new wijmo.collections.CollectionView(getProductPackage());
 
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("Amount", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("SalesNumber", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("User", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("ProductPackage", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("SalesDate", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("RenewalDate", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("ExpiryDate", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("Particulars", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("Quantity", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("Price", 'true'));
+
         //Sales.canFilter = true;
         //debugger;
         var DateFilter = new wijmo.input.InputDate('#SalesDateFilter', {
@@ -759,69 +770,68 @@
                 {
                     "header": "Sales Number",
                     "binding": "SalesNumber",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": 110
                 },
-                    {
-                        "header": "Username",
-                        "binding": "User",
-                        "allowSorting": false,
-                        "width": "2*"
-                    },
+                {
+                    "header": "Username",
+                    "binding": "User",
+                    "allowSorting": true,
+                    "width": "2*"
+                },
                 {
                     "header": "Product Package",
                     "binding": "ProductPackage",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": "4*",
                     "wordWrap": false
                 },
                 {
                     "header": "Sale Date",
                     "binding": "SalesDate",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": 100,
                     "visible": false
                 },
                 {
                     "header": "Renewal Date",
                     "binding": "RenewalDate",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": 100,
                     "visible": false
                 },
                 {
                     "header": "Expiry Date",
                     "binding": "ExpiryDate",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": 100,
                     "visible": false
                 },
-                    {
-                        "header": "Particulars",
-                        "binding": "Particulars",
-                        "allowSorting": false,
-                        "width": "4*",
-                        "visible": false
-                    },
-
+                {
+                    "header": "Particulars",
+                    "binding": "Particulars",
+                    "allowSorting": true,
+                    "width": "4*",
+                    "visible": false
+                },
                 {
                     "header": "Quantity",
                     "binding": "Quantity",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": 80
                 },
                 {
                     "header": "Price",
                     "binding": "Price",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": 80
                 },
-                    {
-                        "header": "Amount",
-                        "binding": "Amount",
-                        "allowSorting": false,
-                        "width": 80
-                    }
+                {
+                    "header": "Amount",
+                    "binding": "Amount",
+                    "allowSorting": true,
+                    "width": 80
+                }
             ],
             autoGenerateColumns: false,
             itemsSource: Sales,

@@ -97,3 +97,13 @@ dt {
 .textinput { 
     border: 1px silver solid;
 }
+
+@media screen and (min-width: 1200px){
+    .marginTop{
+        margin-top: -38px;
+    }
+}
+
+.marginButton {
+    margin-top: -11px;
+}

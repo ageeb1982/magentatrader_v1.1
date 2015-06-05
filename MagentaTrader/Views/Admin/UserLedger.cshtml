@@ -52,49 +52,62 @@
     <div class="container">
 
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-8">
                 <h4 class="header">User Ledger</h4>
             </div>
         </div>
         <div class="row">
-            <div class="info-div-ledger">
-                <div class="user-fieldLabel-ledger">
-                    <div class="text-ledger">Username</div>
+            <div class="col-lg-8">
+                <div class="info-div-ledger">
+                    <div class="user-fieldLabel-ledger">
+                        <div class="text-ledger">Username</div>
+                    </div>
+                    <div class="box-ledger">
+                        <input class="form-control" id="Username" disabled />
+                    </div>
                 </div>
-                <div class="box-ledger">
-                    <input class="form-control" id="Username" disabled />
+                <div class="info-div-ledger">
+                    <div class="user-fieldLabel-ledger">
+                        <div class="text-ledger">First Name</div>
+                    </div>
+                    <div class="box-ledger">
+                        <input class="form-control" id="FirstName" disabled />
+                    </div>
+                </div>
+                <div class="info-div-ledger">
+                    <div class="user-fieldLabel-ledger">
+                        <div class="text-ledger">Last Name</div>
+                    </div>
+                    <div class="box-ledger">
+                        <input class="form-control" id="LastName" disabled />
+                    </div>
+                </div>
+                <div class="info-div-ledger">
+                    <div class="user-fieldLabel-ledger">
+                        <div class="text-ledger">Email Address</div>
+                    </div>
+                    <div class="box-ledger">
+                        <input class="form-control" id="EmailAdd" disabled />
+                    </div>
+                </div>
+                <div class="info-div-ledger">
+                    <div class="user-fieldLabel-ledger">
+                        <div class="text-ledger">Phone Number</div>
+                    </div>
+                    <div class="box-ledger">
+                        <input class="form-control" id="PhoneNum" disabled />
+                    </div>
                 </div>
             </div>
-            <div class="info-div-ledger">
-                <div class="user-fieldLabel-ledger">
-                    <div class="text-ledger">First Name</div>
-                </div>
-                <div class="box-ledger">
-                    <input class="form-control" id="FirstName" disabled />
-                </div>
+            <div class="col-lg-4">
+                <h4 class="marginTop">
+                    Roles
+                    <button class="btn btn-primary pull-right marginButton" id="AddUserRole">Add</button>
+                </h4>
             </div>
-            <div class="info-div-ledger">
-                <div class="user-fieldLabel-ledger">
-                    <div class="text-ledger">Last Name</div>
-                </div>
-                <div class="box-ledger">
-                    <input class="form-control" id="LastName" disabled />
-                </div>
-            </div>
-            <div class="info-div-ledger">
-                <div class="user-fieldLabel-ledger">
-                    <div class="text-ledger">Email Address</div>
-                </div>
-                <div class="box-ledger">
-                    <input class="form-control" id="EmailAdd" disabled />
-                </div>
-            </div>
-            <div class="info-div-ledger">
-                <div class="user-fieldLabel-ledger">
-                    <div class="text-ledger">Phone Number</div>
-                </div>
-                <div class="box-ledger">
-                    <input class="form-control" id="PhoneNum" disabled />
+            <div class="col-lg-4">
+                <div class="row">
+                   <div id="RoleGrid" class="grid"></div>
                 </div>
             </div>
         </div>
@@ -108,8 +121,62 @@
                 <div id="SalesLedgerGrid" class="grid"></div>
             </div>
         </div>
+        <br />
+        <div class="row">
+            <div class="btn-group col-md-7" id="naviagtionPageUser">
+                <button type="button" class="btn btn-default" id="btnMoveToFirstPageUser">
+                    <span class="glyphicon glyphicon-fast-backward"></span>
+                </button>
+                <button type="button" class="btn btn-default" id="btnMoveToPreviousPageUser">
+                    <span class="glyphicon glyphicon-step-backward"></span>
+                </button>
+                <button type="button" class="btn btn-default" disabled style="width:100px" id="btnCurrentPageUser"></button>
+                <button type="button" class="btn btn-default" id="btnMoveToNextPageUser">
+                    <span class="glyphicon glyphicon-step-forward"></span>
+                </button>
+                <button type="button" class="btn btn-default" id="btnMoveToLastPageUser">
+                    <span class="glyphicon glyphicon-fast-forward"></span>
+                </button>
+            </div>
+            <div class="col-md-5">
+                <div class="pull-right"><span id="AmountTotal"></span></div>
+            </div>
+        </div>
     </div>
+</div>
 
+@*Edit Detail*@
+<div class="modal fade" id="UserRoleEdit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dimiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title">Role Edit</h4>
+            </div>
+            <div class="modal-body scroll">
+                <dl class="dl-horizontal">
+                    <dt>Role</dt>
+                    <dd>
+                        <select class="form-control custom-width" id="RoleEdit" name="RoleEdit" @*required*@>
+                            <option class="role" value="1">Charts</option>
+                            <option class="role" value="2">Web99</option>
+                            <option class="role" value="4">Admin</option>
+                        </select>
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @*data-dismiss="modal"*@ id="CmdRoleEditOk" onclick="CmdRoleEditOk_OnClick()">
+                    Ok
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="CmdRoleEditCancel">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @*Loading*@
@@ -128,6 +195,14 @@
 
 <script type="text/javascript">
 
+    var Sales;
+
+    var btnFirstPageUser;
+    var btnPreviousPageUser;
+    var btnNextPageUser;
+    var btnLastPageUser;
+    var btnCurrentPageUser;
+    
     function GetValue(value) {
         var variable = window.location.search.substring(1);
         var variableArr = variable.split('?');
@@ -174,7 +249,8 @@
     function GetPurchases() {
 
         var purchases = new wijmo.collections.ObservableArray();
-        var username = GetValue('user');
+        var username = GetValue('user')
+        var Amount = 0;
 
         $.ajax({
             url: '/api/UserSales/' + username,
@@ -185,6 +261,7 @@
                 $('#loading').modal('hide');
                 if (Results.length > 0) {
                     for (i = 0; i < Results.length; i++) {
+                        Amount = Amount + Results[i]["Price"];
                         purchases.push({
                             ProductPackage: Results[i]["ProductPackage"],
                             SalesNumber: Results[i]["SalesNumber"],
@@ -197,6 +274,7 @@
                             Price: Results[i]["Price"]
                         });
                     }
+                    $("#AmountTotal").text("Total Amount: " + (Amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
                 } else {
                     alert("No Purchases");
                 }
@@ -210,12 +288,157 @@
         return purchases;
     }
 
-    $(document).ready(function () {
-        GetUserLedger();
+    function EditUserRole(role)
+    {
+        var username = GetValue('user');
 
+        $.ajax({
+            url: '/api/ModifyUserRole/' + username + '/' + role + '/' + true,
+            contentType: 'application/json; charset=utf-8',
+            type: 'POST',
+            dataType: 'json',
+            data: {},
+            success: function (result) {
+                if (result > 0){
+                    toastr.success('Successfully Added!');
+                    window.setTimeout(function () { location.reload() }, 3000);
+                }
+                else
+                    toastr.error("Bad request");
+            }
+
+        }).fail(
+            function (xhr, textStatus, err) {
+                alert(err);
+            }
+        );
+    }
+
+    function GetRoles() {
+
+        var role = '';
+        var username = GetValue('user');
+        var roles = new wijmo.collections.ObservableArray();
+        
+        $.ajax({
+            url: '/api/GetRoles/' + username,
+            contentType: 'application/json; charset=urf-8',
+            type: 'GET',
+            dataType: 'json',
+            success: function (Results) {
+                for (i = 0; i <= Results.length - 1; i++) {
+                    switch (Results[i]["Roles"]) {
+                        case '1':
+                            role = 'Charts';
+                            document.getElementById("RoleEdit").options[0].disabled = true;
+                            roles.push({
+                                DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteRole' onclick='CmdDeleteRole_OnClick(this.value)' value='" + Results[i]["Roles"] + "'>Delete</button>",
+                                Role: role
+                            });
+                            break;
+                        case '2':
+                            role = 'Web99';
+                            document.getElementById("RoleEdit").options[1].disabled = true;
+                            roles.push({
+                                DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteRole' onclick='CmdDeleteRole_OnClick(this.value)' value='" + Results[i]["Roles"] + "'>Delete</button>",
+                                Role: role
+                            });
+                            break;
+                        case '4':
+                            role = 'Admin';
+                            document.getElementById("RoleEdit").options[2].disabled = true;
+                            roles.push({
+                                DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteRole' onclick='CmdDeleteRole_OnClick(this.value)' value='" + Results[i]["Roles"] + "'>Delete</button>",
+                                Role: role
+                            });
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+           
+        }).fail(
+            function (xhr, textStatus, err) {
+                alert(err);
+            }
+        );
+        return roles;
+    }
+
+    function CmdRoleEditOk_OnClick(role) {
+        var role = document.getElementById('RoleEdit');
+        var roleId = role.options[role.selectedIndex].value;
+        EditUserRole(roleId);
+    }
+
+    function CmdDeleteRole_OnClick(role) {
+        var username = GetValue('user');
+
+        if (confirm("Delete Role for this user?") == true) {
+            $.ajax({
+                type: "DELETE",
+                url: "/api/DeleteUserRole/" + username + '/' + role,
+                contentType: "apllication/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success('Successfully Deleted!');
+                        window.setTimeout(function () { location.reload() }, 3000);
+                    },
+                    404: function () {
+                        toastr.error("Not found!");
+                    },
+                    400: function () {
+                        toastr.error("Bad request");
+                    }
+                }
+            });
+        }
+    }
+
+    function UpdateNavigateButtonsUser() {
+        if (Sales.pageSize <= 0) {
+            document.getElementById('naviagtionPageUser').style.display = 'none';
+            return;
+        }
+        document.getElementById('naviagtionPageUser').style.display = 'block';
+        if (Sales.pageIndex === 0) {
+            btnFirstPageUser.setAttribute('disabled', 'disabled');
+            btnPreviousPageUser.setAttribute('disabled', 'disabled');
+            btnNextPageUser.removeAttribute('disabled');
+            btnLastPageUser.removeAttribute('disabled');
+        }
+        else if (Sales.pageIndex === (Sales.pageCount - 1)) {
+            btnFirstPageUser.removeAttribute('disabled');
+            btnPreviousPageUser.removeAttribute('disabled');
+            btnLastPageUser.setAttribute('disabled', 'disabled');
+            btnNextPageUser.setAttribute('disabled', 'disabled');
+        }
+        else {
+            btnFirstPageUser.removeAttribute('disabled');
+            btnPreviousPageUser.removeAttribute('disabled');
+            btnNextPageUser.removeAttribute('disabled');
+            btnLastPageUser.removeAttribute('disabled');
+        }
+        btnCurrentPageUser.innerHTML = (Sales.pageIndex + 1) + ' / ' + Sales.pageCount;
+    }
+
+    $(document).ready(function() {
+        GetUserLedger();
+        
         Sales = new wijmo.collections.CollectionView(GetPurchases());
+        Roles = new wijmo.collections.CollectionView(GetRoles());
 
         SalesGrid = new wijmo.grid.FlexGrid('#SalesLedgerGrid');
+        RolesGrid = new wijmo.grid.FlexGrid('#RoleGrid');
+
+        $('#AddUserRole').click(function(){
+            $("#UserRoleEdit").modal({
+                show: true,
+                backdrop: false
+            });
+        });
 
         SalesGrid.initialize({
             columns: [
@@ -237,48 +460,67 @@
                     "allowSorting": false,
                     "width": 500
                 },
-                //{
-                //    "header": "Particulars",
-                //    "binding": "Particulars",
-                //    "allowSorting": false,
-                //    "width": 250
-                //},
-                //{
-                //    "header": "Quantity",
-                //    "binding": "Quantity",
-                //    "allowSorting": false,
-                //    "width": "4*"
-                //},
-                //{
-                //    "header": "Amount",
-                //    "binding": "Amount",
-                //    "allowSorting": false,
-                //    "width": "4*"
-                //},
                 {
                     "header": "Price",
                     "binding": "Price",
                     "allowSorting": false,
                     "width": "4*"
-                },
-                //{
-                //    "header": "Renewal Date",
-                //    "binding": "RenewalDate",
-                //    "allowSorting": false,
-                //    "width": 100
-                //},
-                //{
-                //    "header": "Expiry Date",
-                //    "binding": "ExpiryDate",
-                //    "allowSorting": false,
-                //    "width": 100
-                //}
+                }
             ],
             autoGenerateColumns: false,
             itemsSource: Sales,
             isReadOnly: true,
             selectionMode: wijmo.grid.SelectionMode.Row
         });
-    });
 
+        RolesGrid.initialize({
+            columns: [
+                {
+                    "binding": "DeleteId",
+                    "width": "4*",
+                    "allowSorting": false,
+                    "isContentHtml": true
+                },
+                {
+                    "binding": "Role",
+                    "width": "4*",
+                    "allowSorting": false,
+                    "isContentHtml": true
+                }
+            ],
+            autoGenerateColumns: false,
+            itemsSource: Roles,
+            isReadOnly: true,
+            selectionMode: wijmo.grid.SelectionMode.Row
+        });
+
+        Sales.pageSize = 10;
+
+        btnFirstPageUser = document.getElementById('btnMoveToFirstPageUser');
+        btnPreviousPageUser = document.getElementById('btnMoveToPreviousPageUser');
+        btnNextPageUser = document.getElementById('btnMoveToNextPageUser');
+        btnLastPageUser = document.getElementById('btnMoveToLastPageUser');
+        btnCurrentPageUser = document.getElementById('btnCurrentPageUser');
+
+        UpdateNavigateButtonsUser();
+
+        // Page Button Users
+        btnFirstPageUser.addEventListener('click', function () {
+            Sales.moveToFirstPage();
+            UpdateNavigateButtonsUser();
+        });
+        btnPreviousPageUser.addEventListener('click', function () {
+            Sales.moveToPreviousPage();
+            UpdateNavigateButtonsUser();
+        });
+        btnNextPageUser.addEventListener('click', function () {
+            Sales.moveToNextPage();
+            UpdateNavigateButtonsUser();
+        });
+        btnLastPageUser.addEventListener('click', function () {
+            Sales.moveToLastPage();
+            UpdateNavigateButtonsUser();
+        });
+    });
+    
 </script>

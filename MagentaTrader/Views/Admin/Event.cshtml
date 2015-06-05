@@ -472,6 +472,11 @@
 
         Events = new wijmo.collections.CollectionView(GetEvents());
 
+        Events.sortDescriptions.push(new wijmo.collections.SortDescription("EventDate", 'true'));
+        Events.sortDescriptions.push(new wijmo.collections.SortDescription("EventDescription", 'true'));
+        Events.sortDescriptions.push(new wijmo.collections.SortDescription("Particulars", 'true'));
+        Events.sortDescriptions.push(new wijmo.collections.SortDescription("EventType", 'true'));
+        
         EventGrid = new wijmo.grid.FlexGrid('#EventGrid');
 
         EventGrid.initialize({
@@ -493,44 +498,46 @@
                         {
                             "header": "Date",
                             "binding": "EventDate",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": 80
                         },
                         {
                             "header": "Event",
                             "binding": "EventDescription",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         },
                         {
                             "header": "Particulars",
                             "binding": "Particulars",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         },
                         {
                             "header": "Type",
                             "binding": "EventType",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": 80
                         },
                         {
                             "header": "URL",
                             "binding": "URL",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         },
                         {
                             "header": "Video URL",
                             "binding": "VideoURL",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         }
             ],
             autoGenerateColumns: false,
             itemsSource: Events,
             isReadOnly: true,
-            selectionMode: wijmo.grid.SelectionMode.Row
+            selectionMode: wijmo.grid.SelectionMode.Row,
+            allowSorting: true,
+            showSort: true
         });
 
         EventGrid.trackChanges = true;

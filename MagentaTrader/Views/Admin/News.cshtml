@@ -407,6 +407,10 @@
 
         News = new wijmo.collections.CollectionView(GetNews());
 
+        News.sortDescriptions.push(new wijmo.collections.SortDescription("NewsDate", 'true'));
+        News.sortDescriptions.push(new wijmo.collections.SortDescription("NewsDescription", 'true'));
+        News.sortDescriptions.push(new wijmo.collections.SortDescription("Particulars", 'true'));
+
         NewsGrid = new wijmo.grid.FlexGrid('#NewsGrid');
 
         NewsGrid.initialize({
@@ -428,19 +432,19 @@
                         {
                             "header": "Date",
                             "binding": "NewsDate",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": 100
                         },
                         {
                             "header": "News Description",
                             "binding": "NewsDescription",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         },
                         {
                             "header": "Particulars",
                             "binding": "Particulars",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         }
             ],

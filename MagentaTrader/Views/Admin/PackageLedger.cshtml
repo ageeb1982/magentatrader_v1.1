@@ -898,6 +898,15 @@
         
         SalesGrid = new wijmo.grid.FlexGrid('#PurchasersLedgerGrid');
 
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("SalesDate", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("User", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("FirstName", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("LastName", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("EmailAddress", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("PhoneNumber", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("Price", 'true'));
+        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("SalesNumber", 'true'));
+
         SalesGrid.initialize({
             columns: [
                 {
@@ -911,57 +920,57 @@
                     "header": "Delete",
                     "binding": "DeleteId",
                     "width": 60,
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "isContentHtml": true
                 },
                 {
                     "header": "Sales Date",
                     "binding": "SalesDate",
                     "width": 80,
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "isContentHtml": true
                 },
                 {
                     "header": "Sales Number",
                     "binding": "SalesNumber",
                     "width": 90,
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "isContentHtml": true
                 },
                 {
                     "header": "Username",
                     "binding": "User",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": "6*"
                 },
                 {
                     "header": "First Name",
                     "binding": "FirstName",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": "6*"
                 },
                 {
                     "header": "Last Name",
                     "binding": "LastName",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": "6*"
                 },
                 {
                     "header": "Email Address",
                     "binding": "EmailAddress",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": 190
                 },
                 {
                     "header": "Phone Number",
                     "binding": "PhoneNumber",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": "4*"
                 },
                 {
                     "header": "Price",
                     "binding": "Price",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": 50
                 }
 

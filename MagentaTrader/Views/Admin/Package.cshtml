@@ -510,6 +510,12 @@
 
         ProductPackages = new wijmo.collections.CollectionView(GetProductPackages());
 
+        ProductPackages.sortDescriptions.push(new wijmo.collections.SortDescription("ProductPackageDescription", 'true'));
+        ProductPackages.sortDescriptions.push(new wijmo.collections.SortDescription("SKU", 'true'));
+        ProductPackages.sortDescriptions.push(new wijmo.collections.SortDescription("Price", 'true'));
+        ProductPackages.sortDescriptions.push(new wijmo.collections.SortDescription("Product", 'true'));
+        ProductPackages.sortDescriptions.push(new wijmo.collections.SortDescription("Particulars", 'true'));
+
         ProductPackageGrid = new wijmo.grid.FlexGrid('#ProductPackageGrid');
 
         ProductList = new wijmo.collections.CollectionView(getProducts());
@@ -540,31 +546,31 @@
                         {
                             "header": "Description",
                             "binding": "ProductPackageDescription",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "6*"
                         },
                         {
                             "header": "SKU",
                             "binding": "SKU",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "1*"
                         },
                         {
                             "header": "Price",
                             "binding": "Price",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "1*"
                         },
                         {
                             "header": "Product",
                             "binding": "Product",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         },
                         {
                             "header": "Particulars",
                             "binding": "Particulars",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "6*"
                         }
             ],
