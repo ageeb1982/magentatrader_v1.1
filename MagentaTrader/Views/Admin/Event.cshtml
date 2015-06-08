@@ -120,7 +120,7 @@
                         </dd>
                         <dt>URL</dt>
                         <dd>
-                            <input class="form-control" id="EventEdit_URL" name="EventEdit_URL" type="url" required placeholder="https://sample.com"/>
+                            <input class="form-control" id="EventEdit_URL" name="EventEdit_URL" required placeholder="https://sample.com"/>
                         </dd>
                         <dt>Video URL</dt>
                         <dd>
@@ -210,7 +210,7 @@
 
         EventDate.dispose();
         EventDate = new wijmo.input.InputDate('#EventEdit_EventDate', {
-            format: 'M/d/yyyy',
+            format: 'MM/dd/yyyy',
             value: new Date(Event.EventDate),
             onValueChanged: function () {
                 document.getElementById('EventEdit_EventDate_Data').value = this.value.toString("M/d/yyyy");
@@ -453,7 +453,7 @@
                $('#EventEdit').modal('hide');
            }
            else
-               toastr.error("URL must contain <i>https://</i> and <i>.com</i> ", 'Fill in the required fields.')
+               toastr.error('Fill in the required fields.')
        });
 
        $('#CmdEventEditCancel, .close').click(function () {
