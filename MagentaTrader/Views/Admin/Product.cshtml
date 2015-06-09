@@ -403,6 +403,10 @@
 
         Products.pageSize = 15;
 
+        Products.collectionChanged.addHandler(function (sender, args) {
+            UpdateNavigateButtonsProduct();
+        });
+
         UpdateNavigateButtonsProduct();
 
         // Page Button Products

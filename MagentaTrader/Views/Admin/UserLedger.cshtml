@@ -116,7 +116,7 @@
                 <h4>Purchases</h4>
             </div>
             <div class="col-lg-6">
-                <button class="btn btn-primary pull-right" id="SaveUserLedger">Save Ledger</button>
+                <button class="btn btn-primary pull-right" id="SaveUserLedger">Export</button>
             </div>
         </div>
         <div class="row">
@@ -450,7 +450,11 @@
             });
         }
 
-        ULR += 'User Ledger Record' + '\r\n\n';
+        var $firstName = document.getElementById('FirstName').value;
+        var $lastName = document.getElementById('LastName').value;
+        var $userName = document.getElementById('Username').value;
+
+        ULR += 'User Ledger Record' + '\r\n\n' + $firstName + ' ' + $lastName + '\r\n\n';
 
         var recordLabelRow = '';
         for (var s in record[0]) {
@@ -477,11 +481,7 @@
 
         // Create filename
 
-        var $firstName = document.getElementById('FirstName').value;
-        var $lastName = document.getElementById('LastName').value;
-        var $userName = document.getElementById('Username').value;
-
-        var fileName = 'magenta_UserLegder_' + $firstName + '_' + $lastName + '_' + $userName + '_' + '.CSV';
+        var fileName = 'magenta_' + $userName + '_' + 'purchases.CSV';
 
         // Download via <a> link
 
@@ -535,25 +535,25 @@
                 {
                     "header": "Sales Date",
                     "binding": "SalesDate",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": 100
                 },
                 {
                     "header": "Sales Number",
                     "binding": "SalesNumber",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": 150
                 },
                 {
                     "header": "Product Package",
                     "binding": "ProductPackage",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": 500
                 },
                 {
                     "header": "Price",
                     "binding": "Price",
-                    "allowSorting": false,
+                    "allowSorting": true,
                     "width": "4*"
                 }
             ],
@@ -587,6 +587,10 @@
         });
 
         Sales.pageSize = 10;
+
+        Sales.collectionChanged.addHandler(function (sender, args) {
+            UpdateNavigateButtonsUser();
+        });
 
         btnFirstPageUser = document.getElementById('btnMoveToFirstPageUser');
         btnPreviousPageUser = document.getElementById('btnMoveToPreviousPageUser');

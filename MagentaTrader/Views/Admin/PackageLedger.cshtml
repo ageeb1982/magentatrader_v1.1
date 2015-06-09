@@ -147,14 +147,11 @@
             <div class="col-lg-6">
                 <h4 id="usersTotal"></h4>
             </div>
-            @*<div class="col-lg-3">
-                <button class="btn btn-primary pull-right" id="SavePackageLedger">Save Ledger</button>
-            </div>*@
             <div class="col-lg-6">
                 <button id="CmdAddProductPackage" type="submit" class="btn btn-primary pull-right" onclick="CmdSaleAdd_OnClick()" style="margin-left: 8px;">
                     Add
                 </button>
-                <button class="btn btn-primary pull-right" id="SavePackageLedger">Save Ledger</button>
+                <button class="btn btn-primary pull-right" id="SavePackageLedger">Export</button>
             </div>
         </div>
         <div class="row">
@@ -902,7 +899,9 @@
             });
         }
 
-        PLR += 'Package Ledger Record' + '\r\n\n';
+        var $productPackage = document.getElementById('ProductPackage').value;
+
+        PLR += 'Package Ledger Record' + '\r\n\n' + $productPackage + ' Users \r\n\n';
 
         var recordLabelRow = '';
         for (var s in record[0]) {
@@ -929,10 +928,7 @@
 
         // Create filename
 
-        var $productPackage = document.getElementById('ProductPackage').value;
-        var $price = document.getElementById('Price').value;
-
-        var fileName = 'magenta_PackageLegder_' + $productPackage + '_' + $price + '_' + '.CSV';
+        var fileName = 'magenta_' + $productPackage + '_' + 'users' + '.CSV';
 
         // Download via <a> link
 
@@ -1004,13 +1000,13 @@
                     "header": "Delete",
                     "binding": "DeleteId",
                     "width": 60,
-                    "allowSorting": true,
+                    "allowSorting": false,
                     "isContentHtml": true
                 },
                 {
                     "header": "Sales Date",
                     "binding": "SalesDate",
-                    "width": 80,
+                    "width": 100,
                     "allowSorting": true,
                     "isContentHtml": true
                 },
@@ -1068,6 +1064,10 @@
         SalesGrid.trackChanges = true;
 
         Sales.pageSize = 15;
+
+        Sales.collectionChanged.addHandler(function (sender, args) {
+            UpdateNavigateButtonsUser();
+        });
 
         btnFirstPageUser = document.getElementById('btnMoveToFirstPageUser');
         btnPreviousPageUser = document.getElementById('btnMoveToPreviousPageUser');

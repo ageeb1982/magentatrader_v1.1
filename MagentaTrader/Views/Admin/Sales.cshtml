@@ -67,7 +67,6 @@
             <div class="col-lg-12">
                 <div id="DateFilter">
                     <input id="SalesDateFilter" readonly />
-                    @*<input class="form-control" id="SaleEdit_Date" type="text" />*@
                 </div>
                 <input class="form-control" id="DateFilter_Data" type="hidden" />
             </div>
@@ -253,12 +252,11 @@
         SaleDate.dispose();
         SaleDate = new wijmo.input.InputDate('#SaleEdit_SaleDate', {
             format: 'M/d/yyyy',
-            value: new Date(Sale.SaleDate),
+            value: new Date(Sale.SalesDate),
             onValueChanged: function () {
                 document.getElementById('SaleEdit_SaleDate_Data').value = this.value.toString("M/d/yyyy");
             }
         });
-
         RenewalDate.dispose();
         RenewalDate = new wijmo.input.InputDate('#SaleEdit_RenewalDate', {
             format: 'M/d/yyyy',
@@ -685,6 +683,21 @@
         "tapToDismiss": false
     }
 
+    //var filterElement = document.getElementById('SalesDateFilter'),
+    //    filterText = $('#SalesDateFilter').find('input').val();
+    //    filterText = '';
+
+    //// update grid when filter changes
+    //    filterElement.addEventListener('input', function () {
+    //    filterText = this.value.toLowerCase();
+    //    Sales.refresh();
+    //});
+
+    //// CollectionView filter
+    //Sales.filter = function (item) {
+    //    return !filterText || item.SalesDate.toLowerCase().indexOf(filterText) > -1;
+    //};
+
     $(document).ready(function () {
 
         toastr.options.preventDuplicates = true;
@@ -716,20 +729,17 @@
              
         SalesGrid = new wijmo.grid.FlexGrid('#SalesGrid');
 
-        //var filter = new wijmo.grid.filter.FlexGridFilter(SalesGrid);
-
         var DateFilter = new wijmo.input.InputDate('#SalesDateFilter', {
-            format: 'M/dd/yyyy',
+            format: 'M/d/yyyy',
             value: new Date()
         });
 
-        var filterElement = document.getElementById('SalesDateFilter'),
-            filterText = $('#SalesDateFilter').find('input').val();
-            filterText = '';
+        var filterText = $('#DateFilter').find('input').val();
 
-        $('#SalesDateFilter').on('click', function () {
-            var str = $('#SalesDateFilter').find('input').val();
-            filterText = str;
+        Sales.refresh;
+
+        DateFilter.valueChanged.addHandler(function (sender, args) {
+            filterText = $('#DateFilter').find('input').val();
             Sales.refresh();
         });
 
@@ -777,7 +787,7 @@
                     "binding": "SalesDate",
                     "allowSorting": true,
                     "width": 100,
-                    "visible": true
+                    "visible": false
                 },
                 {
                     "header": "Renewal Date",
@@ -828,6 +838,10 @@
         SalesGrid.trackChanges = true;
 
         Sales.pageSize = 15;
+
+        Sales.collectionChanged.addHandler(function (sender, args) {
+            UpdateNavigateButtonsSale();
+        });
 
         SaleDate = new wijmo.input.InputDate('#SaleEdit_SaleDate', {
             format: 'M/d/yyyy',

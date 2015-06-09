@@ -243,7 +243,7 @@ namespace MagentaTrader.Controllers
                                     SaleId = s.Id,
                                     Price = s.Price,
                                     SalesNumber = s.SalesNumber,
-                                    SalesDate = s.SalesDate.ToShortDateString(),
+                                    SalesDate = Convert.ToString(s.SalesDate.Year) + "-" + Convert.ToString(s.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(s.SalesDate.Day + 100).Substring(1, 2),
                                     RenewalDate = s.RenewalDate.ToShortDateString(),
                                     ExpiryDate = s.ExpiryDate.ToShortDateString(),
                                     Particulars = s.Particulars,

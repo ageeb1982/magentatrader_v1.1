@@ -547,7 +547,7 @@
                             "header": "SKU",
                             "binding": "SKU",
                             "allowSorting": true,
-                            "width": "1*"
+                            "width": 80
                         },
                         {
                             "header": "Price",
@@ -577,6 +577,10 @@
         ProductPackageGrid.trackChanges = true;
 
         ProductPackages.pageSize = 15;
+
+        ProductPackages.collectionChanged.addHandler(function (sender, args) {
+            UpdateNavigateButtonsProductPackage();
+        });
 
         ddl = new wijmo.input.AutoComplete('#cboProductPackageEdit_ProductId', {
             itemsSource: getProductsList(ProductList.items),

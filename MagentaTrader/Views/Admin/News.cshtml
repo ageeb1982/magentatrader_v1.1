@@ -454,6 +454,10 @@
 
         News.pageSize = 15;
 
+        News.collectionChanged.addHandler(function (sender, args) {
+            UpdateNavigateButtonsNews();
+        });
+
         NewsDate = new wijmo.input.InputDate('#NewsEdit_NewsDate', {
             format: 'M/d/yyyy',
             value: new Date()

@@ -446,6 +446,10 @@
 
         Users.pageSize = 15;
 
+        Users.collectionChanged.addHandler(function (sender, args) {
+            UpdateNavigateButtonsUser();
+        });
+
         UpdateNavigateButtonsUser();
 
         // Page Button Users
