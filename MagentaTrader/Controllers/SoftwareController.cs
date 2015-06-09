@@ -10,7 +10,7 @@ namespace MagentaTrader.Controllers
     {
         //
         // GET: /Software/
-        [Authorize]
+        [Authorize(Roles = "Chart")]
         public ActionResult Index()
         {
             return View();

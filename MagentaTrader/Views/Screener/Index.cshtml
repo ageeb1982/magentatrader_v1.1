@@ -9,6 +9,7 @@
 <script src="/js/knockout-3.2.0.js"></script>
 <script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
 <script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+<script src="/js/date.js"></script>
 
 <nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
     <div class="container topnav">
@@ -27,6 +28,18 @@
 <div class="container">
     <div class="row">
         <h2 class="section-heading">Screener</h2>
+        <div class="col-lg-6">
+            <p>Strategy</p>
+            <select id="Strategy" class="form-control" onchange="Strategy_AfterUpdate()">
+                <option value="CUS" selected="selected">Customize</option>
+                <option value="SSU">Strong and Steady (Up)</option>
+                <option value="SSD">Strong and Steady (Down)</option>
+                <option value="WLS">Win/Loss Strategy</option>
+            </select>
+        </div>
+    </div>  
+    <br />
+    <div class="row">
         <div class="col-lg-2">
             <p>Exchange</p>
             <select id="Exchange" class="form-control">
@@ -79,6 +92,24 @@
     <br />
     <div class="row">
         <div class="col-lg-2">
+            <p>30 Days Correlation</p>
+            <select id="Correlation30" class="form-control">
+                <option value="10" selected="selected">0.10</option>
+                <option value="20">0.20</option>
+                <option value="30">0.30</option>
+                <option value="40">0.40</option>
+                <option value="50">0.50</option>
+                <option value="60">0.60</option>
+                <option value="70">0.70</option>
+                <option value="80">0.80</option>
+                <option value="90">0.90</option>
+                <option value="100">1.00</option>
+            </select>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-lg-2">
             <button id="CmdGetResult" type="submit" class="btn btn-primary btn-block" onclick="CmdGetResult_OnClick()">Get Result</button>
         </div>
         <div class="col-lg-2">
@@ -124,9 +155,32 @@
     </div>
 </div>
 
+<div class="modal" id="YearlyWinLoss" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 id="YearlyWinLossTitle" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="YearlyWinLossGrid" class="grid"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     var ScreenerData;
     var ScreenerGrid;
+    var YearlyWinLossData;
+    var YearlyWinLossGrid;
 
     var ScreenerSaveData = [];
 
@@ -171,17 +225,18 @@
         }
         return Math.round(returnResult);
     }
-    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears) {
+    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears, Correlation30) {
         $('#loading').modal('show');
         var d = new wijmo.collections.ObservableArray();
+
         $.ajax({
-            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume + '/' + GrowthDecayRate + '/' + GrowthDecayTime + '/' + NoOfYears,
+            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume + '/' + GrowthDecayRate + '/' + GrowthDecayTime + '/' + NoOfYears + '/' + Correlation30,
             type: 'GET',
             dataType: 'json',
             success: function (result) {
                 for (i = 0; i < result.length; i++) {
                     d.push({
-                        Symbol: "<a  href='/Software?symbol=" + result[i].SymbolDescription + "' target='_blank'>" + result[i].SymbolDescription + "</a>",
+                        Symbol: "<a href='/Software?symbol=" + result[i].SymbolDescription + "' target='_blank'><font color='black'>" + result[i].SymbolDescription + "</font></a>",
                         SymbolRaw: result[i].SymbolDescription,
                         Description: result[i].Description,
                         Exchange: result[i].Exchange,
@@ -199,12 +254,13 @@
                         TrendNoOfDays: result[i].TrendNoOfDays,
                         WinLossCurrent30: result[i].WinLossCurrent30,
                         WinLossAverageCurrent30: result[i].WinLossAverageCurrent30,
-                        WinLoss20: result[i].WinLoss20,
+                        WinLoss20: "<a href='javascript:;' onclick='OpenYearlyWinLoss(20);'><font color='black'>" + result[i].WinLoss20 + "</font></a>",
                         WinLossAverage20: result[i].WinLossAverage20,
-                        WinLoss40: result[i].WinLoss40,
+                        WinLoss40: "<a href='javascript:;' onclick='OpenYearlyWinLoss(40);'><font color='black'>" + result[i].WinLoss40 + "</font></a>",
                         WinLossAverage40: result[i].WinLossAverage40,
-                        WinLoss60: result[i].WinLoss60,
-                        WinLossAverage60: result[i].WinLossAverage60
+                        WinLoss60: "<a href='javascript:;' onclick='OpenYearlyWinLoss(60);'><font color='black'>" + result[i].WinLoss60 + "</font></a>",
+                        WinLossAverage60: result[i].WinLossAverage60,
+                        CorrelationCoefficient30: result[i].CorrelationCoefficient30
                     });
                 }
 
@@ -258,126 +314,133 @@
                         {
                             "header": "Symbol",
                             "binding": "Symbol",
-                            "width": 80,
+                            "width": 70,
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         },{
                             "header": "Price",
                             "binding": "ClosePrice",
-                            "width": "11*",
+                            "width": "12*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         },{
                             "header": "Vol (M)",
                             "binding": "Volume",
-                            "width": 60,
+                            "width": 50,
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         },{
                             "header": "Years",
                             "binding": "NoOfYears",
-                            "width": 40,
+                            "width": 35,
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         },{
                             "header": "Trend",
                             "binding": "TrendNoOfDays",
-                            "width": 40,
+                            "width": 35,
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        }, {
+                            "header": "Correlation",
+                            "binding": "CorrelationCoefficient30",
+                            "width": "12*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-T",
                             "binding": "GrowthDecayRate",
-                            "width": "11*",
+                            "width": "12*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-W1",
                             "binding": "GrowthDecayRateW1",
-                            "width": "11*",
+                            "width": "12*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-W2",
                             "binding": "GrowthDecayRateW2",
-                            "width": "11*",
+                            "width": "12*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-W3",
                             "binding": "GrowthDecayRateW3",
-                            "width": "11*",
+                            "width": "12*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-M1",
                             "binding": "GrowthDecayRateM1",
-                            "width": "11*",
+                            "width": "12*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-M2",
                             "binding": "GrowthDecayRateM2",
-                            "width": "11*",
+                            "width": "12*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-M3",
                             "binding": "GrowthDecayRateM3",
-                            "width": "11*",
+                            "width": "12*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "20 W/L %",
                             "binding": "WinLossAverage20",
-                            "width": "11*",
+                            "width": "12*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "20 W/L",
                             "binding": "WinLoss20",
-                            "width": 60,
+                            "width": 55,
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "40 W/L %",
                             "binding": "WinLossAverage40",
-                            "width": "11*",
+                            "width": "12*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "40 W/L",
                             "binding": "WinLoss40",
-                            "width": 60,
+                            "width": 55,
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "60 W/L %",
                             "binding": "WinLossAverage60",
-                            "width": "11*",
+                            "width": "12*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "60 W/L",
                             "binding": "WinLoss60",
-                            "width": 60,
+                            "width": 55,
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
@@ -435,6 +498,15 @@
             UpdateNavigateButtonsEvent();
         });
     }
+    function DisableScreenFields(disable) {
+        document.getElementById('Exchange').disabled = disable;
+        document.getElementById('ClosePrice').disabled = disable;
+        document.getElementById('Volume').disabled = disable;
+        document.getElementById('GrowthDecayRate').disabled = disable;
+        document.getElementById('GrowthDecayTime').disabled = disable;
+        document.getElementById('NoOfYears').disabled = disable;
+        document.getElementById('Correlation30').disabled = disable;
+    }
 
     function CmdGetResult_OnClick() {
         var $exchange = document.getElementById('Exchange').value;
@@ -442,15 +514,17 @@
         var $volume = parseFloat(document.getElementById('Volume').value);
         var $growthDecayRate = parseFloat(document.getElementById('GrowthDecayRate').value);
         var $growthDecayTime = document.getElementById('GrowthDecayTime').value;
-        var $noOfYears = document.getElementById('NoOfYears').value;
+        var $noOfYears = parseInt(document.getElementById('NoOfYears').value);
+        var $correlation30 = parseFloat(document.getElementById('Correlation30').value);
         
         $closePrice = !$closePrice ? 10 : $closePrice;
         $volume = !$volume ? 1000000 : $volume;
         $growthDecayRate = !$growthDecayRate ? 100 : $growthDecayRate;
         $growthDecayTime = !$growthDecayTime ? "C0" : $growthDecayTime;
         $noOfYears = !$noOfYears ? 8 : $noOfYears;
+        $correlation30 = !$correlation30 ? 10 : $correlation30;
 
-        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears);
+        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears, $correlation30);
     }
     function CmdSaveXLS_OnClick() {
         var CSV = '';
@@ -479,7 +553,8 @@
                 WinLoss40: ScreenerSaveData[i].WinLoss40,
                 WinLossAverage40: ScreenerSaveData[i].WinLossAverage40,
                 WinLoss60: ScreenerSaveData[i].WinLoss60,
-                WinLossAverage60: ScreenerSaveData[i].WinLossAverage60
+                WinLossAverage60: ScreenerSaveData[i].WinLossAverage60,
+                CorrelationCoefficient30: ScreenerSaveData[i].CorrelationCoefficient30
             });
         }
 
@@ -549,8 +624,153 @@
 
     }
 
+    function Strategy_AfterUpdate() {
+        var $strategy = document.getElementById('Strategy').value;
+        switch($strategy) {
+            case "CUS":
+                DisableScreenFields(false);
+                break;
+            case "SSU":
+                document.getElementById('Exchange').value = "All";
+                document.getElementById('ClosePrice').value = 10;
+                document.getElementById('Volume').value = 800000;
+                document.getElementById('GrowthDecayRate').value = 80;
+                document.getElementById('NoOfYears').value = 8;
+                document.getElementById('Correlation30').value = 10;
+                DisableScreenFields(true);
+                break;
+            case "SSD":
+                document.getElementById('Exchange').value = "All";
+                document.getElementById('ClosePrice').value = 10;
+                document.getElementById('Volume').value = 800000;
+                document.getElementById('GrowthDecayRate').value = -80;
+                document.getElementById('NoOfYears').value = 8;
+                document.getElementById('Correlation30').value = 10;
+                DisableScreenFields(true);
+                break;
+            case "WLS":
+                DisableScreenFields(true);
+                break;
+        }
+    }
+
+    function OpenYearlyWinLoss(range) {
+        var symbol = ScreenerData.currentItem.SymbolRaw;
+
+        $('#loading').modal({
+            show: true,
+            backdrop: false
+        });
+        $.ajax({
+            url: '/api/StockPrice/' + symbol,
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            data: {},
+            success: function (data) {
+                $('#loading').modal('hide');
+                if (data.StockPrices.length > 0) {
+                    // Prepare the closing price data
+                    var stockPrices = data.StockPrices;
+                    var closeYearData = [];
+                    var countYear = 0;
+                    var dayIndex = 251;
+                    var NumberOfDaysInYear = 252;
+                    var seasonYearNo = 12;
+                    while (closeYearData.length > 0) closeYearData.pop();
+                    for (var i = 0; i < seasonYearNo; i++) {
+                        closeYearData[i] = [];
+                        for (var d = 0; d < NumberOfDaysInYear; d++) closeYearData[i].push(0);
+                    }
+                    for (var i = 126; i < stockPrices.length; i++) {
+                        closeYearData[countYear][dayIndex] = parseFloat(stockPrices[i]["ClosePrice"]);
+                        dayIndex--;
+                        if (dayIndex == -1) {
+                            dayIndex = 251;
+                            countYear++;
+                        }
+                    }
+                    // Compute for the year to year average win loss
+                    var currentYear = parseDate(stockPrices[0]["QuoteDate"]).getFullYear();
+                    var startIndex = 125;
+                    var endIndex = startIndex + (range - 1);
+                    var averageWinLoss = 0;
+                    var winLossData = new wijmo.collections.ObservableArray();
+                    for (var i = 0; i < 10; i++) {
+                        if ((closeYearData[i][endIndex] + closeYearData[i][startIndex]) > 0) {
+                            if (closeYearData[i][endIndex] >= closeYearData[i][startIndex]) {
+                                if (closeYearData[i][startIndex] > 0)
+                                    averageWinLoss = ((closeYearData[i][endIndex] - closeYearData[i][startIndex]) / closeYearData[i][startIndex]);
+                            }
+                            else {
+                                if (closeYearData[i][endIndex] > 0)
+                                    averageWinLoss = ((closeYearData[i][endIndex] - closeYearData[i][startIndex]) / closeYearData[i][endIndex]);
+                            }
+                            winLossData.push({
+                                year: (currentYear-i-1).toString(),
+                                averageWinLoss: averageWinLoss * 100,
+                            });
+                        }
+                    }
+                    // Show modal
+                    $('#YearlyWinLoss').modal({
+                        show: true,
+                        backdrop: false
+                    });
+                    $("#YearlyWinLossTitle").html("<b>" + symbol + " : </b> " + range + " Days Win/Loss");
+                    // Create the grid
+                    YearlyWinLossData = new wijmo.collections.CollectionView(winLossData);
+                    YearlyWinLossGrid.dispose();
+                    YearlyWinLossGrid = new wijmo.grid.FlexGrid('#YearlyWinLossGrid');
+                    YearlyWinLossGrid.initialize({
+                        columns: [
+                                    {
+                                        "header": "Year",
+                                        "binding": "year",
+                                        "width": "*",
+                                        "allowSorting": true,
+                                        "isContentHtml": true
+                                    }, {
+                                        "header": "Win/(Loss)",
+                                        "binding": "averageWinLoss",
+                                        "width": "*",
+                                        "allowSorting": true,
+                                        "isContentHtml": true
+                                    }
+
+                        ],
+                        autoGenerateColumns: false,
+                        itemsSource: YearlyWinLossData,
+                        isReadOnly: true,
+                        selectionMode: wijmo.grid.SelectionMode.Row,
+                        itemFormatter: function (panel, r, c, cell) {
+                            if (wijmo.grid.CellType.Cell == panel.cellType &&
+                               (panel.columns[c].binding == 'averageWinLoss')) {
+                                var cellData = panel.getCellData(r, c);
+                                cell.style.color = GetRateColor(cellData);
+                            }
+                        }
+                    });
+                    YearlyWinLossGrid.trackChanges = true;
+                } else {
+                    alert("Please retry.  Server is busy.");
+                }
+            }
+        }).fail(
+                function (xhr, textStatus, err) {
+                    alert(err);
+                }
+        );
+
+    }
+    function parseDate(input) {
+        var parts = input.split('-');
+        return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+
     $(document).ready(function () {
         ScreenerGrid = new wijmo.grid.FlexGrid('#ScreenerGrid');
+        YearlyWinLossGrid = new wijmo.grid.FlexGrid('#YearlyWinLossGrid');
     });
 </script>
 

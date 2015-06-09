@@ -40,5 +40,6 @@ namespace MagentaTrader.Models
         public decimal WinLossAverage40 { get; set; }
         public string WinLoss60 { get; set; }
         public decimal WinLossAverage60 { get; set; }
+        public decimal CorrelationCoefficient30 { get; set; }
     }
 }

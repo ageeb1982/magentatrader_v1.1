@@ -3546,6 +3546,8 @@ namespace MagentaTrader.Data
 		
 		private System.Nullable<decimal> _WinLossAverage60;
 		
+		private System.Nullable<decimal> _CorrelationCoefficient30;
+		
 		private EntitySet<TrnStockPrice> _TrnStockPrices;
 		
 		private EntitySet<TrnStockEarning> _TrnStockEarnings;
@@ -3618,6 +3620,8 @@ namespace MagentaTrader.Data
     partial void OnWinLoss60Changed();
     partial void OnWinLossAverage60Changing(System.Nullable<decimal> value);
     partial void OnWinLossAverage60Changed();
+    partial void OnCorrelationCoefficient30Changing(System.Nullable<decimal> value);
+    partial void OnCorrelationCoefficient30Changed();
     #endregion
 		
 		public MstSymbol()
@@ -4263,6 +4267,26 @@ namespace MagentaTrader.Data
 					this._WinLossAverage60 = value;
 					this.SendPropertyChanged("WinLossAverage60");
 					this.OnWinLossAverage60Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CorrelationCoefficient30", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> CorrelationCoefficient30
+		{
+			get
+			{
+				return this._CorrelationCoefficient30;
+			}
+			set
+			{
+				if ((this._CorrelationCoefficient30 != value))
+				{
+					this.OnCorrelationCoefficient30Changing(value);
+					this.SendPropertyChanging();
+					this._CorrelationCoefficient30 = value;
+					this.SendPropertyChanged("CorrelationCoefficient30");
+					this.OnCorrelationCoefficient30Changed();
 				}
 			}
 		}

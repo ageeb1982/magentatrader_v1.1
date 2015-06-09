@@ -94,10 +94,10 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
-        // GET api/SymbolScreener/NYSE/10/1000000/100/C0/8
+        // GET api/SymbolScreener/NYSE/10/1000000/100/C0/8/0.80
         [Authorize]
-        [Route("api/SymbolScreener/{Exchange}/{Price}/{Volume}/{GrowthDecayRate}/{GrowthDecayTime}/{NoOfYears}")]
-        public List<Models.Symbol> GetSymbolScreener(string Exchange, decimal Price, decimal Volume, decimal GrowthDecayRate, string GrowthDecayTime, int NoOfYears)
+        [Route("api/SymbolScreener/{Exchange}/{Price}/{Volume}/{GrowthDecayRate}/{GrowthDecayTime}/{NoOfYears}/{Correlation30}")]
+        public List<Models.Symbol> GetSymbolScreener(string Exchange, decimal Price, decimal Volume, decimal GrowthDecayRate, string GrowthDecayTime, int NoOfYears, decimal Correlation30)
         {
             var retryCounter = 0;
 
@@ -112,6 +112,7 @@ namespace MagentaTrader.Controllers
                                         (d.ClosePrice >= Price) &&
                                         (d.Volume >= Volume) &&
                                         (d.NoOfYears >= NoOfYears) &&
+                                        (d.CorrelationCoefficient30 >= (Correlation30/100)) && 
                                         (GrowthDecayTime == "C0" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value) >= GrowthDecayRate ? true : false) : true) == true &&
                                         (GrowthDecayTime == "C0" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value) ? true : false) : true) == true &&
                                         (GrowthDecayTime == "W1" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRateW1.Value == null ? 0 : d.GrowthDecayRateW1.Value) >= GrowthDecayRate ? true : false) : true) == true &&
@@ -149,7 +150,8 @@ namespace MagentaTrader.Controllers
                                       WinLoss40 = d.WinLoss40 == null ? "NA" : d.WinLoss40,
                                       WinLossAverage40 = d.WinLossAverage40.Value == null ? 0 : d.WinLossAverage40.Value,
                                       WinLoss60 = d.WinLoss60 == null ? "NA" : d.WinLoss60,
-                                      WinLossAverage60 = d.WinLossAverage60.Value == null ? 0 : d.WinLossAverage60.Value
+                                      WinLossAverage60 = d.WinLossAverage60.Value == null ? 0 : d.WinLossAverage60.Value,
+                                      CorrelationCoefficient30 = d.CorrelationCoefficient30.Value
                                   };
                     if (Symbols.Count() > 0)
                     {

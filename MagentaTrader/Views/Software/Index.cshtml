@@ -68,6 +68,13 @@
                             <div>Movement of prices 10 days after and before earnings.</div>
                         </a>
                     </li>
+                    <li>
+                        <hr style="margin: 10px 0 10px 0;" />
+                        <a href="#" onclick="openMovingAverage()">
+                            <div><strong>Moving Average</strong></div>
+                            <div>Create Simple and Exponential Moving Averages</div>
+                        </a>
+                    </li>
                 </ul>
                 <!-- /.dropdown-messages -->
             </li>
@@ -115,7 +122,7 @@
 
                     @using Microsoft.AspNet.Identity
                     @{
-                        if (User.Identity.GetUserName().ToUpper() == "DPILGER" || User.Identity.GetUserName().ToUpper() == "MORTON")
+                        if (User.Identity.GetUserName().ToUpper() == "DPILGER" || User.Identity.GetUserName().ToUpper() == "MORTON" || User.Identity.GetUserName().ToUpper() == "JRGS")
                         {
                             <li>
                                 <hr style="margin: 10px 0 10px 0;" />
@@ -196,7 +203,7 @@
         </div>
     </nav>
     <div id="page-wrapper">
-        <div id="chartdiv" style="width: 100%; height: 650px; padding: 20px 10px 10px 10px; "></div>
+        <div id="chartdiv" style="width: 100%; height: 600px; padding: 20px 10px 10px 10px; "></div>
     </div>
 </div>
 
@@ -445,6 +452,31 @@
     </div>
 </div>
 
+<div class="modal" id="MovingAverage" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 id="MovingAverageTitle" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="MovingAverageGrid" class="grid"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="applyMovingAverage" onclick="applyMovingAverage()">
+                    Apply
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script src="/js/date.js"></script>
 
 <link rel="stylesheet" href="/amcharts/amcharts/style.css" type="text/css">
@@ -452,13 +484,13 @@
 <script src="/amcharts/amcharts/serial.js" type="text/javascript"></script>
 <script src="/amcharts/amcharts/amstock.js" type="text/javascript"></script>
 
-<script src="/js/knockout-3.2.0.js"></script>
+@*<script src="/js/knockout-3.2.0.js"></script>*@
 
 <link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
 <script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
 <script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
 <script src="/wijmo/controls/wijmo.input.min.js"></script>
-<script src="/wijmo/interop/knockout/wijmo.knockout.min.js"></script>
+@*<script src="/wijmo/interop/knockout/wijmo.knockout.min.js"></script>*@
 
 <script type="text/javascript">
     // Modal
@@ -494,6 +526,9 @@
 
     // Hidden Season Yearly Graph
     var scannerYearGraph = [];
+
+    // Hidden Moving Average
+    var graphMA = [];
 
     // Number of trading days in a year / period
     var NumberOfDaysInYear = 252;
@@ -533,6 +568,11 @@
     var TradierUserProfileGrid;
     var TradierOrdersGrid;
     var TradierPositionsGrid;
+
+    // Moving Average
+
+    var MovingAverageGrid;
+    var MovingAverageData = [];
 
     // Tradier
 
@@ -1125,8 +1165,279 @@
         }
     }
 
-    // Earnings
+    // Moving Average
 
+    function generateMovingAverage() {
+        if (MovingAverageData.length == 0) {
+            MovingAverageData = [{
+                "id": 1,
+                "description": "EMA 8",
+                "type": "e",
+                "noOfDays": 8,
+                "color": "#070BB0",
+                "isActive": false
+            }, {
+                "id": 2,
+                "description": "EMA 21",
+                "type": "e",
+                "noOfDays": 21,
+                "color": "#B1030B",
+                "isActive": false
+            }, {
+                "id": 3,
+                "description": "SMA 50",
+                "type": "s",
+                "noOfDays": 50,
+                "color": "#C97232",
+                "isActive": false
+            }, {
+                "id": 4,
+                "description": "SMA 200",
+                "type": "s",
+                "noOfDays": 200,
+                "color": "#C607BB",
+                "isActive": false
+            }, {
+                "id": 5,
+                "description": "Custom",
+                "type": "e",
+                "noOfDays": 0,
+                "color": "#000000",
+                "isActive": false
+            }];
+        }
+    }
+    function openMovingAverage() {
+        $('#MovingAverage').modal({
+            show: true,
+            backdrop: false
+        });
+        $("#MovingAverageTitle").text("Moving Average");
+
+        generateMovingAverage();
+
+        var MovingAverageType = [{
+            "type": 'e',
+            "name": 'Exponential'
+        }, {
+            "type": 's',
+            "name": 'Simple'
+        }];
+
+        var MovingAverageColor = [{
+            "color": '#070BB0',
+            "name": "Blue",
+            "nameHTML": "<font color='#070BB0'>Blue</font>"
+        }, {
+            "color": '#0088BB',
+            "name": "Light Blue",
+            "nameHTML": "<font color='#0088BB'>Light Blue</font>"
+        }, {
+            "color": '#C607BB',
+            "name": "Magenta",
+            "nameHTML": "<font color='#C607BB'>Magenta</font>"
+        }, {
+            "color": '#C97232',
+            "name": "Orange",
+            "nameHTML": "<font color='#C97232'>Orange</font>"
+        }, {
+            "color": '#B1030B',
+            "name": "Red",
+            "nameHTML": "<font color='#B1030B'>Red</font>"
+        }, {
+            "color": '#1A8B24',
+            "name": "Green",
+            "nameHTML": "<font color='#1A8B24'>Green</font>"
+        }, {
+            "color": '#000000',
+            "name": "Black",
+            "nameHTML": "<font color='#000000'>Black</font>"
+        }];
+
+        MovingAverageGrid.dispose();
+        MovingAverageGrid = new wijmo.grid.FlexGrid('#MovingAverageGrid');
+
+        MovingAverageGrid.initialize({
+            columns: [
+                        {
+                            "header": "Moving Average",
+                            "binding": "description",
+                            "width": "*"
+                        },
+                        {
+                            "header": "Type",
+                            "binding": "type",
+                            "width": 120,
+                            "dataMap": new wijmo.grid.DataMap(MovingAverageType, 'type', 'name')
+                        },
+                        {
+                            "header": "Days",
+                            "binding": "noOfDays",
+                            "width": 60
+                        },
+                        {
+                            "header": "Color",
+                            "binding": "color",
+                            "width": 90,
+                            "dataMap": new wijmo.grid.DataMap(MovingAverageColor, 'color', 'name')
+                        },
+                        {
+                            "header": "Active",
+                            "binding": "isActive",
+                            "width": 60,
+                        }
+            ],
+            autoGenerateColumns: false,
+            selectionMode: 'Row',
+            itemsSource: MovingAverageData
+        });
+
+        //createColorEditor(MovingAverageGrid.columns.getColumn('color'));
+    }
+    function applyMovingAverage() {
+        computeMovingAverage();
+        plotMovingAverage();
+        $('#MovingAverage').modal('hide');
+    }
+    function computeMovingAverage() {
+        if (chartData.length > 252) {
+            for (var m = 0; m < 5; m++) {
+                if (MovingAverageData[m].isActive == true) {
+                    if (MovingAverageData[m].type == "e") {
+                        // Exponential Moving Average
+                        var day = 1;
+                        var noOfDays = MovingAverageData[m].noOfDays;
+                        var ma_close = 0;
+                        var ma = 0;
+                        var ma_previous = 0;
+                        for (var i = 252; i >= 0; i--) {
+                            if (day < noOfDays) {
+                                ma_close = ma_close + chartData[i].close;
+                            } else if (day == noOfDays) {
+                                ma_close = ma_close + chartData[i].close;
+                                ma = ma_close / noOfDays;
+                                ma_previous = ma;
+                                switch (m) {
+                                    case 0: chartData[i].ma1 = ma; break;
+                                    case 1: chartData[i].ma2 = ma; break;
+                                    case 2: chartData[i].ma3 = ma; break;
+                                    case 3: chartData[i].ma4 = ma; break;
+                                    case 4: chartData[i].ma5 = ma; break;
+                                }
+                            } else if (day > noOfDays) {
+                                ma = (chartData[i].close * (2 / (noOfDays + 1)) + ma_previous * (1 - (2 / (noOfDays + 1))));
+                                ma_previous = ma;
+                                switch (m) {
+                                    case 0: chartData[i].ma1 = ma; break;
+                                    case 1: chartData[i].ma2 = ma; break;
+                                    case 2: chartData[i].ma3 = ma; break;
+                                    case 3: chartData[i].ma4 = ma; break;
+                                    case 4: chartData[i].ma5 = ma; break;
+                                }
+                            }
+                            day++;
+                        }
+                    }
+                    else {
+                        // Simple Moving Average
+                        var day = 1;
+                        var noOfDays = MovingAverageData[m].noOfDays;
+                        var ma_close = 0;
+                        var ma = 0;
+                        var ma_previous = 0;
+                        for (var i = 252; i >= 0; i--) {
+                            if (day < noOfDays) {
+                                ma_close = ma_close + chartData[i].close;
+                            } else if (day == noOfDays) {
+                                ma_close = ma_close + chartData[i].close;
+                                ma = ma_close / noOfDays;
+                                switch (m) {
+                                    case 0: chartData[i].ma1 = ma; break;
+                                    case 1: chartData[i].ma2 = ma; break;
+                                    case 2: chartData[i].ma3 = ma; break;
+                                    case 3: chartData[i].ma4 = ma; break;
+                                    case 4: chartData[i].ma5 = ma; break;
+                                }
+                            } else if (day > noOfDays) {
+                                ma_close = ma_close + chartData[i].close - chartData[i + noOfDays].close;
+                                ma = ma_close / noOfDays;
+                                switch (m) {
+                                    case 0: chartData[i].ma1 = ma; break;
+                                    case 1: chartData[i].ma2 = ma; break;
+                                    case 2: chartData[i].ma3 = ma; break;
+                                    case 3: chartData[i].ma4 = ma; break;
+                                    case 4: chartData[i].ma5 = ma; break;
+                                }
+                            }
+                            day++;
+                        }
+                    }
+                }
+            }
+            // Modify the plot data
+            for (i = 0; i < 252; i++) {
+                if (i <= 125) {
+                    plotData[i].ma1 = AmCharts.roundTo(chartData[125 - i]["ma1"], 2);
+                    plotData[i].ma2 = AmCharts.roundTo(chartData[125 - i]["ma2"], 2);
+                    plotData[i].ma3 = AmCharts.roundTo(chartData[125 - i]["ma3"], 2);
+                    plotData[i].ma4 = AmCharts.roundTo(chartData[125 - i]["ma4"], 2);
+                    plotData[i].ma5 = AmCharts.roundTo(chartData[125 - i]["ma5"], 2);
+                }
+            }
+        }
+    }
+    function plotMovingAverage() {
+        chart.validateData();
+        for (var m = 0; m < 5; m++) {
+            if (MovingAverageData[m].isActive == true) {
+                graphMA[m].title = MovingAverageData[m].description;
+                graphMA[m].lineColor = MovingAverageData[m].color;
+                stockPanel1.showGraph(graphMA[m]);
+            } else {
+                stockPanel1.hideGraph(graphMA[m]);
+            }
+        }
+    }
+    //function createColorEditor(editColumn, colorSource) {
+    //    var grid = editColumn.grid;
+
+    //    grid.formatItem.addHandler(function (s, e) {
+    //        var editRange = grid.editRange,
+    //            column = e.panel.columns[e.col];
+    //        // check whether this is an editing cell of the wanted column
+    //        if (!(e.panel.cellType === wijmo.grid.CellType.Cell && column === editColumn && editRange && editRange.row === e.row && editRange.col === e.col)) {
+    //            return;
+    //        }
+
+    //        // hide standard editor (don't remove!)
+    //        if (e.cell.firstChild) {
+    //            e.cell.firstChild.style.display = 'none';
+    //        }
+
+    //        // add custom editor
+    //        var editorRoot = document.createElement('div');
+    //        var cmb = new wijmo.input.ComboBox(editorRoot, {
+    //            itemsSource: colorSource,
+    //            selectedItem: grid.getCellData(e.row, e.col, false)
+    //        });
+
+    //        e.cell.appendChild(editorRoot);
+
+    //        // cellEditEnding that updates cell with user's input
+    //        var editEndingEH = function (s, args) {
+    //            grid.cellEditEnding.removeHandler(editEndingEH);
+    //            if (!args.cancel) {
+    //                args.cancel = true;
+    //                grid.setCellData(e.row, e.col, cmb.selectedItem);
+    //            }
+    //        };
+
+    //        // subscribe the handler to the cellEditEnding event
+    //        grid.cellEditEnding.addHandler(editEndingEH);
+    //    });
+    //}
+
+    // Earnings
     function openEarnings() {
         $("#EarningsTitle").text(dataSymbol + " Earnings Percentage (%)");
         $('#Earnings').modal({
@@ -1788,6 +2099,8 @@
         );
     }
     function createStockChart(symbol, stockPrice) {
+        document.title = chartSymbol + ' - Magenta Trader'
+
         chart = new AmCharts.AmStockChart();
 
         chart.pathToImages = "/amcharts/amcharts/images/";
@@ -1806,6 +2119,9 @@
 
         // Hidden season yearly data
         while (scannerYearGraph.length > 0) scannerYearGraph.pop();
+
+        // Hidden moving average data
+        while (graphMA.length > 0) graphMA.pop();
 
         // Hidden plotted season yearly data
         while (plottedYearGraphs.length > 0) plottedYearGraphs.pop();
@@ -1868,7 +2184,12 @@
                 ema1: 0,
                 ema2: 0,
                 macd: 0,
-                macdSignal: 0
+                macdSignal: 0,
+                ma1: 0,
+                ma2: 0,
+                ma3: 0,
+                ma4: 0,
+                ma5: 0
             });
 
             dayIndex--;
@@ -1944,7 +2265,7 @@
 
             macd_index++;
         }
-        debugger;
+
         // Compute for the yearly data, e.g., closing price, seasonality, etc.
         var season = 0;
         var season5Year = 0;
@@ -1986,7 +2307,8 @@
 
         // Fill the Plot Data
         var futureDate = new Date((new Date(chartData[0]["date"])).add(1).days());
-        var earningValue = parseFloat(chartData[0]["close"]); // The earning value is set to the latest price.
+        var earningValue = parseFloat(chartData[0]["close"]) * .95; // The earning value is set to the latest price.
+
         for (i = 0; i < 252; i++) {
             var earning = 0;
             if (i > 125) {
@@ -2049,10 +2371,20 @@
                     earnings: earning == 0 ? 'NaN' : earning,
                     volume: chartData[125 - i]["volume"],
                     macd: AmCharts.roundTo(chartData[125 - i]["macd"], 2),
-                    macdSignal: AmCharts.roundTo(chartData[125 - i]["macdSignal"], 2)
+                    macdSignal: AmCharts.roundTo(chartData[125 - i]["macdSignal"], 2),
+                    ma1: 0,
+                    ma2: 0,
+                    ma3: 0,
+                    ma4: 0,
+                    ma5: 0
                 });
             }
         }
+
+        // Compute moving average
+
+        generateMovingAverage();
+        computeMovingAverage();
 
         // AMChart dataset
 
@@ -2119,6 +2451,21 @@
         }, {
             fromField: "macdSignal",
             toField: "macdSignal"
+        }, {
+            fromField: "ma1",
+            toField: "ma1"
+        }, {
+            fromField: "ma2",
+            toField: "ma2"
+        }, {
+            fromField: "ma3",
+            toField: "ma3"
+        }, {
+            fromField: "ma4",
+            toField: "ma4"
+        }, {
+            fromField: "ma5",
+            toField: "ma5"
         }];
         dataSet.dataProvider = plotData;
         dataSet.categoryField = "date";
@@ -2134,7 +2481,6 @@
         stockPanel1.recalculateToPercents = "never";
 
         stockPanel2 = new AmCharts.StockPanel();
-        //stockPanel2.title = "Volume";
         stockPanel2.allowTurningOff = true;
         stockPanel2.percentHeight = 30;
 
@@ -2313,8 +2659,6 @@
         graphVolume.valueField = "volume";
         graphVolume.type = "column";
         graphVolume.useDataSetColors = false;
-        //graphVolume.color = "#9C0063";
-        //graphVolume.lineColor = "#9C0063";
         graphVolume.color = "#FAD3EF";
         graphVolume.lineColor = "#FAD3EF";
         graphVolume.showBalloon = false;
@@ -2344,6 +2688,28 @@
         graphMACDSignal.lineColor = "#C20303";
         graphMACDSignal.showBalloon = false;
         graphMACDSignal.valueAxis = valueAxisMACD;
+
+        // Moving Average
+
+        for (var m = 0; m < 5; m++) {
+            graphMA[m] = new AmCharts.StockGraph();
+            graphMA[m].id = "graphMA" + (m+1).toString();
+            graphMA[m].valueField = "ma" + (m + 1).toString();
+            graphMA[m].title = MovingAverageData[m].description;
+            graphMA[m].useDataSetColors = false;
+            graphMA[m].type = "line";
+            graphMA[m].lineThickness = 1;
+            graphMA[m].visibleInLegend = false;
+            graphMA[m].lineColor = MovingAverageData[m].color;
+            graphMA[m].valueAxis = valueAxisPrice;
+            stockPanel1.addStockGraph(graphMA[m]);
+
+            if (MovingAverageData[m].isActive == true) {
+                stockPanel1.showGraph(graphMA[m]);
+            } else {
+                stockPanel1.hideGraph(graphMA[m]);
+            }
+        }
 
         // AMChart Invisible Graphs, Yearly Seasonality
 
@@ -2388,13 +2754,15 @@
             stockPanel1.hideGraph(scannerYearGraph[y]);
         }
 
-        // Plot the graphs in the panels
+        // Move Average Graph
 
+
+        // Plot the graphs in the panels
+        stockPanel1.addStockGraph(graphVolume);
         stockPanel1.addStockGraph(graphPrice);
         stockPanel1.addStockGraph(graphEarnings);
         stockPanel1.addStockGraph(graphSeason);
         stockPanel1.addStockGraph(graphSeason5Year);
-        stockPanel1.addStockGraph(graphVolume);
         stockPanel1.stockLegend = new AmCharts.StockLegend();
 
         //stockPanel1.addStockGraph(graphVolume);
@@ -2406,10 +2774,12 @@
 
         // AMChart scrollbar settings
 
-        var chartScrollbarSettings = new AmCharts.ChartScrollbarSettings();
-        chartScrollbarSettings.graph = graphPrice;
-        chartScrollbarSettings.graphType = "line";
-        chart.chartScrollbarSettings = chartScrollbarSettings;
+        chart.chartScrollbarSettings.enabled = false;
+
+        //var chartScrollbarSettings = new AmCharts.ChartScrollbarSettings();
+        //chartScrollbarSettings.graph = graphPrice;
+        //chartScrollbarSettings.graphType = "line";
+        //chart.chartScrollbarSettings = chartScrollbarSettings;
 
         // AMChart category axis (x axis) settings
 
@@ -2429,7 +2799,7 @@
         // AMChart period selector
 
         var periodSelector = new AmCharts.PeriodSelector();
-        periodSelector.position = "bottom";
+        periodSelector.position = "top";
         periodSelector.inputFieldsEnabled = false;
         periodSelector.periods = [
         {
@@ -2673,8 +3043,9 @@
             sumOfX2 = sumOfX2 + (X * X);
             sumOfY2 = sumOfY2 + (Y * Y);
         }
-        // NΣXY - (ΣX)(ΣY) / Sqrt([NΣX2 - (ΣX)2][NΣY2 - (ΣY)2])
-        return ((X * sumOfXY) - (sumOfX * sumOfX)) / Math.sqrt((sumOfX2 - (sumOfX * sumOfX)) * (sumOfY2 - (sumOfY * sumOfY)));
+        //r = Σ (xy) / sqrt [ ( Σ x2 ) * ( Σ y2 ) ]
+        // return sumOfXY / Math.sqrt(sumOfX2 * sumOfY2); // Simple 
+        return (sumOfXY - ((sumOfX * sumOfY) / X)) / Math.sqrt(((sumOfX2 - ((sumOfX * sumOfX) / X)) * (sumOfY2 - ((sumOfY * sumOfY) / X)))); // Pearson
     }
     function drawTrendLines(stockPanel, plotData, startIndex, endIndex, upChannelLine, downChannelLine, midChannelLine) {
         var m = 0;
@@ -2692,13 +3063,14 @@
         // Check for the correlation (you only check for the correlation if the data is more than 30 days onward)
         // Move the startIndex if the correlation is greater than 0.8 both ways to that day
         // Recompute the number of days to that day
+        //debugger;
         if (NumberOfDays > 30) {
             var correlationStartIndex = endIndex > 126 ? 126 : endIndex;
             var counter = 0;
             for (var i = correlationStartIndex; i > startIndex - 1; i--) {
                 if (counter > 30) {
                     chartCoefficient = Math.abs(getCorrelation(plotData, i, correlationStartIndex));
-                    if (chartCoefficient < 0.8) {
+                    if (chartCoefficient <= 0.9) {
                         startIndex = i;
                         if (endIndex > 126) {
                             NumberOfDays = 126 - startIndex + 1;
@@ -2710,9 +3082,15 @@
                 }
                 counter++;
             }
+            //debugger;
+        } else {
+            if (startIndex <= 126) {
+                chartCoefficient = Math.abs(getCorrelation(plotData, startIndex, endIndex > 126 ? 126 : endIndex));
+            }
         }
+        //debugger;
         chartChannelNoOfDays = NumberOfDays; // Use to display the number of days in the channel.
-
+        
         // Compute for the slope
         if (endIndex > 126) {
             m = (parseFloat(plotData[125]["close"]) - parseFloat(plotData[startIndex - 1]["close"])) / NumberOfDays;
@@ -2811,6 +3189,7 @@
             }
             $("#symbolSlopePercentage").html("<a href='#' style='padding: 2px 20px'><font color='" + RedColor + "'><span>ADR:</span><span class='pull-right'>" + ADR.toFixed(2) + "%</span></font></a>");
         }
+        
         $("#symbolInfoCoefficient").html("<a href='#' style='padding: 2px 20px'><span>Coefficient:</span><span class='pull-right'>" + chartCoefficient.toFixed(2) + "</span></a>");
         $("#symbolInfoRange").html("<a href='#' style='padding: 2px 20px'><span>Range:</span><span class='pull-right'>" + chartChannelRange.toFixed(2) + "%</span></a>");
 
@@ -3024,7 +3403,7 @@
             if (process == false) {
                 alert("Invalid range of number of days.");
             } else {
-                if (confirm("Compute variable scanner?") == true) {
+                // if (confirm("Compute variable scanner?") == true) {
                     var highestUp = 0;
                     var highestUpAverage = 0;
                     var highestUpIndex = 0;
@@ -3100,7 +3479,7 @@
                     stockPanel1.validateNow();
 
                 } // Compute?
-            } // Process = true?
+            // } // Process = true?
         }  // Chart
     }
 
@@ -3148,6 +3527,10 @@
         // Earnings global variables
 
         PrePostEarningsGrid = new wijmo.grid.FlexGrid('#PrePostEarningsGrid');
+
+        // Moving Average variables
+
+        MovingAverageGrid = new wijmo.grid.FlexGrid('#MovingAverageGrid');
 
         // Tradier Global Variable
 

@@ -193,6 +193,7 @@
       <Column Name="WinLossAverage40" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
       <Column Name="WinLoss60" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Column Name="WinLossAverage60" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
+      <Column Name="CorrelationCoefficient30" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
       <Association Name="MstSymbol_TrnStockPrice" Member="TrnStockPrices" ThisKey="Id" OtherKey="SymbolId" Type="TrnStockPrice" />
       <Association Name="MstSymbol_TrnStockEarning" Member="TrnStockEarnings" ThisKey="Id" OtherKey="SymbolId" Type="TrnStockEarning" />
     </Type>

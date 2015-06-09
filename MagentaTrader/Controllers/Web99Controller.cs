@@ -10,7 +10,8 @@ namespace MagentaTrader.Controllers
     {
         //
         // GET: /Web99/
-        [Authorize]
+        //[Authorize]
+        [Authorize(Roles = "Web99")]
         public ActionResult Index()
         {
             return View();
