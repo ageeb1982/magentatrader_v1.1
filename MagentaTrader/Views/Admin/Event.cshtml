@@ -448,12 +448,12 @@
    $(document).ready(function () {
 
        $('#CmdEventEditOk').click(function () {
-           if (FormValidate() == true) {
+           //if (FormValidate() == true) {
                CmdEventEditOkFunction();
-               $('#EventEdit').modal('hide');
-           }
-           else
-               toastr.error('Fill in the required fields.')
+               //$('#EventEdit').modal('hide');
+           //}
+           //else
+               //toastr.error('Fill in the required fields.')
        });
 
        $('#CmdEventEditCancel, .close').click(function () {
@@ -472,10 +472,10 @@
 
         Events = new wijmo.collections.CollectionView(GetEvents());
 
-        Events.sortDescriptions.push(new wijmo.collections.SortDescription("EventDate", 'true'));
-        Events.sortDescriptions.push(new wijmo.collections.SortDescription("EventDescription", 'true'));
-        Events.sortDescriptions.push(new wijmo.collections.SortDescription("Particulars", 'true'));
-        Events.sortDescriptions.push(new wijmo.collections.SortDescription("EventType", 'true'));
+        //Events.sortDescriptions.push(new wijmo.collections.SortDescription("EventDate", 'true'));
+        //Events.sortDescriptions.push(new wijmo.collections.SortDescription("EventDescription", 'true'));
+        //Events.sortDescriptions.push(new wijmo.collections.SortDescription("Particulars", 'true'));
+        //Events.sortDescriptions.push(new wijmo.collections.SortDescription("EventType", 'true'));
         
         EventGrid = new wijmo.grid.FlexGrid('#EventGrid');
 
@@ -498,46 +498,44 @@
                         {
                             "header": "Date",
                             "binding": "EventDate",
-                            "allowSorting": true,
-                            "width": 80
+                            "allowSorting": false,
+                            "width": 100
                         },
                         {
                             "header": "Event",
                             "binding": "EventDescription",
-                            "allowSorting": true,
+                            "allowSorting": false,
                             "width": "4*"
                         },
                         {
                             "header": "Particulars",
                             "binding": "Particulars",
-                            "allowSorting": true,
+                            "allowSorting": false,
                             "width": "4*"
                         },
                         {
                             "header": "Type",
                             "binding": "EventType",
-                            "allowSorting": true,
+                            "allowSorting": false,
                             "width": 80
                         },
                         {
                             "header": "URL",
                             "binding": "URL",
-                            "allowSorting": true,
+                            "allowSorting": false,
                             "width": "4*"
                         },
                         {
                             "header": "Video URL",
                             "binding": "VideoURL",
-                            "allowSorting": true,
+                            "allowSorting": false,
                             "width": "4*"
                         }
             ],
             autoGenerateColumns: false,
             itemsSource: Events,
             isReadOnly: true,
-            selectionMode: wijmo.grid.SelectionMode.Row,
-            allowSorting: true,
-            showSort: true
+            selectionMode: wijmo.grid.SelectionMode.Row
         });
 
         EventGrid.trackChanges = true;

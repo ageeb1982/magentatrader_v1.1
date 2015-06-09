@@ -28,7 +28,7 @@ namespace MagentaTrader.Controllers
                                  select new Models.Event
                                  {
                                      Id = d.Id,
-                                     EventDate = d.EventDate.ToShortDateString(),
+                                     EventDate = Convert.ToString(d.EventDate.Year) + "-" + Convert.ToString(d.EventDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EventDate.Day + 100).Substring(1, 2),
                                      EventDescription = d.EventDescription,
                                      Particulars = d.Particulars,
                                      URL = d.URL,
