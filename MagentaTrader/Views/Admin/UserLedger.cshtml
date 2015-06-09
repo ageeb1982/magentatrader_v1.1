@@ -112,8 +112,11 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-6">
                 <h4>Purchases</h4>
+            </div>
+            <div class="col-lg-6">
+                <button class="btn btn-primary pull-right" id="SaveUserLedger">Save Ledger</button>
             </div>
         </div>
         <div class="row">
@@ -197,6 +200,10 @@
 
     var Sales;
 
+    var TotalAmount;
+
+    var UserLedgerSaveData = [];
+
     var btnFirstPageUser;
     var btnPreviousPageUser;
     var btnNextPageUser;
@@ -249,7 +256,7 @@
     function GetPurchases() {
 
         var purchases = new wijmo.collections.ObservableArray();
-        var username = GetValue('user')
+        var username = GetValue('user');
         var Amount = 0;
 
         $.ajax({
@@ -274,7 +281,10 @@
                             Price: Results[i]["Price"]
                         });
                     }
+
+                    TotalAmount = Amount;
                     $("#AmountTotal").text("Total Amount: " + (Amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
+                    
                 } else {
                     alert("No Purchases");
                 }
@@ -284,6 +294,9 @@
                 alert(err);
             }
         );
+
+        while (UserLedgerSaveData.length > 0) UserLedgerSaveData.pop();
+        UserLedgerSaveData = purchases;
 
         return purchases;
     }
@@ -424,7 +437,80 @@
         btnCurrentPageUser.innerHTML = (Sales.pageIndex + 1) + ' / ' + Sales.pageCount;
     }
 
-    $(document).ready(function() {
+    function CmdSaveXLS_OnClick() {
+        var ULR = '';
+        var record = [];
+
+        for (i = 0; i < UserLedgerSaveData.length; i++) {
+            record.push({
+                SalesDate: UserLedgerSaveData[i].SalesDate,
+                SalesNumber: UserLedgerSaveData[i].SalesNumber,
+                ProductPackage: UserLedgerSaveData[i].ProductPackage,
+                Price: UserLedgerSaveData[i].Price
+            });
+        }
+
+        ULR += 'User Ledger Record' + '\r\n\n';
+
+        var recordLabelRow = '';
+        for (var s in record[0]) {
+            recordLabelRow += s + ',';
+        }
+        recordLabelRow = recordLabelRow.slice(0, -1);
+        ULR += recordLabelRow + '\r\n';
+
+        for (var i = 0; i < record.length; i++) {
+            var recordRow = '';
+            for (var s in record[i]) {
+                recordRow += '"' + record[i][s] + '",';
+            }
+            recordRow.slice(0, recordRow.length - 1);
+            ULR += recordRow + '\r\n';
+        }
+
+        ULR += '\r\n' + 'Total: ' + TotalAmount;
+
+        if (ULR == '') {
+            alert("No data");
+            return;
+        }
+
+        // Create filename
+
+        var $firstName = document.getElementById('FirstName').value;
+        var $lastName = document.getElementById('LastName').value;
+        var $userName = document.getElementById('Username').value;
+
+        var fileName = 'magenta_UserLegder_' + $firstName + '_' + $lastName + '_' + $userName + '_' + '.CSV';
+
+        // Download via <a> link
+
+        var link = document.createElement("a");
+
+        if (link.download !== undefined) {
+            var blob = new Blob([ULR], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style = "visibility:hidden";
+        }
+
+        if (navigator.msSaveBlob) {
+            link.addEventListener("click", function (event) {
+                var blob = new Blob([ULR], {
+                    "type": "text/csv;charset=utf-8;"
+                });
+                navigator.msSaveBlob(blob, fileName);
+            }, false);
+        }
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    }
+
+    $(document).ready(function () {
         GetUserLedger();
         
         Sales = new wijmo.collections.CollectionView(GetPurchases());
@@ -438,6 +524,10 @@
                 show: true,
                 backdrop: false
             });
+        });
+
+        $('#SaveUserLedger').click(function () {
+            CmdSaveXLS_OnClick();
         });
 
         SalesGrid.initialize({

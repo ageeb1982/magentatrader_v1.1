@@ -371,10 +371,6 @@
         btnCurrentPageUser = document.getElementById('btnCurrentPageUser');
 
         Users = new wijmo.collections.CollectionView(GetUsers());
-
-        Users.sortDescriptions.push(new wijmo.collections.SortDescription("UserName", 'true'));
-        Users.sortDescriptions.push(new wijmo.collections.SortDescription("FirstName", 'true'));
-        Users.sortDescriptions.push(new wijmo.collections.SortDescription("LastName", 'true'));
         
         UserGrid = new wijmo.grid.FlexGrid('#UserGrid');
 

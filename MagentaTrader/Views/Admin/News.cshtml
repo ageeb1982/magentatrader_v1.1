@@ -407,10 +407,6 @@
 
         News = new wijmo.collections.CollectionView(GetNews());
 
-        News.sortDescriptions.push(new wijmo.collections.SortDescription("NewsDate", 'true'));
-        News.sortDescriptions.push(new wijmo.collections.SortDescription("NewsDescription", 'true'));
-        News.sortDescriptions.push(new wijmo.collections.SortDescription("Particulars", 'true'));
-
         NewsGrid = new wijmo.grid.FlexGrid('#NewsGrid');
 
         NewsGrid.initialize({

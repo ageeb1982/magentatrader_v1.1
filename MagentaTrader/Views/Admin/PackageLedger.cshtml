@@ -147,8 +147,14 @@
             <div class="col-lg-6">
                 <h4 id="usersTotal"></h4>
             </div>
+            @*<div class="col-lg-3">
+                <button class="btn btn-primary pull-right" id="SavePackageLedger">Save Ledger</button>
+            </div>*@
             <div class="col-lg-6">
-                <button id="CmdAddProductPackage" type="submit" class="btn btn-primary pull-right" onclick="CmdSaleAdd_OnClick()">Add</button>
+                <button id="CmdAddProductPackage" type="submit" class="btn btn-primary pull-right" onclick="CmdSaleAdd_OnClick()" style="margin-left: 8px;">
+                    Add
+                </button>
+                <button class="btn btn-primary pull-right" id="SavePackageLedger">Save Ledger</button>
             </div>
         </div>
         <div class="row">
@@ -283,6 +289,8 @@
 
     var Sales;
 
+    var TotalAmount;
+
     var SaleDate;
     var SaleRenewalDate;
     var SaleExpiryDate;
@@ -298,6 +306,8 @@
 
     var UserList;
     var ProductPackageList;
+
+    var PackageLedgerSaveData = [];
 
     // get product id from url
     function GetValue(value) {
@@ -391,6 +401,7 @@
                             IsRefunded: Results[i]["IsRefunded"]
                         })
                     }
+                    TotalAmount = Amount;
                     $("#AmountTotal").text("Total Amount: " + (Amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
                 } else {
                     alert("No Purchasers");
@@ -401,6 +412,8 @@
                 alert(err);
             }
         );
+        while (PackageLedgerSaveData.length > 0) PackageLedgerSaveData.pop();
+        PackageLedgerSaveData = purchasers;
 
         return purchasers;
     }
@@ -872,6 +885,82 @@
         "tapToDismiss": false
     }
 
+    function CmdSaveXLS_OnClick() {
+        var PLR = '';
+        var record = [];
+
+        for (i = 0; i < PackageLedgerSaveData.length; i++) {
+            record.push({
+                SalesDate: PackageLedgerSaveData[i].SalesDate,
+                SalesNumber: PackageLedgerSaveData[i].SalesNumber,
+                User: PackageLedgerSaveData[i].User,
+                LastName: PackageLedgerSaveData[i].LastName,
+                FirstName: PackageLedgerSaveData[i].FirstName,
+                EmailAddress: PackageLedgerSaveData[i].EmailAddress,
+                PhoneNumber: PackageLedgerSaveData[i].PhoneNumber,
+                Price: PackageLedgerSaveData[i].Price,
+            });
+        }
+
+        PLR += 'Package Ledger Record' + '\r\n\n';
+
+        var recordLabelRow = '';
+        for (var s in record[0]) {
+            recordLabelRow += s + ',';
+        }
+        recordLabelRow = recordLabelRow.slice(0, -1);
+        PLR += recordLabelRow + '\r\n';
+
+        for (var i = 0; i < record.length; i++) {
+            var recordRow = '';
+            for (var s in record[i]) {
+                recordRow += '"' + record[i][s] + '",';
+            }
+            recordRow.slice(0, recordRow.length - 1);
+            PLR += recordRow + '\r\n';
+        }
+
+        PLR += '\r\n' + 'Total: ' + TotalAmount;
+
+        if (PLR == '') {
+            alert("No data");
+            return;
+        }
+
+        // Create filename
+
+        var $productPackage = document.getElementById('ProductPackage').value;
+        var $price = document.getElementById('Price').value;
+
+        var fileName = 'magenta_PackageLegder_' + $productPackage + '_' + $price + '_' + '.CSV';
+
+        // Download via <a> link
+
+        var link = document.createElement("a");
+
+        if (link.download !== undefined) {
+            var blob = new Blob([PLR], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style = "visibility:hidden";
+        }
+
+        if (navigator.msSaveBlob) {
+            link.addEventListener("click", function (event) {
+                var blob = new Blob([PLR], {
+                    "type": "text/csv;charset=utf-8;"
+                });
+                navigator.msSaveBlob(blob, fileName);
+            }, false);
+        }
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    }
+
     $(document).ready(function () {
         GetProductLedger();
 
@@ -892,20 +981,15 @@
             $('#SaleEdit').modal('hide');
         });
 
+        $('#SavePackageLedger').click(function () {
+            CmdSaveXLS_OnClick();
+        });
+
         Sales = new wijmo.collections.CollectionView(GetPackageUsers());
         UserList = new wijmo.collections.CollectionView(getUsers());
         ProductPackageList = new wijmo.collections.CollectionView(getProductPackage());
         
         SalesGrid = new wijmo.grid.FlexGrid('#PurchasersLedgerGrid');
-
-        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("SalesDate", 'true'));
-        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("User", 'true'));
-        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("FirstName", 'true'));
-        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("LastName", 'true'));
-        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("EmailAddress", 'true'));
-        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("PhoneNumber", 'true'));
-        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("Price", 'true'));
-        Sales.sortDescriptions.push(new wijmo.collections.SortDescription("SalesNumber", 'true'));
 
         SalesGrid.initialize({
             columns: [

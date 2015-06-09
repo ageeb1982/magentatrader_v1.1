@@ -510,12 +510,6 @@
 
         ProductPackages = new wijmo.collections.CollectionView(GetProductPackages());
 
-        ProductPackages.sortDescriptions.push(new wijmo.collections.SortDescription("ProductPackageDescription", 'true'));
-        ProductPackages.sortDescriptions.push(new wijmo.collections.SortDescription("SKU", 'true'));
-        ProductPackages.sortDescriptions.push(new wijmo.collections.SortDescription("Price", 'true'));
-        ProductPackages.sortDescriptions.push(new wijmo.collections.SortDescription("Product", 'true'));
-        ProductPackages.sortDescriptions.push(new wijmo.collections.SortDescription("Particulars", 'true'));
-
         ProductPackageGrid = new wijmo.grid.FlexGrid('#ProductPackageGrid');
 
         ProductList = new wijmo.collections.CollectionView(getProducts());

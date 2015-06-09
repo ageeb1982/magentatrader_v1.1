@@ -120,11 +120,11 @@
                         </dd>
                         <dt>URL</dt>
                         <dd>
-                            <input class="form-control" id="EventEdit_URL" name="EventEdit_URL" required placeholder="https://sample.com"/>
+                            <input class="form-control" id="EventEdit_URL" name="EventEdit_URL" required maxlength="250"/>
                         </dd>
                         <dt>Video URL</dt>
                         <dd>
-                            <input class="form-control" id="EventEdit_VideoURL" name="EventEdit_VideoURL" type="url" />
+                            <input class="form-control" id="EventEdit_VideoURL" name="EventEdit_VideoURL" />
                         </dd>
                         <dt>Type</dt>
                         <dd>
@@ -198,6 +198,7 @@
 
         var Event = Events.currentEditItem;
         document.getElementById('EventEdit_Id').value = Event.Id !== null && typeof (Event.Id) != 'undefined' ? wijmo.Globalize.format(Event.Id) : '';
+        debugger;
         document.getElementById('EventEdit_EventDate').value = Event.EventDate ? Event.EventDate : '';
         document.getElementById('EventEdit_EventDate_Data').value = Event.EventDate ? Event.EventDate : '';
         document.getElementById('EventEdit_EventDescription').value = Event.EventDescription ? Event.EventDescription : '';
@@ -208,14 +209,18 @@
         document.getElementById('EventEdit_IsRestricted').checked = Event.IsRestricted;
         document.getElementById('EventEdit_IsArchived').checked = Event.IsArchived;
 
+        var splitDate = Event.EventDate.split("-");
+
         EventDate.dispose();
         EventDate = new wijmo.input.InputDate('#EventEdit_EventDate', {
             format: 'MM/dd/yyyy',
-            value: new Date(Event.EventDate),
+            value: new Date(splitDate[0], splitDate[1] - 1, splitDate[2]),
             onValueChanged: function () {
-                document.getElementById('EventEdit_EventDate_Data').value = this.value.toString("M/d/yyyy");
+                document.getElementById('EventEdit_EventDate_Data').value = this.value.toString("MM/dd/yyyy");
             }
         });
+        //from = $("#datepicker").val().split("-");
+        //f = new Date(from[2], from[1] - 1, from[0]);
     }
     function CmdEventAdd_OnClick() {
         $('#EventEdit').modal({
@@ -226,8 +231,8 @@
         var CurrentDate = new Date();
 
         document.getElementById('EventEdit_Id').value = 0;
-        document.getElementById('EventEdit_EventDate').value = CurrentDate.toString("M/d/yyyy");
-        document.getElementById('EventEdit_EventDate_Data').value = CurrentDate.toString("M/d/yyyy");
+        document.getElementById('EventEdit_EventDate').value = CurrentDate.toString("MM/dd/yyyy");
+        document.getElementById('EventEdit_EventDate_Data').value = CurrentDate.toString("MM/dd/yyyy");
         document.getElementById('EventEdit_EventDescription').value = "";
         document.getElementById('EventEdit_Particulars').value = "";
         document.getElementById('EventEdit_URL').value = "";
@@ -238,10 +243,10 @@
 
         EventDate.dispose();
         EventDate = new wijmo.input.InputDate('#EventEdit_EventDate', {
-            format: 'M/d/yyyy',
+            format: 'MM/dd/yyyy',
             value: new Date(Event.EventDate),
             onValueChanged: function () {
-                document.getElementById('EventEdit_EventDate_Data').value = this.value.toString("M/d/yyyy");
+                document.getElementById('EventEdit_EventDate_Data').value = this.value.toString("MM/dd/yyyy");
             }
         });
     }
@@ -448,12 +453,12 @@
    $(document).ready(function () {
 
        $('#CmdEventEditOk').click(function () {
-           //if (FormValidate() == true) {
+           if (FormValidate() == true) {
                CmdEventEditOkFunction();
-               //$('#EventEdit').modal('hide');
-           //}
-           //else
-               //toastr.error('Fill in the required fields.')
+               $('#EventEdit').modal('hide');
+           }
+           else
+               toastr.error('Fill in the required fields.')
        });
 
        $('#CmdEventEditCancel, .close').click(function () {
@@ -471,11 +476,6 @@
         btnCurrentPageEvent = document.getElementById('btnCurrentPageEvent');
 
         Events = new wijmo.collections.CollectionView(GetEvents());
-
-        //Events.sortDescriptions.push(new wijmo.collections.SortDescription("EventDate", 'true'));
-        //Events.sortDescriptions.push(new wijmo.collections.SortDescription("EventDescription", 'true'));
-        //Events.sortDescriptions.push(new wijmo.collections.SortDescription("Particulars", 'true'));
-        //Events.sortDescriptions.push(new wijmo.collections.SortDescription("EventType", 'true'));
         
         EventGrid = new wijmo.grid.FlexGrid('#EventGrid');
 
@@ -498,37 +498,37 @@
                         {
                             "header": "Date",
                             "binding": "EventDate",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": 100
                         },
                         {
                             "header": "Event",
                             "binding": "EventDescription",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         },
                         {
                             "header": "Particulars",
                             "binding": "Particulars",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         },
                         {
                             "header": "Type",
                             "binding": "EventType",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": 80
                         },
                         {
                             "header": "URL",
                             "binding": "URL",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         },
                         {
                             "header": "Video URL",
                             "binding": "VideoURL",
-                            "allowSorting": false,
+                            "allowSorting": true,
                             "width": "4*"
                         }
             ],
@@ -541,9 +541,13 @@
         EventGrid.trackChanges = true;
 
         Events.pageSize = 15;
+       
+        Events.collectionChanged.addHandler(function (sender, args) {
+            UpdateNavigateButtonsEvent();
+        });
 
         EventDate = new wijmo.input.InputDate('#EventEdit_EventDate', {
-            format: 'M/d/yyyy',
+            format: 'MM/dd/yyyy',
             value: new Date()
         });
 
