@@ -524,7 +524,7 @@
         SaleDate.dispose();
         SaleDate = new wijmo.input.InputDate('#SaleEdit_SaleDate', {
             format: 'M/d/yyyy',
-            value: new Date(Sales.SaleDate),
+            value: new Date(Sales.SalesDate),
             onValueChanged: function () {
                 document.getElementById('SaleEdit_SaleDate_Data').value = this.value.toString("M/d/yyyy");
             }
