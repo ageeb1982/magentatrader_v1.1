@@ -161,6 +161,7 @@
                             <li id=symbolSlopePercentage></li>
                             <li id=symbolInfoCoefficient></li>
                             <li id=symbolInfoRange></li>
+                            <li id=symbolInfoSeasonalityCorrelation></li>
                         </ul>
                     </li>
                     <li class="sidebar-item">
@@ -441,12 +442,58 @@
                 <h4 id="TradierOptionChainTitle" class="modal-title"></h4>
             </div>
             <div class="modal-body">
-
+                <div>
+                    <div class="col-lg-4">
+                        <p>Expiration Dates</p>
+                        <select class="form-control custom-width" id="optionExpirationDates" onchange="createOptionChain();"></select>
+                    </div>
+                    <div class="col-lg-2">
+                        <p>No of days</p>
+                        <input type="text" class="form-control" id="optionTime" placeholder="30 Day(s)">
+                    </div>
+                    <div class="col-lg-2">
+                        <p>Target Price</p>
+                        <input type="text" class="form-control" id="optionTargePrice" placeholder="Current Price">
+                    </div>
+                    <div class="col-lg-2">
+                        <p>Volatility</p>
+                        <input type="text" class="form-control" id="optionVolatility" placeholder="20%">
+                    </div>
+                    <div class="col-lg-2">
+                        <p>Interest</p>
+                        <input type="text" class="form-control" id="optionRate" placeholder="5%">
+                    </div>
+                </div>
+                <div>&nbsp;</div>
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#OptionCall">Calls</a></li>
+                    <li><a data-toggle="tab" href="#OptionPut">Puts</a></li>
+                </ul>
+                <div id="OptionChainTab" class="tab-content">
+                    <div id="OptionCall" class="tab-pane active">
+                        <div id="OptionCallGrid" class="grid"></div>
+                    </div>
+                    <div id="OptionPut" class="tab-pane">
+                        <div id="OptionPutGrid" class="grid"></div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">
-                    Close
-                </button>
+                <span class='pull-left'>
+                    <span>
+                        <button type="button" class="btn btn-primary" id="plotCalls" onclick="plotCallOptionChain()">
+                            Plot Calls
+                        </button>
+                        <button type="button" class="btn btn-primary" id="plotPuts" onclick="plotPutOptionChain()">
+                            Plot Puts
+                        </button>
+                    </span>
+                </span>
+                <span class='pull-right'>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        Close
+                    </button>
+                </span>
             </div>
         </div>
     </div>
@@ -492,6 +539,9 @@
 <script src="/wijmo/controls/wijmo.input.min.js"></script>
 @*<script src="/wijmo/interop/knockout/wijmo.knockout.min.js"></script>*@
 
+<script src="/js/simple_statistics.js"></script>
+<script src="/js/black_scholes.js"></script>
+
 <script type="text/javascript">
     // Modal
     var pleaseWaitDiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h1>Processing...</h1></div><div class="modal-body"><div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div></div></div>');
@@ -505,6 +555,7 @@
     var chart;
     var stockPanel1;
     var stockPanel2;
+    var chartEvent1;
 
     // Constant colors
     var seasonColor = "#F0F004";
@@ -556,6 +607,7 @@
     var chartSlopePercentage = 0;
     var chartCoefficient = 0;
     var chartChannelRange = 0;
+    var chartSeasonalityCorrelation = 0;
 
     // Earning variables
 
@@ -568,6 +620,16 @@
     var TradierUserProfileGrid;
     var TradierOrdersGrid;
     var TradierPositionsGrid;
+
+    // Options
+
+    var OptionCallGrid;
+    var OptionPutGrid;
+    var sortedDataCalls;
+    var sortedDataPuts;
+    var trendStrike = [];
+    var guideRiskReward = [];
+    var trendTarget;
 
     // Moving Average
 
@@ -1154,15 +1216,441 @@
 
     // Tradier Buy Option
     function openTradierOptionChain() {
+
         if (TradierAccessToken != "") {
             $('#TradierOptionChain').modal({
                 show: true,
                 backdrop: false
             });
             $("#TradierOptionChainTitle").text(dataSymbol + " Option Chain");
+            $('#optionExpirationDates').empty();
+            $('#OptionCallGrid').empty();
+            $('#OptionPutGrid').empty();
+            $.ajax({
+                url: '/api/GetTradierOptionExpiration/' + dataSymbol + '/' + TradierAccessToken,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (result) {
+                    if (result.expirations.date.length > 0) {
+                        for (var i = 0; i < result.expirations.date.length; i++) {
+                            $('#optionExpirationDates').append("<option value='" + result.expirations.date[i] + "'>" + result.expirations.date[i] + "</option>");
+                        }
+                    }
+                }
+            });
         } else {
             alert("No Tradier connection.");
         }
+    }
+    function createOptionChain() {
+        var expirationDate = document.getElementById("optionExpirationDates").value;
+        $.ajax({
+            url: '/api/GetTradierOptionChain/' + dataSymbol + '/' + expirationDate + '/' + TradierAccessToken,
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            data: {},
+            success: function (result) {
+                var dataCalls = [];
+                var dataPuts = new wijmo.collections.ObservableArray();
+
+                for (var i = 0; i < result.options.option.length; i++) {
+                    if (result.options.option[i].option_type == "call") {
+                        dataCalls.push({
+                            symbol: result.options.option[i].symbol,
+                            description: result.options.option[i].description,
+                            type: result.options.option[i].type,
+                            last: result.options.option[i].last,
+                            change: result.options.option[i].change,
+                            volume: result.options.option[i].volume,
+                            bid: result.options.option[i].bid,
+                            bidsize: result.options.option[i].bidsize,
+                            ask: result.options.option[i].ask,
+                            asksize: result.options.option[i].asksize,
+                            open_interest: result.options.option[i].open_interest,
+                            strike: result.options.option[i].strike,
+                            contract_size: result.options.option[i].contract_size,
+                            expiration_date: result.options.option[i].expiration_date,
+                            expiration_type: result.options.option[i].expiration_type,
+                            option_type: result.options.option[i].option_type,
+                            root_symbol: result.options.option[i].root_symbol
+                        })
+                    } else {
+                        dataPuts.push({
+                            symbol: result.options.option[i].symbol,
+                            description: result.options.option[i].description,
+                            type: result.options.option[i].type,
+                            last: result.options.option[i].last,
+                            change: result.options.option[i].change,
+                            volume: result.options.option[i].volume,
+                            bid: result.options.option[i].bid,
+                            bidsize: result.options.option[i].bidsize,
+                            ask: result.options.option[i].ask,
+                            asksize: result.options.option[i].asksize,
+                            open_interest: result.options.option[i].open_interest,
+                            strike: result.options.option[i].strike,
+                            contract_size: result.options.option[i].contract_size,
+                            expiration_date: result.options.option[i].expiration_date,
+                            expiration_type: result.options.option[i].expiration_type,
+                            option_type: result.options.option[i].option_type,
+                            root_symbol: result.options.option[i].root_symbol
+                        })
+                    }
+                }
+
+                dataCalls.sort(function compare(a, b) {
+                    if (a.strike < b.strike)
+                        return -1;
+                    if (a.strike > b.strike)
+                        return 1;
+                    return 0;
+                });
+
+                dataPuts.sort(function compare(a, b) {
+                    if (a.strike < b.strike)
+                        return -1;
+                    if (a.strike > b.strike)
+                        return 1;
+                    return 0;
+                });
+
+                sortedDataCalls = new wijmo.collections.ObservableArray();
+                sortedDataPuts = new wijmo.collections.ObservableArray();
+
+                sortedDataCalls = extractOptionChain(dataCalls);
+                sortedDataPuts = extractOptionChain(dataPuts);
+
+                // Call Grid
+                var Calls = new wijmo.collections.CollectionView(sortedDataCalls);
+
+                OptionCallGrid.dispose();
+                OptionCallGrid = new wijmo.grid.FlexGrid('#OptionCallGrid');
+
+                OptionCallGrid.initialize({
+                    columns: [
+                                {
+                                    "header": "Description",
+                                    "binding": "description",
+                                    "width": "*",
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Bid",
+                                    "binding": "bid",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Ask",
+                                    "binding": "ask",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Last",
+                                    "binding": "last",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Change",
+                                    "binding": "change",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Vol.",
+                                    "binding": "volume",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Op Int.",
+                                    "binding": "open_interest",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Strike",
+                                    "binding": "strike",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                }
+                    ],
+                    autoGenerateColumns: false,
+                    itemsSource: Calls,
+                    isReadOnly: true,
+                    selectionMode: wijmo.grid.SelectionMode.Row
+                });
+
+                OptionCallGrid.trackChanges = true;
+
+                Calls.pageSize = 10;
+
+                // Put Grid
+                var Puts = new wijmo.collections.CollectionView(sortedDataPuts);
+
+                OptionPutGrid.dispose();
+                OptionPutGrid = new wijmo.grid.FlexGrid('#OptionPutGrid');
+
+                OptionPutGrid.initialize({
+                    columns: [
+                                {
+                                    "header": "Description",
+                                    "binding": "description",
+                                    "width": "*",
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Bid",
+                                    "binding": "bid",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Ask",
+                                    "binding": "ask",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Last",
+                                    "binding": "last",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Change",
+                                    "binding": "change",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Vol.",
+                                    "binding": "volume",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Op Int.",
+                                    "binding": "open_interest",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                },
+                                {
+                                    "header": "Strike",
+                                    "binding": "strike",
+                                    "width": 100,
+                                    "isContentHtml": true
+                                }
+                    ],
+                    autoGenerateColumns: false,
+                    itemsSource: Puts,
+                    isReadOnly: true,
+                    selectionMode: wijmo.grid.SelectionMode.Row
+                });
+
+                OptionPutGrid.trackChanges = true;
+
+                Puts.pageSize = 10;
+            }
+        });
+    }
+    function extractOptionChain(chain) {
+        var sortedChain = new wijmo.collections.ObservableArray();
+        var counter = 0;
+        for (var i = 0; i < chain.length; i++) {
+            if (chain[i].strike > plotData[125].close) {
+                if (counter == 0) {
+                    var index = new Array(6);
+                    var backCounter = 0;
+                    for (var b = i; b >= 0; b--) {
+                        index[5 - backCounter] = b;
+                        backCounter++;
+                        if (backCounter > 5) break;
+                    }
+                    for (var b = 0; b < index.length; b++) {
+                        sortedChain.push({
+                            symbol: chain[index[b]].symbol,
+                            description: chain[index[b]].description,
+                            type: chain[index[b]].type,
+                            last: chain[index[b]].last,
+                            change: chain[index[b]].change,
+                            volume: chain[index[b]].volume,
+                            bid: chain[index[b]].bid,
+                            bidsize: chain[index[b]].bidsize,
+                            ask: chain[index[b]].ask,
+                            asksize: chain[index[b]].asksize,
+                            open_interest: chain[index[b]].open_interest,
+                            strike: chain[index[b]].strike,
+                            contract_size: chain[index[b]].contract_size,
+                            expiration_date: chain[index[b]].expiration_date,
+                            expiration_type: chain[index[b]].expiration_type,
+                            option_type: chain[index[b]].option_type,
+                            root_symbol: chain[index[b]].root_symbol
+                        })
+                    }
+                } else {
+                    sortedChain.push({
+                        symbol: chain[i].symbol,
+                        description: chain[i].description,
+                        type: chain[i].type,
+                        last: chain[i].last,
+                        change: chain[i].change,
+                        volume: chain[i].volume,
+                        bid: chain[i].bid,
+                        bidsize: chain[i].bidsize,
+                        ask: chain[i].ask,
+                        asksize: chain[i].asksize,
+                        open_interest: chain[i].open_interest,
+                        strike: chain[i].strike,
+                        contract_size: chain[i].contract_size,
+                        expiration_date: chain[i].expiration_date,
+                        expiration_type: chain[i].expiration_type,
+                        option_type: chain[i].option_type,
+                        root_symbol: chain[i].root_symbol
+                    })
+                }
+
+                counter++;
+            }
+            if (counter > 4) break;
+        }
+        return sortedChain;
+    }
+    function plotCallOptionChain() {
+        var callColor = "#00B92C";
+        // Remove existing plot
+        for (var i = 0; i < trendStrike.length; i++) {
+            stockPanel1.removeTrendLine(trendStrike[i]);
+        }
+        for (var i = 0; i < guideRiskReward.length; i++) {
+            stockPanel1.valueAxes[1].removeGuide(guideRiskReward[i]);
+        }
+        stockPanel1.validateNow();
+        // Compute for the max
+        var maxVolume = 0;
+        for (var i = 0; i < sortedDataCalls.length; i++) {
+            if ((sortedDataCalls[i].volume + sortedDataCalls[i].open_interest) > maxVolume) {
+                maxVolume = sortedDataCalls[i].volume + sortedDataCalls[i].open_interest;
+            }
+        }
+        // Plot
+        if (maxVolume > 0) {
+            var $optionTime = document.getElementById('optionTime').value;
+            var $optionTargePrice = document.getElementById('optionTargePrice').value;
+            var $optionVolatility = document.getElementById('optionVolatility').value;
+            var $optionRate = document.getElementById('optionRate').value;
+
+            $optionTime = !$optionTime ? 0.10 : $optionTime / 360; // Annualize
+            $optionTargePrice = !$optionTargePrice ? plotData[125]["close"] : $optionTargePrice;
+            $optionVolatility = !$optionVolatility ? 0.20 : $optionVolatility / 100; // Percentage
+            $optionRate = !$optionRate ? 0.05 : $optionRate / 100; // Percentage
+
+            for (var i = 0; i < sortedDataCalls.length; i++) {
+                var volumeLength = parseInt(((sortedDataCalls[i].volume + sortedDataCalls[i].open_interest) / maxVolume) * 30);
+                trendStrike[i] = new AmCharts.TrendLine();
+                trendStrike[i].lineColor = callColor;
+                trendStrike[i].initialDate = plotData[126]["date"];
+                trendStrike[i].finalDate = plotData[126 + volumeLength]["date"];
+                trendStrike[i].initialValue = sortedDataCalls[i].strike;
+                trendStrike[i].finalValue = sortedDataCalls[i].strike;
+                trendStrike[i].lineThickness = 10;
+                trendStrike[i].lineAlpha = 0.5;
+                stockPanel1.addTrendLine(trendStrike[i]);
+
+                var option_price = black_scholes.calculate(false, $optionTargePrice, sortedDataCalls[i].strike, $optionRate, $optionTime, $optionVolatility);
+                var change = option_price - sortedDataCalls[i].last;
+                var percentage = (change / option_price) * 100;
+
+                guideRiskReward[i] = new AmCharts.Guide();
+                guideRiskReward[i].lineColor = callColor;
+                guideRiskReward[i].date = plotData[126]["date"];
+                guideRiskReward[i].label = sortedDataCalls[i].description + ":" + AmCharts.roundTo(option_price, 2).toString() + "(" + AmCharts.roundTo(change, 2).toString() + ") " + AmCharts.roundTo(percentage, 2) + "%   ";
+                guideRiskReward[i].color = callColor;
+                guideRiskReward[i].value = sortedDataCalls[i].strike;
+                guideRiskReward[i].inside = true;
+                stockPanel1.valueAxes[1].addGuide(guideRiskReward[i]);
+            }
+            chartEvent1.date = plotData[125 + parseInt($optionTime * 360)]["date"];
+            chartEvent1.backgroundColor = callColor;
+            chartEvent1.color = "#FFFFFF";
+
+            chart.showStockEvents();
+            chart.validateData();
+            chart.validateNow();
+        }
+        // Hide modal
+        $('#TradierOptionChain').modal('hide');
+    }
+    function plotPutOptionChain() {
+        var putColor = "#A51717";
+        // Remove existing plot
+        for (var i = 0; i < trendStrike.length; i++) {
+            stockPanel1.removeTrendLine(trendStrike[i]);
+        }
+        for (var i = 0; i < guideRiskReward.length; i++) {
+            stockPanel1.valueAxes[1].removeGuide(guideRiskReward[i]);
+        }
+        stockPanel1.removeTrendLine(trendTarget);
+        stockPanel1.validateNow();
+        // Compute for the max volumen
+        var maxVolume = 0;
+        for (var i = 0; i < sortedDataPuts.length; i++) {
+            if ((sortedDataPuts[i].volume + sortedDataPuts[i].open_interest) > maxVolume) {
+                maxVolume = sortedDataPuts[i].volume + sortedDataPuts[i].open_interest;
+            }
+        }
+        // Plot
+        if (maxVolume > 0) {
+            var $optionTime = document.getElementById('optionTime').value;
+            var $optionTargePrice = document.getElementById('optionTargePrice').value;
+            var $optionVolatility = document.getElementById('optionVolatility').value;
+            var $optionRate = document.getElementById('optionRate').value;
+
+            $optionTime = !$optionTime ? 0.10 : $optionTime / 360; // Annualize
+            $optionTargePrice = !$optionTargePrice ? plotData[125]["close"] : $optionTargePrice;
+            $optionVolatility = !$optionVolatility ? 0.20 : $optionVolatility / 100; // Percentage
+            $optionRate = !$optionRate ? 0.05 : $optionRate / 100; // Percentage
+
+            for (var i = 0; i < sortedDataPuts.length; i++) {
+                var volumeLength = parseInt(((sortedDataPuts[i].volume + sortedDataPuts[i].open_interest) / maxVolume) * 30);
+                trendStrike[i] = new AmCharts.TrendLine();
+                trendStrike[i].lineColor = putColor;
+                trendStrike[i].initialDate = plotData[126]["date"];
+                trendStrike[i].finalDate = plotData[126 + volumeLength]["date"];
+                trendStrike[i].initialValue = sortedDataPuts[i].strike;
+                trendStrike[i].finalValue = sortedDataPuts[i].strike;
+                trendStrike[i].lineThickness = 10;
+                trendStrike[i].lineAlpha = 0.5;
+                stockPanel1.addTrendLine(trendStrike[i]);
+
+                var option_price = black_scholes.calculate(false, $optionTargePrice, sortedDataPuts[i].strike, $optionRate, $optionTime, $optionVolatility);
+                var change = option_price - sortedDataPuts[i].last;
+                var percentage =(change / option_price) * 100;
+
+                guideRiskReward[i] = new AmCharts.Guide();
+                guideRiskReward[i].lineColor = putColor;
+                guideRiskReward[i].date = plotData[126]["date"];
+                guideRiskReward[i].label = sortedDataPuts[i].description + ":" + AmCharts.roundTo(option_price, 2).toString() + "(" + AmCharts.roundTo(change, 2).toString() + ") " + AmCharts.roundTo(percentage, 2) + "%   ";
+                guideRiskReward[i].color = putColor;
+                guideRiskReward[i].value = sortedDataPuts[i].strike;
+                guideRiskReward[i].inside = true;
+                stockPanel1.valueAxes[1].addGuide(guideRiskReward[i]);
+            }
+
+            chartEvent1.date = plotData[125 + parseInt($optionTime*360)]["date"];
+            chartEvent1.backgroundColor = putColor;
+            chartEvent1.color = "#FFFFFF";
+
+            chart.showStockEvents();
+            chart.validateData();
+            chart.validateNow();
+        }
+        // Hide modal
+        $('#TradierOptionChain').modal('hide');
     }
 
     // Moving Average
@@ -1398,44 +1886,6 @@
             }
         }
     }
-    //function createColorEditor(editColumn, colorSource) {
-    //    var grid = editColumn.grid;
-
-    //    grid.formatItem.addHandler(function (s, e) {
-    //        var editRange = grid.editRange,
-    //            column = e.panel.columns[e.col];
-    //        // check whether this is an editing cell of the wanted column
-    //        if (!(e.panel.cellType === wijmo.grid.CellType.Cell && column === editColumn && editRange && editRange.row === e.row && editRange.col === e.col)) {
-    //            return;
-    //        }
-
-    //        // hide standard editor (don't remove!)
-    //        if (e.cell.firstChild) {
-    //            e.cell.firstChild.style.display = 'none';
-    //        }
-
-    //        // add custom editor
-    //        var editorRoot = document.createElement('div');
-    //        var cmb = new wijmo.input.ComboBox(editorRoot, {
-    //            itemsSource: colorSource,
-    //            selectedItem: grid.getCellData(e.row, e.col, false)
-    //        });
-
-    //        e.cell.appendChild(editorRoot);
-
-    //        // cellEditEnding that updates cell with user's input
-    //        var editEndingEH = function (s, args) {
-    //            grid.cellEditEnding.removeHandler(editEndingEH);
-    //            if (!args.cancel) {
-    //                args.cancel = true;
-    //                grid.setCellData(e.row, e.col, cmb.selectedItem);
-    //            }
-    //        };
-
-    //        // subscribe the handler to the cellEditEnding event
-    //        grid.cellEditEnding.addHandler(editEndingEH);
-    //    });
-    //}
 
     // Earnings
     function openEarnings() {
@@ -2104,6 +2554,7 @@
         chart = new AmCharts.AmStockChart();
 
         chart.pathToImages = "/amcharts/amcharts/images/";
+        chart.hideStockEvents();
 
         // Day number (0-251) in a year: mid year - 125
         var dayIndex = 0;
@@ -2326,7 +2777,7 @@
                         date: new Date(futureDate),
                         season: (seasonTenYearData[i] / 10).toFixed(2),
                         season5Year: (seasonFiveYearData[i] / 5).toFixed(2),
-                        seasonCount: i+1,
+                        seasonCount: i + 1,
                         seasonY0: seasonYearData[0][i].toFixed(2),
                         seasonY1: seasonYearData[1][i].toFixed(2),
                         seasonY2: seasonYearData[2][i].toFixed(2),
@@ -2385,6 +2836,16 @@
 
         generateMovingAverage();
         computeMovingAverage();
+
+        // AMChart events
+
+        chartEvent1 = new AmCharts.StockEvent();
+        chartEvent1.date = plotData[125]["date"];
+        chartEvent1.type =  "sign";
+        chartEvent1.backgroundColor = "#7f8da9";
+        chartEvent1.graph = "graphSeason";
+        chartEvent1.text =  "T";
+        chartEvent1.description =  "Target Price";
 
         // AMChart dataset
 
@@ -2469,7 +2930,8 @@
         }];
         dataSet.dataProvider = plotData;
         dataSet.categoryField = "date";
-
+        dataSet.stockEvents = [chartEvent1];
+        
         chart.dataSets = [dataSet];
 
         // AMChart Panels
@@ -2505,6 +2967,7 @@
         var addInterval = 0;
 
         var valueAxisPrice = new AmCharts.ValueAxis();
+        var valueAxisStrikePrice = new AmCharts.ValueAxis();
         for (var i = 0; i < NumberOfDaysInYear / 2; i++) {
             if (i == 0) {
                 minValue = parseFloat(plotData[i]["close"]);
@@ -2520,11 +2983,18 @@
         if (upDistance > downDistance) {
             valueAxisPrice.maximum = maxValue;
             valueAxisPrice.minimum = minValue - (upDistance - downDistance);
+            valueAxisStrikePrice.maximum = maxValue;
+            valueAxisStrikePrice.minimum = minValue - (upDistance - downDistance);
         } else if (upDistance < downDistance) {
             valueAxisPrice.maximum = maxValue + (downDistance - upDistance);
             valueAxisPrice.minimum = minValue;
+            valueAxisStrikePrice.maximum = maxValue + (downDistance - upDistance);
+            valueAxisStrikePrice.minimum = minValue;
         }
+        valueAxisStrikePrice.position = "right";
+        valueAxisStrikePrice.labelsEnabled = false;
         stockPanel1.addValueAxis(valueAxisPrice);
+        stockPanel1.addValueAxis(valueAxisStrikePrice);
 
         // Calibrated Seasonality 10 Year Axis
 
@@ -2618,8 +3088,9 @@
         graphPrice.valueAxis = valueAxisPrice;
 
         var graphEarnings = new AmCharts.AmGraph();
+        graphEarnings.id = "graphEarnings";
         graphEarnings.valueField = 'earnings';
-        graphEarnings.valueAxis = valueAxisPrice;
+        graphEarnings.valueAxis = valueAxisStrikePrice
         graphEarnings.type = 'line';
         graphEarnings.fillAlphas = 0;
         graphEarnings.balloonText = 'Earnings'
@@ -2754,9 +3225,6 @@
             stockPanel1.hideGraph(scannerYearGraph[y]);
         }
 
-        // Move Average Graph
-
-
         // Plot the graphs in the panels
         stockPanel1.addStockGraph(graphVolume);
         stockPanel1.addStockGraph(graphPrice);
@@ -2876,9 +3344,13 @@
                 if (upDistance > downDistance) {
                     valueAxisPrice.maximum = maxValue;
                     valueAxisPrice.minimum = minValue - (upDistance - downDistance);
+                    valueAxisStrikePrice.maximum = maxValue;
+                    valueAxisStrikePrice.minimum = minValue - (upDistance - downDistance);
                 } else if (upDistance < downDistance) {
                     valueAxisPrice.maximum = maxValue + (downDistance - upDistance);
                     valueAxisPrice.minimum = minValue;
+                    valueAxisStrikePrice.maximum = maxValue + (downDistance - upDistance);
+                    valueAxisStrikePrice.minimum = minValue;
                 }
             } else {
                 for (var i = start; i < end + 1; i++) {
@@ -2896,13 +3368,19 @@
                     if (upDistance > downDistance) {
                         valueAxisPrice.maximum = maxValue;
                         valueAxisPrice.minimum = minValue - (upDistance - downDistance);
+                        valueAxisStrikePrice.maximum = maxValue;
+                        valueAxisStrikePrice.minimum = minValue - (upDistance - downDistance);
                     } else if (upDistance < downDistance) {
                         valueAxisPrice.maximum = maxValue + (downDistance - upDistance);
                         valueAxisPrice.minimum = minValue;
+                        valueAxisStrikePrice.maximum = maxValue + (downDistance - upDistance);
+                        valueAxisStrikePrice.minimum = minValue;
                     }
                 } else {
                     valueAxisPrice.maximum = maxValue;
                     valueAxisPrice.minimum = minValue;
+                    valueAxisStrikePrice.maximum = maxValue;
+                    valueAxisStrikePrice.minimum = minValue;
                 }
             }
 
@@ -3019,6 +3497,7 @@
                 $('#scannerYear').empty();
                 displayScannerYears(seasonYearData, currentYear, xValue, dateValue);
             }
+            
         });
 
     }
@@ -3167,6 +3646,7 @@
         $("#symbolSlopePercentage").empty();
         $("#symbolInfoCoefficient").empty();
         $("#symbolInfoRange").empty();
+        $("#symbolInfoSeasonalityCorrelation").empty();
 
         //$("#symbol").html("<span><b>" + chartSymbol + "</b></span>");
         $("#symbol").html("<span><b>" + chartSymbol + ":</b>&nbsp;<button class='btn btn-success btn-xs' data-toggle='modal' id='openTradierEquity' onclick='openTradierEquity()'>Buy</button>&nbsp;<button class='btn btn-info btn-xs' data-toggle='modal' id='openTradierOptionChain' onclick='openTradierOptionChain()'>Option Chain</button></span>");
@@ -3193,6 +3673,18 @@
         $("#symbolInfoCoefficient").html("<a href='#' style='padding: 2px 20px'><span>Coefficient:</span><span class='pull-right'>" + chartCoefficient.toFixed(2) + "</span></a>");
         $("#symbolInfoRange").html("<a href='#' style='padding: 2px 20px'><span>Range:</span><span class='pull-right'>" + chartChannelRange.toFixed(2) + "%</span></a>");
 
+        var corrPriceData = [];
+        var corrSeasonData = [];
+        while (corrPriceData.length > 0) corrPriceData.pop();
+        while (corrSeasonData.length > 0) corrSeasonData.pop();
+        for (var i = 0; i < 126; i++) {
+            corrPriceData[i] = plotData[i].close;
+            corrSeasonData[i] = parseFloat(plotData[i].season);
+        }
+
+        chartSeasonalityCorrelation = Math.abs(ss.sample_correlation(corrPriceData, corrSeasonData));
+
+        $("#symbolInfoSeasonalityCorrelation").html("<a href='#' style='padding: 2px 20px'><span>Correlation:</span><span class='pull-right'>" + chartSeasonalityCorrelation.toFixed(2) + "</span></a>");
     }
 
     // Scanner Years
@@ -3538,6 +4030,11 @@
         TradierOrdersGrid = new wijmo.grid.FlexGrid('#TradierOrdersGrid');
         TradierPositionsGrid = new wijmo.grid.FlexGrid('#TradierPositionsGrid');
 
+        // Option
+
+        OptionCallGrid = new wijmo.grid.FlexGrid('#OptionCallGrid');
+        OptionPutGrid = new wijmo.grid.FlexGrid('#OptionPutGrid');
+
         // Tradier Authorization Code
         TradierAccessToken = getCookie("TradierAccessToken");
         if (TradierAccessToken == "") {
@@ -3558,6 +4055,12 @@
             getTradierAccountNumber(TradierAccessToken);
         }
 
+        $("a[href='#OptionCall']").on('shown.bs.tab', function (e) {
+            OptionCallGrid.invalidate();
+        });
+        $("a[href='#OptionPut']").on('shown.bs.tab', function (e) {
+            OptionPutGrid.invalidate();
+        });
 
         //$.ajax({
         //    type: 'GET',

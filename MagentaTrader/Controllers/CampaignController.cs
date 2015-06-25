@@ -14,5 +14,19 @@ namespace MagentaTrader.Controllers
         {
             return View();
         }
+
+        //
+        // GET: /Campaign/Anniversary5
+        public ActionResult Anniversary5()
+        {
+            return View();
+        }
+
+        //
+        // GET: /Campaign/SeasonalityWorkshop01
+        public ActionResult SeasonalityWorkshop01()
+        {
+            return View();
+        }
 	}
 }

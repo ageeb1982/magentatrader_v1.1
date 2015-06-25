@@ -92,7 +92,7 @@
     <br />
     <div class="row">
         <div class="col-lg-2">
-            <p>30 Days Correlation</p>
+            <p>30 Days Coefficient</p>
             <select id="Correlation30" class="form-control">
                 <option value="10" selected="selected">0.10</option>
                 <option value="20">0.20</option>
@@ -260,7 +260,8 @@
                         WinLossAverage40: result[i].WinLossAverage40,
                         WinLoss60: "<a href='javascript:;' onclick='OpenYearlyWinLoss(60);'><font color='black'>" + result[i].WinLoss60 + "</font></a>",
                         WinLossAverage60: result[i].WinLossAverage60,
-                        CorrelationCoefficient30: result[i].CorrelationCoefficient30
+                        CorrelationCoefficient30: result[i].CorrelationCoefficient30,
+                        SeasonalityCorrelation: result[i].SeasonalityCorrelation
                     });
                 }
 
@@ -321,7 +322,7 @@
                         },{
                             "header": "Price",
                             "binding": "ClosePrice",
-                            "width": "12*",
+                            "width": "13*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
@@ -340,6 +341,13 @@
                             "isContentHtml": true,
                             "wordWrap": true
                         },{
+                            "header": "Correlation",
+                            "binding": "SeasonalityCorrelation",
+                            "width": "13*",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "wordWrap": true
+                        },{
                             "header": "Trend",
                             "binding": "TrendNoOfDays",
                             "width": 35,
@@ -347,65 +355,65 @@
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
-                            "header": "Correlation",
+                            "header": "Coefficient",
                             "binding": "CorrelationCoefficient30",
-                            "width": "12*",
+                            "width": "13*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-T",
                             "binding": "GrowthDecayRate",
-                            "width": "12*",
+                            "width": "13*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-W1",
                             "binding": "GrowthDecayRateW1",
-                            "width": "12*",
+                            "width": "13*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-W2",
                             "binding": "GrowthDecayRateW2",
-                            "width": "12*",
+                            "width": "13*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-W3",
                             "binding": "GrowthDecayRateW3",
-                            "width": "12*",
+                            "width": "13*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-M1",
                             "binding": "GrowthDecayRateM1",
-                            "width": "12*",
+                            "width": "13*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-M2",
                             "binding": "GrowthDecayRateM2",
-                            "width": "12*",
+                            "width": "13*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "Rate-M3",
                             "binding": "GrowthDecayRateM3",
-                            "width": "12*",
+                            "width": "13*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
                         }, {
                             "header": "20 W/L %",
                             "binding": "WinLossAverage20",
-                            "width": "12*",
+                            "width": "13*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
@@ -419,7 +427,7 @@
                         }, {
                             "header": "40 W/L %",
                             "binding": "WinLossAverage40",
-                            "width": "12*",
+                            "width": "13*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
@@ -433,7 +441,7 @@
                         }, {
                             "header": "60 W/L %",
                             "binding": "WinLossAverage60",
-                            "width": "12*",
+                            "width": "13*",
                             "allowSorting": true,
                             "isContentHtml": true,
                             "wordWrap": true
@@ -467,7 +475,7 @@
                     cell.style.color = GetRateColor(cellData);
                 } else if (wijmo.grid.CellType.ColumnHeader == panel.cellType) {
                     var cellData = panel.getCellData(r, c);
-                    cell.style.fontSize = "90%";
+                    cell.style.fontSize = "85%";
                 }
             }
         });
@@ -554,7 +562,8 @@
                 WinLossAverage40: ScreenerSaveData[i].WinLossAverage40,
                 WinLoss60: ScreenerSaveData[i].WinLoss60,
                 WinLossAverage60: ScreenerSaveData[i].WinLossAverage60,
-                CorrelationCoefficient30: ScreenerSaveData[i].CorrelationCoefficient30
+                CorrelationCoefficient30: ScreenerSaveData[i].CorrelationCoefficient30,
+                SeasonalityCorrelation: ScreenerSaveData[i].SeasonalityCorrelation
             });
         }
 

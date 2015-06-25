@@ -216,7 +216,28 @@
             Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='7915f54f-4c28-411d-8c90-2745e3725f20' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
         });
 
+        purchases.push({
+            Product: "Magenta Las Vegas Workshop - Nov 11-13, 2015",
+            Price: "US$ 995",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='16c583e4-ba7e-4c09-8f53-698490f80d47' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        });
+
+        purchases.push({
+            Product: "Magenta 5 Year Anniversary Festival <button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditEvent' onclick='CmdAnniversary5_OnClick()'>Details</button>",
+            Price: "US$ 295",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='b8d5d262-ae96-4aef-bd51-d6d990a69277' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        });
+
+        purchases.push({
+            Product: "Magenta 5 Year Anniversary Festival (If Couple) <button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditEvent' onclick='CmdAnniversary5_OnClick()'>Details</button>",
+            Price: "US$ 445",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='e9dcd6e8-0f05-4247-b715-834d16923000' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        });
+
         return purchases;
+    }
+    function CmdAnniversary5_OnClick() {
+        location.href = '/Campaign/Anniversary5';
     }
     function CmdCoupon_OnClick() {
         $("#CouponsTitle").text("Coupons");

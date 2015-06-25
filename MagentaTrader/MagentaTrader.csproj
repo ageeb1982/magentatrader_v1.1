@@ -185,6 +185,7 @@
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Controllers\ProductPackageController.cs" />
     <Compile Include="Controllers\PurchaseController.cs" />
+    <Compile Include="Controllers\QuestTradeController.cs" />
     <Compile Include="Controllers\SalesController.cs" />
     <Compile Include="Controllers\ScreenerController.cs" />
     <Compile Include="Controllers\SoftwareController.cs" />
@@ -224,6 +225,11 @@
     <Compile Include="Models\TradierAddOrder.cs" />
     <Compile Include="Models\TradierAddOrderStatus.cs" />
     <Compile Include="Models\TradierAddOrderStatusOrder.cs" />
+    <Compile Include="Models\TradierOption.cs" />
+    <Compile Include="Models\TradierOptionChain.cs" />
+    <Compile Include="Models\TradierOptionChainRoot.cs" />
+    <Compile Include="Models\TradierOptionExpiration.cs" />
+    <Compile Include="Models\TradierOptionExpirationRoot.cs" />
     <Compile Include="Models\TradierOrder.cs" />
     <Compile Include="Models\TradierOrderAccount.cs" />
     <Compile Include="Models\TradierOrderAccountOrders.cs" />
@@ -241,6 +247,7 @@
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="Utilities\SimpleStatistics.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="amcharts\amcharts\amcharts.js" />
@@ -839,6 +846,7 @@
     <Content Include="img\webinar.png" />
     <Content Include="img\workshop1.jpg" />
     <Content Include="img\workshop2.jpg" />
+    <Content Include="js\black_scholes.js" />
     <Content Include="js\bootstrap.js" />
     <Content Include="js\bootstrap.min.js" />
     <Content Include="js\date.js" />
@@ -851,6 +859,7 @@
     <Content Include="js\knockout-3.2.0.js" />
     <Content Include="js\morris-data.js" />
     <Content Include="js\require.js" />
+    <Content Include="js\simple_statistics.js" />
     <Content Include="js\toastr.js" />
     <Content Include="lib\bootstrap\css\bootstrap-theme.css" />
     <Content Include="lib\bootstrap\css\bootstrap-theme.min.css" />
@@ -1448,9 +1457,12 @@
     <Content Include="wijmo\styles\themes\wijmo.theme.trust.less" />
     <Content Include="wijmo\styles\themes\wijmo.theme.zen.less" />
     <Content Include="Views\Campaign\Index.cshtml" />
+    <Content Include="Views\Campaign\Anniversary5.cshtml" />
+    <Content Include="Views\Campaign\SeasonalityWorkshop01.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\QuestTrade\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

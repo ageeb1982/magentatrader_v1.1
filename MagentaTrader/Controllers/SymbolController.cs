@@ -151,7 +151,8 @@ namespace MagentaTrader.Controllers
                                       WinLossAverage40 = d.WinLossAverage40.Value == null ? 0 : d.WinLossAverage40.Value,
                                       WinLoss60 = d.WinLoss60 == null ? "NA" : d.WinLoss60,
                                       WinLossAverage60 = d.WinLossAverage60.Value == null ? 0 : d.WinLossAverage60.Value,
-                                      CorrelationCoefficient30 = d.CorrelationCoefficient30.Value
+                                      CorrelationCoefficient30 = d.CorrelationCoefficient30.Value,
+                                      SeasonalityCorrelation = d.SeasonalityCorrelation.Value
                                   };
                     if (Symbols.Count() > 0)
                     {

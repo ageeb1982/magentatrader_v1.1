@@ -335,6 +335,61 @@ namespace MagentaTrader.Controllers
             }
         }
 
+        // GET api/GetTradierOptionExpiration
+        [Authorize]
+        [Route("api/GetTradierOptionExpiration/{symbol}/{token}")]
+        public Models.TradierOptionExpirationRoot GetTradierOptionExpiration(string symbol, string token)
+        {
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.tradier.com/v1/markets/options/expirations?symbol=" + symbol);
+
+            httpWebRequest.Method = "GET";
+            httpWebRequest.Accept = "application/json";
+
+            httpWebRequest.Headers.Add("Authorization", "Bearer " + token);
+            try
+            {
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    var result = streamReader.ReadToEnd();
+                    JavaScriptSerializer js = new JavaScriptSerializer();
+                    Models.TradierOptionExpirationRoot q = (Models.TradierOptionExpirationRoot)js.Deserialize(result, typeof(Models.TradierOptionExpirationRoot));
+                    return q;
+                }
+            }
+            catch
+            {
+                return new Models.TradierOptionExpirationRoot();
+            }
+        }
+
+        // GET api/GetTradierOptionChain
+        [Authorize]
+        [Route("api/GetTradierOptionChain/{symbol}/{expiration}/{token}")]
+        public Models.TradierOptionChainRoot GetTradierOptionChain(string symbol, string expiration, string token)
+        {
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.tradier.com/v1/markets/options/chains?symbol=" + symbol + "&expiration=" + expiration);
+
+            httpWebRequest.Method = "GET";
+            httpWebRequest.Accept = "application/json";
+
+            httpWebRequest.Headers.Add("Authorization", "Bearer " + token);
+            try
+            {
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    var result = streamReader.ReadToEnd();
+                    JavaScriptSerializer js = new JavaScriptSerializer();
+                    Models.TradierOptionChainRoot q = (Models.TradierOptionChainRoot)js.Deserialize(result, typeof(Models.TradierOptionChainRoot));
+                    return q;
+                }
+            }
+            catch
+            {
+                return new Models.TradierOptionChainRoot();
+            }
+        }
 
     }
 }

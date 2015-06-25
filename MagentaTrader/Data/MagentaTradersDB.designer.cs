@@ -3548,6 +3548,8 @@ namespace MagentaTrader.Data
 		
 		private System.Nullable<decimal> _CorrelationCoefficient30;
 		
+		private System.Nullable<decimal> _SeasonalityCorrelation;
+		
 		private EntitySet<TrnStockPrice> _TrnStockPrices;
 		
 		private EntitySet<TrnStockEarning> _TrnStockEarnings;
@@ -3622,6 +3624,8 @@ namespace MagentaTrader.Data
     partial void OnWinLossAverage60Changed();
     partial void OnCorrelationCoefficient30Changing(System.Nullable<decimal> value);
     partial void OnCorrelationCoefficient30Changed();
+    partial void OnSeasonalityCorrelationChanging(System.Nullable<decimal> value);
+    partial void OnSeasonalityCorrelationChanged();
     #endregion
 		
 		public MstSymbol()
@@ -4287,6 +4291,26 @@ namespace MagentaTrader.Data
 					this._CorrelationCoefficient30 = value;
 					this.SendPropertyChanged("CorrelationCoefficient30");
 					this.OnCorrelationCoefficient30Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SeasonalityCorrelation", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> SeasonalityCorrelation
+		{
+			get
+			{
+				return this._SeasonalityCorrelation;
+			}
+			set
+			{
+				if ((this._SeasonalityCorrelation != value))
+				{
+					this.OnSeasonalityCorrelationChanging(value);
+					this.SendPropertyChanging();
+					this._SeasonalityCorrelation = value;
+					this.SendPropertyChanged("SeasonalityCorrelation");
+					this.OnSeasonalityCorrelationChanged();
 				}
 			}
 		}
