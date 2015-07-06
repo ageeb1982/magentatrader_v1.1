@@ -186,6 +186,7 @@
     <Compile Include="Controllers\ProductPackageController.cs" />
     <Compile Include="Controllers\PurchaseController.cs" />
     <Compile Include="Controllers\QuestTradeController.cs" />
+    <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\SalesController.cs" />
     <Compile Include="Controllers\ScreenerController.cs" />
     <Compile Include="Controllers\SoftwareController.cs" />
@@ -216,6 +217,7 @@
     <Compile Include="Models\News.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\ProductPackage.cs" />
+    <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\Sales.cs" />
     <Compile Include="Models\StockEarning.cs" />
     <Compile Include="Models\StockPrice.cs" />
@@ -1463,6 +1465,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\QuestTrade\" />
+    <Folder Include="Views\Roles\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

@@ -24,8 +24,35 @@ namespace MagentaTrader.Controllers
             {
                 try
                 {
+                    var query1 = from sale in db.TrnSales
+                                 group sale by sale.UserId into g
+                                 let maxDate = g.Max(s => s.SalesDate)
+                                 select new { UserId = g.Key, maxDate };
+
+                    var query2 = from user in db.MstUsers
+                                 from q1 in query1.Where(q => q.UserId == user.Id)
+                                 select new {
+                                     Id = user.Id,
+                                     UserName = user.UserName,
+                                     FirstName = user.FirstName,
+                                     LastName = user.LastName,
+                                     EmailAddress = user.EmailAddress,
+                                     PhoneNumber = user.PhoneNumber,
+                                     q1.maxDate
+                                 };
+
+                    var result = query2.ToList();
+
                     var Users = from d in db.MstUsers
-                                where d.AspNetUserId != null
+                                join s in
+                                    (from sale in db.TrnSales
+                                     group sale by sale.Id into grp
+                                     select new
+                                     {
+                                         Id = grp.Key,
+                                         LastPurchase = grp.Max(item => item.SalesDate)
+                                     })
+                                on d.Id equals s.Id
                                 select new Models.User
                                 {
                                     Id = d.Id,
@@ -33,7 +60,8 @@ namespace MagentaTrader.Controllers
                                     FirstName = d.FirstName,
                                     LastName = d.LastName,
                                     EmailAddress = d.EmailAddress,
-                                    PhoneNumber = d.PhoneNumber
+                                    PhoneNumber = d.PhoneNumber,
+                                    LastPurchase = s.LastPurchase.ToShortDateString()
                                 };
                     if (Users.Count() > 0)
                     {
@@ -208,144 +236,145 @@ namespace MagentaTrader.Controllers
                     retryCounter++;
                 }
             }
+
             return values;
         }
 
-        // GET api/AddUserRole/dpilger/1/1
-        [Authorize]
-        [Route("api/ModifyUserRole/{username}/{role}/{change}")]
-        public int AddUserRole(string Username, string Role, bool Change)
-        {
-            try
-            {
-                var id = (from m in db.MstUsers
-                          join n in db.AspNetUsers on m.AspNetUserId equals n.Id
-                          where m.UserName == Username
-                          select new Models.User
-                          {
-                              AspNetUserId = m.AspNetUserId
-                          }).ToList();
+        //// GET api/AddUserRole/dpilger/1/1
+        //[Authorize]
+        //[Route("api/ModifyUserRole/{username}/{role}/{change}")]
+        //public int AddUserRole(string Username, string Role, bool Change)
+        //{
+        //    try
+        //    {
+        //        var id = (from m in db.MstUsers
+        //                  join n in db.AspNetUsers on m.AspNetUserId equals n.Id
+        //                  where m.UserName == Username
+        //                  select new Models.User
+        //                  {
+        //                      AspNetUserId = m.AspNetUserId
+        //                  }).ToList();
 
-                var AspNetUserId = id[0].AspNetUserId;
+        //        var AspNetUserId = id[0].AspNetUserId;
                 
-                Data.AspNetUserRole NewRole = new Data.AspNetUserRole();
+        //        Data.AspNetUserRole NewRole = new Data.AspNetUserRole();
 
-                NewRole.UserId = AspNetUserId;
-                NewRole.RoleId = Role;
+        //        NewRole.UserId = AspNetUserId;
+        //        NewRole.RoleId = Role;
                 
-                if(Change)
-                    db.AspNetUserRoles.InsertOnSubmit(NewRole);                
-                try
-                {
-                    db.SubmitChanges();
-                    return 1;
-                }
-                catch
-                {
-                    return 0;
-                }
-            }
-            catch
-            {
-                return 0;
-            }
-        }
+        //        if(Change)
+        //            db.AspNetUserRoles.InsertOnSubmit(NewRole);                
+        //        try
+        //        {
+        //            db.SubmitChanges();
+        //            return 1;
+        //        }
+        //        catch
+        //        {
+        //            return 0;
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        return 0;
+        //    }
+        //}
 
-        [Authorize]
-        [Route("api/GetRoles/{username}")]
-        public List<Models.User> GetRoles(string userName)
-        {
-            try
-            {
-                try
-                {
-                    var id = (from m in db.MstUsers
-                              join n in db.AspNetUsers on m.AspNetUserId equals n.Id
-                              where m.UserName == userName
-                              select new Models.User
-                              {
-                                  AspNetUserId = m.AspNetUserId
-                              }).ToList();
+        //[Authorize]
+        //[Route("api/GetRoles/{username}")]
+        //public List<Models.User> GetRoles(string userName)
+        //{
+        //    try
+        //    {
+        //        try
+        //        {
+        //            var id = (from m in db.MstUsers
+        //                      join n in db.AspNetUsers on m.AspNetUserId equals n.Id
+        //                      where m.UserName == userName
+        //                      select new Models.User
+        //                      {
+        //                          AspNetUserId = m.AspNetUserId
+        //                      }).ToList();
 
-                    var AspNetUserId = id[0].AspNetUserId;
+        //            var AspNetUserId = id[0].AspNetUserId;
 
-                    try
-                    {
-                        var x = (from m in db.AspNetUserRoles
-                                 where m.UserId == AspNetUserId
-                                 select new Models.User
-                                 {
-                                    Roles = m.RoleId
-                                 }).Distinct().ToList();
+        //            try
+        //            {
+        //                var x = (from m in db.AspNetUserRoles
+        //                         where m.UserId == AspNetUserId
+        //                         select new Models.User
+        //                         {
+        //                            Roles = m.RoleId
+        //                         }).Distinct().ToList();
 
-                        var y = x;
-                        return y;
-                    }
-                    catch
-                    {
-                        return null;
-                    }
-                }
-                catch
-                {
-                    return null;
-                }
+        //                var y = x;
+        //                return y;
+        //            }
+        //            catch
+        //            {
+        //                return null;
+        //            }
+        //        }
+        //        catch
+        //        {
+        //            return null;
+        //        }
                                         
-            }
-            catch
-            {
-                return null;
-            }
-        }
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
+        //}
 
 
         
-        private string getAspNetUserId( string username )
-        {
-            try
-            {
-               var x = (from m in db.MstUsers
-                        join n in db.AspNetUsers on m.AspNetUserId equals n.Id
-                        where m.UserName == username
-                        select new Models.User
-                        {
-                            AspNetUserId = m.AspNetUserId
-                        }).ToList();
+        //private string getAspNetUserId( string username )
+        //{
+        //    try
+        //    {
+        //       var x = (from m in db.MstUsers
+        //                join n in db.AspNetUsers on m.AspNetUserId equals n.Id
+        //                where m.UserName == username
+        //                select new Models.User
+        //                {
+        //                    AspNetUserId = m.AspNetUserId
+        //                }).ToList();
 
-               return x[0].AspNetUserId;
-            }
-            catch
-            {
-                return null;
-            }
-        }
+        //       return x[0].AspNetUserId;
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
+        //}
 
 
-        // DELETE api/DeleteUser/5
-        [Authorize]
-        [Route("api/DeleteUserRole/{username}/{role}")]
-        public HttpResponseMessage Delete(string Username, string Role)
-        {
-            var UserId = getAspNetUserId(Username);
-            Data.AspNetUserRole DeleteRole = db.AspNetUserRoles.Where(d => d.RoleId == Role && d.UserId == UserId).First();
+        //// DELETE api/DeleteUser/5
+        //[Authorize]
+        //[Route("api/DeleteUserRole/{username}/{role}")]
+        //public HttpResponseMessage Delete(string Username, string Role)
+        //{
+        //    var UserId = getAspNetUserId(Username);
+        //    Data.AspNetUserRole DeleteRole = db.AspNetUserRoles.Where(d => d.RoleId == Role && d.UserId == UserId).First();
             
-            if (DeleteRole != null)
-            {
-                db.AspNetUserRoles.DeleteOnSubmit(DeleteRole);
-                try
-                {
-                    db.SubmitChanges();
-                    return Request.CreateResponse(HttpStatusCode.OK);
-                }
-                catch
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest);
-                }
-            }
-            else
-            {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
-        }
+        //    if (DeleteRole != null)
+        //    {
+        //        db.AspNetUserRoles.DeleteOnSubmit(DeleteRole);
+        //        try
+        //        {
+        //            db.SubmitChanges();
+        //            return Request.CreateResponse(HttpStatusCode.OK);
+        //        }
+        //        catch
+        //        {
+        //            return Request.CreateResponse(HttpStatusCode.BadRequest);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.NotFound);
+        //    }
+        //}
     }
 }

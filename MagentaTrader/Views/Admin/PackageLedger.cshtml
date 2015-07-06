@@ -38,8 +38,8 @@
                 <li role="presentation"><a href="~/Admin/user">Users</a></li>
                 <li role="presentation"><a href="~/Admin/Event">Event</a></li>
                 <li role="presentation"><a href="~/Admin/Sales">Sales</a></li>
-                <li role="presentation"><a href="~/Admin/Product">Products</a></li>
                 <li role="presentation" class="active"><a href="~/Admin/Package">Packages</a></li>
+                <li role="presentation"><a href="~/Admin/Product">Products</a></li>                
                 <li role="presentation"><a href="~/Admin/News">News</a></li>
                 <li role="presentation"><a href="~/Admin/"><i class="fa fa-home"></i></a></li>
             </ul>
@@ -369,7 +369,7 @@
             contentType: 'application/json; charset=utf-8',
             success: function (Results) {
                 $('#loading').modal('hide');
-                $('#usersTotal').text('User(s) using: ' + Results.length);
+                $('#usersTotal').text('User(s) : ' + Results.length);
                 if (Results.length > 0) {
                     for (i = 0; i < Results.length; i++) {
                         Amount = Amount + Results[i]["Price"];

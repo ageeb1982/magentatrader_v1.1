@@ -37,8 +37,8 @@
                 <li role="presentation"><a href="~/Admin/user">Users</a></li>
                 <li role="presentation"><a href="~/Admin/Event">Event</a></li>
                 <li role="presentation"><a href="~/Admin/Sales">Sales</a></li>
-                <li role="presentation" class="active"><a href="~/Admin/Product">Products</a></li>
                 <li role="presentation"><a href="~/Admin/Package">Packages</a></li>
+                <li role="presentation" class="active"><a href="~/Admin/Product">Products</a></li>
                 <li role="presentation"><a href="~/Admin/News">News</a></li>
                 <li role="presentation"><a href="~/Admin/"><i class="fa fa-home"></i></a></li>
             </ul>
@@ -52,16 +52,24 @@
 
         <div class="row">
             <h2 class="section-heading">Event</h2>
-            <div class="col-lg-11">
+            <div class="col-lg-12">
                 <h4>Products</h4>
             </div>
-            <div class="col-lg-1">
-                <button id="CmdAddProduct" type="submit" class="btn btn-primary" onclick="CmdProductAdd_OnClick()">Add</button>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" readonly><span class="fa fa-search"></span></button>
+                    </span>
+                    <input type="text" class="form-control" id="InputFilter" placeholder="Search...">
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <button id="CmdAddProduct" type="submit" class="btn btn-primary pull-right" onclick="CmdProductAdd_OnClick()">Add</button>
             </div>
         </div>
-
         <br />
-
         <div class="row">
             <div class="col-lg-12">
                 <div id="ProductGrid" class="grid"></div>
@@ -369,6 +377,19 @@
         Products = new wijmo.collections.CollectionView(GetProducts());
 
         ProductGrid = new wijmo.grid.FlexGrid('#ProductGrid');
+
+        Products.canFilter = true;
+
+        var filterText = '';
+
+        $('#InputFilter').keyup(function () {
+            filterText = this.value.toLowerCase();
+            Products.refresh();
+        });
+
+        Products.filter = function (item) {
+            return !filterText || (item.ProductDescription.toLowerCase().indexOf(filterText) > -1);
+        }
 
         ProductGrid.initialize({
             columns: [

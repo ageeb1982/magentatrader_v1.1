@@ -40,8 +40,8 @@
                 <li role="presentation"><a href="~/Admin/user">Users</a></li>
                 <li role="presentation"><a href="~/Admin/Event">Event</a></li>
                 <li role="presentation" class="active"><a href="~/Admin/Sales">Sales</a></li>
-                <li role="presentation"><a href="~/Admin/Product">Products</a></li>
                 <li role="presentation"><a href="~/Admin/Package">Packages</a></li>
+                <li role="presentation"><a href="~/Admin/Product">Products</a></li>
                 <li role="presentation"><a href="~/Admin/News">News</a></li>
                 <li role="presentation"><a href="~/Admin/"><i class="fa fa-home"></i></a></li>
             </ul>
@@ -55,20 +55,21 @@
 
         <div class="row">
             <h2 class="section-heading">Sale</h2>
-            <div class="col-lg-11">
+            <div class="col-lg-12">
                 <h4>Sales</h4>
-            </div>
-            <div class="col-lg-1">
-                <button id="CmdAddSale" type="submit" class="btn btn-primary" onclick="CmdSaleAdd_OnClick()">Add</button>
             </div>
         </div>
         <br />
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-6">
                 <div id="DateFilter">
                     <input id="SalesDateFilter" readonly />
                 </div>
                 <input class="form-control" id="DateFilter_Data" type="hidden" />
+            </div>
+            <div class="col-lg-6">
+                <button id="CmdAddSale" type="submit" class="btn btn-primary pull-right" onclick="CmdSaleAdd_OnClick()" style="margin-left: 8px;">Add</button>
+                <button class="btn btn-primary pull-right" id="SaveSaleLedger">Export</button>
             </div>
         </div>
         <br />
@@ -94,9 +95,9 @@
                     <span class="glyphicon glyphicon-fast-forward"></span>
                 </button>
             </div>
-            @*<div class="col-md-5">
-                <div class="pull-right"><span id="AmountTotal"></span></div>
-            </div>*@
+            <div class="col-md-5">
+                <div class="pull-right"><span id="TotalAmount"></span></div>
+            </div>
         </div>
 
     </div>
@@ -221,6 +222,8 @@
 
     var UserList;
     var ProductPackageList;
+
+    var SalesLedgerSaveData = [];
 
     function CmdSaleEdit_OnClick() {
         Sales.editItem(Sales.currentItem);
@@ -360,6 +363,7 @@
                 $("#SaleEdit_UserId").val(UserList.items[this.selectedIndex].Id);
             }
         });
+
         ax.dispose();
         ax = new wijmo.input.AutoComplete('#cboSaleEdit_ProductPackageId', {
             itemsSource: getProductPackageList(ProductPackageList.items),
@@ -500,7 +504,7 @@
                         });
                     }
                     //debugger;
-                    $("#AmountTotal").text("Total Amount: " + (Amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
+                    //$("#AmountTotal").text("Total Amount: " + (Amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
                 } else {
                     alert("No data.");
                 }
@@ -637,6 +641,79 @@
         btnCurrentPageSale.innerHTML = (Sales.pageIndex + 1) + ' / ' + Sales.pageCount;
     }
 
+    function CmdSaveXLS_OnClick() {
+        var SLR = '';
+        var record = [];
+
+        for (i = 0; i < SalesLedgerSaveData.length; i++) {
+            record.push({
+                SalesNumber: SalesLedgerSaveData[i].SalesNumber,
+                User: SalesLedgerSaveData[i].User,
+                ProductPackage: SalesLedgerSaveData[i].ProductPackage,
+                Quantity: SalesLedgerSaveData[i].Quantity,
+                Price: SalesLedgerSaveData[i].Price,
+                Amount: SalesLedgerSaveData[i].Amount
+            });
+        }
+
+        var $salesDate = $('#DateFilter').find('input').val();
+
+        SLR += 'Sales Ledger Record' + '\r\n\n' + $salesDate + ' ' + '\r\n\n';
+
+        var recordLabelRow = '';
+        for (var s in record[0]) {
+            recordLabelRow += s + ',';
+        }
+        recordLabelRow = recordLabelRow.slice(0, -1);
+        SLR += recordLabelRow + '\r\n';
+
+        for (var i = 0; i < record.length; i++) {
+            var recordRow = '';
+            for (var s in record[i]) {
+                recordRow += '"' + record[i][s] + '",';
+            }
+            recordRow.slice(0, recordRow.length - 1);
+            SLR += recordRow + '\r\n';
+        }
+
+        SLR += '\r\n' + 'Total: ' + $('#TotalAmount').text();
+
+        if (SLR == '') {
+            alert("No data");
+            return;
+        }
+
+        // Create filename
+
+        var fileName = 'magenta_' + $salesDate + '_' + 'sales.CSV';
+
+        // Download via <a> link
+
+        var link = document.createElement("a");
+
+        if (link.download !== undefined) {
+            var blob = new Blob([SLR], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style = "visibility:hidden";
+        }
+
+        if (navigator.msSaveBlob) {
+            link.addEventListener("click", function (event) {
+                var blob = new Blob([SLR], {
+                    "type": "text/csv;charset=utf-8;"
+                });
+                navigator.msSaveBlob(blob, fileName);
+            }, false);
+        }
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    }
+
     function FormValidate() {
         var validator = $('form').validate({
             submitHandler: function (form) {
@@ -683,21 +760,6 @@
         "tapToDismiss": false
     }
 
-    //var filterElement = document.getElementById('SalesDateFilter'),
-    //    filterText = $('#SalesDateFilter').find('input').val();
-    //    filterText = '';
-
-    //// update grid when filter changes
-    //    filterElement.addEventListener('input', function () {
-    //    filterText = this.value.toLowerCase();
-    //    Sales.refresh();
-    //});
-
-    //// CollectionView filter
-    //Sales.filter = function (item) {
-    //    return !filterText || item.SalesDate.toLowerCase().indexOf(filterText) > -1;
-    //};
-
     $(document).ready(function () {
 
         toastr.options.preventDuplicates = true;
@@ -715,6 +777,10 @@
             $("form input").removeClass("errorHighlight");
             $('form')[0].reset();
             $('#SaleEdit').modal('hide');
+        });
+
+        $('#SaveSaleLedger').click( function(){
+            CmdSaveXLS_OnClick();
         });
 
         btnFirstPageSale = document.getElementById('btnMoveToFirstPageSale');
@@ -735,12 +801,27 @@
         });
 
         var filterText = $('#DateFilter').find('input').val();
+        
 
         Sales.refresh;
 
         DateFilter.valueChanged.addHandler(function (sender, args) {
+            var totalAmount = 0;
             filterText = $('#DateFilter').find('input').val();
             Sales.refresh();
+            while (SalesLedgerSaveData.length > 0) SalesLedgerSaveData.pop();
+            for (var x = 0; x < Sales.totalItemCount; x++) {
+                totalAmount += parseInt(Sales.items[x].Amount, 10);
+                SalesLedgerSaveData.push({
+                    SalesNumber: Sales.items[x].SalesNumber,
+                    User: Sales.items[x].User,
+                    ProductPackage: Sales.items[x].ProductPackage,
+                    Quantity: Sales.items[x].Quantity,
+                    Price: Sales.items[x].Price,
+                    Amount: Sales.items[x].Amount
+                });
+            }
+            $('#TotalAmount').text('Total Amount : ' + (totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
         });
 
         Sales.filter = function (item) {
