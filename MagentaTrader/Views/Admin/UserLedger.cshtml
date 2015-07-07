@@ -498,7 +498,9 @@
 
     }
 
-    function CmdAddUserRole_OnClick(){
+    function CmdAddUserRole_OnClick() {
+
+        $('#cboRoleEdit_RoleId').find('option').remove();
 
         $("#UserRoleEdit").modal({
             show: true,

@@ -61,7 +61,7 @@ namespace MagentaTrader.Controllers
                                     LastName = d.LastName,
                                     EmailAddress = d.EmailAddress,
                                     PhoneNumber = d.PhoneNumber,
-                                    LastPurchase = s.LastPurchase.ToShortDateString()
+                                    LastPurchase = Convert.ToString(s.LastPurchase.Year) + "-" + Convert.ToString(s.LastPurchase.Month + 100).Substring(1, 2) + "-" + Convert.ToString(s.LastPurchase.Day + 100).Substring(1, 2)
                                 };
                     if (Users.Count() > 0)
                     {
