@@ -34,8 +34,8 @@
                 <li role="presentation" class="active"><a href="~/Admin/user">Users</a></li>
                 <li role="presentation"><a href="~/Admin/Event">Event</a></li>
                 <li role="presentation"><a href="~/Admin/Sales">Sales</a></li>
-                <li role="presentation"><a href="~/Admin/Product">Products</a></li>
                 <li role="presentation"><a href="~/Admin/Package">Packages</a></li>
+                <li role="presentation"><a href="~/Admin/Product">Products</a></li>
                 <li role="presentation"><a href="~/Admin/News">News</a></li>
                 <li role="presentation"><a href="~/Admin/"><i class="fa fa-home"></i></a></li>
             </ul>
@@ -53,20 +53,23 @@
             <div class="col-lg-11">
                 <h4>Users</h4>
             </div>
-            <div class="col-lg-1">
-                <button id="CmdAddUser" type="submit" class="btn btn-primary" onclick="CmdUserAdd_OnClick()">Add</button>
-            </div>
         </div>
 
         <br />
         <div class="row">
-            <div class="col-lg-3">
+            <div class="col-lg-4">
                 <div class="input-group">
                     <span class="input-group-btn">
                         <button class="btn btn-default" type="button" readonly><span class="fa fa-search"></span></button>
                     </span>
                     <input type="text" class="form-control" id="InputFilter" placeholder="Search User... ">
                 </div>
+            </div>
+            <div class="col-lg-8">
+                <button id="CmdAddUser" type="submit" class="btn btn-primary pull-right" onclick="CmdUserAdd_OnClick()">Add</button>
+                <button class="btn btn-primary pull-right" id="SaveUserList" style="margin-right: 10px;">
+                    Export
+                </button>
             </div>
         </div>
         <div class="row">
@@ -170,6 +173,8 @@
     var Users;
     var UserGrid;
 
+    var UserListSaveData = [];
+
     var btnFirstPageUser;
     var btnPreviousPageUser;
     var btnNextPageUser;
@@ -192,6 +197,7 @@
         document.getElementById('UserEdit_EmailAddress').value = User.EmailAddress ? User.EmailAddress : '';
         document.getElementById('UserEdit_PhoneNumber').value = User.PhoneNumber ? User.PhoneNumber : '';
     }
+
     function CmdUserAdd_OnClick() {
 
         window.location.href = '/Account/Register';
@@ -296,7 +302,8 @@
                             FirstName: Results[i]["FirstName"],
                             LastName: Results[i]["LastName"],
                             EmailAddress: Results[i]["EmailAddress"],
-                            PhoneNumber: Results[i]["PhoneNumber"]
+                            PhoneNumber: Results[i]["PhoneNumber"],
+                            LastPurchase: Results[i]["LastPurchase"]
                         });
                     }
                 } else {
@@ -308,8 +315,11 @@
                 alert(err);
             }
         );
+        while (UserListSaveData.length > 0) UserListSaveData.pop();
+        UserListSaveData = users;
         return users;
     }
+
     function UpdateNavigateButtonsUser() {
         if (Users.pageSize <= 0) {
             document.getElementById('naviagtionPageUser').style.display = 'none';
@@ -336,6 +346,7 @@
         }
         btnCurrentPageUser.innerHTML = (Users.pageIndex + 1) + ' / ' + Users.pageCount;
     }
+
     function ValidateUserEdit() {
         var errortext = "";
         //Firstname
@@ -363,6 +374,76 @@
         return errortext;
     }
 
+    function CmdSaveXLS_OnClick() {
+        var ULR = '';
+        var record = [];
+
+        for (i = 0; i < UserListSaveData.length; i++) {
+            record.push({
+                Id: UserListSaveData[i].Id,
+                UserName: UserListSaveData[i].UserName,
+                FirstName: UserListSaveData[i].FirstName,
+                LastName: UserListSaveData[i].LastName,
+                EmailAddress: UserListSaveData[i].EmailAddress,
+                PhoneNumber: UserListSaveData[i].PhoneNumber,
+                LastPurchase: UserListSaveData[i].LastPurchase,
+            });
+        }
+
+        ULR += 'User List Record' + '\r\n\n';
+
+        var recordLabelRow = '';
+        for (var s in record[0]) {
+            recordLabelRow += s + ',';
+        }
+        recordLabelRow = recordLabelRow.slice(0, -1);
+        ULR += recordLabelRow + '\r\n';
+
+        for (var i = 0; i < record.length; i++) {
+            var recordRow = '';
+            for (var s in record[i]) {
+                recordRow += '"' + record[i][s] + '",';
+            }
+            recordRow.slice(0, recordRow.length - 1);
+            ULR += recordRow + '\r\n';
+        }
+
+        if (ULR == '') {
+            alert("No data");
+            return;
+        }
+
+        // Create filename
+
+        var fileName = 'magenta_users.CSV';
+
+        // Download via <a> link
+
+        var link = document.createElement("a");
+
+        if (link.download !== undefined) {
+            var blob = new Blob([ULR], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style = "visibility:hidden";
+        }
+
+        if (navigator.msSaveBlob) {
+            link.addEventListener("click", function (event) {
+                var blob = new Blob([ULR], {
+                    "type": "text/csv;charset=utf-8;"
+                });
+                navigator.msSaveBlob(blob, fileName);
+            }, false);
+        }
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    }
+
     $(document).ready(function () {
         btnFirstPageUser = document.getElementById('btnMoveToFirstPageUser');
         btnPreviousPageUser = document.getElementById('btnMoveToPreviousPageUser');
@@ -386,7 +467,10 @@
         Users.filter = function (item) {
             return !filterText || (item.UserName.toLowerCase().indexOf(filterText) > -1) || (item.FirstName.toLowerCase().indexOf(filterText) > -1) || (item.LastName.toLowerCase().indexOf(filterText) > -1) || (item.EmailAddress.toLowerCase().indexOf(filterText) > -1) || (item.PhoneNumber.toLowerCase().indexOf(filterText) > -1);
         }
-
+        
+        $('#SaveUserList').click(function () {
+            CmdSaveXLS_OnClick();
+        });
 
         UserGrid.initialize({
             columns: [
@@ -431,6 +515,12 @@
                         {
                             "header": "Phone Number",
                             "binding": "PhoneNumber",
+                            "allowSorting": true,
+                            "width": "4*"
+                        },
+                        {
+                            "header": "Last Purchase",
+                            "binding": "LastPurchase",
                             "allowSorting": true,
                             "width": "4*"
                         }
