@@ -85,10 +85,14 @@
                 <ul class="dropdown-menu dropdown-messages">
 
                     <li>
-                        <a href="/Account">
+                        <a href="#" onclick="userEdit()">
+                            <div><strong>User Information</strong></div>
+                            <div>Your personal information.</div>
+                        </a>
+                        @*<a href="/Account">
                             <div><strong>Account</strong></div>
                             <div>Your account profile page.</div>
-                        </a>
+                        </a>*@
                     </li>
 
                     <li>
@@ -448,8 +452,8 @@
                         <select class="form-control custom-width" id="optionExpirationDates" onchange="createOptionChain();"></select>
                     </div>
                     <div class="col-lg-2">
-                        <p>No of days</p>
-                        <input type="text" class="form-control" id="optionTime" placeholder="30 Day(s)">
+                        <p>Days Prior Expiry</p>
+                        <input type="text" class="form-control" id="optionTime" placeholder="10 Day(s)">
                     </div>
                     <div class="col-lg-2">
                         <p>Target Price</p>
@@ -523,6 +527,51 @@
     </div>
 </div>
 
+<div class="modal fade" id="UserEdit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title">Edit User Information</h4>
+            </div>
+            <div class="modal-body">
+                <dl class="dl-horizontal">
+                    <dt>User Name</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_Id" type="hidden" />
+                        <input class="form-control" id="UserEdit_UserName" type="text" readonly />
+                    </dd>
+                    <dt>First Name</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_FirstName" type="text" />
+                    </dd>
+                    <dt>Last Name</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_LastName" type="text" />
+                    </dd>
+                    <dt>Email Address</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_EmailAddress" type="text" />
+                    </dd>
+                    <dt>Phone Number</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_PhoneNumber" type="text" />
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="userEditOk" onclick="userEditOk()">
+                    Ok
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="userEditCancel" onclick="userEditCancel()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="/js/date.js"></script>
 
@@ -629,12 +678,111 @@
     var sortedDataPuts;
     var trendStrike = [];
     var guideRiskReward = [];
+    var guideExpiryDate;
+    var guideTargetDate;
     var trendTarget;
 
     // Moving Average
 
     var MovingAverageGrid;
     var MovingAverageData = [];
+
+    // User Edit
+
+    function userEdit() {
+        $('#loading').modal({
+            show: true,
+            backdrop: false
+        });
+
+        var username = '@User.Identity.Name';
+
+        $.ajax({
+            url: '/api/GetUser/' + username,
+            type: 'GET',
+            data: {},
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (Results) {
+                $('#loading').modal('hide');
+
+                $('#UserEdit').modal({
+                    show: true,
+                    backdrop: false
+                });
+
+                if (Results.length > 0) {
+                    document.getElementById('UserEdit_Id').value = Results[0].Id !== null && typeof (Results[0].Id) != 'undefined' ? wijmo.Globalize.format(Results[0].Id) : '';
+                    document.getElementById('UserEdit_UserName').value = Results[0].UserName ? Results[0].UserName : '';
+                    document.getElementById('UserEdit_FirstName').value = Results[0].FirstName ? Results[0].FirstName : '';
+                    document.getElementById('UserEdit_LastName').value = Results[0].LastName ? Results[0].LastName : '';
+                    document.getElementById('UserEdit_EmailAddress').value = Results[0].EmailAddress ? Results[0].EmailAddress : '';
+                    document.getElementById('UserEdit_PhoneNumber').value = Results[0].PhoneNumber ? Results[0].PhoneNumber : '';
+                }
+            }
+
+        }).fail(
+            function (xhr, textStatus, err) {
+                alert(err);
+                $('#UserEdit').modal('hide');
+        });
+    }
+    function userEditOk() {
+        if (confirm("Save Information?") == true) {
+            var User = new Object();
+
+            User.Id = document.getElementById('UserEdit_Id').value;
+            User.UserName = document.getElementById('UserEdit_UserName').value;
+            User.FirstName = document.getElementById('UserEdit_FirstName').value;
+            User.LastName = document.getElementById('UserEdit_LastName').value;
+            User.EmailAddress = document.getElementById('UserEdit_EmailAddress').value;
+            User.PhoneNumber = document.getElementById('UserEdit_PhoneNumber').value;
+
+            var data = JSON.stringify(User);
+
+            $.ajax({
+                type: "PUT",
+                url: "/api/UpdateUser/" + User.Id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: data,
+                statusCode: {
+                    404: function () {
+                        alert("Not found");
+                    },
+                    400: function () {
+                        alert("Bad request");
+                    }
+                }
+            });
+            $('#UserEdit').modal('hide');
+        }
+    }
+    function userEditCancel() {
+        $('#UserEdit').modal('hide');
+    }
+    function userCheck() {
+        var username = '@User.Identity.Name';
+        $.ajax({
+            url: '/api/GetUser/' + username,
+            type: 'GET',
+            data: {},
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (Results) {
+                if (Results.length > 0) {
+                    if (Results[0].FirstName == "NA" || Results[0].FirstName == "" ||
+                        Results[0].LastName == "NA" || Results[0].LastName == "" ||
+                        Results[0].EmailAddress == "NA" || Results[0].EmailAddress == "" ||
+                        Results[0].PhoneNumber == "NA" || Results[0].PhoneNumber == "") {
+                        alert("To remove this prompt, you must fill in all user information.");
+                        userEdit();
+                    }
+                }
+            }
+
+        });
+    }
 
     // Tradier
 
@@ -955,6 +1103,7 @@
     }
 
     // Tradier Buy Equity
+
     function changeTradierOrderType() {
         var type = event.target.value;
         switch (type) {
@@ -1215,14 +1364,24 @@
     }
 
     // Tradier Buy Option
+
     function openTradierOptionChain() {
+        var GreenColor = "#0FB203";
+        var RedColor = "#A80008";
 
         if (TradierAccessToken != "") {
             $('#TradierOptionChain').modal({
                 show: true,
                 backdrop: false
             });
-            $("#TradierOptionChainTitle").text(dataSymbol + " Option Chain");
+
+            var change = plotData[125].close - plotData[124].close;
+            if (change >= 0) {
+                $("#TradierOptionChainTitle").html(dataSymbol + " Option Chain: " + "<font color='" + GreenColor + "'>" + plotData[125].close + "(" + change.toFixed(2) + ")</font>");
+            } else {
+                $("#TradierOptionChainTitle").html(dataSymbol + " Option Chain: " + "<font color='" + RedColor + "'>" + plotData[125].close + "(" + change.toFixed(2) + ")</font>");
+            }
+            
             $('#optionExpirationDates').empty();
             $('#OptionCallGrid').empty();
             $('#OptionPutGrid').empty();
@@ -1476,16 +1635,16 @@
                             symbol: chain[index[b]].symbol,
                             description: chain[index[b]].description,
                             type: chain[index[b]].type,
-                            last: chain[index[b]].last,
-                            change: chain[index[b]].change,
-                            volume: chain[index[b]].volume,
-                            bid: chain[index[b]].bid,
-                            bidsize: chain[index[b]].bidsize,
-                            ask: chain[index[b]].ask,
-                            asksize: chain[index[b]].asksize,
-                            open_interest: chain[index[b]].open_interest,
+                            last: !chain[index[b]].last ? 0 : chain[index[b]].last,
+                            change: !chain[index[b]].change ? 0 : chain[index[b]].change,
+                            volume: !chain[index[b]].volume ? 0 : chain[index[b]].volume,
+                            bid: !chain[index[b]].bid ? 0 : chain[index[b]].bid,
+                            bidsize: !chain[index[b]].bidsize ? 0 : chain[index[b]].bidsize,
+                            ask: !chain[index[b]].ask ? 0 : chain[index[b]].ask,
+                            asksize: !chain[index[b]].asksize ? 0 : chain[index[b]].asksize,
+                            open_interest: !chain[index[b]].open_interest ? 0 : chain[index[b]].open_interest,
                             strike: chain[index[b]].strike,
-                            contract_size: chain[index[b]].contract_size,
+                            contract_size: !chain[index[b]].contract_size ? 0 : chain[index[b]].contract_size,
                             expiration_date: chain[index[b]].expiration_date,
                             expiration_type: chain[index[b]].expiration_type,
                             option_type: chain[index[b]].option_type,
@@ -1497,16 +1656,16 @@
                         symbol: chain[i].symbol,
                         description: chain[i].description,
                         type: chain[i].type,
-                        last: chain[i].last,
-                        change: chain[i].change,
-                        volume: chain[i].volume,
-                        bid: chain[i].bid,
-                        bidsize: chain[i].bidsize,
-                        ask: chain[i].ask,
-                        asksize: chain[i].asksize,
-                        open_interest: chain[i].open_interest,
+                        last: !chain[i].last ? 0 : chain[i].last,
+                        change: !chain[i].change ? 0 : chain[i].change,
+                        volume: !chain[i].volume ? 0 : chain[i].volume,
+                        bid: !chain[i].bid ? 0 : chain[i].bid,
+                        bidsize: !chain[i].bidsize ? 0 : chain[i].bidsize,
+                        ask: !chain[i].ask ? 0 : chain[i].ask,
+                        asksize: !chain[i].asksize ? 0 : chain[i].asksize,
+                        open_interest: !chain[i].open_interest ? 0 : chain[i].open_interest,
                         strike: chain[i].strike,
-                        contract_size: chain[i].contract_size,
+                        contract_size: !chain[i].contract_size ? 0 : chain[i].contract_size,
                         expiration_date: chain[i].expiration_date,
                         expiration_type: chain[i].expiration_type,
                         option_type: chain[i].option_type,
@@ -1529,6 +1688,8 @@
         for (var i = 0; i < guideRiskReward.length; i++) {
             stockPanel1.valueAxes[1].removeGuide(guideRiskReward[i]);
         }
+        stockPanel1.categoryAxis.removeGuide(guideExpiryDate);
+        stockPanel1.categoryAxis.removeGuide(guideTargetDate);
         stockPanel1.validateNow();
         // Compute for the max
         var maxVolume = 0;
@@ -1544,7 +1705,7 @@
             var $optionVolatility = document.getElementById('optionVolatility').value;
             var $optionRate = document.getElementById('optionRate').value;
 
-            $optionTime = !$optionTime ? 0.10 : $optionTime / 360; // Annualize
+            $optionTime = !$optionTime ? 0.027 : $optionTime / 360; // Annualize
             $optionTargePrice = !$optionTargePrice ? plotData[125]["close"] : $optionTargePrice;
             $optionVolatility = !$optionVolatility ? 0.20 : $optionVolatility / 100; // Percentage
             $optionRate = !$optionRate ? 0.05 : $optionRate / 100; // Percentage
@@ -1561,26 +1722,64 @@
                 trendStrike[i].lineAlpha = 0.5;
                 stockPanel1.addTrendLine(trendStrike[i]);
 
-                var option_price = black_scholes.calculate(false, $optionTargePrice, sortedDataCalls[i].strike, $optionRate, $optionTime, $optionVolatility);
+                var option_price = black_scholes.calculate(true, $optionTargePrice, sortedDataCalls[i].strike, $optionRate, $optionTime, $optionVolatility);
                 var change = option_price - sortedDataCalls[i].last;
-                var percentage = (change / option_price) * 100;
+                var percentage = 0;
+
+                if (sortedDataCalls[i].last > 0) {
+                    percentage = (change / sortedDataCalls[i].last) * 100;
+                } else {
+                    if (change > 0) {
+                        percentage = 100;
+                    } else if (change == 0) {
+                        percentage = 0;
+                    } else {
+                        percentage = -100;
+                    }
+                }
+
+                if (percentage < -100) {
+                    percentage = -100;
+                }
 
                 guideRiskReward[i] = new AmCharts.Guide();
                 guideRiskReward[i].lineColor = callColor;
                 guideRiskReward[i].date = plotData[126]["date"];
-                guideRiskReward[i].label = sortedDataCalls[i].description + ":" + AmCharts.roundTo(option_price, 2).toString() + "(" + AmCharts.roundTo(change, 2).toString() + ") " + AmCharts.roundTo(percentage, 2) + "%   ";
+                guideRiskReward[i].label = sortedDataCalls[i].strike.toString() + " (" + sortedDataCalls[i].last.toFixed(2) + "): " + AmCharts.roundTo(option_price, 2).toFixed(2) + " (" + AmCharts.roundTo(change, 2).toFixed(2) + ") " + AmCharts.roundTo(percentage, 2) + "%   ";
                 guideRiskReward[i].color = callColor;
                 guideRiskReward[i].value = sortedDataCalls[i].strike;
                 guideRiskReward[i].inside = true;
                 stockPanel1.valueAxes[1].addGuide(guideRiskReward[i]);
             }
-            chartEvent1.date = plotData[125 + parseInt($optionTime * 360)]["date"];
-            chartEvent1.backgroundColor = callColor;
-            chartEvent1.color = "#FFFFFF";
+            //chartEvent1.date = plotData[125 + parseInt($optionTime * 360)]["date"];
+            //chartEvent1.backgroundColor = callColor;
+            //chartEvent1.color = "#FFFFFF";
 
-            chart.showStockEvents();
-            chart.validateData();
-            chart.validateNow();
+            //chart.showStockEvents();
+            //chart.validateData();
+            //chart.validateNow();
+
+            guideExpiryDate = new AmCharts.Guide();
+            guideExpiryDate.date = parseDate(sortedDataCalls[0].expiration_date);
+            guideExpiryDate.lineColor = callColor;
+            guideExpiryDate.lineAlpha = 1;
+            guideExpiryDate.lineThickness = 2;
+            guideExpiryDate.inside = true;
+            guideExpiryDate.labelRotation = 90;
+            guideExpiryDate.label = "Expiry: " + sortedDataCalls[0].expiration_date;
+            stockPanel1.categoryAxis.addGuide(guideExpiryDate);
+
+            guideTargetDate = new AmCharts.Guide();
+            guideTargetDate.date = parseDate(sortedDataCalls[0].expiration_date).add(-1*parseInt($optionTime * 360)).days();
+            guideTargetDate.lineColor = callColor;
+            guideTargetDate.lineAlpha = 1;
+            guideTargetDate.lineThickness = 2;
+            guideTargetDate.inside = true;
+            guideTargetDate.labelRotation = 90;
+            guideTargetDate.label = "Call Target: " + (parseDate(sortedDataCalls[0].expiration_date).add(-1 * parseInt($optionTime * 360)).days()).toString("yyyy-MM-dd") + " @@ " + AmCharts.roundTo($optionTargePrice, 2).toString();
+            stockPanel1.categoryAxis.addGuide(guideTargetDate);
+
+            stockPanel1.validateNow();
         }
         // Hide modal
         $('#TradierOptionChain').modal('hide');
@@ -1594,7 +1793,9 @@
         for (var i = 0; i < guideRiskReward.length; i++) {
             stockPanel1.valueAxes[1].removeGuide(guideRiskReward[i]);
         }
-        stockPanel1.removeTrendLine(trendTarget);
+        //stockPanel1.removeTrendLine(trendTarget);
+        stockPanel1.categoryAxis.removeGuide(guideExpiryDate);
+        stockPanel1.categoryAxis.removeGuide(guideTargetDate);
         stockPanel1.validateNow();
         // Compute for the max volumen
         var maxVolume = 0;
@@ -1610,7 +1811,7 @@
             var $optionVolatility = document.getElementById('optionVolatility').value;
             var $optionRate = document.getElementById('optionRate').value;
 
-            $optionTime = !$optionTime ? 0.10 : $optionTime / 360; // Annualize
+            $optionTime = !$optionTime ? 0.027 : $optionTime / 360; // Annualize
             $optionTargePrice = !$optionTargePrice ? plotData[125]["close"] : $optionTargePrice;
             $optionVolatility = !$optionVolatility ? 0.20 : $optionVolatility / 100; // Percentage
             $optionRate = !$optionRate ? 0.05 : $optionRate / 100; // Percentage
@@ -1629,25 +1830,63 @@
 
                 var option_price = black_scholes.calculate(false, $optionTargePrice, sortedDataPuts[i].strike, $optionRate, $optionTime, $optionVolatility);
                 var change = option_price - sortedDataPuts[i].last;
-                var percentage =(change / option_price) * 100;
+                var percentage = 0;
+
+                if (sortedDataPuts[i].last > 0) {
+                    percentage = (change / sortedDataPuts[i].last) * 100;
+                } else {
+                    if (change > 0) {
+                        percentage = 100;
+                    } else if (change == 0) {
+                        percentage = 0;
+                    } else {
+                        percentage = -100;
+                    }
+                }
+
+                if (percentage < -100) {
+                    percentage = -100;
+                }
 
                 guideRiskReward[i] = new AmCharts.Guide();
                 guideRiskReward[i].lineColor = putColor;
                 guideRiskReward[i].date = plotData[126]["date"];
-                guideRiskReward[i].label = sortedDataPuts[i].description + ":" + AmCharts.roundTo(option_price, 2).toString() + "(" + AmCharts.roundTo(change, 2).toString() + ") " + AmCharts.roundTo(percentage, 2) + "%   ";
+                guideRiskReward[i].label = sortedDataPuts[i].strike.toString() + " (" + sortedDataPuts[i].last.toFixed(2) + "): " + AmCharts.roundTo(option_price, 2).toFixed(2) + " (" + AmCharts.roundTo(change, 2).toFixed(2) + ") " + AmCharts.roundTo(percentage, 2) + "%   ";
                 guideRiskReward[i].color = putColor;
                 guideRiskReward[i].value = sortedDataPuts[i].strike;
                 guideRiskReward[i].inside = true;
                 stockPanel1.valueAxes[1].addGuide(guideRiskReward[i]);
             }
 
-            chartEvent1.date = plotData[125 + parseInt($optionTime*360)]["date"];
-            chartEvent1.backgroundColor = putColor;
-            chartEvent1.color = "#FFFFFF";
+            //chartEvent1.date = plotData[125 + parseInt($optionTime*360)]["date"];
+            //chartEvent1.backgroundColor = putColor;
+            //chartEvent1.color = "#FFFFFF";
 
-            chart.showStockEvents();
-            chart.validateData();
-            chart.validateNow();
+            //chart.showStockEvents();
+            //chart.validateData();
+            //chart.validateNow();
+
+            guideExpiryDate = new AmCharts.Guide();
+            guideExpiryDate.date = parseDate(sortedDataPuts[0].expiration_date);
+            guideExpiryDate.lineColor = putColor;
+            guideExpiryDate.lineAlpha = 1;
+            guideExpiryDate.lineThickness = 2;
+            guideExpiryDate.inside = true;
+            guideExpiryDate.labelRotation = 90;
+            guideExpiryDate.label = "Expiry: " + sortedDataPuts[0].expiration_date;
+            stockPanel1.categoryAxis.addGuide(guideExpiryDate);
+
+            guideTargetDate = new AmCharts.Guide();
+            guideTargetDate.date = parseDate(sortedDataPuts[0].expiration_date).add(-1 * parseInt($optionTime * 360)).days();
+            guideTargetDate.lineColor = putColor;
+            guideTargetDate.lineAlpha = 1;
+            guideTargetDate.lineThickness = 2;
+            guideTargetDate.inside = true;
+            guideTargetDate.labelRotation = 90;
+            guideTargetDate.label = "Put Target: " + (parseDate(sortedDataPuts[0].expiration_date).add(-1 * parseInt($optionTime * 360)).days()).toString("yyyy-MM-dd") + " @@ " + AmCharts.roundTo($optionTargePrice, 2).toString();
+            stockPanel1.categoryAxis.addGuide(guideTargetDate);
+
+            stockPanel1.validateNow();
         }
         // Hide modal
         $('#TradierOptionChain').modal('hide');
@@ -2515,6 +2754,7 @@
             chartSymbol = $('#searchSymbol').val().toUpperCase();
             getEarningsSchedule(symbol);
             getData(symbol);
+            userCheck();
         }
     }
     function getData(symbol) {
@@ -3670,7 +3910,7 @@
             $("#symbolSlopePercentage").html("<a href='#' style='padding: 2px 20px'><font color='" + RedColor + "'><span>ADR:</span><span class='pull-right'>" + ADR.toFixed(2) + "%</span></font></a>");
         }
         
-        $("#symbolInfoCoefficient").html("<a href='#' style='padding: 2px 20px'><span>Coefficient:</span><span class='pull-right'>" + chartCoefficient.toFixed(2) + "</span></a>");
+        $("#symbolInfoCoefficient").html("<a href='#' style='padding: 2px 20px'><span>Linear:</span><span class='pull-right'>" + chartCoefficient.toFixed(2) + "</span></a>");
         $("#symbolInfoRange").html("<a href='#' style='padding: 2px 20px'><span>Range:</span><span class='pull-right'>" + chartChannelRange.toFixed(2) + "%</span></a>");
 
         var corrPriceData = [];
@@ -3807,6 +4047,20 @@
     function parseDate(input) {
         var parts = input.split('-');
         return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+    function addZeroes(num) {
+        // Cast as number
+        var num = Number(num);
+        // If not a number, return 0
+        if (isNaN) {
+            return 0;
+        }
+        // If there is no decimal, or the decimal is less than 2 digits, toFixed
+        if (String(num).split(".").length < 2 || String(num).split(".")[1].length <= 2) {
+            num = num.toFixed(2);
+        }
+        // Return the number
+        return num;
     }
 
     // Variable Scanner
@@ -4000,6 +4254,7 @@
             $('#searchSymbol').val(symbol);
             getEarningsSchedule(symbol);
             getData(symbol);
+            userCheck();
         }
 
         //  After update event on Search Symbol (on exit and enter key press)

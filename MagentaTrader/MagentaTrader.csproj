@@ -820,6 +820,7 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="img\banner-bg.jpg" />
+    <Content Include="img\campaign\20150626.png" />
     <Content Include="img\contact.jpg" />
     <Content Include="img\contact.png" />
     <Content Include="img\derekportrait-1.png" />
