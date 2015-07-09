@@ -24,45 +24,21 @@ namespace MagentaTrader.Controllers
             {
                 try
                 {
-                    var query1 = from sale in db.TrnSales
-                                 group sale by sale.UserId into g
-                                 let maxDate = g.Max(s => s.SalesDate)
-                                 select new { UserId = g.Key, maxDate };
 
-                    var query2 = from user in db.MstUsers
-                                 from q1 in query1.Where(q => q.UserId == user.Id)
-                                 select new {
-                                     Id = user.Id,
-                                     UserName = user.UserName,
-                                     FirstName = user.FirstName,
-                                     LastName = user.LastName,
-                                     EmailAddress = user.EmailAddress,
-                                     PhoneNumber = user.PhoneNumber,
-                                     q1.maxDate
-                                 };
+                    var Users = (from d in db.MstUsers.Where(x=>x.AspNetUserId != null)
+                                 from s in db.TrnSales.Where(x=>x.UserId == d.Id).GroupBy(x=>x.UserId)
+                                 join ss in db.TrnSales on d.Id equals ss.UserId 
+                                 select new Models.User
+                                 {
+                                     Id = d.Id,
+                                     UserName = d.UserName,
+                                     FirstName = d.FirstName,
+                                     LastName = d.LastName,
+                                     EmailAddress = d.EmailAddress,
+                                     PhoneNumber = d.PhoneNumber,
+                                     LastPurchase = Convert.ToString(ss.SalesDate.Year) + "-" + Convert.ToString(ss.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(ss.SalesDate.Day + 100).Substring(1, 2)
+                                 }).ToList();
 
-                    var result = query2.ToList();
-
-                    var Users = from d in db.MstUsers
-                                join s in
-                                    (from sale in db.TrnSales
-                                     group sale by sale.Id into grp
-                                     select new
-                                     {
-                                         Id = grp.Key,
-                                         LastPurchase = grp.Max(item => item.SalesDate)
-                                     })
-                                on d.Id equals s.Id
-                                select new Models.User
-                                {
-                                    Id = d.Id,
-                                    UserName = d.UserName,
-                                    FirstName = d.FirstName,
-                                    LastName = d.LastName,
-                                    EmailAddress = d.EmailAddress,
-                                    PhoneNumber = d.PhoneNumber,
-                                    LastPurchase = Convert.ToString(s.LastPurchase.Year) + "-" + Convert.ToString(s.LastPurchase.Month + 100).Substring(1, 2) + "-" + Convert.ToString(s.LastPurchase.Day + 100).Substring(1, 2)
-                                };
                     if (Users.Count() > 0)
                     {
                         values = Users.ToList();
