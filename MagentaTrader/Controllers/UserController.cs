@@ -24,20 +24,34 @@ namespace MagentaTrader.Controllers
             {
                 try
                 {
-
-                    var Users = (from d in db.MstUsers.Where(x=>x.AspNetUserId != null)
-                                 from s in db.TrnSales.Where(x=>x.UserId == d.Id).GroupBy(x=>x.UserId)
-                                 join ss in db.TrnSales on d.Id equals ss.UserId 
+                    var Userss = (from u in db.MstUsers.Where(x => x.AspNetUserId != null)
                                  select new Models.User
                                  {
-                                     Id = d.Id,
-                                     UserName = d.UserName,
-                                     FirstName = d.FirstName,
-                                     LastName = d.LastName,
-                                     EmailAddress = d.EmailAddress,
-                                     PhoneNumber = d.PhoneNumber,
-                                     LastPurchase = Convert.ToString(ss.SalesDate.Year) + "-" + Convert.ToString(ss.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(ss.SalesDate.Day + 100).Substring(1, 2)
+                                     Id = u.Id,
+                                     UserName = u.UserName,
+                                     FirstName = u.FirstName,
+                                     LastName = u.LastName,
+                                     EmailAddress = u.EmailAddress,
+                                     PhoneNumber = u.PhoneNumber,
                                  }).ToList();
+
+                    var MaxLastPurchase = (from u in db.MstUsers.Where(x => x.AspNetUserId != null)
+                                           from s in db.TrnSales.Where(x => x.UserId == u.Id).GroupBy(x => x.UserId)
+                                           select new Models.User
+                                           {
+                                               Id = u.Id,
+                                               AspNetUserId = u.AspNetUserId,
+                                               dateLP = s.Max(x => x.SalesDate)
+                                           }).ToArray();
+                    
+                    for( var x = 0; x < MaxLastPurchase.Count()-1; x++ )
+                    {
+                        if (Userss.Any(n => n.Id == MaxLastPurchase[x].Id))
+                            MaxLastPurchase[x].LastPurchase = Convert.ToString(MaxLastPurchase[x].dateLP.Year) + "-" + Convert.ToString(MaxLastPurchase[x].dateLP.Month + 100).Substring(1, 2) + "-" + Convert.ToString(MaxLastPurchase[x].dateLP.Day + 100).Substring(1, 2);
+                            Userss.Where(m => m.Id == MaxLastPurchase[x].Id).ToList().ForEach(c => c.LastPurchase = MaxLastPurchase[x].LastPurchase);
+                    }
+
+                    var Users = Userss.ToList();
 
                     if (Users.Count() > 0)
                     {

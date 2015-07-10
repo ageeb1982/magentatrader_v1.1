@@ -15,6 +15,7 @@ namespace MagentaTrader.Models
         public string PhoneNumber { get; set; }
         public string AspNetUserId { get; set; }
         public string LastPurchase { get; set; }
+        public DateTime dateLP { get; set; }
         
         // Variables for PackageLedger
         public int SaleId { get; set; }
