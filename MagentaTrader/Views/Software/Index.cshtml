@@ -1726,6 +1726,8 @@
                 var change = option_price - sortedDataCalls[i].last;
                 var percentage = 0;
 
+                change = Math.round(change * 100) / 100;
+
                 if (sortedDataCalls[i].last > 0) {
                     percentage = (change / sortedDataCalls[i].last) * 100;
                 } else {
@@ -1831,6 +1833,8 @@
                 var option_price = black_scholes.calculate(false, $optionTargePrice, sortedDataPuts[i].strike, $optionRate, $optionTime, $optionVolatility);
                 var change = option_price - sortedDataPuts[i].last;
                 var percentage = 0;
+
+                change = Math.round(change * 100) / 100;
 
                 if (sortedDataPuts[i].last > 0) {
                     percentage = (change / sortedDataPuts[i].last) * 100;

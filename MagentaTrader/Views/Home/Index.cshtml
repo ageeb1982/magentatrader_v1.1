@@ -270,11 +270,12 @@
             <div class="clearfix"></div>
             <h2 class="section-heading">News</h2>
             <p class="lead">
-                April 27, 2015:
+                July 12, 2015:
                 <ul class="list-group">
                     @*<li class="list-group-item">Magenta Trader.com | 5/4/2015-5/10/2015 | <a href="https://www2.tuscanylasvegas.com/smsworld/wc.dll?smsWorld~Availbox~&wsi=port">1387I1 - Tuscany Suites & Casino Group Code</a></li>*@
+                    <li class="list-group-item">Security prompt on Web99 Webinars are now active.</li>
+                    <li class="list-group-item">Option Risk and Reward value verification</li>
                     <li class="list-group-item"><a href="https://brokerage.tradier.com/platforms/magenta-trader">Tradier Brokerage Integration</a></li>
-                    <li class="list-group-item">Screener to include ADR/AGR values</li>
                     <li class="list-group-item">Chart to include 5 years of data</li>
                 </ul>
             </p>
@@ -502,11 +503,71 @@
     </div>
 </footer>
 
+<div class="modal fade" id="loading" tabindex="-1" role="dialog" aria-labelledby="Loading..." aria-hidden="true">
+    <div class="modal-dialog" style="width: 220px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Loading...</h4>
+            </div>
+            <div class="modal-body">
+                <img src="/img/progress_bar.gif" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="UserEdit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title">Edit User Information</h4>
+            </div>
+            <div class="modal-body">
+                <dl class="dl-horizontal">
+                    <dt>User Name</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_Id" type="hidden" />
+                        <input class="form-control" id="UserEdit_UserName" type="text" readonly />
+                    </dd>
+                    <dt>First Name</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_FirstName" type="text" />
+                    </dd>
+                    <dt>Last Name</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_LastName" type="text" />
+                    </dd>
+                    <dt>Email Address</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_EmailAddress" type="text" />
+                    </dd>
+                    <dt>Phone Number</dt>
+                    <dd>
+                        <input class="form-control" id="UserEdit_PhoneNumber" type="text" />
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="userEditOk" onclick="userEditOk()">
+                    Ok
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="userEditCancel" onclick="userEditCancel()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!--JAVASCRIPT-->>
 <script type="text/javascript">
     var CalendarData;
     var CalendarGrid;
     var WebinarData = [];
+    var WebinarURL = "";
 
     function GetCalendarDate(Month, Year) {
         var Sun = "", Mon = "", Tue = "", Wed = "", Thu = "", Fri = "", Sat = "";
@@ -665,21 +726,133 @@
         for (var i = 0; i < WebinarData.length; i++) {
             var webinarDate = new Date(WebinarData[i]["EventDate"]);
             if (parseDate(dayDate).equals(webinarDate) == true) {
-                webinars = webinars + "<a href='" + WebinarData[i]["URL"] + "'>" + WebinarData[i]["EventDescription"] + "</a><br />"
+                if (WebinarData[i]["IsRestricted"] == true) {
+                    webinars = webinars + "<a href='#' onclick='OpenWeb99Link(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
+                } else {
+                    webinars = webinars + "<a href='" + WebinarData[i]["URL"] + "'>" + WebinarData[i]["EventDescription"] + "</a><br />";
+                } 
             }
         }
         return webinars;
+    }
+    function OpenWeb99Link(URL) {
+        var username = '@User.Identity.Name';
+        if (username.length > 0) {
+            WebinarURL = URL;
+            userCheck(username);
+        } else {
+            window.location.href = "/account/login";
+        } 
     }
     function parseDate(input) {
         var parts = input.split('-');
         return new Date(parts[0], parts[1] - 1, parts[2]);
     }
-
     function CmdGetWebinar_OnClick() {
         var m = parseInt($("#WebinarMonth").val());
         var y = parseInt($("#WebinarYear").val());
 
         MakeCalendarGrid(m, y);
+    }
+
+    function userEdit(username) {
+        $('#loading').modal({
+            show: true,
+            backdrop: false
+        });
+
+        $.ajax({
+            url: '/api/GetUser/' + username,
+            type: 'GET',
+            data: {},
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (Results) {
+                $('#loading').modal('hide');
+
+                $('#UserEdit').modal({
+                    show: true,
+                    backdrop: false
+                });
+
+                if (Results.length > 0) {
+                    document.getElementById('UserEdit_Id').value = Results[0].Id !== null && typeof (Results[0].Id) != 'undefined' ? wijmo.Globalize.format(Results[0].Id) : '';
+                    document.getElementById('UserEdit_UserName').value = Results[0].UserName ? Results[0].UserName : '';
+                    document.getElementById('UserEdit_FirstName').value = Results[0].FirstName ? Results[0].FirstName : '';
+                    document.getElementById('UserEdit_LastName').value = Results[0].LastName ? Results[0].LastName : '';
+                    document.getElementById('UserEdit_EmailAddress').value = Results[0].EmailAddress ? Results[0].EmailAddress : '';
+                    document.getElementById('UserEdit_PhoneNumber').value = Results[0].PhoneNumber ? Results[0].PhoneNumber : '';
+                }
+            }
+
+        }).fail(
+            function (xhr, textStatus, err) {
+                alert(err);
+                $('#UserEdit').modal('hide');
+            });
+    }
+    function userEditOk() {
+        if (confirm("Save Information?") == true) {
+            var User = new Object();
+
+            User.Id = document.getElementById('UserEdit_Id').value;
+            User.UserName = document.getElementById('UserEdit_UserName').value;
+            User.FirstName = document.getElementById('UserEdit_FirstName').value;
+            User.LastName = document.getElementById('UserEdit_LastName').value;
+            User.EmailAddress = document.getElementById('UserEdit_EmailAddress').value;
+            User.PhoneNumber = document.getElementById('UserEdit_PhoneNumber').value;
+
+            var data = JSON.stringify(User);
+
+            $.ajax({
+                type: "PUT",
+                url: "/api/UpdateUser/" + User.Id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: data,
+                statusCode: {
+                    200: function () {
+                        var username = '@User.Identity.Name';
+                        $('#UserEdit').modal('hide');
+                        userCheck(username);
+                        window.location.href = WebinarURL;
+                    },
+                    404: function () {
+                        alert("Not found");
+                    },
+                    400: function () {
+                        alert("Bad request");
+                    }
+                }
+            });
+            $('#UserEdit').modal('hide');
+        }
+    }
+    function userEditCancel() {
+        $('#UserEdit').modal('hide');
+    }
+    function userCheck(username) {
+        $.ajax({
+            url: '/api/GetUser/' + username,
+            type: 'GET',
+            data: {},
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (Results) {
+                if (Results.length > 0) {
+                    if (Results[0].FirstName == "NA" || Results[0].FirstName == "" ||
+                        Results[0].LastName == "NA" || Results[0].LastName == "" ||
+                        Results[0].EmailAddress == "NA" || Results[0].EmailAddress == "" ||
+                        Results[0].PhoneNumber == "NA" || Results[0].PhoneNumber == "") {
+                        alert("To remove this prompt, you must fill in all user information.");
+                        userEdit(username);
+                    } else {
+                        window.location.href = WebinarURL;
+                    }
+                }
+            }
+
+        });
     }
 
     $(document).ready(function () {

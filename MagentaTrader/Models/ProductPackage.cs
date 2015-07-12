@@ -19,5 +19,6 @@ namespace MagentaTrader.Models
         public bool IsReoccuring { get; set; }
         public string Particulars { get; set; }
         public string PackageURL { get; set; }
+        public string ProductPackageGroup { get; set; }
     }
 }

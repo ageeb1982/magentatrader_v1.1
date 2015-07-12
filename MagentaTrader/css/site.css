@@ -140,3 +140,11 @@ textarea {
 .full-width {
     width: 100% !important;
 }
+
+dd {
+    margin-bottom: 8px;
+}
+
+dt {
+    margin-top: 5px;
+}

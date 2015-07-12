@@ -126,10 +126,10 @@ namespace MagentaTrader.Controllers
                         Data.MstUser NewUser = new Data.MstUser();
 
                         NewUser.UserName = model.UserName;
-                        NewUser.FirstName = "NA";
-                        NewUser.LastName = "NA";
-                        NewUser.EmailAddress = "NA";
-                        NewUser.PhoneNumber = "NA";
+                        NewUser.FirstName = model.FirstName == null || model.FirstName.Length == 0 ? "NA" : model.FirstName;
+                        NewUser.LastName = model.LastName == null || model.LastName.Length == 0 ? "NA" : model.LastName;
+                        NewUser.EmailAddress = model.EmailAddress == null || model.EmailAddress.Length == 0 ? "NA" : model.EmailAddress;
+                        NewUser.PhoneNumber = model.PhoneNumber == null || model.PhoneNumber.Length == 0 ? "NA" : model.PhoneNumber;
                         NewUser.AspNetUserId = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault().Id;
 
                         db.MstUsers.InsertOnSubmit(NewUser);
