@@ -62,12 +62,37 @@
         <br />
         <div class="row">
             <div class="col-lg-6">
-                <div id="DateFilter">
-                    <input id="SalesDateFilter" readonly />
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <span>FROM</span>
+                    </span>
+                    <div id="StartDateFilter">
+                        <input id="SalesDateStartFilter" readonly />
+                    </div>
+                    <span class="input-group-addon">
+                        <span>TO</span>
+                    </span>
+                    <div id="EndDateFilter">
+                        <input id="SalesDateEndFilter" readonly />
+                    </div>
                 </div>
-                <input class="form-control" id="DateFilter_Data" type="hidden" />
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-2">
+                <select id="GroupList_Data" class="full-width form-control">
+                    <option value="">All</option>
+                    <option value="ONE-TIME">One-time</option>
+                    <option value="REOCCURRING">Recurring</option>
+                </select>
+            </div>
+            <div class="col-lg-2">
+                <select id="StatusList_Data" class="full-width form-control">
+                    <option value="">All</option>
+                    <option value="OK">Ok</option>
+                    <option value="DECLINED">Declined</option>
+                    <option value="ERROR">Error</option>
+                </select>
+            </div>
+            <div class="col-lg-2">
                 <button id="CmdAddSale" type="submit" class="btn btn-primary pull-right" onclick="CmdSaleAdd_OnClick()" style="margin-left: 8px;">Add</button>
                 <button class="btn btn-primary pull-right" id="SaveSaleLedger">Export</button>
             </div>
@@ -97,6 +122,11 @@
             </div>
             <div class="col-md-5">
                 <div class="pull-right"><span id="TotalAmount"></span></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="pull-right"><span id="TotalSalesAmount"></span></div>
             </div>
         </div>
 
@@ -468,7 +498,6 @@
     function GetSales() {
         var sales = new wijmo.collections.ObservableArray();
         var Amount = 0;
-
         $('#loading').modal('show');
         $.ajax({
             url: '/api/Sales',
@@ -491,6 +520,7 @@
                             User: Results[i]["User"],
                             FirstName: Results[i]["FirstName"],
                             LastName: Results[i]["LastName"],
+                            FullName: Results[i]["FirstName"] + " " + Results[i]["LastName"],
                             SalesNumber: Results[i]["SalesNumber"],
                             SalesDate: Results[i]["SalesDate"],
                             RenewalDate: Results[i]["RenewalDate"],
@@ -500,7 +530,10 @@
                             Price: Results[i]["Price"],
                             Amount: Results[i]["Amount"],
                             IsActive: Results[i]["IsActive"],
-                            IsRefunded: Results[i]["IsRefunded"]
+                            IsRefunded: Results[i]["IsRefunded"],
+                            SalesStatus: Results[i]["SalesStatus"],
+                            SalesAmount: Results[i]["SalesAmount"],
+                            Group: Results[i]["Group"]
                         });
                     }
                     //debugger;
@@ -648,17 +681,18 @@
         for (i = 0; i < SalesLedgerSaveData.length; i++) {
             record.push({
                 SalesNumber: SalesLedgerSaveData[i].SalesNumber,
+                SalesDate: SalesLedgerSaveData[i].SalesDate,
+                Name: SalesLedgerSaveData[i].FullName,
                 User: SalesLedgerSaveData[i].User,
                 ProductPackage: SalesLedgerSaveData[i].ProductPackage,
-                Quantity: SalesLedgerSaveData[i].Quantity,
-                Price: SalesLedgerSaveData[i].Price,
-                Amount: SalesLedgerSaveData[i].Amount
+                Amount: SalesLedgerSaveData[i].Amount,
+                Group: SalesLedgerSaveData[i].Group,
+                SalesStatus: SalesLedgerSaveData[i].SalesStatus,
+                SalesAmount: SalesLedgerSaveData[i].SalesAmount
             });
         }
 
-        var $salesDate = $('#DateFilter').find('input').val();
-
-        SLR += 'Sales Ledger Record' + '\r\n\n' + $salesDate + ' ' + '\r\n\n';
+        SLR += 'Sales Ledger Record' + '\r\n\n';
 
         var recordLabelRow = '';
         for (var s in record[0]) {
@@ -676,7 +710,7 @@
             SLR += recordRow + '\r\n';
         }
 
-        SLR += '\r\n' + 'Total: ' + $('#TotalAmount').text();
+        SLR += '\r\n' + 'Total Amount: ' + $('#TotalAmount').text() + '\r\n' + 'Total Sales Amount: ' + $('#TotalSalesAmount').text();
 
         if (SLR == '') {
             alert("No data");
@@ -685,7 +719,7 @@
 
         // Create filename
 
-        var fileName = 'magenta_' + $salesDate + '_' + 'sales.CSV';
+        var fileName = 'magenta_' + '_' + 'sales.CSV';
 
         // Download via <a> link
 
@@ -795,37 +829,82 @@
              
         SalesGrid = new wijmo.grid.FlexGrid('#SalesGrid');
 
-        var DateFilter = new wijmo.input.InputDate('#SalesDateFilter', {
-            format: 'M/d/yyyy',
+        var StartDateFilter = new wijmo.input.InputDate('#SalesDateStartFilter', {
+            format: 'yyyy-MM-dd',
             value: new Date()
         });
 
-        var filterText = $('#DateFilter').find('input').val();
-        
+        var EndDateFilter = new wijmo.input.InputDate('#SalesDateEndFilter', {
+            format: 'yyyy-MM-dd',
+            value: new Date()
+        });
 
-        Sales.refresh;
+        var filterText = $('#StartDateFilter').find('input').val();
+        var EndDateFilterText = $('#EndDateFilter').find('input').val();
+        var groupFilter = '';
+        var salesAmountFilter = '';
 
-        DateFilter.valueChanged.addHandler(function (sender, args) {
+        StartDateFilter.valueChanged.addHandler(function (sender, args) {
             var totalAmount = 0;
-            filterText = $('#DateFilter').find('input').val();
+            var totalSalesAmount = 0;
+            filterText = $('#StartDateFilter').find('input').val();
             Sales.refresh();
             while (SalesLedgerSaveData.length > 0) SalesLedgerSaveData.pop();
             for (var x = 0; x < Sales.totalItemCount; x++) {
                 totalAmount += parseInt(Sales.items[x].Amount, 10);
+                totalSalesAmount += parseInt(Sales.items[x].SalesAmount, 10);
                 SalesLedgerSaveData.push({
                     SalesNumber: Sales.items[x].SalesNumber,
+                    SalesDate: Sales.items[x].SalesDate,
+                    Name: Sales.items[x].FullName,
                     User: Sales.items[x].User,
                     ProductPackage: Sales.items[x].ProductPackage,
-                    Quantity: Sales.items[x].Quantity,
-                    Price: Sales.items[x].Price,
-                    Amount: Sales.items[x].Amount
+                    Amount: Sales.items[x].Amount,
+                    Group: Sales.items[x].Group,
+                    SalesStatus: Sales.items[x].SalesStatus,
+                    SalesAmount: Sales.items[x].SalesAmount
                 });
             }
             $('#TotalAmount').text('Total Amount : ' + (totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
+            $('#TotalSalesAmount').text('Total Sales Amount : ' + totalSalesAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+        });
+
+        EndDateFilter.valueChanged.addHandler(function (sender, args) {
+            var totalAmount = 0;
+            var totalSalesAmount = 0;
+            for (var x = 0; x < Sales.totalItemCount; x++) {
+                totalAmount += parseInt(Sales.items[x].Amount, 10);
+                totalSalesAmount += parseInt(Sales.items[x].SalesAmount, 10);
+                SalesLedgerSaveData.push({
+                    SalesNumber: Sales.items[x].SalesNumber,
+                    SalesDate: Sales.items[x].SalesDate,
+                    Name: Sales.items[x].FullName,
+                    User: Sales.items[x].User,
+                    ProductPackage: Sales.items[x].ProductPackage,
+                    Amount: Sales.items[x].Amount,
+                    Group: Sales.items[x].Group,
+                    SalesStatus: Sales.items[x].SalesStatus,
+                    SalesAmount: Sales.items[x].SalesAmount
+                });
+            }
+            $('#TotalAmount').text('Total Amount : ' + (totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
+            $('#TotalSalesAmount').text('Total Sales Amount : ' + totalSalesAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+            EndDateFilterText = $('#EndDateFilter').find('input').val();
+            Sales.refresh();
+        });
+
+        $('#GroupList_Data').change(function () {
+            groupFilter = $(this).val();
+            Sales.refresh();
+        });
+
+        $('#StatusList_Data').change(function () {
+            salesAmountFilter = $(this).val();
+            Sales.refresh();
         });
 
         Sales.filter = function (item) {
-            return !filterText || item.SalesDate.indexOf(filterText) > -1;
+            return (item.SalesDate >= filterText) && (item.SalesDate <= EndDateFilterText) && item.Group.indexOf(groupFilter) > -1 && item.SalesStatus.indexOf(salesAmountFilter) > -1;
         };
 
         SalesGrid.initialize({
@@ -845,10 +924,23 @@
                     "isContentHtml": true
                 },
                 {
+                    "header": "Sale Date",
+                    "binding": "SalesDate",
+                    "allowSorting": true,
+                    "width": 100,
+                    "visible": true
+                },
+                {
                     "header": "Sales Number",
                     "binding": "SalesNumber",
                     "allowSorting": true,
                     "width": 110
+                },
+                {
+                    "header": "Name",
+                    "binding": "FullName",
+                    "allowSorting": true,
+                    "width": "2*"
                 },
                 {
                     "header": "Username",
@@ -864,11 +956,10 @@
                     "wordWrap": false
                 },
                 {
-                    "header": "Sale Date",
-                    "binding": "SalesDate",
+                    "header": "Group",
+                    "binding": "Group",
                     "allowSorting": true,
-                    "width": 100,
-                    "visible": false
+                    "width": 80
                 },
                 {
                     "header": "Renewal Date",
@@ -895,17 +986,31 @@
                     "header": "Quantity",
                     "binding": "Quantity",
                     "allowSorting": true,
-                    "width": 80
+                    "width": 80,
+                    "visible": false
                 },
                 {
                     "header": "Price",
                     "binding": "Price",
                     "allowSorting": true,
-                    "width": 80
+                    "width": 80,
+                    "visible": false
                 },
                 {
                     "header": "Amount",
                     "binding": "Amount",
+                    "allowSorting": true,
+                    "width": 80
+                },
+                {
+                    "header": "Status",
+                    "binding": "SalesStatus",
+                    "allowSorting": true,
+                    "width": 80
+                },
+                {
+                    "header": "Sales Amount",
+                    "binding": "SalesAmount",
                     "allowSorting": true,
                     "width": 80
                 }

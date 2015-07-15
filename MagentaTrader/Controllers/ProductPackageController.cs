@@ -36,7 +36,8 @@ namespace MagentaTrader.Controllers
                                        WithSoftware = d.WithSoftware,
                                        IsReoccuring = d.IsReoccuring,
                                        Particulars = d.Particulars,
-                                       PackageURL = d.PackageURL
+                                       PackageURL = d.PackageURL,
+                                       ProductPackageGroup = d.ProductPackageGroup
                                    };
                     if (Packages.Count() > 0)
                     {

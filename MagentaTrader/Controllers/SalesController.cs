@@ -25,6 +25,7 @@ namespace MagentaTrader.Controllers
                 try
                 {
                     var Sales = from d in db.TrnSales
+                                join p in db.MstProductPackages on d.ProductPackageId equals p.Id
                                 select new Models.Sales
                                 {
                                     Id = d.Id,
@@ -35,7 +36,7 @@ namespace MagentaTrader.Controllers
                                     FirstName = d.MstUser.FirstName,
                                     LastName = d.MstUser.LastName,
                                     SalesNumber = d.SalesNumber,
-                                    SalesDate = d.SalesDate.ToShortDateString(),
+                                    SalesDate = Convert.ToString(d.SalesDate.Year) + "-" + Convert.ToString(d.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.SalesDate.Day + 100).Substring(1, 2),
                                     RenewalDate = d.RenewalDate.ToShortDateString(),
                                     ExpiryDate = d.ExpiryDate.ToShortDateString(),
                                     Particulars = d.Particulars,
@@ -43,7 +44,10 @@ namespace MagentaTrader.Controllers
                                     Price = d.Price,
                                     Amount = d.Amount,
                                     IsActive = d.IsActive,
-                                    IsRefunded = d.IsRefunded
+                                    IsRefunded = d.IsRefunded,
+                                    SalesStatus = d.SalesStatus,
+                                    Group = p.ProductPackageGroup,
+                                    SalesAmount = d.SalesStatus.ToString() == "OK" ? d.Amount : 0
                                 };
                     if (Sales.Count() > 0)
                     {

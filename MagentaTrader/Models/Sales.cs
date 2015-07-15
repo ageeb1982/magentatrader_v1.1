@@ -26,5 +26,7 @@ namespace MagentaTrader.Models
         public bool IsActive { get; set; }
         public bool IsRefunded { get; set; }
         public string SalesStatus { get; set; }
+        public string Group { get; set; }
+        public decimal SalesAmount { get; set; }
     }
 }
