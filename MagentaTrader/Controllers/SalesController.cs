@@ -261,5 +261,73 @@ namespace MagentaTrader.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
         }
+
+        [Authorize]
+        [Route("api/GetFilteredSales/{dateStart}/{dateEnd}/{packageGroup}/{status}")]
+        //[Route("api/GetFilteredSales")]
+        public List<Models.Sales> GetFilteredSales(string dateStart, string dateEnd, string packageGroup, string status)
+        //public List<Models.Sales> GetFilteredSales()
+        {
+            var retryCounter = 0;
+            List<Models.Sales> values;
+
+	        while(true)
+	        {
+                try
+                {
+                    //var query1 = db.TrnSales.Where(x=>x.SalesStatus == status).Select(x=> new Models.Sales { SalesStatus = x.SalesStatus, Id = x.Id }).ToList();
+                    //var query2 = db.MstProductPackages.Where(x=>x.ProductPackageGroup == packageGroup ).Select(x=> new Models.Sales { Group = x.ProductPackageGroup, Id = x.Id }).ToList();
+
+                    var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) || x.SalesStatus == status)
+                                from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId || x.ProductPackageGroup == packageGroup)
+                                select new Models.Sales
+                                {
+                                    Id = s.Id,
+                                    UserId = s.UserId,
+                                    User = s.MstUser.UserName,
+                                    FirstName = s.MstUser.FirstName,
+                                    LastName = s.MstUser.LastName,
+                                    SalesDate = Convert.ToString(s.SalesDate.Year) + "-" + Convert.ToString(s.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(s.SalesDate.Day + 100).Substring(1, 2),
+                                    SalesStatus = s.SalesStatus,
+                                    ProductPackageId = p.Id,
+                                    SalesNumber = s.SalesNumber,
+                                    SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                    Amount = s.Amount,
+                                    ProductPackage = s.MstProductPackage.ProductPackage,
+                                    RenewalDate = s.RenewalDate.ToShortDateString(),
+                                    ExpiryDate = s.ExpiryDate.ToShortDateString(),
+                                    Particulars = s.Particulars,
+                                    Quantity = s.Quantity,
+                                    Price = s.Price,
+                                    IsActive = s.IsActive,
+                                    IsRefunded = s.IsRefunded,
+                                    Group = p.ProductPackageGroup
+                                };
+
+                    if (Sales.Count() > 0)
+                    {
+                        values = Sales.ToList();
+                    }
+                    else
+                    {
+                        values = new List<Models.Sales>();
+                    }
+                    break;
+                }
+                catch
+                {
+                    if (retryCounter == 3)
+                    {
+                        values = new List<Models.Sales>();
+                        break;
+                    }
+
+                    System.Threading.Thread.Sleep(1000);
+                    retryCounter++;
+                }
+            }
+            return values;
+        }
     }
+    
 }

@@ -61,40 +61,35 @@
         </div>
         <br />
         <div class="row">
-            <div class="col-lg-6">
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        <span>FROM</span>
-                    </span>
-                    <div id="StartDateFilter">
-                        <input id="SalesDateStartFilter" readonly />
-                    </div>
-                    <span class="input-group-addon">
-                        <span>TO</span>
-                    </span>
-                    <div id="EndDateFilter">
-                        <input id="SalesDateEndFilter" readonly />
-                    </div>
+            <div class="col-lg-5">
+                <div id="StartDateFilter" class="col-lg-6">
+                    <input id="SalesDateStartFilter" readonly />
+                </div>
+                <div id="EndDateFilter" class="col-lg-6">
+                    <input id="SalesDateEndFilter" readonly />
                 </div>
             </div>
             <div class="col-lg-2">
                 <select id="GroupList_Data" class="full-width form-control">
-                    <option value="">All</option>
+                    <option value="n">All</option>
                     <option value="ONE-TIME">One-time</option>
                     <option value="REOCCURRING">Recurring</option>
                 </select>
             </div>
             <div class="col-lg-2">
                 <select id="StatusList_Data" class="full-width form-control">
-                    <option value="">All</option>
+                    <option value="n">All</option>
                     <option value="OK">Ok</option>
                     <option value="DECLINED">Declined</option>
                     <option value="ERROR">Error</option>
                 </select>
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-3">
                 <button id="CmdAddSale" type="submit" class="btn btn-primary pull-right" onclick="CmdSaleAdd_OnClick()" style="margin-left: 8px;">Add</button>
-                <button class="btn btn-primary pull-right" id="SaveSaleLedger">Export</button>
+                <button class="btn btn-primary pull-right" id="SaveSaleLedger" style="margin-left: 8px;">
+                    Export
+                </button>
+                <button class="btn btn-primary pull-right" id="SearchFilter">Search</button>
             </div>
         </div>
         <br />
@@ -494,6 +489,57 @@
         }
     }
     //}
+    function getFilteredSales(dateStart, dateEnd, packageGroup, status) {
+        var sales = new wijmo.collections.ObservableArray();
+        var totalAmount = 0;
+        var totalSalesAmount = 0;
+        $.ajax({
+            url: '/api/GetFilteredSales/' + dateStart + '/' + dateEnd + '/' + packageGroup + '/' + status,
+            cache: false,
+            type: 'GET',
+            dataType: 'json',
+            success: function (Results) {
+                $('#loading').modal('hide');
+                for (i = 0; i < Results.length; i++) {
+                    totalAmount += Results[i]["Amount"];
+                    totalSalesAmount += Results[i]["SalesAmount"];
+                    sales.push({
+                        EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditSale' onclick='CmdSaleEdit_OnClick()'>Edit</button>",
+                        DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteSale' onclick='CmdSaleDelete_OnClick()'>Delete</button>",
+                        Id: Results[i]["Id"],
+                        UserId: Results[i]["UserId"],
+                        User: Results[i]["User"],
+                        FirstName: Results[i]["FirstName"],
+                        LastName: Results[i]["LastName"],
+                        FullName: Results[i]["FirstName"] + " " + Results[i]["LastName"],
+                        SalesNumber: Results[i]["SalesNumber"],
+                        SalesDate: Results[i]["SalesDate"],
+                        RenewalDate: Results[i]["RenewalDate"],
+                        ExpiryDate: Results[i]["ExpiryDate"],
+                        Particulars: Results[i]["Particulars"],
+                        Quantity: Results[i]["Quantity"],
+                        Price: Results[i]["Price"],
+                        Amount: Results[i]["Amount"],
+                        IsActive: Results[i]["IsActive"],
+                        IsRefunded: Results[i]["IsRefunded"],
+                        SalesStatus: Results[i]["SalesStatus"],
+                        SalesAmount: Results[i]["SalesAmount"],
+                        Group: Results[i]["Group"],
+                        ProductPackage: Results[i]["ProductPackage"]
+                    })
+                }
+                Sales = new wijmo.collections.CollectionView(sales);
+                Sales.pageSize = 15;
+                MakeGrid();
+                $('#TotalAmount').text('Total Amount : ' + (totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
+                $('#TotalSalesAmount').text('Total Sales Amount : ' + totalSalesAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+            }
+            }).fail(
+            function (xhr, textStatus, err) {
+                alert(err);
+            }
+        );
+    }
 
     function GetSales() {
         var sales = new wijmo.collections.ObservableArray();
@@ -536,8 +582,6 @@
                             Group: Results[i]["Group"]
                         });
                     }
-                    //debugger;
-                    //$("#AmountTotal").text("Total Amount: " + (Amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
                 } else {
                     alert("No data.");
                 }
@@ -794,119 +838,10 @@
         "tapToDismiss": false
     }
 
-    $(document).ready(function () {
-
-        toastr.options.preventDuplicates = true;
-
-        $('#CmdSaleEditOk').click(function () {
-            if (FormValidate() == true) {
-                CmdSaleEditOkFunction();
-                $('#SaleEdit').modal('hide');
-            }
-            else
-                toastr.error('Sales Number, Quantity, and Price should be numeric.', 'Fill in all the required fields!');
-        });
-
-        $('#CmdSaleEditCancel, .close').click(function () {
-            $("form input").removeClass("errorHighlight");
-            $('form')[0].reset();
-            $('#SaleEdit').modal('hide');
-        });
-
-        $('#SaveSaleLedger').click( function(){
-            CmdSaveXLS_OnClick();
-        });
-
-        btnFirstPageSale = document.getElementById('btnMoveToFirstPageSale');
-        btnPreviousPageSale = document.getElementById('btnMoveToPreviousPageSale');
-        btnNextPageSale = document.getElementById('btnMoveToNextPageSale');
-        btnLastPageSale = document.getElementById('btnMoveToLastPageSale');
-        btnCurrentPageSale = document.getElementById('btnCurrentPageSale');
-
-        Sales = new wijmo.collections.CollectionView(GetSales());
-        UserList = new wijmo.collections.CollectionView(getUsers());
-        ProductPackageList = new wijmo.collections.CollectionView(getProductPackage());
-             
+    function MakeGrid()
+    {
+        SalesGrid.dispose();
         SalesGrid = new wijmo.grid.FlexGrid('#SalesGrid');
-
-        var StartDateFilter = new wijmo.input.InputDate('#SalesDateStartFilter', {
-            format: 'yyyy-MM-dd',
-            value: new Date()
-        });
-
-        var EndDateFilter = new wijmo.input.InputDate('#SalesDateEndFilter', {
-            format: 'yyyy-MM-dd',
-            value: new Date()
-        });
-
-        var filterText = $('#StartDateFilter').find('input').val();
-        var EndDateFilterText = $('#EndDateFilter').find('input').val();
-        var groupFilter = '';
-        var salesAmountFilter = '';
-
-        StartDateFilter.valueChanged.addHandler(function (sender, args) {
-            var totalAmount = 0;
-            var totalSalesAmount = 0;
-            filterText = $('#StartDateFilter').find('input').val();
-            Sales.refresh();
-            while (SalesLedgerSaveData.length > 0) SalesLedgerSaveData.pop();
-            for (var x = 0; x < Sales.totalItemCount; x++) {
-                totalAmount += parseInt(Sales.items[x].Amount, 10);
-                totalSalesAmount += parseInt(Sales.items[x].SalesAmount, 10);
-                SalesLedgerSaveData.push({
-                    SalesNumber: Sales.items[x].SalesNumber,
-                    SalesDate: Sales.items[x].SalesDate,
-                    Name: Sales.items[x].FullName,
-                    User: Sales.items[x].User,
-                    ProductPackage: Sales.items[x].ProductPackage,
-                    Amount: Sales.items[x].Amount,
-                    Group: Sales.items[x].Group,
-                    SalesStatus: Sales.items[x].SalesStatus,
-                    SalesAmount: Sales.items[x].SalesAmount
-                });
-            }
-            $('#TotalAmount').text('Total Amount : ' + (totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
-            $('#TotalSalesAmount').text('Total Sales Amount : ' + totalSalesAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-        });
-
-        EndDateFilter.valueChanged.addHandler(function (sender, args) {
-            var totalAmount = 0;
-            var totalSalesAmount = 0;
-            for (var x = 0; x < Sales.totalItemCount; x++) {
-                totalAmount += parseInt(Sales.items[x].Amount, 10);
-                totalSalesAmount += parseInt(Sales.items[x].SalesAmount, 10);
-                SalesLedgerSaveData.push({
-                    SalesNumber: Sales.items[x].SalesNumber,
-                    SalesDate: Sales.items[x].SalesDate,
-                    Name: Sales.items[x].FullName,
-                    User: Sales.items[x].User,
-                    ProductPackage: Sales.items[x].ProductPackage,
-                    Amount: Sales.items[x].Amount,
-                    Group: Sales.items[x].Group,
-                    SalesStatus: Sales.items[x].SalesStatus,
-                    SalesAmount: Sales.items[x].SalesAmount
-                });
-            }
-            $('#TotalAmount').text('Total Amount : ' + (totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
-            $('#TotalSalesAmount').text('Total Sales Amount : ' + totalSalesAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-            EndDateFilterText = $('#EndDateFilter').find('input').val();
-            Sales.refresh();
-        });
-
-        $('#GroupList_Data').change(function () {
-            groupFilter = $(this).val();
-            Sales.refresh();
-        });
-
-        $('#StatusList_Data').change(function () {
-            salesAmountFilter = $(this).val();
-            Sales.refresh();
-        });
-
-        Sales.filter = function (item) {
-            return (item.SalesDate >= filterText) && (item.SalesDate <= EndDateFilterText) && item.Group.indexOf(groupFilter) > -1 && item.SalesStatus.indexOf(salesAmountFilter) > -1;
-        };
-
         SalesGrid.initialize({
             columns: [
                 {
@@ -1029,6 +964,80 @@
             UpdateNavigateButtonsSale();
         });
 
+        UpdateNavigateButtonsSale();
+
+        // Page Button Events
+        btnFirstPageSale.addEventListener('click', function () {
+            Sales.moveToFirstPage();
+            UpdateNavigateButtonsSale();
+        });
+        btnPreviousPageSale.addEventListener('click', function () {
+            Sales.moveToPreviousPage();
+            UpdateNavigateButtonsSale();
+        });
+        btnNextPageSale.addEventListener('click', function () {
+            Sales.moveToNextPage();
+            UpdateNavigateButtonsSale();
+        });
+        btnLastPageSale.addEventListener('click', function () {
+            Sales.moveToLastPage();
+            UpdateNavigateButtonsSale();
+        });
+    }
+
+    $(document).ready(function () {
+
+        toastr.options.preventDuplicates = true;
+
+        $('#CmdSaleEditOk').click(function () {
+            if (FormValidate() == true) {
+                CmdSaleEditOkFunction();
+                $('#SaleEdit').modal('hide');
+            }
+            else
+                toastr.error('Sales Number, Quantity, and Price should be numeric.', 'Fill in all the required fields!');
+        });
+
+        $('#CmdSaleEditCancel, .close').click(function () {
+            $("form input").removeClass("errorHighlight");
+            $('form')[0].reset();
+            $('#SaleEdit').modal('hide');
+        });
+
+        $('#SaveSaleLedger').click( function(){
+            CmdSaveXLS_OnClick();
+        });
+
+        btnFirstPageSale = document.getElementById('btnMoveToFirstPageSale');
+        btnPreviousPageSale = document.getElementById('btnMoveToPreviousPageSale');
+        btnNextPageSale = document.getElementById('btnMoveToNextPageSale');
+        btnLastPageSale = document.getElementById('btnMoveToLastPageSale');
+        btnCurrentPageSale = document.getElementById('btnCurrentPageSale');
+
+        UserList = new wijmo.collections.CollectionView(getUsers());
+        ProductPackageList = new wijmo.collections.CollectionView(getProductPackage());
+
+        var StartDateFilter = new wijmo.input.InputDate('#SalesDateStartFilter', {
+            format: 'yyyy-MM-dd',
+            value: new Date()
+        });
+
+        var EndDateFilter = new wijmo.input.InputDate('#SalesDateEndFilter', {
+            format: 'yyyy-MM-dd',
+            value: new Date()
+        });
+
+        $('#SearchFilter').click(function () {
+            var dateStart = $('#StartDateFilter').find('input').val();
+            var dateEnd = $('#EndDateFilter').find('input').val();
+            var packageGroup = $('#GroupList_Data').val();
+            var status = $('#StatusList_Data').val();
+            console.log(dateStart + " " + dateEnd + " " + packageGroup + " " + status);
+            getFilteredSales(dateStart, dateEnd, packageGroup, status);
+        });
+
+        SalesGrid = new wijmo.grid.FlexGrid('#SalesGrid');
+
         SaleDate = new wijmo.input.InputDate('#SaleEdit_SaleDate', {
             format: 'M/d/yyyy',
             value: new Date()
@@ -1058,26 +1067,6 @@
             onSelectedIndexChanged: function (e, data) {
                 $("#SaleEdit_ProductPackageId").val(ProductPackageList.items[this.selectedIndex].Id);
             }
-        });
-
-        UpdateNavigateButtonsSale();
-
-        // Page Button Events
-        btnFirstPageSale.addEventListener('click', function () {
-            Sales.moveToFirstPage();
-            UpdateNavigateButtonsSale();
-        });
-        btnPreviousPageSale.addEventListener('click', function () {
-            Sales.moveToPreviousPage();
-            UpdateNavigateButtonsSale();
-        });
-        btnNextPageSale.addEventListener('click', function () {
-            Sales.moveToNextPage();
-            UpdateNavigateButtonsSale();
-        });
-        btnLastPageSale.addEventListener('click', function () {
-            Sales.moveToLastPage();
-            UpdateNavigateButtonsSale();
         });
 
         $('.scroll').slimscroll({
