@@ -79,8 +79,10 @@
             <div class="col-lg-2">
                 <select id="StatusList_Data" class="full-width form-control">
                     <option value="n">All</option>
-                    <option value="OK">Ok</option>
+                    <option value="OK">OK</option>
+                    <option value="OK-First">OK-First</option>
                     <option value="DECLINED">Declined</option>
+                    <option value="REFUND">Refund</option>
                     <option value="ERROR">Error</option>
                 </select>
             </div>
@@ -116,7 +118,16 @@
                 </button>
             </div>
             <div class="col-md-5">
-                <div class="pull-right"><span id="TotalAmount"></span></div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="pull-right"><span id="TotalAmount"></span></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="pull-right"><span id="TotalFirstSalesAmount"></span></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -199,7 +210,9 @@
                         <dd>
                             <select id="StatusList_Edit" class="full-width form-control">
                                 <option value="OK">Ok</option>
+                                <option value="OK-First">Ok-First</option>
                                 <option value="DECLINED">Declined</option>
+                                <option value="REFUND">Refund</option>
                                 <option value="ERROR">Error</option>
                             </select>
                         </dd>
@@ -447,6 +460,7 @@
         var Sale = new Object();
 
         Sale.Id = document.getElementById('SaleEdit_Id').value;
+        Sale.Id = Sale.Id.replace(",", "");
         Sale.ProductPackageId = document.getElementById('SaleEdit_ProductPackageId').value;
         Sale.UserId = document.getElementById('SaleEdit_UserId').value;
         Sale.SalesNumber = document.getElementById('SaleEdit_SalesNumber').value;
@@ -509,6 +523,8 @@
         var sales = new wijmo.collections.ObservableArray();
         var totalAmount = 0;
         var totalSalesAmount = 0;
+        var totalFirstSalesAmount = 0;
+        $('#loading').modal('show');
         $.ajax({
             url: '/api/GetFilteredSales/' + dateStart + '/' + dateEnd + '/' + packageGroup + '/' + status,
             cache: false,
@@ -516,9 +532,11 @@
             dataType: 'json',
             success: function (Results) {
                 $('#loading').modal('hide');
+                $('#loading').modal('hide');
                 for (i = 0; i < Results.length; i++) {
                     totalAmount += Results[i]["Amount"];
                     totalSalesAmount += Results[i]["SalesAmount"];
+                    totalFirstSalesAmount += Results[i]["SalesOKFirstAmount"];
                     sales.push({
                         EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditSale' onclick='CmdSaleEdit_OnClick()'>Edit</button>",
                         DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteSale' onclick='CmdSaleDelete_OnClick()'>Delete</button>",
@@ -548,6 +566,7 @@
                 Sales.pageSize = 15;
                 MakeGrid();
                 $('#TotalAmount').text('Total Amount : ' + (totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
+                $('#TotalFirstSalesAmount').text('Total First Sales Amount : ' + (totalFirstSalesAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
                 $('#TotalSalesAmount').text('Total Sales Amount : ' + totalSalesAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
             }
             }).fail(

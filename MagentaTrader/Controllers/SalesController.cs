@@ -37,7 +37,8 @@ namespace MagentaTrader.Controllers
                                     LastName = d.MstUser.LastName,
                                     SalesNumber = d.SalesNumber,
                                     SalesDate = Convert.ToString(d.SalesDate.Year) + "-" + Convert.ToString(d.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.SalesDate.Day + 100).Substring(1, 2),
-                                    RenewalDate = d.RenewalDate.ToShortDateString(),
+                                    RenewalDate = d.RenewalDate.ToShortDateString
+                                    (),
                                     ExpiryDate = d.ExpiryDate.ToShortDateString(),
                                     Particulars = d.Particulars,
                                     Quantity = d.Quantity,
@@ -47,7 +48,9 @@ namespace MagentaTrader.Controllers
                                     IsRefunded = d.IsRefunded,
                                     SalesStatus = d.SalesStatus,
                                     Group = p.ProductPackageGroup,
-                                    SalesAmount = d.SalesStatus.ToString() == "OK" ? d.Amount : 0
+                                    SalesAmount = d.SalesStatus.ToString() == "OK" ? d.Amount : 0,
+                                    SalesOKFirstAmount = d.SalesStatus.ToString() == "OK-First" ? d.Amount : 0
+
                                 };
                     if (Sales.Count() > 0)
                     {
@@ -293,6 +296,7 @@ namespace MagentaTrader.Controllers
                                         ProductPackageId = p.Id,
                                         SalesNumber = s.SalesNumber,
                                         SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
                                         Amount = s.Amount,
                                         ProductPackage = s.MstProductPackage.ProductPackage,
                                         RenewalDate = s.RenewalDate.ToShortDateString(),
@@ -330,6 +334,7 @@ namespace MagentaTrader.Controllers
                                         ProductPackageId = p.Id,
                                         SalesNumber = s.SalesNumber,
                                         SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
                                         Amount = s.Amount,
                                         ProductPackage = s.MstProductPackage.ProductPackage,
                                         RenewalDate = s.RenewalDate.ToShortDateString(),
@@ -367,6 +372,45 @@ namespace MagentaTrader.Controllers
                                         ProductPackageId = p.Id,
                                         SalesNumber = s.SalesNumber,
                                         SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
+                                        Amount = s.Amount,
+                                        ProductPackage = s.MstProductPackage.ProductPackage,
+                                        RenewalDate = s.RenewalDate.ToShortDateString(),
+                                        ExpiryDate = s.ExpiryDate.ToShortDateString(),
+                                        Particulars = s.Particulars,
+                                        Quantity = s.Quantity,
+                                        Price = s.Price,
+                                        IsActive = s.IsActive,
+                                        IsRefunded = s.IsRefunded,
+                                        Group = p.ProductPackageGroup
+                                    };
+                        if (Sales.Count() > 0)
+                        {
+                            values = Sales.ToList();
+                        }
+                        else
+                        {
+                            values = new List<Models.Sales>();
+                        }
+                        break;
+                    }
+                    else if (status.Equals("OK-First") && packageGroup.Equals("ONE-TIME"))
+                    {
+                        var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) && x.SalesStatus == status)
+                                    from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId && x.ProductPackageGroup == packageGroup)
+                                    select new Models.Sales
+                                    {
+                                        Id = s.Id,
+                                        UserId = s.UserId,
+                                        User = s.MstUser.UserName,
+                                        FirstName = s.MstUser.FirstName,
+                                        LastName = s.MstUser.LastName,
+                                        SalesDate = Convert.ToString(s.SalesDate.Year) + "-" + Convert.ToString(s.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(s.SalesDate.Day + 100).Substring(1, 2),
+                                        SalesStatus = s.SalesStatus,
+                                        ProductPackageId = p.Id,
+                                        SalesNumber = s.SalesNumber,
+                                        SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
                                         Amount = s.Amount,
                                         ProductPackage = s.MstProductPackage.ProductPackage,
                                         RenewalDate = s.RenewalDate.ToShortDateString(),
@@ -404,6 +448,7 @@ namespace MagentaTrader.Controllers
                                         ProductPackageId = p.Id,
                                         SalesNumber = s.SalesNumber,
                                         SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
                                         Amount = s.Amount,
                                         ProductPackage = s.MstProductPackage.ProductPackage,
                                         RenewalDate = s.RenewalDate.ToShortDateString(),
@@ -442,6 +487,7 @@ namespace MagentaTrader.Controllers
                                         ProductPackageId = p.Id,
                                         SalesNumber = s.SalesNumber,
                                         SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
                                         Amount = s.Amount,
                                         ProductPackage = s.MstProductPackage.ProductPackage,
                                         RenewalDate = s.RenewalDate.ToShortDateString(),
@@ -463,7 +509,45 @@ namespace MagentaTrader.Controllers
                         }
                         break;
                     }
-
+                    else if (status.Equals("REFUND") && packageGroup.Equals("ONE-TIME"))
+                    {
+                        //query2 = query + " AND S.SALESSTATUS = " + status;
+                        var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) && x.SalesStatus == status)
+                                    from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId && x.ProductPackageGroup == packageGroup)
+                                    select new Models.Sales
+                                    {
+                                        Id = s.Id,
+                                        UserId = s.UserId,
+                                        User = s.MstUser.UserName,
+                                        FirstName = s.MstUser.FirstName,
+                                        LastName = s.MstUser.LastName,
+                                        SalesDate = Convert.ToString(s.SalesDate.Year) + "-" + Convert.ToString(s.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(s.SalesDate.Day + 100).Substring(1, 2),
+                                        SalesStatus = s.SalesStatus,
+                                        ProductPackageId = p.Id,
+                                        SalesNumber = s.SalesNumber,
+                                        SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
+                                        Amount = s.Amount,
+                                        ProductPackage = s.MstProductPackage.ProductPackage,
+                                        RenewalDate = s.RenewalDate.ToShortDateString(),
+                                        ExpiryDate = s.ExpiryDate.ToShortDateString(),
+                                        Particulars = s.Particulars,
+                                        Quantity = s.Quantity,
+                                        Price = s.Price,
+                                        IsActive = s.IsActive,
+                                        IsRefunded = s.IsRefunded,
+                                        Group = p.ProductPackageGroup
+                                    };
+                        if (Sales.Count() > 0)
+                        {
+                            values = Sales.ToList();
+                        }
+                        else
+                        {
+                            values = new List<Models.Sales>();
+                        }
+                        break;
+                    }
                     else if (status.Equals("OK") && packageGroup.Equals("REOCCURRING"))
                     {
                         var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) && x.SalesStatus == status)
@@ -480,6 +564,45 @@ namespace MagentaTrader.Controllers
                                         ProductPackageId = p.Id,
                                         SalesNumber = s.SalesNumber,
                                         SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
+                                        Amount = s.Amount,
+                                        ProductPackage = s.MstProductPackage.ProductPackage,
+                                        RenewalDate = s.RenewalDate.ToShortDateString(),
+                                        ExpiryDate = s.ExpiryDate.ToShortDateString(),
+                                        Particulars = s.Particulars,
+                                        Quantity = s.Quantity,
+                                        Price = s.Price,
+                                        IsActive = s.IsActive,
+                                        IsRefunded = s.IsRefunded,
+                                        Group = p.ProductPackageGroup
+                                    };
+                        if (Sales.Count() > 0)
+                        {
+                            values = Sales.ToList();
+                        }
+                        else
+                        {
+                            values = new List<Models.Sales>();
+                        }
+                        break;
+                    }
+                    else if (status.Equals("OK-First") && packageGroup.Equals("REOCCURRING"))
+                    {
+                        var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) && x.SalesStatus == status)
+                                    from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId && x.ProductPackageGroup == packageGroup)
+                                    select new Models.Sales
+                                    {
+                                        Id = s.Id,
+                                        UserId = s.UserId,
+                                        User = s.MstUser.UserName,
+                                        FirstName = s.MstUser.FirstName,
+                                        LastName = s.MstUser.LastName,
+                                        SalesDate = Convert.ToString(s.SalesDate.Year) + "-" + Convert.ToString(s.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(s.SalesDate.Day + 100).Substring(1, 2),
+                                        SalesStatus = s.SalesStatus,
+                                        ProductPackageId = p.Id,
+                                        SalesNumber = s.SalesNumber,
+                                        SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
                                         Amount = s.Amount,
                                         ProductPackage = s.MstProductPackage.ProductPackage,
                                         RenewalDate = s.RenewalDate.ToShortDateString(),
@@ -517,6 +640,7 @@ namespace MagentaTrader.Controllers
                                         ProductPackageId = p.Id,
                                         SalesNumber = s.SalesNumber,
                                         SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
                                         Amount = s.Amount,
                                         ProductPackage = s.MstProductPackage.ProductPackage,
                                         RenewalDate = s.RenewalDate.ToShortDateString(),
@@ -540,7 +664,6 @@ namespace MagentaTrader.Controllers
                     }
                     else if (status.Equals("ERROR") && packageGroup.Equals("REOCCURRING"))
                     {
-                        //query2 = query + " AND S.SALESSTATUS = " + status;
                         var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) && x.SalesStatus == status)
                                     from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId && x.ProductPackageGroup == packageGroup)
                                     select new Models.Sales
@@ -555,6 +678,45 @@ namespace MagentaTrader.Controllers
                                         ProductPackageId = p.Id,
                                         SalesNumber = s.SalesNumber,
                                         SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
+                                        Amount = s.Amount,
+                                        ProductPackage = s.MstProductPackage.ProductPackage,
+                                        RenewalDate = s.RenewalDate.ToShortDateString(),
+                                        ExpiryDate = s.ExpiryDate.ToShortDateString(),
+                                        Particulars = s.Particulars,
+                                        Quantity = s.Quantity,
+                                        Price = s.Price,
+                                        IsActive = s.IsActive,
+                                        IsRefunded = s.IsRefunded,
+                                        Group = p.ProductPackageGroup
+                                    };
+                        if (Sales.Count() > 0)
+                        {
+                            values = Sales.ToList();
+                        }
+                        else
+                        {
+                            values = new List<Models.Sales>();
+                        }
+                        break;
+                    }
+                    else if (status.Equals("REFUND") && packageGroup.Equals("REOCCURRING"))
+                    {
+                        var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) && x.SalesStatus == status)
+                                    from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId && x.ProductPackageGroup == packageGroup)
+                                    select new Models.Sales
+                                    {
+                                        Id = s.Id,
+                                        UserId = s.UserId,
+                                        User = s.MstUser.UserName,
+                                        FirstName = s.MstUser.FirstName,
+                                        LastName = s.MstUser.LastName,
+                                        SalesDate = Convert.ToString(s.SalesDate.Year) + "-" + Convert.ToString(s.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(s.SalesDate.Day + 100).Substring(1, 2),
+                                        SalesStatus = s.SalesStatus,
+                                        ProductPackageId = p.Id,
+                                        SalesNumber = s.SalesNumber,
+                                        SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
                                         Amount = s.Amount,
                                         ProductPackage = s.MstProductPackage.ProductPackage,
                                         RenewalDate = s.RenewalDate.ToShortDateString(),
@@ -578,7 +740,6 @@ namespace MagentaTrader.Controllers
                     }
                     else if (status.Equals("ERROR") && packageGroup.Equals("n"))
                     {
-                        //query2 = query + " AND S.SALESSTATUS = " + status;
                         var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) && x.SalesStatus == status)
                                     from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId)
                                     select new Models.Sales
@@ -593,6 +754,7 @@ namespace MagentaTrader.Controllers
                                         ProductPackageId = p.Id,
                                         SalesNumber = s.SalesNumber,
                                         SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
                                         Amount = s.Amount,
                                         ProductPackage = s.MstProductPackage.ProductPackage,
                                         RenewalDate = s.RenewalDate.ToShortDateString(),
@@ -616,7 +778,6 @@ namespace MagentaTrader.Controllers
                     }
                     else if (status.Equals("OK") && packageGroup.Equals("n"))
                     {
-                        //query2 = query + " AND S.SALESSTATUS = " + status;
                         var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) && x.SalesStatus == status)
                                     from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId)
                                     select new Models.Sales
@@ -631,6 +792,7 @@ namespace MagentaTrader.Controllers
                                         ProductPackageId = p.Id,
                                         SalesNumber = s.SalesNumber,
                                         SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
                                         Amount = s.Amount,
                                         ProductPackage = s.MstProductPackage.ProductPackage,
                                         RenewalDate = s.RenewalDate.ToShortDateString(),
@@ -654,7 +816,6 @@ namespace MagentaTrader.Controllers
                     }
                     else if (status.Equals("DECLINED") && packageGroup.Equals("n"))
                     {
-                        //query2 = query + " AND S.SALESSTATUS = " + status;
                         var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) && x.SalesStatus == status)
                                     from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId)
                                     select new Models.Sales
@@ -669,6 +830,83 @@ namespace MagentaTrader.Controllers
                                         ProductPackageId = p.Id,
                                         SalesNumber = s.SalesNumber,
                                         SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
+                                        Amount = s.Amount,
+                                        ProductPackage = s.MstProductPackage.ProductPackage,
+                                        RenewalDate = s.RenewalDate.ToShortDateString(),
+                                        ExpiryDate = s.ExpiryDate.ToShortDateString(),
+                                        Particulars = s.Particulars,
+                                        Quantity = s.Quantity,
+                                        Price = s.Price,
+                                        IsActive = s.IsActive,
+                                        IsRefunded = s.IsRefunded,
+                                        Group = p.ProductPackageGroup
+                                    };
+                        if (Sales.Count() > 0)
+                        {
+                            values = Sales.ToList();
+                        }
+                        else
+                        {
+                            values = new List<Models.Sales>();
+                        }
+                        break;
+                    }
+                    else if (status.Equals("OK-First") && packageGroup.Equals("n"))
+                    {
+                        var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) && x.SalesStatus == status)
+                                    from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId)
+                                    select new Models.Sales
+                                    {
+                                        Id = s.Id,
+                                        UserId = s.UserId,
+                                        User = s.MstUser.UserName,
+                                        FirstName = s.MstUser.FirstName,
+                                        LastName = s.MstUser.LastName,
+                                        SalesDate = Convert.ToString(s.SalesDate.Year) + "-" + Convert.ToString(s.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(s.SalesDate.Day + 100).Substring(1, 2),
+                                        SalesStatus = s.SalesStatus,
+                                        ProductPackageId = p.Id,
+                                        SalesNumber = s.SalesNumber,
+                                        SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
+                                        Amount = s.Amount,
+                                        ProductPackage = s.MstProductPackage.ProductPackage,
+                                        RenewalDate = s.RenewalDate.ToShortDateString(),
+                                        ExpiryDate = s.ExpiryDate.ToShortDateString(),
+                                        Particulars = s.Particulars,
+                                        Quantity = s.Quantity,
+                                        Price = s.Price,
+                                        IsActive = s.IsActive,
+                                        IsRefunded = s.IsRefunded,
+                                        Group = p.ProductPackageGroup
+                                    };
+                        if (Sales.Count() > 0)
+                        {
+                            values = Sales.ToList();
+                        }
+                        else
+                        {
+                            values = new List<Models.Sales>();
+                        }
+                        break;
+                    }
+                    else if (status.Equals("REFUND") && packageGroup.Equals("n"))
+                    {
+                        var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) && x.SalesStatus == status)
+                                    from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId)
+                                    select new Models.Sales
+                                    {
+                                        Id = s.Id,
+                                        UserId = s.UserId,
+                                        User = s.MstUser.UserName,
+                                        FirstName = s.MstUser.FirstName,
+                                        LastName = s.MstUser.LastName,
+                                        SalesDate = Convert.ToString(s.SalesDate.Year) + "-" + Convert.ToString(s.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(s.SalesDate.Day + 100).Substring(1, 2),
+                                        SalesStatus = s.SalesStatus,
+                                        ProductPackageId = p.Id,
+                                        SalesNumber = s.SalesNumber,
+                                        SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
                                         Amount = s.Amount,
                                         ProductPackage = s.MstProductPackage.ProductPackage,
                                         RenewalDate = s.RenewalDate.ToShortDateString(),
@@ -692,7 +930,6 @@ namespace MagentaTrader.Controllers
                     }
                     else if (status.Equals("n") && packageGroup.Equals("n"))
                     {
-                        //query2 = query + " AND S.SALESSTATUS = " + status;
                         var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd))
                                     from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId)
                                     select new Models.Sales
@@ -707,6 +944,7 @@ namespace MagentaTrader.Controllers
                                         ProductPackageId = p.Id,
                                         SalesNumber = s.SalesNumber,
                                         SalesAmount = s.SalesStatus.ToString() == "OK" ? s.Amount : 0,
+                                        SalesOKFirstAmount = s.SalesStatus.ToString() == "OK-First" ? s.Amount : 0,
                                         Amount = s.Amount,
                                         ProductPackage = s.MstProductPackage.ProductPackage,
                                         RenewalDate = s.RenewalDate.ToShortDateString(),

@@ -28,5 +28,6 @@ namespace MagentaTrader.Models
         public string SalesStatus { get; set; }
         public string Group { get; set; }
         public decimal SalesAmount { get; set; }
+        public decimal SalesOKFirstAmount { get; set; }
     }
 }
