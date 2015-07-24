@@ -1004,24 +1004,6 @@
         });
 
         UpdateNavigateButtonsSale();
-
-        // Page Button Events
-        btnFirstPageSale.addEventListener('click', function () {
-            Sales.moveToFirstPage();
-            UpdateNavigateButtonsSale();
-        });
-        btnPreviousPageSale.addEventListener('click', function () {
-            Sales.moveToPreviousPage();
-            UpdateNavigateButtonsSale();
-        });
-        btnNextPageSale.addEventListener('click', function () {
-            Sales.moveToNextPage();
-            UpdateNavigateButtonsSale();
-        });
-        btnLastPageSale.addEventListener('click', function () {
-            Sales.moveToLastPage();
-            UpdateNavigateButtonsSale();
-        });
     }
 
     $(document).ready(function () {
@@ -1107,6 +1089,26 @@
             onSelectedIndexChanged: function (e, data) {
                 $("#SaleEdit_ProductPackageId").val(ProductPackageList.items[this.selectedIndex].Id);
             }
+        });
+
+        UpdateNavigateButtonsSale();
+
+        // Page Button Events
+        btnFirstPageSale.addEventListener('click', function () {
+            Sales.moveToFirstPage();
+            UpdateNavigateButtonsSale();
+        });
+        btnPreviousPageSale.addEventListener('click', function () {
+            Sales.moveToPreviousPage();
+            UpdateNavigateButtonsSale();
+        });
+        btnNextPageSale.addEventListener('click', function () {
+            Sales.moveToNextPage();
+            UpdateNavigateButtonsSale();
+        });
+        btnLastPageSale.addEventListener('click', function () {
+            Sales.moveToLastPage();
+            UpdateNavigateButtonsSale();
         });
 
         $('.scroll').slimscroll({
