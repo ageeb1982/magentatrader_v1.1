@@ -167,6 +167,7 @@ namespace MagentaTrader.Controllers
                 NewSale.Amount = value.Amount;
                 NewSale.IsActive = value.IsActive;
                 NewSale.IsRefunded = value.IsRefunded;
+                NewSale.SalesStatus = value.SalesStatus;
 
                 db.TrnSales.InsertOnSubmit(NewSale);
                 db.SubmitChanges();
@@ -221,6 +222,7 @@ namespace MagentaTrader.Controllers
                     UpdatedSale.Amount = value.Amount;
                     UpdatedSale.IsActive = value.IsActive;
                     UpdatedSale.IsRefunded = value.IsRefunded;
+                    UpdatedSale.SalesStatus = value.SalesStatus; 
 
                     db.SubmitChanges();
                 }
@@ -314,8 +316,8 @@ namespace MagentaTrader.Controllers
                     }
                     else if (status.Equals("n") && packageGroup.Equals("REOCCURRING"))
                     {
-                        var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd) && x.SalesStatus == status)
-                                    from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId)
+                        var Sales = from s in db.TrnSales.Where(x => Convert.ToDateTime(x.SalesDate) >= Convert.ToDateTime(dateStart) && Convert.ToDateTime(x.SalesDate) <= Convert.ToDateTime(dateEnd))
+                                    from p in db.MstProductPackages.Where(x => x.Id == s.ProductPackageId && x.ProductPackageGroup == packageGroup)
                                     select new Models.Sales
                                     {
                                         Id = s.Id,

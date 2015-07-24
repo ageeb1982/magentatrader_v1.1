@@ -195,6 +195,14 @@
                         <dd>
                             <input class="form-control" id="SaleEdit_IsRefunded" type="checkbox" />
                         </dd>
+                        <dt>Staus</dt>
+                        <dd>
+                            <select id="StatusList_Edit" class="full-width form-control">
+                                <option value="OK">Ok</option>
+                                <option value="DECLINED">Declined</option>
+                                <option value="ERROR">Error</option>
+                            </select>
+                        </dd>
                     </dl>
                 </form>
             </div>
@@ -259,6 +267,7 @@
         });
 
         var Sale = Sales.currentEditItem;
+        var Status = document.getElementById('StatusList_Edit').options[document.getElementById('StatusList_Edit').selectedIndex].value;
         document.getElementById('SaleEdit_Id').value = Sale.Id !== null && typeof (Sale.Id) != 'undefined' ? wijmo.Globalize.format(Sale.Id) : '';
         document.getElementById('SaleEdit_ProductPackageId').value = Sale.ProductPackageId ? Sale.ProductPackageId : '';
         document.getElementById('SaleEdit_UserId').value = Sale.UserId ? Sale.UserId : '';
@@ -275,7 +284,7 @@
         document.getElementById('SaleEdit_Amount').value = Sale.Amount ? Sale.Amount : '';
         document.getElementById('SaleEdit_IsActive').checked = Sale.IsActive;
         document.getElementById('SaleEdit_IsRefunded').checked = Sale.IsRefunded;
-
+        document.getElementById('StatusList_Edit').value = Status ? Status : '';
 
         SaleDate.dispose();
         SaleDate = new wijmo.input.InputDate('#SaleEdit_SaleDate', {
@@ -343,6 +352,10 @@
         document.getElementById('SaleEdit_Quantity').value = 1;
         document.getElementById('SaleEdit_Price').value = 0;
         document.getElementById('SaleEdit_Amount').value = '';
+        document.getElementById('StatusList_Edit').addEventListener('keyup', function () {
+            document.getElementById('StatusList_Edit').value = document.getElementById('StatusList_Edit').options[document.getElementById('StatusList_Edit').selectedIndex].value
+            console.log(document.getElementById('StatusList_Edit').value);
+        });
         document.getElementById('SaleEdit_Quantity').addEventListener('keyup', function () {
             document.getElementById('SaleEdit_Amount').value = document.getElementById('SaleEdit_Quantity').value * document.getElementById('SaleEdit_Price').value;
         });
@@ -543,7 +556,8 @@
 
     function GetSales() {
         var sales = new wijmo.collections.ObservableArray();
-        var Amount = 0;
+        var totalAmount = 0;
+        var totalSalesAmount = 0;
         $('#loading').modal('show');
         $.ajax({
             url: '/api/Sales',
@@ -555,7 +569,8 @@
                 $('#loading').modal('hide');
                 if (Results.length > 0) {
                     for (i = 0; i < Results.length; i++) {
-                        Amount = Amount + Results[i]["Price"];
+                        totalAmount = totalAmount + Results[i]["Price"];
+                        totalSalesAmount = totalSalesAmount+ Results[i]["SalesAmount"];
                         sales.push({
                             EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditSale' onclick='CmdSaleEdit_OnClick()'>Edit</button>",
                             DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteSale' onclick='CmdSaleDelete_OnClick()'>Delete</button>",
@@ -582,6 +597,8 @@
                             Group: Results[i]["Group"]
                         });
                     }
+                    //$('#TotalAmount').text('Total Amount : ' + (totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
+                    //$('#TotalSalesAmount').text('Total Sales Amount : ' + totalSalesAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                 } else {
                     alert("No data.");
                 }
@@ -1008,6 +1025,7 @@
             CmdSaveXLS_OnClick();
         });
 
+        Sales = new wijmo.collections.CollectionView(GetSales());
         btnFirstPageSale = document.getElementById('btnMoveToFirstPageSale');
         btnPreviousPageSale = document.getElementById('btnMoveToPreviousPageSale');
         btnNextPageSale = document.getElementById('btnMoveToNextPageSale');
