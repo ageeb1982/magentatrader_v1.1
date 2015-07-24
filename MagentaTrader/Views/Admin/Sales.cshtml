@@ -572,8 +572,10 @@
             }).fail(
             function (xhr, textStatus, err) {
                 alert(err);
-            }
-        );
+            });
+
+        while (SalesLedgerSaveData.length > 0) SalesLedgerSaveData.pop();
+        SalesLedgerSaveData = sales;
     }
 
     function GetSales() {
@@ -619,8 +621,6 @@
                             Group: Results[i]["Group"]
                         });
                     }
-                    //$('#TotalAmount').text('Total Amount : ' + (totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
-                    //$('#TotalSalesAmount').text('Total Sales Amount : ' + totalSalesAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                 } else {
                     alert("No data.");
                 }
@@ -760,6 +760,13 @@
     function CmdSaveXLS_OnClick() {
         var SLR = '';
         var record = [];
+        var totalAmount = $('#TotalAmount').text().replace(",", "");
+        var totalFirstSalesAmount = $('#TotalFirstSalesAmount').text().replace(",", "");
+        var totalSalesAmount = $('#TotalSalesAmount').text().replace(",", "");
+        var dateStart = $('#StartDateFilter').find('input').val();
+        var dateEnd = $('#EndDateFilter').find('input').val();
+
+        console.log(totalAmount + " " + totalFirstSalesAmount + " " + totalSalesAmount);
 
         for (i = 0; i < SalesLedgerSaveData.length; i++) {
             record.push({
@@ -793,7 +800,7 @@
             SLR += recordRow + '\r\n';
         }
 
-        SLR += '\r\n' + 'Total Amount: ' + $('#TotalAmount').text() + '\r\n' + 'Total Sales Amount: ' + $('#TotalSalesAmount').text();
+        SLR += '\r\n' + totalAmount + '\r\n' + totalFirstSalesAmount + '\r\n' + totalSalesAmount;
 
         if (SLR == '') {
             alert("No data");
@@ -802,7 +809,7 @@
 
         // Create filename
 
-        var fileName = 'magenta_' + '_' + 'sales.CSV';
+        var fileName = 'magenta_' + dateStart + '_to_' + dateEnd + 'sales.CSV';
 
         // Download via <a> link
 
