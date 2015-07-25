@@ -299,6 +299,12 @@
         document.getElementById('SaleEdit_IsActive').checked = Sale.IsActive;
         document.getElementById('SaleEdit_IsRefunded').checked = Sale.IsRefunded;
         document.getElementById('StatusList_Edit').value = Status ? Status : '';
+        document.getElementById('SaleEdit_Quantity').addEventListener('keyup', function () {
+            document.getElementById('SaleEdit_Amount').value = document.getElementById('SaleEdit_Quantity').value * document.getElementById('SaleEdit_Price').value;
+        });
+        document.getElementById('SaleEdit_Price').addEventListener('keyup', function () {
+            document.getElementById('SaleEdit_Amount').value = document.getElementById('SaleEdit_Quantity').value * document.getElementById('SaleEdit_Price').value;
+        });
 
         SaleDate.dispose();
         SaleDate = new wijmo.input.InputDate('#SaleEdit_SaleDate', {
