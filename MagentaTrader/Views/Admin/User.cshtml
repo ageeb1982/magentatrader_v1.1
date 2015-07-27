@@ -465,8 +465,7 @@
         });
 
         Users.filter = function (item) {
-            //return !filterText || (item.UserName.toLowerCase().indexOf(filterText) > -1) || (item.FirstName.toLowerCase().indexOf(filterText) > -1) || (item.LastName.toLowerCase().indexOf(filterText) > -1) || (item.EmailAddress.toLowerCase().indexOf(filterText) > -1) || (item.PhoneNumber.toLowerCase().indexOf(filterText) > -1);
-            return !filterText || (item.FirstName.toLowerCase().indexOf(filterText) > -1);
+            return !filterText || (item.UserName.toLowerCase().indexOf(filterText) > -1) || (item.FirstName.toLowerCase().indexOf(filterText) > -1) || (item.LastName.toLowerCase().indexOf(filterText) > -1) || (item.EmailAddress.toLowerCase().indexOf(filterText) > -1) || (item.PhoneNumber.toLowerCase().indexOf(filterText) > -1);
         }
         
         $('#SaveUserList').click(function () {
