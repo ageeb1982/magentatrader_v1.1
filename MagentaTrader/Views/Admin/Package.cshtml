@@ -115,7 +115,7 @@
                         </dd>
                         <dt>Price</dt>
                         <dd>
-                            <input class="form-control custom-width" id="ProductPackageEdit_Price" name="ProductPackageEdit_Price" type="text" required />
+                            <input class="form-control custom-width" id="ProductPackageEdit_Price" name="ProductPackageEdit_Price" type="number" required />
                         </dd>
                         <dt>Product</dt>
                         <dd>
@@ -145,6 +145,13 @@
                         <dt>Package URL</dt>
                         <dd>
                             <input class="form-control" id="ProductPackageEdit_PackageURL" type="text" />
+                        </dd>
+                        <dt>Group</dt>
+                        <dd>
+                            <select id="GroupList_Edit" class="full-width form-control">
+                                <option value="ONE-TIME">One-Time</option>
+                                <option value="REOCCURING">Recurring</option>
+                            </select>
                         </dd>
                     </dl>
                 </form>
@@ -199,8 +206,10 @@
         });
 
         var ProductPackage = ProductPackages.currentEditItem;
+        var Status = document.getElementById('GroupList_Edit').options[document.getElementById('GroupList_Edit').selectedIndex].value;
         document.getElementById('ProductPackageEdit_Id').value = ProductPackage.Id !== null && typeof (ProductPackage.Id) != 'undefined' ? wijmo.Globalize.format(ProductPackage.Id) : '';
         document.getElementById('ProductPackageEdit_ProductPackageDescription').value = ProductPackage.ProductPackageDescription ? ProductPackage.ProductPackageDescription : '';
+        document.getElementById('ProductPackageEdit_ProductId').value = ProductPackage.ProductId ? ProductPackage.ProductId : '';
         document.getElementById('ProductPackageEdit_SKU').value = ProductPackage.SKU ? ProductPackage.SKU : '';
         document.getElementById('ProductPackageEdit_Price').value = ProductPackage.Price ? ProductPackage.Price : '';
         document.getElementById('ProductPackageEdit_IsAvailable').checked = ProductPackage.IsAvailable;
@@ -209,7 +218,7 @@
         document.getElementById('ProductPackageEdit_IsReoccuring').checked = ProductPackage.IsReoccuring;
         document.getElementById('ProductPackageEdit_Particulars').value = ProductPackage.Particulars ? ProductPackage.Particulars : '';
         document.getElementById('ProductPackageEdit_PackageURL').value = ProductPackage.PackageURL ? ProductPackage.PackageURL : '';
-
+        document.getElementById('GroupList_Edit').value = Status ? Status : '';
 
         ddl.dispose();
         ddl = new wijmo.input.AutoComplete('#cboProductPackageEdit_ProductId', {
@@ -238,6 +247,10 @@
         document.getElementById('ProductPackageEdit_IsReoccuring').checked = false;
         document.getElementById('ProductPackageEdit_Particulars').value = '';
         document.getElementById('ProductPackageEdit_PackageURL').value = '';
+        document.getElementById('GroupList_Edit').addEventListener('keyup', function () {
+            var Status = document.getElementById('GroupList_Edit').options[document.getElementById('GroupList_Edit').selectedIndex].value
+            document.getElementById('GroupList_Edit').value = Status;
+        });
 
         ddl.dispose();
         ddl = new wijmo.input.AutoComplete('#cboProductPackageEdit_ProductId', {
@@ -275,66 +288,64 @@
         }
     }
     function CmdProductPackageEditOkFunction() {
-        //if (confirm("Save Product Package?") == true) {
 
-            var ProductPackage = new Object();
+        var ProductPackage = new Object();
 
-            ProductPackage.Id = document.getElementById('ProductPackageEdit_Id').value;
-            ProductPackage.ProductPackageDescription = document.getElementById('ProductPackageEdit_ProductPackageDescription').value;
-            ProductPackage.SKU = document.getElementById('ProductPackageEdit_SKU').value;
-            ProductPackage.Price = document.getElementById('ProductPackageEdit_Price').value;
-            ProductPackage.ProductId = document.getElementById('ProductPackageEdit_ProductId').value;
-            ProductPackage.IsAvailable = document.getElementById('ProductPackageEdit_IsAvailable').checked;
-            ProductPackage.WithCoupon = document.getElementById('ProductPackageEdit_WithCoupon').checked;
-            ProductPackage.WithSoftware = document.getElementById('ProductPackageEdit_WithSoftware').checked;
-            ProductPackage.IsReoccuring = document.getElementById('ProductPackageEdit_IsReoccuring').checked;
-            ProductPackage.Particulars = document.getElementById('ProductPackageEdit_Particulars').value;
-            ProductPackage.PackageURL = document.getElementById('ProductPackageEdit_PackageURL').value;
+        ProductPackage.Id = document.getElementById('ProductPackageEdit_Id').value;
+        ProductPackage.ProductPackageDescription = document.getElementById('ProductPackageEdit_ProductPackageDescription').value;
+        ProductPackage.SKU = document.getElementById('ProductPackageEdit_SKU').value;
+        ProductPackage.Price = document.getElementById('ProductPackageEdit_Price').value;
+        ProductPackage.ProductId = document.getElementById('ProductPackageEdit_ProductId').value;
+        ProductPackage.IsAvailable = document.getElementById('ProductPackageEdit_IsAvailable').checked;
+        ProductPackage.WithCoupon = document.getElementById('ProductPackageEdit_WithCoupon').checked;
+        ProductPackage.WithSoftware = document.getElementById('ProductPackageEdit_WithSoftware').checked;
+        ProductPackage.IsReoccuring = document.getElementById('ProductPackageEdit_IsReoccuring').checked;
+        ProductPackage.Particulars = document.getElementById('ProductPackageEdit_Particulars').value;
+        ProductPackage.PackageURL = document.getElementById('ProductPackageEdit_PackageURL').value;
+        ProductPackage.ProductPackageGroup = document.getElementById('GroupList_Edit').value;
 
+        var data = JSON.stringify(ProductPackage);
 
-            var data = JSON.stringify(ProductPackage);
-
-            // Add New
-            if (ProductPackage.Id == 0) {
-                $.ajax({
-                    type: "POST",
-                    url: "/api/AddProductPackage",
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    data: data,
-                    success: function (id) {
-                        if (id > 0) {
-                            toastr.success("Successfully Added!");
-                            window.setTimeout(function () { location.erdload() }, 3000);
-                        } else {
-                            toastr.error("Not Added!");
-                        }
+        // Add New
+        if (ProductPackage.Id == 0) {
+            $.ajax({
+                type: "POST",
+                url: "/api/AddProductPackage",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: data,
+                success: function (id) {
+                    if (id > 0) {
+                        toastr.success("Successfully Added!");
+                        window.setTimeout(function () { location.reload() }, 3000);
+                    } else {
+                        toastr.error("Not Added!");
                     }
-                });
+                }
+            });
 
-                // Edit
-            } else {
-                $.ajax({
-                    type: "PUT",
-                    url: "/api/UpdateProductPackage/" + ProductPackage.Id,
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    data: data,
-                    statusCode: {
-                        200: function () {
-                            toastr.success('Successfully Modified!');
-                            window.setTimeout(function () { location.reload() }, 3000);
-                        },
-                        404: function () {
-                            toastr.error("Not found!");
-                        },
-                        400: function () {
-                            toastr.error("Bad Request!");
-                        }
+            // Edit
+        } else {
+            $.ajax({
+                type: "PUT",
+                url: "/api/UpdateProductPackage/" + ProductPackage.Id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: data,
+                statusCode: {
+                    200: function () {
+                        toastr.success('Successfully Modified!');
+                        window.setTimeout(function () { location.reload() }, 3000);
+                    },
+                    404: function () {
+                        toastr.error("Not found!");
+                    },
+                    400: function () {
+                        toastr.error("Bad Request!");
                     }
-                });
-            }
-        //}
+                }
+            });
+        }
     }
 
     function CmdLedgerView_OnClick(Id) {
@@ -448,23 +459,33 @@
         btnCurrentPageProductPackage.innerHTML = (ProductPackages.pageIndex + 1) + ' / ' + ProductPackages.pageCount;
     }
 
+    //function FormValidate() {
+    //    var validator = $('form').validate({
+    //        rules: {
+    //            ProductPackageEdit_Price: {
+    //                number: true
+    //            }
+    //        },
+    //        messages: {
+    //            number: toastr.error('Price should be numeric.', 'Fill in all the required fields!')
+    //        },
+    //        submitHandler: function (form) {
+    //            form.submit();
+    //        }
+    //    });
+    //    var x = validator.form();
+    //    console.log(x);
+    //    return x;
+    //}
+
     function FormValidate() {
         var validator = $('form').validate({
-            rules: {
-                ProductPackageEdit_Price: {
-                    number: true
-                }
-            },
-            messages: {
-                number: toastr.error('Price should be numeric.', 'Fill in all the required fields!')
-            },
             submitHandler: function (form) {
                 form.submit();
             }
         });
 
         var x = validator.form();
-        console.log(x);
         return x;
     }
 

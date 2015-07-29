@@ -84,6 +84,7 @@ namespace MagentaTrader.Controllers
                 NewProductPackage.IsReoccuring = value.IsReoccuring;
                 NewProductPackage.Particulars = value.Particulars;
                 NewProductPackage.PackageURL = value.PackageURL;
+                NewProductPackage.ProductPackageGroup = value.ProductPackageGroup;
 
                 db.MstProductPackages.InsertOnSubmit(NewProductPackage);
                 db.SubmitChanges();
@@ -99,15 +100,15 @@ namespace MagentaTrader.Controllers
         // PUT /api/UpdateProductPackage/5
         [Authorize]
         [Route("api/UpdateProductPackage/{Id}")]
-        public HttpResponseMessage Put(String Id, Models.ProductPackage value)
+        public HttpResponseMessage Put(Models.ProductPackage value)
         {
-            Id = Id.Replace(",", "");
-            int id = Convert.ToInt32(Id);
+            string id = Convert.ToString(value.Id).Replace(",", "");
+            int Id = Convert.ToInt32(id);
 
             try
             {
                 //var Sales = from d in db.TrnSales where d.Id == Id select d;
-                var ProductPackage = from d in db.MstProductPackages where d.Id == id select d;
+                var ProductPackage = from d in db.MstProductPackages where d.Id == Id select d;
 
                 if (ProductPackage.Any())
                 {
@@ -124,6 +125,7 @@ namespace MagentaTrader.Controllers
                     UpdatedProductPackage.IsReoccuring = value.IsReoccuring;
                     UpdatedProductPackage.Particulars = value.Particulars;
                     UpdatedProductPackage.PackageURL = value.PackageURL;
+                    UpdatedProductPackage.ProductPackageGroup = value.ProductPackageGroup;
 
                     db.SubmitChanges();
                 }
@@ -245,6 +247,7 @@ namespace MagentaTrader.Controllers
                                     Price = s.Price,
                                     SalesNumber = s.SalesNumber,
                                     SalesDate = Convert.ToString(s.SalesDate.Year) + "-" + Convert.ToString(s.SalesDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(s.SalesDate.Day + 100).Substring(1, 2),
+                                    Status = s.SalesStatus,
                                     RenewalDate = s.RenewalDate.ToShortDateString(),
                                     ExpiryDate = s.ExpiryDate.ToShortDateString(),
                                     Particulars = s.Particulars,

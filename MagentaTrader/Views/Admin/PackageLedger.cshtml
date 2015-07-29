@@ -253,6 +253,16 @@
                         <dd>
                             <input class="form-control" id="SaleEdit_IsRefunded" type="checkbox" />
                         </dd>
+                        <dt>Staus</dt>
+                        <dd>
+                            <select id="StatusList_Edit" class="full-width form-control">
+                                <option value="OK">Ok</option>
+                                <option value="OK-First">Ok-First</option>
+                                <option value="DECLINED">Declined</option>
+                                <option value="REFUND">Refund</option>
+                                <option value="ERROR">Error</option>
+                            </select>
+                        </dd>
                     </dl>
                 </form>
             </div>
@@ -388,6 +398,7 @@
                             LastName: Results[i]["LastName"],
                             SalesNumber: Results[i]["SalesNumber"],
                             SalesDate: Results[i]["SalesDate"],
+                            SalesStatus: Results[i]["Status"],
                             RenewalDate: Results[i]["RenewalDate"],
                             ExpiryDate: Results[i]["ExpiryDate"],
                             Particulars: Results[i]["Particulars"],
@@ -424,6 +435,7 @@
         });
 
         var Sale = Sales.currentEditItem;
+        var Status = document.getElementById('StatusList_Edit').options[document.getElementById('StatusList_Edit').selectedIndex].value;
         document.getElementById('SaleEdit_Id').value = Sale.Id !== null && typeof (Sale.Id) != 'undefined' ? wijmo.Globalize.format(Sale.Id) : '';
         document.getElementById('SaleEdit_ProductPackageId').value = Sale.ProductPackageId ? Sale.ProductPackageId : '';
         document.getElementById('SaleEdit_UserId').value = Sale.UserId ? Sale.UserId : '';
@@ -438,9 +450,15 @@
         document.getElementById('SaleEdit_Quantity').value = Sale.Quantity ? Sale.Quantity : '';
         document.getElementById('SaleEdit_Price').value = Sale.Price ? Sale.Price : '';
         document.getElementById('SaleEdit_Amount').value = Sale.Amount ? Sale.Amount : '';
+        document.getElementById('SaleEdit_Quantity').addEventListener('keyup', function () {
+            document.getElementById('SaleEdit_Amount').value = document.getElementById('SaleEdit_Quantity').value * document.getElementById('SaleEdit_Price').value;
+        });
+        document.getElementById('SaleEdit_Price').addEventListener('keyup', function () {
+            document.getElementById('SaleEdit_Amount').value = document.getElementById('SaleEdit_Quantity').value * document.getElementById('SaleEdit_Price').value;
+        });
         document.getElementById('SaleEdit_IsActive').checked = Sale.IsActive;
         document.getElementById('SaleEdit_IsRefunded').checked = Sale.IsRefunded;
-
+        document.getElementById('StatusList_Edit').value = Status ? Status : '';
 
         SaleDate.dispose();
         SaleDate = new wijmo.input.InputDate('#SaleEdit_SaleDate', {
@@ -520,6 +538,10 @@
         });
         document.getElementById('SaleEdit_IsActive').checked = false;
         document.getElementById('SaleEdit_IsRefunded').checked = false;
+        document.getElementById('StatusList_Edit').addEventListener('keyup', function () {
+            var Status = document.getElementById('StatusList_Edit').options[document.getElementById('StatusList_Edit').selectedIndex].value
+            document.getElementById('StatusList_Edit').value = Status;
+        });
 
         SaleDate.dispose();
         SaleDate = new wijmo.input.InputDate('#SaleEdit_SaleDate', {
@@ -597,8 +619,6 @@
     }
 
     function CmdSaleEditOkFunction() {
-        //if (confirm("Save Sales?") == true) {
-
             var Sale = new Object();
 
             Sale.Id = document.getElementById('SaleEdit_Id').value;
@@ -614,9 +634,15 @@
             Sale.Amount = document.getElementById('SaleEdit_Amount').value;
             Sale.IsActive = document.getElementById('SaleEdit_IsActive').checked;
             Sale.IsRefunded = document.getElementById('SaleEdit_IsRefunded').checked;
+            document.getElementById('SaleEdit_Quantity').addEventListener('keyup', function () {
+                document.getElementById('SaleEdit_Amount').value = document.getElementById('SaleEdit_Quantity').value * document.getElementById('SaleEdit_Price').value;
+            });
+            document.getElementById('SaleEdit_Price').addEventListener('keyup', function () {
+                document.getElementById('SaleEdit_Amount').value = document.getElementById('SaleEdit_Quantity').value * document.getElementById('SaleEdit_Price').value;
+            });
+            Sale.SalesStatus = document.getElementById('StatusList_Edit').value;
 
-
-            var data = JSON.stringify(Sale)
+            var data = JSON.stringify(Sale);
             // Add New
             if (Sale.Id == 0) {
                 $.ajax({
@@ -657,7 +683,6 @@
                     }
                 });
             }
-        //}
     }
 
     function getProductPackageList(items) {
@@ -787,6 +812,7 @@
                             LastName: Results[i]["LastName"],
                             SalesNumber: Results[i]["SalesNumber"],
                             SalesDate: Results[i]["SalesDate"],
+                            SalesStatus: Results[i]["Status"],
                             RenewalDate: Results[i]["RenewalDate"],
                             ExpiryDate: Results[i]["ExpiryDate"],
                             Particulars: Results[i]["Particulars"],
@@ -896,6 +922,7 @@
                 EmailAddress: PackageLedgerSaveData[i].EmailAddress,
                 PhoneNumber: PackageLedgerSaveData[i].PhoneNumber,
                 Price: PackageLedgerSaveData[i].Price,
+                Status: PackageLedgerSaveData[i].Status
             });
         }
 
@@ -1050,6 +1077,12 @@
                 {
                     "header": "Price",
                     "binding": "Price",
+                    "allowSorting": true,
+                    "width": 50
+                },
+                {
+                    "header": "Status",
+                    "binding": "SalesStatus",
                     "allowSorting": true,
                     "width": 50
                 }

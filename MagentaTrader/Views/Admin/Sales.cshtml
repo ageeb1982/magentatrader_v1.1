@@ -281,7 +281,6 @@
 
         var Sale = Sales.currentEditItem;
         var Status = document.getElementById('StatusList_Edit').options[document.getElementById('StatusList_Edit').selectedIndex].value;
-        console.log(Status);
         document.getElementById('SaleEdit_Id').value = Sale.Id !== null && typeof (Sale.Id) != 'undefined' ? wijmo.Globalize.format(Sale.Id) : '';
         document.getElementById('SaleEdit_ProductPackageId').value = Sale.ProductPackageId ? Sale.ProductPackageId : '';
         document.getElementById('SaleEdit_UserId').value = Sale.UserId ? Sale.UserId : '';
@@ -375,7 +374,6 @@
         document.getElementById('StatusList_Edit').addEventListener('keyup', function () {
             var Status = document.getElementById('StatusList_Edit').options[document.getElementById('StatusList_Edit').selectedIndex].value
             document.getElementById('StatusList_Edit').value = Status;
-            console.log(document.getElementById('StatusList_Edit').value);
         });
         document.getElementById('SaleEdit_Quantity').addEventListener('keyup', function () {
             document.getElementById('SaleEdit_Amount').value = document.getElementById('SaleEdit_Quantity').value * document.getElementById('SaleEdit_Price').value;
