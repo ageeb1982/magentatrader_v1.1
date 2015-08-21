@@ -23,6 +23,13 @@ namespace MagentaTrader.Controllers
         }
 
         //
+        // GET: /Campaign/AlaskaCruise2016
+        public ActionResult AlaskaCruise2016()
+        {
+            return View();
+        }
+
+        //
         // GET: /Campaign/SeasonalityWorkshop01
         public ActionResult SeasonalityWorkshop01()
         {

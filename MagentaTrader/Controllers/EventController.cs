@@ -198,7 +198,7 @@ namespace MagentaTrader.Controllers
                                  };
                     if (Events.Count() > 0)
                     {
-                        values = Events.Take(7).ToList();
+                        values = Events.Take(100).ToList();
                     }
                     else
                     {

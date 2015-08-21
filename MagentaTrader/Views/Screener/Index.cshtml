@@ -35,6 +35,8 @@
                 <option value="SSU">Strong and Steady (Up)</option>
                 <option value="SSD">Strong and Steady (Down)</option>
                 <option value="WLS">Win/Loss Strategy</option>
+                <option value="MEU">Magenta Early Up</option>
+                <option value="MED">Magenta Early Down</option>
             </select>
         </div>
     </div>  
@@ -225,12 +227,12 @@
         }
         return Math.round(returnResult);
     }
-    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears, Correlation30) {
+    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears, Correlation30, Strategy) {
         $('#loading').modal('show');
         var d = new wijmo.collections.ObservableArray();
 
         $.ajax({
-            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume + '/' + GrowthDecayRate + '/' + GrowthDecayTime + '/' + NoOfYears + '/' + Correlation30,
+            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume + '/' + GrowthDecayRate + '/' + GrowthDecayTime + '/' + NoOfYears + '/' + Correlation30 + '/' + Strategy,
             type: 'GET',
             dataType: 'json',
             success: function (result) {
@@ -259,9 +261,18 @@
                         WinLoss40: "<a href='javascript:;' onclick='OpenYearlyWinLoss(40);'><font color='black'>" + result[i].WinLoss40 + "</font></a>",
                         WinLossAverage40: result[i].WinLossAverage40,
                         WinLoss60: "<a href='javascript:;' onclick='OpenYearlyWinLoss(60);'><font color='black'>" + result[i].WinLoss60 + "</font></a>",
+                        WinLoss20Raw: result[i].WinLoss20,
+                        WinLoss40Raw: result[i].WinLoss40,
+                        WinLoss60Raw: result[i].WinLoss60,
                         WinLossAverage60: result[i].WinLossAverage60,
                         CorrelationCoefficient30: result[i].CorrelationCoefficient30,
-                        SeasonalityCorrelation: result[i].SeasonalityCorrelation
+                        SeasonalityCorrelation: result[i].SeasonalityCorrelation,
+                        MACDTrendNoOfDays: result[i].MACDGrowthDecayRate < 0 ? (result[i].MACDTrendNoOfDays * -1) : result[i].MACDTrendNoOfDays,
+                        MACDGrowthDecayRate: result[i].MACDGrowthDecayRate,
+                        EMATrendNoOfDays: result[i].EMAGrowthDecayRate < 0 ? (result[i].EMATrendNoOfDays * -1) : result[i].EMATrendNoOfDays,
+                        EMAGrowthDecayRate: result[i].EMAGrowthDecayRate,
+                        EMAStartDate: result[i].EMAStartDate,
+                        EMALinear: result[i].EMALinear
                     });
                 }
 
@@ -307,154 +318,300 @@
         }
         btnCurrentPageEvent.innerHTML = (ScreenerData.pageIndex + 1) + ' / ' + ScreenerData.pageCount;
     }
+    function MakeGridColumns(Strategy) {
+        var gridColumns = [];
+        switch (Strategy) {
+            case "MEU":
+            case "MED":
+                gridColumns = [{"header": "Symbol",
+                                "binding": "Symbol",
+                                "width": 70,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Price",
+                                "binding": "ClosePrice",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Vol (M)",
+                                "binding": "Volume",
+                                "width": 50,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Years",
+                                "binding": "NoOfYears",
+                                "width": 35,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Correlation",
+                                "binding": "SeasonalityCorrelation",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Trend",
+                                "binding": "TrendNoOfDays",
+                                "width": 35,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Linear",
+                                "binding": "CorrelationCoefficient30",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Rate-T",
+                                "binding": "GrowthDecayRate",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "MACD",
+                                "binding": "MACDTrendNoOfDays",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "EMA",
+                                "binding": "EMATrendNoOfDays",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "EMA Rate",
+                                "binding": "EMAGrowthDecayRate",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "EMA Start",
+                                "binding": "EMAStartDate",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "EMA Linear",
+                                "binding": "EMALinear",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "20 W/L %",
+                                "binding": "WinLossAverage20",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "20 W/L",
+                                "binding": "WinLoss20",
+                                "width": 55,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "40 W/L %",
+                                "binding": "WinLossAverage40",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "40 W/L",
+                                "binding": "WinLoss40",
+                                "width": 55,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "60 W/L %",
+                                "binding": "WinLossAverage60",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "60 W/L",
+                                "binding": "WinLoss60",
+                                "width": 55,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }];
+                break;
+            default:
+                gridColumns = [{"header": "Symbol",
+                                "binding": "Symbol",
+                                "width": 70,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Price",
+                                "binding": "ClosePrice",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Vol (M)",
+                                "binding": "Volume",
+                                "width": 50,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Years",
+                                "binding": "NoOfYears",
+                                "width": 35,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Correlation",
+                                "binding": "SeasonalityCorrelation",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Trend",
+                                "binding": "TrendNoOfDays",
+                                "width": 35,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Linear",
+                                "binding": "CorrelationCoefficient30",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Rate-T",
+                                "binding": "GrowthDecayRate",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Rate-W1",
+                                "binding": "GrowthDecayRateW1",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Rate-W2",
+                                "binding": "GrowthDecayRateW2",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Rate-W3",
+                                "binding": "GrowthDecayRateW3",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Rate-M1",
+                                "binding": "GrowthDecayRateM1",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Rate-M2",
+                                "binding": "GrowthDecayRateM2",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Rate-M3",
+                                "binding": "GrowthDecayRateM3",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "20 W/L %",
+                                "binding": "WinLossAverage20",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "20 W/L",
+                                "binding": "WinLoss20",
+                                "width": 55,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "40 W/L %",
+                                "binding": "WinLossAverage40",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "40 W/L",
+                                "binding": "WinLoss40",
+                                "width": 55,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "60 W/L %",
+                                "binding": "WinLossAverage60",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "60 W/L",
+                                "binding": "WinLoss60",
+                                "width": 55,
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }];
+                break;
+        }
+        return gridColumns;
+    }
     function MakeScreenerGrid() {
+        var $strategy = document.getElementById('Strategy').value;
+        var gridColumns = [];
+
+        gridColumns = MakeGridColumns($strategy);
+
         ScreenerGrid.dispose();
         ScreenerGrid = new wijmo.grid.FlexGrid('#ScreenerGrid');
         ScreenerGrid.initialize({
-            columns: [
-                        {
-                            "header": "Symbol",
-                            "binding": "Symbol",
-                            "width": 70,
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        },{
-                            "header": "Price",
-                            "binding": "ClosePrice",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        },{
-                            "header": "Vol (M)",
-                            "binding": "Volume",
-                            "width": 50,
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        },{
-                            "header": "Years",
-                            "binding": "NoOfYears",
-                            "width": 35,
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        },{
-                            "header": "Correlation",
-                            "binding": "SeasonalityCorrelation",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        },{
-                            "header": "Trend",
-                            "binding": "TrendNoOfDays",
-                            "width": 35,
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "Linear",
-                            "binding": "CorrelationCoefficient30",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "Rate-T",
-                            "binding": "GrowthDecayRate",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "Rate-W1",
-                            "binding": "GrowthDecayRateW1",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "Rate-W2",
-                            "binding": "GrowthDecayRateW2",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "Rate-W3",
-                            "binding": "GrowthDecayRateW3",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "Rate-M1",
-                            "binding": "GrowthDecayRateM1",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "Rate-M2",
-                            "binding": "GrowthDecayRateM2",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "Rate-M3",
-                            "binding": "GrowthDecayRateM3",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "20 W/L %",
-                            "binding": "WinLossAverage20",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "20 W/L",
-                            "binding": "WinLoss20",
-                            "width": 55,
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "40 W/L %",
-                            "binding": "WinLossAverage40",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "40 W/L",
-                            "binding": "WinLoss40",
-                            "width": 55,
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "60 W/L %",
-                            "binding": "WinLossAverage60",
-                            "width": "13*",
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }, {
-                            "header": "60 W/L",
-                            "binding": "WinLoss60",
-                            "width": 55,
-                            "allowSorting": true,
-                            "isContentHtml": true,
-                            "wordWrap": true
-                        }
-
-            ],
+            columns: gridColumns,
             autoGenerateColumns: false,
             itemsSource: ScreenerData,
             isReadOnly: true,
@@ -473,38 +630,34 @@
                     panel.columns[c].binding == 'WinLossAverage60')) {
                     var cellData = panel.getCellData(r, c);
                     cell.style.color = GetRateColor(cellData);
+                    cell.style.fontSize = "75%";
+                } else if (wijmo.grid.CellType.Cell == panel.cellType && 
+                           (panel.columns[c].binding == 'MACDTrendNoOfDays' ||
+                            panel.columns[c].binding == 'EMATrendNoOfDays' ||
+                            panel.columns[c].binding == 'EMAGrowthDecayRate')) {
+                    var redColor = "#A80008";
+                    var blueColor = "#070BB0";
+
+                    var cellData = panel.getCellData(r, c);
+
+                    if (cellData >= 0) {
+                        cell.style.color = blueColor;
+                    } else {
+                        cell.style.color = redColor;
+                    }
+
+                    cell.style.fontSize = "75%";
                 } else if (wijmo.grid.CellType.ColumnHeader == panel.cellType) {
                     var cellData = panel.getCellData(r, c);
-                    cell.style.fontSize = "85%";
+                    cell.style.fontSize = "70%";
+                } else {
+                    var cellData = panel.getCellData(r, c);
+                    cell.style.fontSize = "75%";
                 }
             }
         });
         ScreenerGrid.trackChanges = true;
-
-        btnFirstPageEvent = document.getElementById('btnMoveToFirstPageEvent');
-        btnPreviousPageEvent = document.getElementById('btnMoveToPreviousPageEvent');
-        btnNextPageEvent = document.getElementById('btnMoveToNextPageEvent');
-        btnLastPageEvent = document.getElementById('btnMoveToLastPageEvent');
-        btnCurrentPageEvent = document.getElementById('btnCurrentPageEvent');
-
         UpdateNavigateButtonsEvent();
-
-        btnFirstPageEvent.addEventListener('click', function () {
-            ScreenerData.moveToFirstPage();
-            UpdateNavigateButtonsEvent();
-        });
-        btnPreviousPageEvent.addEventListener('click', function () {
-            ScreenerData.moveToPreviousPage();
-            UpdateNavigateButtonsEvent();
-        });
-        btnNextPageEvent.addEventListener('click', function () {
-            ScreenerData.moveToNextPage();
-            UpdateNavigateButtonsEvent();
-        });
-        btnLastPageEvent.addEventListener('click', function () {
-            ScreenerData.moveToLastPage();
-            UpdateNavigateButtonsEvent();
-        });
     }
     function DisableScreenFields(disable) {
         document.getElementById('Exchange').disabled = disable;
@@ -524,7 +677,8 @@
         var $growthDecayTime = document.getElementById('GrowthDecayTime').value;
         var $noOfYears = parseInt(document.getElementById('NoOfYears').value);
         var $correlation30 = parseFloat(document.getElementById('Correlation30').value);
-        
+        var $strategy = document.getElementById('Strategy').value;
+
         $closePrice = !$closePrice ? 10 : $closePrice;
         $volume = !$volume ? 1000000 : $volume;
         $growthDecayRate = !$growthDecayRate ? 100 : $growthDecayRate;
@@ -532,7 +686,7 @@
         $noOfYears = !$noOfYears ? 8 : $noOfYears;
         $correlation30 = !$correlation30 ? 10 : $correlation30;
 
-        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears, $correlation30);
+        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears, $correlation30, $strategy);
     }
     function CmdSaveXLS_OnClick() {
         var CSV = '';
@@ -556,14 +710,20 @@
                 GrowthDecayRateM3: ScreenerSaveData[i].GrowthDecayRateM3,
                 WinLossCurrent30: ScreenerSaveData[i].WinLossCurrent30,
                 WinLossAverageCurrent30: ScreenerSaveData[i].WinLossAverageCurrent30,
-                WinLoss20: ScreenerSaveData[i].WinLoss20,
+                WinLoss20: ScreenerSaveData[i].WinLoss20Raw,
                 WinLossAverage20: ScreenerSaveData[i].WinLossAverage20,
-                WinLoss40: ScreenerSaveData[i].WinLoss40,
+                WinLoss40: ScreenerSaveData[i].WinLoss40Raw,
                 WinLossAverage40: ScreenerSaveData[i].WinLossAverage40,
-                WinLoss60: ScreenerSaveData[i].WinLoss60,
+                WinLoss60: ScreenerSaveData[i].WinLoss60Raw,
                 WinLossAverage60: ScreenerSaveData[i].WinLossAverage60,
                 CorrelationCoefficient30: ScreenerSaveData[i].CorrelationCoefficient30,
-                SeasonalityCorrelation: ScreenerSaveData[i].SeasonalityCorrelation
+                SeasonalityCorrelation: ScreenerSaveData[i].SeasonalityCorrelation,
+                MACDTrendNoOfDays: ScreenerSaveData[i].MACDTrendNoOfDays, 
+                MACDGrowthDecayRate: ScreenerSaveData[i].MACDGrowthDecayRate,
+                EMATrendNoOfDays: ScreenerSaveData[i].EMATrendNoOfDays, 
+                EMAGrowthDecayRate: ScreenerSaveData[i].EMAGrowthDecayRate,
+                EMAStartDate: ScreenerSaveData[i].EMAStartDate,
+                EMALinear: ScreenerSaveData[i].EMALinear
             });
         }
 
@@ -659,6 +819,20 @@
                 break;
             case "WLS":
                 DisableScreenFields(true);
+                break;
+            case "MEU":
+            case "MED":
+                DisableScreenFields(true);
+                document.getElementById('Exchange').value = "All";
+                document.getElementById('ClosePrice').value = 10;
+                document.getElementById('Volume').value = 800000;
+                document.getElementById('NoOfYears').value = 8;
+
+                document.getElementById('Exchange').disabled = false;
+                document.getElementById('ClosePrice').disabled = false;
+                document.getElementById('Volume').disabled = false;
+                document.getElementById('NoOfYears').disabled = false;
+
                 break;
         }
     }
@@ -780,6 +954,31 @@
     $(document).ready(function () {
         ScreenerGrid = new wijmo.grid.FlexGrid('#ScreenerGrid');
         YearlyWinLossGrid = new wijmo.grid.FlexGrid('#YearlyWinLossGrid');
+
+        while (ScreenerSaveData.length > 0) ScreenerSaveData.pop();
+
+        btnFirstPageEvent = document.getElementById('btnMoveToFirstPageEvent');
+        btnPreviousPageEvent = document.getElementById('btnMoveToPreviousPageEvent');
+        btnNextPageEvent = document.getElementById('btnMoveToNextPageEvent');
+        btnLastPageEvent = document.getElementById('btnMoveToLastPageEvent');
+        btnCurrentPageEvent = document.getElementById('btnCurrentPageEvent');
+
+        btnFirstPageEvent.addEventListener('click', function () {
+            ScreenerData.moveToFirstPage();
+            UpdateNavigateButtonsEvent();
+        });
+        btnPreviousPageEvent.addEventListener('click', function () {
+            ScreenerData.moveToPreviousPage();
+            UpdateNavigateButtonsEvent();
+        });
+        btnNextPageEvent.addEventListener('click', function () {
+            ScreenerData.moveToNextPage();
+            UpdateNavigateButtonsEvent();
+        });
+        btnLastPageEvent.addEventListener('click', function () {
+            ScreenerData.moveToLastPage();
+            UpdateNavigateButtonsEvent();
+        });
     });
 </script>
 

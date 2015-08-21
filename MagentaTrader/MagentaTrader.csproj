@@ -197,6 +197,7 @@
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\VideoController.cs" />
     <Compile Include="Controllers\Web99Controller.cs" />
+    <Compile Include="Controllers\WorkshopController.cs" />
     <Compile Include="Data\MagentaTradersDB.cs">
       <DependentUpon>MagentaTradersDB.dbml</DependentUpon>
     </Compile>
@@ -805,8 +806,10 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="css\bootstrap-select.min.css" />
+    <Content Include="css\bootstrap-toggle.min.css" />
     <Content Include="css\bootstrap.css" />
     <Content Include="css\bootstrap.min.css" />
+    <Content Include="css\bootstrap2-toggle.min.css" />
     <Content Include="css\landing-page.css" />
     <Content Include="css\site.css" />
     <Content Include="css\styles.css" />
@@ -821,6 +824,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="img\alaska1.jpg" />
     <Content Include="img\banner-bg.jpg" />
     <Content Include="img\campaign\20150626.png" />
     <Content Include="img\contact.jpg" />
@@ -830,6 +834,8 @@
     <Content Include="img\derekportrait.png" />
     <Content Include="img\dog.png" />
     <Content Include="img\intro-bg.jpg" />
+    <Content Include="img\intro-bg1.jpg" />
+    <Content Include="img\intro-bg1.png" />
     <Content Include="img\ipad.png" />
     <Content Include="img\logo-1.png" />
     <Content Include="img\logo-2.png" />
@@ -850,8 +856,10 @@
     <Content Include="img\workshop1.jpg" />
     <Content Include="img\workshop2.jpg" />
     <Content Include="js\black_scholes.js" />
+    <Content Include="js\bootstrap-toggle.min.js" />
     <Content Include="js\bootstrap.js" />
     <Content Include="js\bootstrap.min.js" />
+    <Content Include="js\bootstrap2-toggle.min.js" />
     <Content Include="js\date.js" />
     <Content Include="js\flot-data.js" />
     <Content Include="js\jquery-1.10.2.min.js" />
@@ -1360,6 +1368,8 @@
     <Content Include="wijmo\styles\themes\wijmo.theme.zen.min.css" />
     <Content Include="wijmo\styles\wijmo.css" />
     <Content Include="wijmo\styles\wijmo.min.css" />
+    <Content Include="js\bootstrap-toggle.min.js.map" />
+    <Content Include="js\bootstrap2-toggle.min.js.map" />
     <None Include="Properties\PublishProfiles\magentatrader - FTP %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\magentatrader - FTP %283%29.pubxml" />
     <None Include="Properties\PublishProfiles\magentatrader - FTP %284%29.pubxml" />
@@ -1462,6 +1472,8 @@
     <Content Include="Views\Campaign\Index.cshtml" />
     <Content Include="Views\Campaign\Anniversary5.cshtml" />
     <Content Include="Views\Campaign\SeasonalityWorkshop01.cshtml" />
+    <Content Include="Views\Campaign\AlaskaCruise2016.cshtml" />
+    <Content Include="Views\Workshop\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

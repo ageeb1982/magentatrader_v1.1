@@ -1,34 +1,8 @@
-﻿@*@{
-    ViewBag.Title = "Home Page";
+﻿@{
+    ViewBag.Title = "Home";
+
+    var Agreement = Request.QueryString["agreement"];
 }
-
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
-</div>
-
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>*@
 
 <script src="/lib/jquery/js/jquery.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.js"></script>
@@ -103,7 +77,7 @@
                     <hr class="intro-divider">
                     <ul class="list-inline intro-social-buttons">
                         <li>
-                            <a href="#training" class="btn btn-default btn-lg"><i class="fa fa-lightbulb-o"></i> <span class="network-name">Learn</span></a>
+                            <a href="#webinarCalendar" class="btn btn-default btn-lg"><i class="fa fa-lightbulb-o"></i> <span class="network-name">Learn</span></a>
                         </li>
                         <li>
                             <a href="/Account/Login" class="btn btn-default btn-lg"><i class="fa fa-key"></i> <span class="network-name">Join</span></a>
@@ -357,6 +331,9 @@
                 <div id="CalendarGrid" class="grid"></div>
             </p>
         </div>
+        <div class ="row">
+            <p>Just click on the link in the calendar to join a webinar or change the calendar month to pick your preferred schedule.</p>
+        </div>
     </div>
 </div>
 
@@ -562,6 +539,35 @@
     </div>
 </div>
 
+@*User Detail*@
+<div id="scroll">
+    <div class="modal fade" id="QuestradeAgreement">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Agreement</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Magenta Trader is a technical analysis software which uses seasonality patterns to analyze trading opportunities. The Magenta Trader software includes charting tools and webinar presentations intended for educational purposes only. Magenta Trader is NOT a registered adviser or a Broker Dealer.
+                    </p>
+                    <p>
+                        The information provided by Magenta Trader does not constitute advice or recommendation by Questrade, Inc. (“Questrade”) with respect to investment in financial instruments. Questrade does not recommend the use of, nor endorse any of the material presented through Magenta Trader. Your use or reliance of Magenta Trader as a client of Questrade is subject to the Questrade Legal Notice. Questrade, Inc. is a registered investment dealer, member of the Investment Industry Regulatory Organization of Canada (“IIROC”) and a member of the Canadian Investor Protection Fund (“CIPF”).
+                    </p>
+                    <p>
+                        The incidence of technical difficulty and the risk of inaccuracy is an inherent part of transacting via the internet. Questrade cannot guarantee the timeliness, accuracy, and reliability of the information provided by Magenta Trader and Questrade will not be held liable nor assume any liability for any loss or damages arising directly or indirectly from the use of Magenta Trader. The information provided by Magenta Trader is obtained from sources believed to be reliable. Neither the information nor any opinion expressed constitutes a solicitation by Magenta Trader and Questrade for the purchase or sale of any securities or commodities. For more information, please refer to the <a href="http://www.questrade.com/legal/legal_notices">Questrade Legal notices</a>.  Any information or testimonials relating to past performance of securities through use of the product does not guarantee future performance.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="CmdUserEditOk" onclick="CmdQuestradeAgreementOK_OnClick()">
+                        I AGREE
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!--JAVASCRIPT-->>
 <script type="text/javascript">
     var CalendarData;
@@ -727,7 +733,11 @@
             var webinarDate = new Date(WebinarData[i]["EventDate"]);
             if (parseDate(dayDate).equals(webinarDate) == true) {
                 if (WebinarData[i]["IsRestricted"] == true) {
-                    webinars = webinars + "<a href='#' onclick='OpenWeb99Link(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
+                    if (WebinarData[i]["EventType"] == "WORKSHOP") {
+                        webinars = webinars + "<a href='#' onclick='OpenWorkshopLink(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
+                    } else {
+                        webinars = webinars + "<a href='#' onclick='OpenWeb99Link(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
+                    }
                 } else {
                     webinars = webinars + "<a href='" + WebinarData[i]["URL"] + "'>" + WebinarData[i]["EventDescription"] + "</a><br />";
                 } 
@@ -739,20 +749,34 @@
         var username = '@User.Identity.Name';
         if (username.length > 0) {
             WebinarURL = URL;
-            userCheck(username);
+            userCheck(username,"WEB99");
         } else {
             window.location.href = "/account/login";
         } 
+    }
+    function OpenWorkshopLink(URL) {
+        var username = '@User.Identity.Name';
+        if (username.length > 0) {
+            WebinarURL = URL;
+            userCheck(username,"WORKSHOP");
+        } else {
+            window.location.href = "/account/login";
+        }
     }
     function parseDate(input) {
         var parts = input.split('-');
         return new Date(parts[0], parts[1] - 1, parts[2]);
     }
+
     function CmdGetWebinar_OnClick() {
         var m = parseInt($("#WebinarMonth").val());
         var y = parseInt($("#WebinarYear").val());
 
         MakeCalendarGrid(m, y);
+    }
+    function CmdQuestradeAgreementOK_OnClick() {
+        // $('#QuestradeAgreement').modal('hide');
+        window.location.href = "https://attendee.gotowebinar.com/register/4720442380575466753";
     }
 
     function userEdit(username) {
@@ -814,7 +838,7 @@
                     200: function () {
                         var username = '@User.Identity.Name';
                         $('#UserEdit').modal('hide');
-                        userCheck(username);
+                        userCheck(username,"WEB99");
                         window.location.href = WebinarURL;
                     },
                     404: function () {
@@ -831,7 +855,7 @@
     function userEditCancel() {
         $('#UserEdit').modal('hide');
     }
-    function userCheck(username) {
+    function userCheck(username,eventType) {
         $.ajax({
             url: '/api/GetUser/' + username,
             type: 'GET',
@@ -847,11 +871,41 @@
                         alert("To remove this prompt, you must fill in all user information.");
                         userEdit(username);
                     } else {
-                        window.location.href = WebinarURL;
+                        if (eventType = "WORKSHOP") {
+                            userRoles(username, "Workshop");
+                        } else {
+                            window.location.href = WebinarURL;
+                        }
                     }
                 }
             }
 
+        });
+    }
+    function userRoles(username,role) {
+        $.ajax({
+            url: '/api/GetUserRoles/' + username,
+            type: 'GET',
+            data: {},
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (Results) {
+                var openFlag = false;
+                if (Results.length > 0) {
+                    for (var i = 0; i < Results.length; i++) {
+                        if (Results[i].Name == role) {
+                            openFlag = true;
+                        }
+                    }
+                    if (openFlag == true) {
+                        window.location.href = WebinarURL;
+                    } else {
+                        alert("Needs workshop access.");
+                    }
+                } else {
+                    alert("Needs workshop access.");
+                }
+            }
         });
     }
 
@@ -879,5 +933,14 @@
         }).fail(
             function (xhr, textStatus, err) {  }
         );
+
+        var Agreement = "@Agreement";
+        if (Agreement.toUpperCase() == "QUESTRADE") {
+            $('#QuestradeAgreement').modal({
+                show: true,
+                backdrop: false
+            });
+        }
+
     });
 </script>

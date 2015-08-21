@@ -13,6 +13,7 @@
 <link href="/dist/css/sb-admin-2.css" rel="stylesheet">
 <link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 <link href="/css/styles.css" rel="stylesheet" />
+<link href="/css/bootstrap-toggle.min.css" rel="stylesheet">
 
 <script src="/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -21,10 +22,10 @@
 
 <script src="/dist/js/sb-admin-2.js"></script>
 <script src="/js/jquery.slimscroll.min.js"></script>
+<script src="/js/bootstrap-toggle.min.js"></script>
 
 <div id="wrapper">
-    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-
+    <nav id="menu-wrapper" class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
@@ -138,13 +139,20 @@
                         }
                     }
 
+                    <li>
+                        <hr style="margin: 10px 0 10px 0;" />
+                        <a href="#">
+                            <div><strong>Chart Dark Background?</strong></div>
+                            <div><input id="chartBlackBackground" type="checkbox" checked data-toggle="toggle"></div>
+                        </a>
+                    </li>
+
                 </ul>
                 <!-- /.dropdown-messages -->
             </li>
         </ul>
-        <!-- /.navbar-top-links -->
 
-        <div class="navbar-default sidebar" role="navigation">
+        <div id="sidebar-wrapper" class="navbar-default sidebar" role="navigation">
             <div class="sidebar-nav navbar-collapse">
                 <ul class="nav" id="side-menu">
                     <li class="sidebar-search">
@@ -208,7 +216,7 @@
         </div>
     </nav>
     <div id="page-wrapper">
-        <div id="chartdiv" style="width: 100%; height: 600px; padding: 20px 10px 10px 10px; "></div>
+        <div id="chartdiv" style="width: 100%; height: 93vh; padding: 20px 10px 10px 10px;"></div>
     </div>
 </div>
 
@@ -686,6 +694,18 @@
 
     var MovingAverageGrid;
     var MovingAverageData = [];
+
+    // Colors
+
+    //var GoldColor = "#FFD700";
+    var GoldColor = "#FFA200";
+    var GrayColor = "#858583";
+    var YellowColor = "#FFFF00";
+    var GreenColor = "#00FF00";
+    var BlueColor = "#0000FF";
+    var RedColor = "#FF0000";
+    var DarkGreenColor = "#65BF04";
+    var MagentaColor = "#9C0063";
 
     // User Edit
 
@@ -2782,7 +2802,7 @@
 
                     createStockChart(symbol, data);
                 } else {
-                    alert("Please retry.  Server is busy.");
+                    alert("Please retry.  Symbol not found.");
                 }
             }
         }).fail(
@@ -2939,7 +2959,7 @@
                 ema2_previous = ema2;
                 chartData[i].ema2 = ema2;
                 chartData[i].macd = chartData[i].ema1 - ema2;
-            } else if (macd_index > 11) {
+            } else if (macd_index > 25) {
                 ema2 = (chartData[i].close * (2 / (26 + 1)) + ema2_previous * (1 - (2 / (26 + 1))));
                 ema2_previous = ema2;
                 chartData[i].ema2 = ema2;
@@ -3065,6 +3085,7 @@
                     seasonY9: seasonYearData[9][i].toFixed(2),
                     earnings: earning == 0 ? 'NaN' : earning,
                     volume: chartData[125 - i]["volume"],
+                    volumeDescription: AmCharts.roundTo(chartData[125 - i]["volume"]/1000000,2).toString() + "M",
                     macd: AmCharts.roundTo(chartData[125 - i]["macd"], 2),
                     macdSignal: AmCharts.roundTo(chartData[125 - i]["macdSignal"], 2),
                     ma1: 0,
@@ -3080,6 +3101,9 @@
 
         generateMovingAverage();
         computeMovingAverage();
+
+        // AMChart legend
+
 
         // AMChart events
 
@@ -3194,7 +3218,7 @@
 
         var guideCurrentDate = new AmCharts.Guide();
         guideCurrentDate.date = plotData[125]["date"];
-        guideCurrentDate.lineColor = "#FF0000";
+        guideCurrentDate.lineColor = RedColor;
         guideCurrentDate.lineAlpha = 1;
         guideCurrentDate.dashLength = 2;
         guideCurrentDate.inside = true;
@@ -3235,6 +3259,7 @@
             valueAxisStrikePrice.maximum = maxValue + (downDistance - upDistance);
             valueAxisStrikePrice.minimum = minValue;
         }
+        valueAxisPrice.color = BlueColor;
         valueAxisStrikePrice.position = "right";
         valueAxisStrikePrice.labelsEnabled = false;
         stockPanel1.addValueAxis(valueAxisPrice);
@@ -3349,10 +3374,10 @@
         graphSeason.title = "10-Years Seasonality";
         graphSeason.valueField = "season";
         graphSeason.useDataSetColors = false;
-        graphSeason.color = seasonColor;
+        graphSeason.color = GoldColor;
+        graphSeason.lineColor = GoldColor;
         graphSeason.type = "line";
         graphSeason.lineThickness = 2;
-        graphSeason.lineColor = seasonColor;
         graphSeason.showBalloon = false;
         graphSeason.valueAxis = valueAxisTenYearSeasonality;
 
@@ -3361,10 +3386,10 @@
         graphSeason5Year.title = "5-Years Seasonality";
         graphSeason5Year.valueField = "season5Year";
         graphSeason5Year.useDataSetColors = false;
-        graphSeason5Year.color = season5YearColor;
+        graphSeason5Year.color = DarkGreenColor;
+        graphSeason5Year.lineColor = DarkGreenColor;
         graphSeason5Year.type = "line";
         graphSeason5Year.lineThickness = 1;
-        graphSeason5Year.lineColor = season5YearColor;
         graphSeason5Year.showBalloon = false;
         graphSeason5Year.valueAxis = valueAxisFiveYearSeasonality;
 
@@ -3374,10 +3399,11 @@
         graphVolume.valueField = "volume";
         graphVolume.type = "column";
         graphVolume.useDataSetColors = false;
-        graphVolume.color = "#FAD3EF";
-        graphVolume.lineColor = "#FAD3EF";
+        graphVolume.color = GrayColor;
+        graphVolume.lineColor = GrayColor;
         graphVolume.showBalloon = false;
-        graphVolume.fillAlphas = 1;
+        graphVolume.lineAlpha = 0;
+        graphVolume.fillAlphas = 0.3;
         graphVolume.valueAxis = valueAxisVolume;
 
         var graphMACD = new AmCharts.StockGraph();
@@ -3385,10 +3411,10 @@
         graphMACD.title = "MACD";
         graphMACD.valueField = "macd";
         graphMACD.useDataSetColors = false;
-        graphMACD.color = "#2922B7";
+        graphMACD.color = BlueColor;
+        graphMACD.lineColor = BlueColor;
         graphMACD.type = "line";
-        graphMACD.lineThickness = 1;
-        graphMACD.lineColor = "#2922B7";
+        graphMACD.lineThickness = 1;      
         graphMACD.showBalloon = false;
         graphMACD.valueAxis = valueAxisMACD;
 
@@ -3397,10 +3423,10 @@
         graphMACDSignal.title = "Signal";
         graphMACDSignal.valueField = "macdSignal";
         graphMACDSignal.useDataSetColors = false;
-        graphMACDSignal.color = "#C20303";
+        graphMACDSignal.color = RedColor;
+        graphMACDSignal.lineColor = RedColor;
         graphMACDSignal.type = "line";
         graphMACDSignal.lineThickness = 1;
-        graphMACDSignal.lineColor = "#C20303";
         graphMACDSignal.showBalloon = false;
         graphMACDSignal.valueAxis = valueAxisMACD;
 
@@ -3475,13 +3501,21 @@
         stockPanel1.addStockGraph(graphEarnings);
         stockPanel1.addStockGraph(graphSeason);
         stockPanel1.addStockGraph(graphSeason5Year);
-        stockPanel1.stockLegend = new AmCharts.StockLegend();
+
+        var stockLegend1 = new AmCharts.StockLegend();
+        stockLegend1.color = BlueColor;
+
+        stockPanel1.stockLegend = stockLegend1;
 
         //stockPanel1.addStockGraph(graphVolume);
         stockPanel2.addStockGraph(graphMACD);
         stockPanel2.addStockGraph(graphMACDSignal);
-        stockPanel2.stockLegend = new AmCharts.StockLegend();
 
+        var stockLegend2 = new AmCharts.StockLegend();
+        stockLegend2.color = BlueColor;
+
+        stockPanel2.stockLegend = stockLegend2;
+        
         chart.panels = [stockPanel1, stockPanel2];
 
         // AMChart scrollbar settings
@@ -3499,6 +3533,8 @@
         categoryAxesSettings.maxSeries = 0;
         categoryAxesSettings.groupToPeriods = ["DD", "WW"]
         categoryAxesSettings.equalSpacing = true;
+        categoryAxesSettings.color = BlueColor;
+        categoryAxesSettings.inside = true;
         chart.categoryAxesSettings = categoryAxesSettings;
 
         // AMChart cursor settings
@@ -3513,6 +3549,7 @@
         var periodSelector = new AmCharts.PeriodSelector();
         periodSelector.position = "top";
         periodSelector.inputFieldsEnabled = false;
+        periodSelector.color = BlueColor;
         periodSelector.periods = [
         {
             period: "MAX",
@@ -3854,25 +3891,28 @@
         }
 
         // Plot the channels
-        upChannelLine.lineColor = "#00FF00";
+        upChannelLine.lineColor = GreenColor;
         upChannelLine.initialDate = plotData[startIndex - 1]["date"];
         upChannelLine.finalDate = plotData[endIndex - 1]["date"];
         upChannelLine.initialValue = (m + bMax);
         upChannelLine.finalValue = ((m * (endIndex - startIndex + 1)) + bMax);
+        upChannelLine.lineThickness = 2;
         stockPanel.addTrendLine(upChannelLine);
 
-        downChannelLine.lineColor = "#FF0000";
+        downChannelLine.lineColor = RedColor;
         downChannelLine.initialDate = plotData[startIndex - 1]["date"];
         downChannelLine.finalDate = plotData[endIndex - 1]["date"];
         downChannelLine.initialValue = (m + bMin);
         downChannelLine.finalValue = ((m * (endIndex - startIndex + 1)) + bMin);
+        downChannelLine.lineThickness = 2;
         stockPanel.addTrendLine(downChannelLine);
 
-        midChannelLine.lineColor = "#9C0063";
+        midChannelLine.lineColor = MagentaColor;
         midChannelLine.initialDate = plotData[startIndex - 1]["date"];
         midChannelLine.finalDate = plotData[endIndex - 1]["date"];
         midChannelLine.initialValue = (m + bMid);
         midChannelLine.finalValue = ((m * (endIndex - startIndex + 1)) + bMid);
+        midChannelLine.lineThickness = 1;
         stockPanel.addTrendLine(midChannelLine);
 
         stockPanel.validateNow();
@@ -4333,6 +4373,24 @@
         //    }
         //});
 
+        $('#chartBlackBackground').bootstrapToggle('off')
+        $('#chartBlackBackground').change(function () {
+            if ($(this).prop('checked') == true) {
+                $('#chartdiv').addClass('darkDiv');
+                $('#wrapper').addClass('darkDiv');
+                $('#menu-wrapper').addClass('darkDiv');
+                $('#page-wrapper').addClass('darkDiv');
+                $('#sidebar-wrapper').addClass('darkDiv');
+                document.body.style.backgroundColor = '#030433';
+            } else {
+                $('#chartdiv').removeClass('darkDiv');
+                $('#wrapper').removeClass('darkDiv');
+                $('#menu-wrapper').removeClass('darkDiv');
+                $('#page-wrapper').removeClass('darkDiv');
+                $('#sidebar-wrapper').removeClass('darkDiv');
+                document.body.style.backgroundColor = '#FFFFFF';
+            }
+        })
     });
 
     function setCookie(cname, cvalue, exdays) {

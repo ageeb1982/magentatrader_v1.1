@@ -96,8 +96,8 @@ namespace MagentaTrader.Controllers
 
         // GET api/SymbolScreener/NYSE/10/1000000/100/C0/8/0.80
         [Authorize]
-        [Route("api/SymbolScreener/{Exchange}/{Price}/{Volume}/{GrowthDecayRate}/{GrowthDecayTime}/{NoOfYears}/{Correlation30}")]
-        public List<Models.Symbol> GetSymbolScreener(string Exchange, decimal Price, decimal Volume, decimal GrowthDecayRate, string GrowthDecayTime, int NoOfYears, decimal Correlation30)
+        [Route("api/SymbolScreener/{Exchange}/{Price}/{Volume}/{GrowthDecayRate}/{GrowthDecayTime}/{NoOfYears}/{Correlation30}/{Strategy}")]
+        public List<Models.Symbol> GetSymbolScreener(string Exchange, decimal Price, decimal Volume, decimal GrowthDecayRate, string GrowthDecayTime, int NoOfYears, decimal Correlation30, string Strategy)
         {
             var retryCounter = 0;
 
@@ -107,12 +107,115 @@ namespace MagentaTrader.Controllers
             {
                 try 
                 {
-                    var Symbols = from d in db.MstSymbols
+                    if(Strategy == "MED") {
+                        var Symbols2 = from d in db.MstSymbols
+                                       where (Exchange == "All" ? true : d.Exchange == Exchange) &&
+                                             (d.ClosePrice >= Price) &&
+                                             (d.Volume >= Volume) &&
+                                             (d.NoOfYears >= NoOfYears) &&
+                                             (d.MACDGrowthDecayRate < 0) &&
+                                             (d.EMAGrowthDecayRate < 0)
+                                       select new Models.Symbol
+                                       {
+                                           SymbolDescription = d.Symbol,
+                                           Description = d.Description,
+                                           Exchange = d.Exchange,
+                                           ClosePrice = d.ClosePrice.Value,
+                                           Volume = d.Volume.Value,
+                                           GrowthDecayRate = d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value,
+                                           GrowthDecayRateW1 = d.GrowthDecayRateW1.Value == null ? 0 : d.GrowthDecayRateW1.Value,
+                                           GrowthDecayRateW2 = d.GrowthDecayRateW2.Value == null ? 0 : d.GrowthDecayRateW2.Value,
+                                           GrowthDecayRateW3 = d.GrowthDecayRateW3.Value == null ? 0 : d.GrowthDecayRateW3.Value,
+                                           GrowthDecayRateM1 = d.GrowthDecayRateM1.Value == null ? 0 : d.GrowthDecayRateM1.Value,
+                                           GrowthDecayRateM2 = d.GrowthDecayRateM2.Value == null ? 0 : d.GrowthDecayRateM2.Value,
+                                           GrowthDecayRateM3 = d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value,
+                                           NoOfYears = d.NoOfYears.Value == null ? 0 : d.NoOfYears.Value,
+                                           TrendNoOfDays = d.TrendNoOfDays == null ? 0 : d.TrendNoOfDays.Value,
+                                           WinLossCurrent30 = d.WinLossCurrent30 == null ? "NA" : d.WinLossCurrent30,
+                                           WinLossAverageCurrent30 = d.WinLossAverageCurrent30.Value == null ? 0 : d.WinLossAverageCurrent30.Value,
+                                           WinLoss20 = d.WinLoss20 == null ? "NA" : d.WinLoss20,
+                                           WinLossAverage20 = d.WinLossAverage20.Value == null ? 0 : d.WinLossAverage20.Value,
+                                           WinLoss40 = d.WinLoss40 == null ? "NA" : d.WinLoss40,
+                                           WinLossAverage40 = d.WinLossAverage40.Value == null ? 0 : d.WinLossAverage40.Value,
+                                           WinLoss60 = d.WinLoss60 == null ? "NA" : d.WinLoss60,
+                                           WinLossAverage60 = d.WinLossAverage60.Value == null ? 0 : d.WinLossAverage60.Value,
+                                           CorrelationCoefficient30 = d.CorrelationCoefficient30.Value == null ? 0 : d.CorrelationCoefficient30.Value,
+                                           SeasonalityCorrelation = d.SeasonalityCorrelation.Value == null ? 0 : d.SeasonalityCorrelation.Value,
+                                           MACDTrendNoOfDays = d.MACDTrendNoOfDays.Value == null ? 0 : d.MACDTrendNoOfDays.Value,
+                                           MACDGrowthDecayRate = d.MACDGrowthDecayRate.Value == null ? 0 : d.MACDGrowthDecayRate.Value,
+                                           EMATrendNoOfDays = d.EMATrendNoOfDays.Value == null ? 0 : d.EMATrendNoOfDays.Value,
+                                           EMAGrowthDecayRate = d.EMAGrowthDecayRate.Value == null ? 0 : d.EMAGrowthDecayRate.Value,
+                                           EMAStartDate = d.EMAStartDate == null ? "NA" : Convert.ToString(d.EMAStartDate.Value.Year).Substring(2, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Day + 100).Substring(1, 2),
+                                           EMALinear = d.EMALinear.Value == null ? 0 : d.EMALinear.Value
+                                       };
+                        if (Symbols2.Count() > 0)
+                        {
+                            Values = Symbols2.ToList();
+                        }
+                        else
+                        {
+                            Values = new List<Models.Symbol>();
+                        }
+                        break;
+                    } else if (Strategy == "MEU") {
+                        var Symbols1 = from d in db.MstSymbols
+                                      where (Exchange == "All" ? true : d.Exchange == Exchange) &&
+                                            (d.ClosePrice >= Price) &&
+                                            (d.Volume >= Volume) &&
+                                            (d.NoOfYears >= NoOfYears) &&
+                                            (d.MACDGrowthDecayRate >= 0) && 
+                                            (d.EMAGrowthDecayRate >= 0)
+                                      select new Models.Symbol
+                                      {
+                                          SymbolDescription = d.Symbol,
+                                          Description = d.Description,
+                                          Exchange = d.Exchange,
+                                          ClosePrice = d.ClosePrice.Value,
+                                          Volume = d.Volume.Value,
+                                          GrowthDecayRate = d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value,
+                                          GrowthDecayRateW1 = d.GrowthDecayRateW1.Value == null ? 0 : d.GrowthDecayRateW1.Value,
+                                          GrowthDecayRateW2 = d.GrowthDecayRateW2.Value == null ? 0 : d.GrowthDecayRateW2.Value,
+                                          GrowthDecayRateW3 = d.GrowthDecayRateW3.Value == null ? 0 : d.GrowthDecayRateW3.Value,
+                                          GrowthDecayRateM1 = d.GrowthDecayRateM1.Value == null ? 0 : d.GrowthDecayRateM1.Value,
+                                          GrowthDecayRateM2 = d.GrowthDecayRateM2.Value == null ? 0 : d.GrowthDecayRateM2.Value,
+                                          GrowthDecayRateM3 = d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value,
+                                          NoOfYears = d.NoOfYears.Value == null ? 0 : d.NoOfYears.Value,
+                                          TrendNoOfDays = d.TrendNoOfDays == null ? 0 : d.TrendNoOfDays.Value,
+                                          WinLossCurrent30 = d.WinLossCurrent30 == null ? "NA" : d.WinLossCurrent30,
+                                          WinLossAverageCurrent30 = d.WinLossAverageCurrent30.Value == null ? 0 : d.WinLossAverageCurrent30.Value,
+                                          WinLoss20 = d.WinLoss20 == null ? "NA" : d.WinLoss20,
+                                          WinLossAverage20 = d.WinLossAverage20.Value == null ? 0 : d.WinLossAverage20.Value,
+                                          WinLoss40 = d.WinLoss40 == null ? "NA" : d.WinLoss40,
+                                          WinLossAverage40 = d.WinLossAverage40.Value == null ? 0 : d.WinLossAverage40.Value,
+                                          WinLoss60 = d.WinLoss60 == null ? "NA" : d.WinLoss60,
+                                          WinLossAverage60 = d.WinLossAverage60.Value == null ? 0 : d.WinLossAverage60.Value,
+                                          CorrelationCoefficient30 = d.CorrelationCoefficient30.Value == null ? 0 : d.CorrelationCoefficient30.Value,
+                                          SeasonalityCorrelation = d.SeasonalityCorrelation.Value == null ? 0 : d.SeasonalityCorrelation.Value,
+                                          MACDTrendNoOfDays = d.MACDTrendNoOfDays.Value == null ? 0 : d.MACDTrendNoOfDays.Value,
+                                          MACDGrowthDecayRate = d.MACDGrowthDecayRate.Value == null ? 0 : d.MACDGrowthDecayRate.Value,
+                                          EMATrendNoOfDays = d.EMATrendNoOfDays.Value == null ? 0 : d.EMATrendNoOfDays.Value,
+                                          EMAGrowthDecayRate = d.EMAGrowthDecayRate.Value == null ? 0 : d.EMAGrowthDecayRate.Value,
+                                          EMAStartDate = d.EMAStartDate == null ? "NA" : Convert.ToString(d.EMAStartDate.Value.Year).Substring(2, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Day + 100).Substring(1, 2),
+                                          EMALinear = d.EMALinear.Value == null ? 0 : d.EMALinear.Value
+                                      };
+                        if (Symbols1.Count() > 0)
+                        {
+                            Values = Symbols1.ToList();
+                        }
+                        else
+                        {
+                            Values = new List<Models.Symbol>();
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        var Symbols = from d in db.MstSymbols
                                   where (Exchange == "All" ? true : d.Exchange == Exchange) &&
                                         (d.ClosePrice >= Price) &&
                                         (d.Volume >= Volume) &&
                                         (d.NoOfYears >= NoOfYears) &&
-                                        (d.CorrelationCoefficient30 >= (Correlation30/100)) && 
+                                        (d.CorrelationCoefficient30 >= (Correlation30 / 100)) &&
                                         (GrowthDecayTime == "C0" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value) >= GrowthDecayRate ? true : false) : true) == true &&
                                         (GrowthDecayTime == "C0" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value) ? true : false) : true) == true &&
                                         (GrowthDecayTime == "W1" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRateW1.Value == null ? 0 : d.GrowthDecayRateW1.Value) >= GrowthDecayRate ? true : false) : true) == true &&
@@ -151,18 +254,25 @@ namespace MagentaTrader.Controllers
                                       WinLossAverage40 = d.WinLossAverage40.Value == null ? 0 : d.WinLossAverage40.Value,
                                       WinLoss60 = d.WinLoss60 == null ? "NA" : d.WinLoss60,
                                       WinLossAverage60 = d.WinLossAverage60.Value == null ? 0 : d.WinLossAverage60.Value,
-                                      CorrelationCoefficient30 = d.CorrelationCoefficient30.Value,
-                                      SeasonalityCorrelation = d.SeasonalityCorrelation.Value
+                                      CorrelationCoefficient30 = d.CorrelationCoefficient30.Value == null ? 0 : d.CorrelationCoefficient30.Value,
+                                      SeasonalityCorrelation = d.SeasonalityCorrelation.Value == null ? 0 : d.SeasonalityCorrelation.Value,
+                                      MACDTrendNoOfDays = d.MACDTrendNoOfDays.Value == null ? 0 : d.MACDTrendNoOfDays.Value,
+                                      MACDGrowthDecayRate = d.MACDGrowthDecayRate.Value == null ? 0 : d.MACDGrowthDecayRate.Value,
+                                      EMATrendNoOfDays = d.EMATrendNoOfDays.Value == null ? 0 : d.EMATrendNoOfDays.Value,
+                                      EMAGrowthDecayRate = d.EMAGrowthDecayRate.Value == null ? 0 : d.EMAGrowthDecayRate.Value,
+                                      EMAStartDate = d.EMAStartDate == null ? "NA" : Convert.ToString(d.EMAStartDate.Value.Year).Substring(2, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Day + 100).Substring(1, 2),
+                                      EMALinear = d.EMALinear.Value == null ? 0 : d.EMALinear.Value
                                   };
-                    if (Symbols.Count() > 0)
-                    {
-                        Values = Symbols.ToList();
+                        if (Symbols.Count() > 0)
+                        {
+                            Values = Symbols.ToList();
+                        }
+                        else
+                        {
+                            Values = new List<Models.Symbol>();
+                        }
+                        break;
                     }
-                    else
-                    {
-                        Values = new List<Models.Symbol>();
-                    }
-                    break;
                 }
                 catch
                 {

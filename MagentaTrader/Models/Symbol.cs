@@ -42,5 +42,11 @@ namespace MagentaTrader.Models
         public decimal WinLossAverage60 { get; set; }
         public decimal CorrelationCoefficient30 { get; set; }
         public decimal SeasonalityCorrelation { get; set; }
+        public decimal MACDTrendNoOfDays { get; set; }
+        public decimal MACDGrowthDecayRate { get; set; }
+        public decimal EMATrendNoOfDays { get; set; }
+        public decimal EMAGrowthDecayRate { get; set; }
+        public string EMAStartDate { get; set; }
+        public decimal EMALinear { get; set; }
     }
 }

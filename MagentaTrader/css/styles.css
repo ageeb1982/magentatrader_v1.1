@@ -107,3 +107,8 @@ dt {
 .marginButton {
     margin-top: -11px;
 }
+
+.darkDiv {
+    /*background-color: #555;*/
+    background-color: #030433;
+}

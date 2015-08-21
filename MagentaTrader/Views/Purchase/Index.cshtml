@@ -217,9 +217,15 @@
         });
 
         purchases.push({
-            Product: "Magenta Las Vegas Workshop - Nov 11-13, 2015",
+            Product: "Magenta 7 Day Alaska Cruise Workshop (August 23, 2016) <button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditEvent1' onclick='CmdAlaskaCruise2016_OnClick()'>Details</button>",
             Price: "US$ 995",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='16c583e4-ba7e-4c09-8f53-698490f80d47' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='93a3a6ff-f249-49aa-8b31-85961f66b775' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        });
+
+        purchases.push({
+            Product: "Magenta 7 Day Alaska Cruise Workshop Couples (August 23, 2016) <button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditEvent1' onclick='CmdAlaskaCruise2016_OnClick()'>Details</button>",
+            Price: "US$ 1,495",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='53c868a4-ee26-4e2f-9531-f07498757d96' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
         });
 
         purchases.push({
@@ -234,10 +240,24 @@
             Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='e9dcd6e8-0f05-4247-b715-834d16923000' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
         });
 
+        purchases.push({
+            Product: "<font color='#CC009C'>Journals</font>",
+            Purchase: ""
+        });
+
+        purchases.push({
+            Product: "Variable Seasonality Journal",
+            Price: "US$ 195",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='73b3bed7-0212-47e5-9063-dd05c3a75d6e' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        });
+
         return purchases;
     }
     function CmdAnniversary5_OnClick() {
         location.href = '/Campaign/Anniversary5';
+    }
+    function CmdAlaskaCruise2016_OnClick() {
+        location.href = '/Campaign/AlaskaCruise2016';
     }
     function CmdCoupon_OnClick() {
         $("#CouponsTitle").text("Coupons");
