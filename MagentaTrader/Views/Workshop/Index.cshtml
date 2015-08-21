@@ -68,7 +68,7 @@
     function getEvents() {
         var events = new wijmo.collections.ObservableArray();
         $.ajax({
-            url: '/api/Web99',
+            url: '/api/Workshop',
             cache: false,
             type: 'GET',
             contentType: 'application/json; charset=utf-8',
@@ -147,7 +147,7 @@
                             "width": 100
                         },
                         {
-                            "header": "Webinar",
+                            "header": "Workshop",
                             "binding": "EventDescription",
                             "width": "2*"
                         },
