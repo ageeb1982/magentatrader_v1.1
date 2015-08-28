@@ -1,0 +1,187 @@
+﻿@{
+    ViewBag.Title = "QT";
+}
+
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/site.css" rel="stylesheet" />
+
+<script src="/js/jquery.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.js"></script>
+
+<script src="/js/date.js"></script>
+
+<link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
+<script src="/js/jquery-1.10.2.min.js"></script>
+<script src="/js/knockout-3.2.0.js"></script>
+<script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+
+@*Menu*@
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="~/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"> - Questrade</span></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="container-fluid info-container-wrapper">
+        <div class="col-lg-4">
+            <div class="row">
+                <div class="clearfix text-center">
+                    <h4>Questrade Information</h4>
+                </div>
+            </div>
+            <div class="info-div">
+                <div class="fieldLabel">
+                    <div class="text" style="margin-top: 8px;">Username</div>
+                </div>
+                <div class="box">
+                    <input class="form-control" id="userinfoId" type="hidden" />
+                    <input type="text" class="text form-control" id="username" disabled />
+                </div>
+            </div>
+            <div class="info-div">
+                <div class="fieldLabel">
+                    <div class="text">First Name</div>
+                </div>
+                <div class="box">
+                    <input type="text" class="text form-control" id="firstname" readonly />
+                </div>
+            </div>
+            <div class="info-div">
+                <div class="fieldLabel">
+                    <div class="text">Last Name</div>
+                </div>
+                <div class="box">
+                    <input type="text" class="text form-control" id="lastname" readonly />
+                </div>
+            </div>
+            <div class="info-div">
+                <div class="fieldLabel">
+                    <div class="text">Phone Number</div>
+                </div>
+                <div class="box">
+                    <input type="text" class="text form-control" id="phonenum" readonly />
+                </div>
+            </div>
+            <div class="info-div">
+                <div class="fieldLabel">
+                    <div class="text">Email Address</div>
+                </div>
+                <div class="box">
+                    <input type="text" class="text form-control" id="emailadd" readonly />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="info-div pull-right" style="margin-top: 15px;">
+                        <button class="btn btn-primary editBtn toggleBtn">Edit</button>
+                        <button class="btn btn-danger" id="CancelEditUserInfo">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="row">
+                <div class="clearfix text-center">
+                    <h4>Purchases</h4>
+                </div>
+            </div>
+            <div id="SalesGrid" class="grid"></div>
+        </div>
+    </div>
+</div>
+
+@*Loading*@
+<div class="modal fade" id="loading" tabindex="-1" role="dialog" aria-labelledby="Loading..." aria-hidden="true">
+    <div class="modal-dialog" style="width: 220px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Loading...</h4>
+            </div>
+            <div class="modal-body">
+                <img src="/img/progress_bar.gif" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Module*@
+<script type="text/javascript">
+
+    function GetAccessToken() {
+        var access_token = "";
+        var api_server = "";
+        var refreshToken = 'dzhUAYImAP8akIuTSVPWcEZoWvrjhwlx0';
+        $.ajax({
+            url: '/api/GetQuestradeAccessToken/' + refreshToken,
+            cache: false,
+            type: 'GET',
+            data: {},
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                access_token = data.access_token;
+                api_server = data.api_server;
+                //alert(access_token);
+                GetQuestradeAccount(access_token, api_server);
+            }
+        }).fail(
+            function (xhr, textStatus, err) {
+                alert(err);
+            }
+        );
+    }
+
+    function GetQuestradeAccount(access_token, api_server) {
+        alert('/api/GetQuestradeAccounts/' + access_token + '/' + api_server);
+        //if (access_token != null) {
+            $.ajax({
+                url: '/api/GetQuestradeAccounts/' + access_token + '/' + api_server,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (data) {
+                    alert(JSON.stringify(data));
+                }
+                }).fail(
+                function (xhr, textStatus, err) {
+                    alert(err);
+                }
+            );
+        //}
+    }
+
+    function getCode() {
+        window.location.href = "https://login.questrade.com/oauth2/authorize?client_id=0ruqHEnVEdI2SwCZqTleWkwAt8pnoQ&redirect_uri=http://www.magentatrader.com/Software&response_type=code";
+    }
+
+    function GetValue(value) {
+        var variable = window.location.search.substring(1);
+        var variableArr = variable.split('?');
+        for (var i = 0; i < variableArr.length; i++) {
+            var keyValue = variableArr[i].split('=');
+            if (keyValue[0] == value) {
+                return keyValue[1];
+            }
+        }
+    }
+
+    function GetRefreshKey() {
+        var code = GetValue('code');
+        window.location.href = "https://login.questrade.com/oauth2/token?grant_type=authorization_code&client_id=0ruqHEnVEdI2SwCZqTleWkwAt8pnoQ&code=" + code + "&redirect_uri=https://www.magentatrader.com&responsetype=refresh_token";
+    }
+
+    $(document).ready(function () {
+        //GetAccessToken();
+        getCode();
+    });
+</script>

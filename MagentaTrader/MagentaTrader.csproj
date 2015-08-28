@@ -185,6 +185,7 @@
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Controllers\ProductPackageController.cs" />
     <Compile Include="Controllers\PurchaseController.cs" />
+    <Compile Include="Controllers\QTController.cs" />
     <Compile Include="Controllers\QuestTradeController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\SalesController.cs" />
@@ -1474,10 +1475,10 @@
     <Content Include="Views\Campaign\SeasonalityWorkshop01.cshtml" />
     <Content Include="Views\Campaign\AlaskaCruise2016.cshtml" />
     <Content Include="Views\Workshop\Index.cshtml" />
+    <Content Include="Views\QuestTrade\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\QuestTrade\" />
     <Folder Include="Views\Roles\" />
   </ItemGroup>
   <ItemGroup>

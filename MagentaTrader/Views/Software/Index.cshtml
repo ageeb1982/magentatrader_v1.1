@@ -110,7 +110,20 @@
                             }
                         </a>
                     </li>
-
+                    <li>
+                        <hr style="margin: 10px 0 10px 0;" />
+                        <a href="#">
+                            <div><strong>Questrade</strong></div>
+                            @if (TradierCode != null)
+                            {
+                                <input class="btn btn-sm btn-primary" title="View Account" value="View Account" type="submit" onclick="viewTradierAccount()" />
+                            }
+                            else
+                            {
+                                <input class="btn btn-sm btn-primary" title="Connect" value="Connect" type="submit" onclick="connectQuestrade()" /> @*connectQuestrade*@
+                            }
+                        </a>
+                    </li>
                     <li >
                         <hr style="margin: 10px 0 10px 0;" />
                         <a href="#">
@@ -803,6 +816,26 @@
 
         });
     }
+
+    // Questrade
+    function connectQuestrade() {
+        location.href = "https://login.questrade.com/oauth2/authorize?client_id=0ruqHEnVEdI2SwCZqTleWkwAt8pnoQ&redirect_uri=https://www.magentatrader.com/Software&response_type=code";
+    }
+
+    //function GetValue(value) {
+    //    var variable = window.location.search.substring(1);
+    //    var variableArr = variable.split('?');
+    //    for (var i = 0; i < variableArr.length; i++) {
+    //        var keyValue = variableArr[i].split('=');
+    //        if (keyValue[0] == value) {
+    //            return keyValue[1];
+    //        }
+    //    }
+    //}
+
+    //function GetRefreshKey(code) {
+    //    location.href = "https://login.questrade.com/oauth2/token?grant_type=authorization_code&client_id=0ruqHEnVEdI2SwCZqTleWkwAt8pnoQ&code=" + code + "&redirect_uri=https://www.magentatrader.com&responsetype=refresh_token";
+    //}
 
     // Tradier
 
@@ -4274,6 +4307,12 @@
     }
 
     $(document).ready(function () {
+
+        // Questrade Refresh Key token
+
+        //var code = GetValue('code');
+        //if (code != null)
+        //    GetRefreshKey(code);
 
         // Scanner day range drop down list
 
