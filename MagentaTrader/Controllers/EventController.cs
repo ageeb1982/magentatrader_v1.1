@@ -185,6 +185,8 @@ namespace MagentaTrader.Controllers
                     var Events = from d in db.MstEvents
                                  orderby d.Id descending
                                  where d.EventType == "WORKSHOP" &&
+                                       d.IsRestricted == true &&
+                                       d.IsArchived == true &&
                                        d.VideoURL != null 
                                  select new Models.Event
                                  {

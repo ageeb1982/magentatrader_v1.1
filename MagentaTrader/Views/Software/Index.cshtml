@@ -1,7 +1,7 @@
 ﻿@{
     ViewBag.Title = "Software";
 
-    var Version = "v.Beta.1.20150415";
+    var Version = "v.Beta.1.20151115";
     var Symbol = Request.QueryString["symbol"];
     var TradierScope = Request.QueryString["scope"];
     var TradierState = Request.QueryString["state"];
@@ -1959,14 +1959,14 @@
                 "type": "e",
                 "noOfDays": 8,
                 "color": "#070BB0",
-                "isActive": false
+                "isActive": true
             }, {
                 "id": 2,
                 "description": "EMA 21",
                 "type": "e",
                 "noOfDays": 21,
                 "color": "#B1030B",
-                "isActive": false
+                "isActive": true
             }, {
                 "id": 3,
                 "description": "SMA 50",
@@ -2176,8 +2176,10 @@
             if (MovingAverageData[m].isActive == true) {
                 graphMA[m].title = MovingAverageData[m].description;
                 graphMA[m].lineColor = MovingAverageData[m].color;
+                graphMA[m].visibleInLegend = true;
                 stockPanel1.showGraph(graphMA[m]);
             } else {
+                graphMA[m].visibleInLegend = false;
                 stockPanel1.hideGraph(graphMA[m]);
             }
         }
@@ -2928,7 +2930,7 @@
                 season: 0,
                 season5Year: 0,
                 seasonCount: dayIndex,
-                volume: volume,
+                volume: AmCharts.roundTo(volume / 1000000, 2),
                 ema1: 0,
                 ema2: 0,
                 macd: 0,
@@ -3428,7 +3430,7 @@
 
         var graphVolume = new AmCharts.StockGraph();
         graphVolume.id = "graphVolume";
-        graphVolume.title = "Vol";
+        graphVolume.title = "Volume (M)";
         graphVolume.valueField = "volume";
         graphVolume.type = "column";
         graphVolume.useDataSetColors = false;
@@ -3473,14 +3475,16 @@
             graphMA[m].useDataSetColors = false;
             graphMA[m].type = "line";
             graphMA[m].lineThickness = 1;
-            graphMA[m].visibleInLegend = false;
+            graphMA[m].showBalloon = false;
             graphMA[m].lineColor = MovingAverageData[m].color;
             graphMA[m].valueAxis = valueAxisPrice;
             stockPanel1.addStockGraph(graphMA[m]);
 
             if (MovingAverageData[m].isActive == true) {
+                graphMA[m].visibleInLegend = true;
                 stockPanel1.showGraph(graphMA[m]);
             } else {
+                graphMA[m].visibleInLegend = false;
                 stockPanel1.hideGraph(graphMA[m]);
             }
         }
@@ -3590,6 +3594,10 @@
             label: "MAX"
         }];
         chart.periodSelector = periodSelector;
+
+        // Default Moving Average
+
+        // plotMovingAverageImmediately();
 
         // Draw the chart
 

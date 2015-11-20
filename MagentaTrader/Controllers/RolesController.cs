@@ -145,8 +145,6 @@ namespace MagentaTrader.Controllers
             }
         }
 
-
-
         private string getAspNetUserId(string username)
         {
             try

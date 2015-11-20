@@ -41,7 +41,7 @@ h6 {
 
 .intro-message {
     position: relative;
-    padding-top: 20%;
+    padding-top: 10%;
     padding-bottom: 20%;
 }
 
@@ -167,4 +167,10 @@ footer {
 
 p.copyright {
     margin: 15px 0 0;
+}
+
+/*Customize*/
+p.normal {
+    font-family: verdana;
+    font-weight: normal;
 }

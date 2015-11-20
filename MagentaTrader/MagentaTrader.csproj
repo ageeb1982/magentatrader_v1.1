@@ -215,6 +215,7 @@
     <Compile Include="Models\Affiliate.cs" />
     <Compile Include="Models\CalendarSymbolWrapper.cs" />
     <Compile Include="Models\Event.cs" />
+    <Compile Include="Models\Favorite.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\News.cs" />
     <Compile Include="Models\Product.cs" />
@@ -841,6 +842,8 @@
     <Content Include="img\logo-1.png" />
     <Content Include="img\logo-2.png" />
     <Content Include="img\logo.png" />
+    <Content Include="img\magenta-screen.png" />
+    <Content Include="img\magenta-tradier.png" />
     <Content Include="img\phones.png" />
     <Content Include="img\progress_bar.gif" />
     <Content Include="img\software-1.png" />
@@ -848,6 +851,9 @@
     <Content Include="img\te.jpg" />
     <Content Include="img\te.png" />
     <Content Include="img\te1.png" />
+    <Content Include="img\tradier-brokerage-logo-small.png" />
+    <Content Include="img\tradier-brokerage-logo-smaller.png" />
+    <Content Include="img\tradier-brokerage-logo.png" />
     <Content Include="img\tradier-logo.png" />
     <Content Include="img\training.png" />
     <Content Include="img\training1.png" />
@@ -1476,6 +1482,7 @@
     <Content Include="Views\Campaign\AlaskaCruise2016.cshtml" />
     <Content Include="Views\Workshop\Index.cshtml" />
     <Content Include="Views\QuestTrade\Index.cshtml" />
+    <Content Include="Views\Campaign\Tradier.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

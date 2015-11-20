@@ -99,6 +99,8 @@
       <Column Name="AspNetUserId" Type="System.String" DbType="NVarChar(128)" CanBeNull="true" />
       <Association Name="MstUser_TrnAffiliate" Member="TrnAffiliates" ThisKey="Id" OtherKey="UserId" Type="TrnAffiliate" />
       <Association Name="MstUser_TrnSale" Member="TrnSales" ThisKey="Id" OtherKey="UserId" Type="TrnSale" />
+      <Association Name="MstUser_SysAcessLog" Member="SysAcessLogs" ThisKey="Id" OtherKey="UserId" Type="SysAcessLog" />
+      <Association Name="MstUser_TrnFavorite" Member="TrnFavorites" ThisKey="Id" OtherKey="UserId" Type="TrnFavorite" />
       <Association Name="AspNetUser_MstUser" Member="AspNetUser" ThisKey="AspNetUserId" OtherKey="Id" Type="AspNetUser" IsForeignKey="true" />
     </Type>
   </Table>
@@ -205,6 +207,27 @@
       <Column Name="EMALinear" Type="System.Decimal" DbType="Decimal(18,5)" CanBeNull="true" />
       <Association Name="MstSymbol_TrnStockPrice" Member="TrnStockPrices" ThisKey="Id" OtherKey="SymbolId" Type="TrnStockPrice" />
       <Association Name="MstSymbol_TrnStockEarning" Member="TrnStockEarnings" ThisKey="Id" OtherKey="SymbolId" Type="TrnStockEarning" />
+      <Association Name="MstSymbol_TrnFavorite" Member="TrnFavorites" ThisKey="Id" OtherKey="SymbolId" Type="TrnFavorite" />
+    </Type>
+  </Table>
+  <Table Name="dbo.SysAcessLog" Member="SysAcessLogs">
+    <Type Name="SysAcessLog">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UserId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LogDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="[Log]" Member="Log" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Association Name="MstUser_SysAcessLog" Member="MstUser" ThisKey="UserId" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TrnFavorites" Member="TrnFavorites">
+    <Type Name="TrnFavorite">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="SymbolId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Symbol" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="UserId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Remarks" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Association Name="MstSymbol_TrnFavorite" Member="MstSymbol" ThisKey="SymbolId" OtherKey="Id" Type="MstSymbol" IsForeignKey="true" />
+      <Association Name="MstUser_TrnFavorite" Member="MstUser" ThisKey="UserId" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

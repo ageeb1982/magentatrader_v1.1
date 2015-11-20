@@ -35,5 +35,12 @@ namespace MagentaTrader.Controllers
         {
             return View();
         }
+
+        //
+        // GET: /Campaign/Tradier
+        public ActionResult Tradier()
+        {
+            return View();
+        }
 	}
 }

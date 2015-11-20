@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -15,6 +16,26 @@ namespace MagentaTrader.Controllers
 {
     public class TradierController : ApiController
     {
+        private Data.MagentaTradersDBDataContext db = new Data.MagentaTradersDBDataContext();
+        private void AccessLog(string log)
+        {
+            try
+            {
+                Data.SysAcessLog NewAccessLog = new Data.SysAcessLog();
+
+                string currentUserName = User.Identity.Name;
+
+                NewAccessLog.UserId = (from d in db.MstUsers where d.UserName.Equals(currentUserName) select d).FirstOrDefault().Id;
+                //NewAccessLog.UserId = 2;
+                NewAccessLog.LogDateTime = DateTime.Now;
+                NewAccessLog.Log = log;
+
+                db.SysAcessLogs.InsertOnSubmit(NewAccessLog);
+                db.SubmitChanges();
+            }
+            catch { }
+        }
+
         // GET api/GetTradierAccessToken/pjytfG9a
         [Authorize]
         [Route("api/GetTradierAccessToken/{code}")]
@@ -42,6 +63,9 @@ namespace MagentaTrader.Controllers
                     var result = streamReader.ReadToEnd();
                     JavaScriptSerializer js = new JavaScriptSerializer();
                     Models.TradierAccessToken t = (Models.TradierAccessToken)js.Deserialize(result, typeof(Models.TradierAccessToken));
+
+                    AccessLog("Tradier Access Token");
+
                     return t;
                 }
             }
