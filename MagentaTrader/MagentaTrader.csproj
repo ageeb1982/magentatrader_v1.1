@@ -179,6 +179,8 @@
     <Compile Include="Controllers\CampaignController.cs" />
     <Compile Include="Controllers\EarningController.cs" />
     <Compile Include="Controllers\EventController.cs" />
+    <Compile Include="Controllers\FavoritesAPIController.cs" />
+    <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\FreeWebinarsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NewsController.cs" />
@@ -1483,6 +1485,8 @@
     <Content Include="Views\Workshop\Index.cshtml" />
     <Content Include="Views\QuestTrade\Index.cshtml" />
     <Content Include="Views\Campaign\Tradier.cshtml" />
+    <Content Include="Views\Favorites\Index.cshtml" />
+    <Content Include="Views\Account\ChangePassword.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

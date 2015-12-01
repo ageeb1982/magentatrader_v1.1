@@ -94,10 +94,10 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
-        // GET api/SymbolScreener/NYSE/10/1000000/100/C0/8/0.80
+        // GET api/SymbolScreener/NYSE/10/1000000/100/C0/8/0.80/142
         [Authorize]
-        [Route("api/SymbolScreener/{Exchange}/{Price}/{Volume}/{GrowthDecayRate}/{GrowthDecayTime}/{NoOfYears}/{Correlation30}/{Strategy}")]
-        public List<Models.Symbol> GetSymbolScreener(string Exchange, decimal Price, decimal Volume, decimal GrowthDecayRate, string GrowthDecayTime, int NoOfYears, decimal Correlation30, string Strategy)
+        [Route("api/SymbolScreener/{Exchange}/{Price}/{Volume}/{GrowthDecayRate}/{GrowthDecayTime}/{NoOfYears}/{Correlation30}/{Strategy}/{FavoriteCode}")]
+        public List<Models.Symbol> GetSymbolScreener(string Exchange, decimal Price, decimal Volume, decimal GrowthDecayRate, string GrowthDecayTime, int NoOfYears, decimal Correlation30, string Strategy, int FavoriteCode)
         {
             var retryCounter = 0;
 
@@ -150,7 +150,17 @@ namespace MagentaTrader.Controllers
                                        };
                         if (Symbols2.Count() > 0)
                         {
-                            Values = Symbols2.ToList();
+                            if (FavoriteCode > 0)
+                            {
+                                var FavoriteSymbols = (from d in db.TrnFavorites
+                                                       where d.UserId == FavoriteCode
+                                                       select d.Symbol).ToArray();
+                                Values = Symbols2.Where(d=>FavoriteSymbols.Contains(d.SymbolDescription)==true).ToList();
+                            }
+                            else
+                            {
+                                Values = Symbols2.ToList();
+                            }
                         }
                         else
                         {
@@ -200,7 +210,17 @@ namespace MagentaTrader.Controllers
                                       };
                         if (Symbols1.Count() > 0)
                         {
-                            Values = Symbols1.ToList();
+                            if (FavoriteCode > 0)
+                            {
+                                var FavoriteSymbols = (from d in db.TrnFavorites
+                                                       where d.UserId == FavoriteCode
+                                                       select d.Symbol).ToArray();
+                                Values = Symbols1.Where(d => FavoriteSymbols.Contains(d.SymbolDescription) == true).ToList();
+                            }
+                            else
+                            {
+                                Values = Symbols1.ToList();
+                            }
                         }
                         else
                         {
@@ -265,7 +285,17 @@ namespace MagentaTrader.Controllers
                                   };
                         if (Symbols.Count() > 0)
                         {
-                            Values = Symbols.ToList();
+                            if (FavoriteCode > 0)
+                            {
+                                var FavoriteSymbols = (from d in db.TrnFavorites
+                                                       where d.UserId == FavoriteCode
+                                                       select d.Symbol).ToArray();
+                                Values = Symbols.Where(d => FavoriteSymbols.Contains(d.SymbolDescription) == true).ToList();
+                            }
+                            else
+                            {
+                                Values = Symbols.ToList();
+                            }
                         }
                         else
                         {
@@ -288,5 +318,114 @@ namespace MagentaTrader.Controllers
             }
             return Values;
         }
+
+        // GET api/UploadedSymbolScreener
+        [Authorize]
+        [Route("api/UploadedSymbolScreener")]
+        public List<Models.Symbol> GetUploadedSymbolScreener([FromUri] List<String> Symbols)
+        {
+            List<Models.Symbol> Values;
+            var Data = from d in db.MstSymbols
+                       where Symbols.Contains(d.Symbol) == true
+                        select new Models.Symbol
+                        {
+                            SymbolDescription = d.Symbol,
+                            Description = d.Description,
+                            Exchange = d.Exchange,
+                            ClosePrice = d.ClosePrice.Value,
+                            Volume = d.Volume.Value,
+                            GrowthDecayRate = d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value,
+                            GrowthDecayRateW1 = d.GrowthDecayRateW1.Value == null ? 0 : d.GrowthDecayRateW1.Value,
+                            GrowthDecayRateW2 = d.GrowthDecayRateW2.Value == null ? 0 : d.GrowthDecayRateW2.Value,
+                            GrowthDecayRateW3 = d.GrowthDecayRateW3.Value == null ? 0 : d.GrowthDecayRateW3.Value,
+                            GrowthDecayRateM1 = d.GrowthDecayRateM1.Value == null ? 0 : d.GrowthDecayRateM1.Value,
+                            GrowthDecayRateM2 = d.GrowthDecayRateM2.Value == null ? 0 : d.GrowthDecayRateM2.Value,
+                            GrowthDecayRateM3 = d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value,
+                            NoOfYears = d.NoOfYears.Value == null ? 0 : d.NoOfYears.Value,
+                            TrendNoOfDays = d.TrendNoOfDays == null ? 0 : d.TrendNoOfDays.Value,
+                            WinLossCurrent30 = d.WinLossCurrent30 == null ? "NA" : d.WinLossCurrent30,
+                            WinLossAverageCurrent30 = d.WinLossAverageCurrent30.Value == null ? 0 : d.WinLossAverageCurrent30.Value,
+                            WinLoss20 = d.WinLoss20 == null ? "NA" : d.WinLoss20,
+                            WinLossAverage20 = d.WinLossAverage20.Value == null ? 0 : d.WinLossAverage20.Value,
+                            WinLoss40 = d.WinLoss40 == null ? "NA" : d.WinLoss40,
+                            WinLossAverage40 = d.WinLossAverage40.Value == null ? 0 : d.WinLossAverage40.Value,
+                            WinLoss60 = d.WinLoss60 == null ? "NA" : d.WinLoss60,
+                            WinLossAverage60 = d.WinLossAverage60.Value == null ? 0 : d.WinLossAverage60.Value,
+                            CorrelationCoefficient30 = d.CorrelationCoefficient30.Value == null ? 0 : d.CorrelationCoefficient30.Value,
+                            SeasonalityCorrelation = d.SeasonalityCorrelation.Value == null ? 0 : d.SeasonalityCorrelation.Value,
+                            MACDTrendNoOfDays = d.MACDTrendNoOfDays.Value == null ? 0 : d.MACDTrendNoOfDays.Value,
+                            MACDGrowthDecayRate = d.MACDGrowthDecayRate.Value == null ? 0 : d.MACDGrowthDecayRate.Value,
+                            EMATrendNoOfDays = d.EMATrendNoOfDays.Value == null ? 0 : d.EMATrendNoOfDays.Value,
+                            EMAGrowthDecayRate = d.EMAGrowthDecayRate.Value == null ? 0 : d.EMAGrowthDecayRate.Value,
+                            EMAStartDate = d.EMAStartDate == null ? "NA" : Convert.ToString(d.EMAStartDate.Value.Year).Substring(2, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Day + 100).Substring(1, 2),
+                            EMALinear = d.EMALinear.Value == null ? 0 : d.EMALinear.Value
+                        };
+            if (Data.Count() > 0)
+            {
+                Values = Data.ToList();
+            }
+            else
+            {
+                Values = new List<Models.Symbol>();
+            }
+            return Values;
+        }
+
+        // GET api/FavoritesSymbolScreener/142
+        [Authorize]
+        [Route("api/FavoritesSymbolScreener/{UserId}")]
+        public List<Models.Symbol> GetFavoritesSymbolScreener(int UserId)
+        {
+            List<Models.Symbol> Values;
+
+            var FavoriteSymbols = (from d in db.TrnFavorites
+                                   where d.UserId == UserId
+                                   select d.Symbol).ToArray();
+
+            var Data = from d in db.MstSymbols
+                       where FavoriteSymbols.Contains(d.Symbol) == true
+                       select new Models.Symbol
+                       {
+                           SymbolDescription = d.Symbol,
+                           Description = d.Description,
+                           Exchange = d.Exchange,
+                           ClosePrice = d.ClosePrice.Value,
+                           Volume = d.Volume.Value,
+                           GrowthDecayRate = d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value,
+                           GrowthDecayRateW1 = d.GrowthDecayRateW1.Value == null ? 0 : d.GrowthDecayRateW1.Value,
+                           GrowthDecayRateW2 = d.GrowthDecayRateW2.Value == null ? 0 : d.GrowthDecayRateW2.Value,
+                           GrowthDecayRateW3 = d.GrowthDecayRateW3.Value == null ? 0 : d.GrowthDecayRateW3.Value,
+                           GrowthDecayRateM1 = d.GrowthDecayRateM1.Value == null ? 0 : d.GrowthDecayRateM1.Value,
+                           GrowthDecayRateM2 = d.GrowthDecayRateM2.Value == null ? 0 : d.GrowthDecayRateM2.Value,
+                           GrowthDecayRateM3 = d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value,
+                           NoOfYears = d.NoOfYears.Value == null ? 0 : d.NoOfYears.Value,
+                           TrendNoOfDays = d.TrendNoOfDays == null ? 0 : d.TrendNoOfDays.Value,
+                           WinLossCurrent30 = d.WinLossCurrent30 == null ? "NA" : d.WinLossCurrent30,
+                           WinLossAverageCurrent30 = d.WinLossAverageCurrent30.Value == null ? 0 : d.WinLossAverageCurrent30.Value,
+                           WinLoss20 = d.WinLoss20 == null ? "NA" : d.WinLoss20,
+                           WinLossAverage20 = d.WinLossAverage20.Value == null ? 0 : d.WinLossAverage20.Value,
+                           WinLoss40 = d.WinLoss40 == null ? "NA" : d.WinLoss40,
+                           WinLossAverage40 = d.WinLossAverage40.Value == null ? 0 : d.WinLossAverage40.Value,
+                           WinLoss60 = d.WinLoss60 == null ? "NA" : d.WinLoss60,
+                           WinLossAverage60 = d.WinLossAverage60.Value == null ? 0 : d.WinLossAverage60.Value,
+                           CorrelationCoefficient30 = d.CorrelationCoefficient30.Value == null ? 0 : d.CorrelationCoefficient30.Value,
+                           SeasonalityCorrelation = d.SeasonalityCorrelation.Value == null ? 0 : d.SeasonalityCorrelation.Value,
+                           MACDTrendNoOfDays = d.MACDTrendNoOfDays.Value == null ? 0 : d.MACDTrendNoOfDays.Value,
+                           MACDGrowthDecayRate = d.MACDGrowthDecayRate.Value == null ? 0 : d.MACDGrowthDecayRate.Value,
+                           EMATrendNoOfDays = d.EMATrendNoOfDays.Value == null ? 0 : d.EMATrendNoOfDays.Value,
+                           EMAGrowthDecayRate = d.EMAGrowthDecayRate.Value == null ? 0 : d.EMAGrowthDecayRate.Value,
+                           EMAStartDate = d.EMAStartDate == null ? "NA" : Convert.ToString(d.EMAStartDate.Value.Year).Substring(2, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Day + 100).Substring(1, 2),
+                           EMALinear = d.EMALinear.Value == null ? 0 : d.EMALinear.Value
+                       };
+            if (Data.Count() > 0)
+            {
+                Values = Data.ToList();
+            }
+            else
+            {
+                Values = new List<Models.Symbol>();
+            }
+            return Values;
+        }    
     }
 }

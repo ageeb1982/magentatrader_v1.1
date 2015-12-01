@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using MagentaTrader.Models;
 using MagentaTrader.IdentityExtensions;
+using System.Web.Security;
 
 namespace MagentaTrader.Controllers
 {
@@ -53,6 +54,37 @@ namespace MagentaTrader.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
             return View();
+        }
+
+        // GET: /Account/ChangePassword
+        //[AllowAnonymous]
+        [Authorize]
+        public ActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        // POST: /Account/ChangePassword
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult> ChangePassword(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                ApplicationDbContext context = new ApplicationDbContext();
+                UserStore<ApplicationUser> store = new UserStore<ApplicationUser>(context);
+
+                UserManager<ApplicationUser> UserManager = new UserManager<ApplicationUser>(store);
+
+                String newPassword = model.Password; 
+                String hashedNewPassword = UserManager.PasswordHasher.HashPassword(newPassword);         
+           
+                ApplicationUser cUser = await store.FindByNameAsync(model.UserName);
+
+                await store.SetPasswordHashAsync(cUser, hashedNewPassword);
+                await store.UpdateAsync(cUser);
+            }
+            return View(model);
         }
 
         //

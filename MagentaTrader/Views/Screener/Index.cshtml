@@ -37,11 +37,13 @@
                 <option value="WLS">Win/Loss Strategy</option>
                 <option value="MEU">Magenta Early Up</option>
                 <option value="MED">Magenta Early Down</option>
+                <option value="UPL">Upload Symbols</option>
+                <option value="FAV">Favorites</option>
             </select>
         </div>
     </div>  
     <br />
-    <div class="row">
+    <div class="row" id="parameter1">
         <div class="col-lg-2">
             <p>Exchange</p>
             <select id="Exchange" class="form-control">
@@ -92,7 +94,7 @@
         </div>
     </div>
     <br />
-    <div class="row">
+    <div class="row" id="parameter2">
         <div class="col-lg-2">
             <p>30 Days Linear</p>
             <select id="Correlation30" class="form-control">
@@ -108,13 +110,23 @@
                 <option value="100">1.00</option>
             </select>
         </div>
+        <div class="col-lg-2">
+            <p>Favorite Code</p>
+            <input type="text" class="form-control" id="FavoriteCode" placeholder="Code">
+        </div>
     </div>
     <br />
     <div class="row">
-        <div class="col-lg-2">
+        <div class="col-lg-2" id="GetButton">
             <button id="CmdGetResult" type="submit" class="btn btn-primary btn-block" onclick="CmdGetResult_OnClick()">Get Result</button>
         </div>
-        <div class="col-lg-2">
+        <div class="col-lg-2" id="UploadSymbolButton">
+            <label class="btn btn-primary" for="symbolFile">
+                <input id="symbolFile" type="file" style="display:none;">
+                Upload Symbols
+            </label>
+        </div>
+        <div class="col-lg-2" id="SaveButton">
             <button id="CmdSaveXLS" type="submit" class="btn btn-primary btn-block" onclick="CmdSaveXLS_OnClick()">Save Result</button>
         </div>
     </div>
@@ -178,6 +190,35 @@
     </div>
 </div>
 
+<div class="modal" id="Favorites" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 id="FavoritesTitle" class="modal-title">Download Favorites</h4>
+            </div>
+            <div class="modal-body">
+                <dl class="dl-horizontal">
+                    <dt>Favorite Code</dt>
+                    <dd>
+                        <input class="form-control" id="FavoriteCode" type="text" />
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="CmdFavoritesOk" onclick="CmdFavoritesOk_OnClick()">
+                    Ok
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     var ScreenerData;
     var ScreenerGrid;
@@ -227,12 +268,12 @@
         }
         return Math.round(returnResult);
     }
-    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears, Correlation30, Strategy) {
+    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears, Correlation30, Strategy, FavoriteCode) {
         $('#loading').modal('show');
         var d = new wijmo.collections.ObservableArray();
 
         $.ajax({
-            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume + '/' + GrowthDecayRate + '/' + GrowthDecayTime + '/' + NoOfYears + '/' + Correlation30 + '/' + Strategy,
+            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume + '/' + GrowthDecayRate + '/' + GrowthDecayTime + '/' + NoOfYears + '/' + Correlation30 + '/' + Strategy + '/' + FavoriteCode,
             type: 'GET',
             dataType: 'json',
             success: function (result) {
@@ -678,6 +719,7 @@
         var $noOfYears = parseInt(document.getElementById('NoOfYears').value);
         var $correlation30 = parseFloat(document.getElementById('Correlation30').value);
         var $strategy = document.getElementById('Strategy').value;
+        var $favoriteCode = document.getElementById('FavoriteCode').value;
 
         $closePrice = !$closePrice ? 10 : $closePrice;
         $volume = !$volume ? 1000000 : $volume;
@@ -685,8 +727,9 @@
         $growthDecayTime = !$growthDecayTime ? "C0" : $growthDecayTime;
         $noOfYears = !$noOfYears ? 8 : $noOfYears;
         $correlation30 = !$correlation30 ? 10 : $correlation30;
+        $favoriteCode = !$favoriteCode ? 0 : $favoriteCode;
 
-        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears, $correlation30, $strategy);
+        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears, $correlation30, $strategy, $favoriteCode);
     }
     function CmdSaveXLS_OnClick() {
         var CSV = '';
@@ -792,12 +835,84 @@
         document.body.removeChild(link);
 
     }
+    function CmdFavoritesOk_OnClick() {
+        var d = new wijmo.collections.ObservableArray();
+
+        var UserId = document.getElementById('FavoriteCode').value;
+
+        $('#loading').modal({
+            show: true,
+            backdrop: false
+        });
+
+        $.ajax({
+            url: '/api/FavoritesSymbolScreener/' + UserId,
+            type: 'GET',
+            traditional: true,
+            success: function (result) {
+                for (i = 0; i < result.length; i++) {
+                    d.push({
+                        Symbol: "<a href='/Software?symbol=" + result[i].SymbolDescription + "' target='_blank'><font color='black'>" + result[i].SymbolDescription + "</font></a>",
+                        SymbolRaw: result[i].SymbolDescription,
+                        Description: result[i].Description,
+                        Exchange: result[i].Exchange,
+                        ClosePrice: result[i].ClosePrice,
+                        Volume: Math.round(result[i].Volume / 10000) / 100,
+                        Rate: GetRate(GrowthDecayTime, result[i]),
+                        GrowthDecayRate: Math.round(result[i].GrowthDecayRate),
+                        GrowthDecayRateW1: Math.round(result[i].GrowthDecayRateW1),
+                        GrowthDecayRateW2: Math.round(result[i].GrowthDecayRateW2),
+                        GrowthDecayRateW3: Math.round(result[i].GrowthDecayRateW3),
+                        GrowthDecayRateM1: Math.round(result[i].GrowthDecayRateM1),
+                        GrowthDecayRateM2: Math.round(result[i].GrowthDecayRateM2),
+                        GrowthDecayRateM3: Math.round(result[i].GrowthDecayRateM3),
+                        NoOfYears: result[i].NoOfYears,
+                        TrendNoOfDays: result[i].TrendNoOfDays,
+                        WinLossCurrent30: result[i].WinLossCurrent30,
+                        WinLossAverageCurrent30: result[i].WinLossAverageCurrent30,
+                        WinLoss20: "<a href='javascript:;' onclick='OpenYearlyWinLoss(20);'><font color='black'>" + result[i].WinLoss20 + "</font></a>",
+                        WinLossAverage20: result[i].WinLossAverage20,
+                        WinLoss40: "<a href='javascript:;' onclick='OpenYearlyWinLoss(40);'><font color='black'>" + result[i].WinLoss40 + "</font></a>",
+                        WinLossAverage40: result[i].WinLossAverage40,
+                        WinLoss60: "<a href='javascript:;' onclick='OpenYearlyWinLoss(60);'><font color='black'>" + result[i].WinLoss60 + "</font></a>",
+                        WinLoss20Raw: result[i].WinLoss20,
+                        WinLoss40Raw: result[i].WinLoss40,
+                        WinLoss60Raw: result[i].WinLoss60,
+                        WinLossAverage60: result[i].WinLossAverage60,
+                        CorrelationCoefficient30: result[i].CorrelationCoefficient30,
+                        SeasonalityCorrelation: result[i].SeasonalityCorrelation,
+                        MACDTrendNoOfDays: result[i].MACDGrowthDecayRate < 0 ? (result[i].MACDTrendNoOfDays * -1) : result[i].MACDTrendNoOfDays,
+                        MACDGrowthDecayRate: result[i].MACDGrowthDecayRate,
+                        EMATrendNoOfDays: result[i].EMAGrowthDecayRate < 0 ? (result[i].EMATrendNoOfDays * -1) : result[i].EMATrendNoOfDays,
+                        EMAGrowthDecayRate: result[i].EMAGrowthDecayRate,
+                        EMAStartDate: result[i].EMAStartDate,
+                        EMALinear: result[i].EMALinear
+                    });
+                }
+
+                while (ScreenerSaveData.length > 0) ScreenerSaveData.pop();
+                ScreenerSaveData = d;
+
+                ScreenerData = new wijmo.collections.CollectionView(d);
+                ScreenerData.pageSize = 15;
+                $('#loading').modal('hide');
+                MakeScreenerGrid();
+            }
+        });
+    }
 
     function Strategy_AfterUpdate() {
         var $strategy = document.getElementById('Strategy').value;
+        $("#GetButton").hide();
+        $("#SaveButton").hide();
+        $("#UploadSymbolButton").hide();
+        $("#parameter1").show();
+        $("#parameter2").show();
         switch($strategy) {
             case "CUS":
                 DisableScreenFields(false);
+                $("#GetButton").show();
+                $("#SaveButton").show();
                 break;
             case "SSU":
                 document.getElementById('Exchange').value = "All";
@@ -807,6 +922,8 @@
                 document.getElementById('NoOfYears').value = 8;
                 document.getElementById('Correlation30').value = 10;
                 DisableScreenFields(true);
+                $("#GetButton").show();
+                $("#SaveButton").show();
                 break;
             case "SSD":
                 document.getElementById('Exchange').value = "All";
@@ -816,9 +933,13 @@
                 document.getElementById('NoOfYears').value = 8;
                 document.getElementById('Correlation30').value = 10;
                 DisableScreenFields(true);
+                $("#GetButton").show();
+                $("#SaveButton").show();
                 break;
             case "WLS":
                 DisableScreenFields(true);
+                $("#GetButton").show();
+                $("#SaveButton").show();
                 break;
             case "MEU":
             case "MED":
@@ -833,7 +954,23 @@
                 document.getElementById('Volume').disabled = false;
                 document.getElementById('NoOfYears').disabled = false;
 
+                $("#GetButton").show();
+                $("#SaveButton").show();
                 break;
+            case "UPL":
+                $("#SaveButton").show();
+                $("#UploadSymbolButton").show();
+                $("#parameter1").hide();
+                $("#parameter2").hide();
+                break;
+            case "FAV":
+                $('#Favorites').modal({
+                    show: true,
+                    backdrop: false
+                });
+                $("#SaveButton").show();
+                $("#parameter1").hide();
+                $("#parameter2").hide();
         }
     }
 
@@ -979,6 +1116,80 @@
             ScreenerData.moveToLastPage();
             UpdateNavigateButtonsEvent();
         });
+
+        $("#GetButton").show();
+        $("#SaveButton").show();
+        $("#UploadSymbolButton").hide();
+
+        document.getElementById('symbolFile').onchange = function () {
+            var file = this.files[0];
+            var reader = new FileReader();
+            var data = [];
+            var d = new wijmo.collections.ObservableArray();
+            reader.onload = function (progressEvent) {
+                var lines = this.result.split('\n');
+                for (var line = 0; line < lines.length; line++) {
+                    var buf = lines[line].replace(/['"]+/g, '');
+                    data.push(buf.replace(/(\r\n|\n|\r)/gm, ""));
+                }
+                $.ajax({
+                    url: '/api/UploadedSymbolScreener',
+                    type: 'GET',
+                    data: { Symbols: data },
+                    traditional: true,
+                    success: function (result) {
+                        for (i = 0; i < result.length; i++) {
+                            d.push({
+                                Symbol: "<a href='/Software?symbol=" + result[i].SymbolDescription + "' target='_blank'><font color='black'>" + result[i].SymbolDescription + "</font></a>",
+                                SymbolRaw: result[i].SymbolDescription,
+                                Description: result[i].Description,
+                                Exchange: result[i].Exchange,
+                                ClosePrice: result[i].ClosePrice,
+                                Volume: Math.round(result[i].Volume / 10000) / 100,
+                                Rate: GetRate(GrowthDecayTime, result[i]),
+                                GrowthDecayRate: Math.round(result[i].GrowthDecayRate),
+                                GrowthDecayRateW1: Math.round(result[i].GrowthDecayRateW1),
+                                GrowthDecayRateW2: Math.round(result[i].GrowthDecayRateW2),
+                                GrowthDecayRateW3: Math.round(result[i].GrowthDecayRateW3),
+                                GrowthDecayRateM1: Math.round(result[i].GrowthDecayRateM1),
+                                GrowthDecayRateM2: Math.round(result[i].GrowthDecayRateM2),
+                                GrowthDecayRateM3: Math.round(result[i].GrowthDecayRateM3),
+                                NoOfYears: result[i].NoOfYears,
+                                TrendNoOfDays: result[i].TrendNoOfDays,
+                                WinLossCurrent30: result[i].WinLossCurrent30,
+                                WinLossAverageCurrent30: result[i].WinLossAverageCurrent30,
+                                WinLoss20: "<a href='javascript:;' onclick='OpenYearlyWinLoss(20);'><font color='black'>" + result[i].WinLoss20 + "</font></a>",
+                                WinLossAverage20: result[i].WinLossAverage20,
+                                WinLoss40: "<a href='javascript:;' onclick='OpenYearlyWinLoss(40);'><font color='black'>" + result[i].WinLoss40 + "</font></a>",
+                                WinLossAverage40: result[i].WinLossAverage40,
+                                WinLoss60: "<a href='javascript:;' onclick='OpenYearlyWinLoss(60);'><font color='black'>" + result[i].WinLoss60 + "</font></a>",
+                                WinLoss20Raw: result[i].WinLoss20,
+                                WinLoss40Raw: result[i].WinLoss40,
+                                WinLoss60Raw: result[i].WinLoss60,
+                                WinLossAverage60: result[i].WinLossAverage60,
+                                CorrelationCoefficient30: result[i].CorrelationCoefficient30,
+                                SeasonalityCorrelation: result[i].SeasonalityCorrelation,
+                                MACDTrendNoOfDays: result[i].MACDGrowthDecayRate < 0 ? (result[i].MACDTrendNoOfDays * -1) : result[i].MACDTrendNoOfDays,
+                                MACDGrowthDecayRate: result[i].MACDGrowthDecayRate,
+                                EMATrendNoOfDays: result[i].EMAGrowthDecayRate < 0 ? (result[i].EMATrendNoOfDays * -1) : result[i].EMATrendNoOfDays,
+                                EMAGrowthDecayRate: result[i].EMAGrowthDecayRate,
+                                EMAStartDate: result[i].EMAStartDate,
+                                EMALinear: result[i].EMALinear
+                            });
+                        }
+
+                        while (ScreenerSaveData.length > 0) ScreenerSaveData.pop();
+                        ScreenerSaveData = d;
+
+                        ScreenerData = new wijmo.collections.CollectionView(d);
+                        ScreenerData.pageSize = 15;
+                        $('#loading').modal('hide');
+                        MakeScreenerGrid();
+                    }
+                });
+            };
+            reader.readAsText(file);
+        };
     });
 </script>
 

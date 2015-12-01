@@ -30,6 +30,14 @@
 
             <h2 class="section-heading">Web99</h2>
 
+            <div class="row">
+                <div class="col-lg-12">
+                    <button id="CmdDownloadList" type="submit" class="btn btn-primary pull-right" onclick="CmdDownloadList_OnClick()">Download Symbol List</button>
+                </div>
+            </div>
+
+            <br /> 
+
             <div id="EventGrid" class="grid"></div>
 
             <div class="btn-group col-md-7" id="naviagtionPageEvent">
@@ -119,6 +127,69 @@
             btnLastPageEvent.removeAttribute('disabled');
         }
         btnCurrentPageEvent.innerHTML = (Events.pageIndex + 1) + ' / ' + Events.pageCount;
+    }
+
+    function CmdDownloadList_OnClick() {
+        var data = new wijmo.collections.ObservableArray();
+        var CSV = '';
+        var symbols = [];
+        var fileName = 'web99List.CSV';
+
+        $.ajax({
+            url: '/api/Favorite',
+            type: 'GET',
+            dataType: 'json',
+            success: function (result) {
+                for (i = 0; i < result.length; i++) {
+                    data.push({
+                        Id: result[i].Id,
+                        SymbolId: result[i].SymbolId,
+                        Symbol: result[i].Symbol,
+                        UserId: result[i].UserlId,
+                        Remarks: result[i].Remarks
+                    });
+                }
+                for (i = 0; i < data.length; i++) {
+                    symbols.push({
+                        Symbol: data[i].Symbol
+                    });
+                }
+                for (var i = 0; i < symbols.length; i++) {
+                    CSV += '"' + symbols[i].Symbol + '"\r\n';
+                }
+                if (CSV == '') {
+                    alert("No data");
+                } else {
+                    var link = document.createElement("a");
+
+                    if (link.download !== undefined) {
+                        var blob = new Blob([CSV], { type: 'text/csv;charset=utf-8;' });
+                        var url = URL.createObjectURL(blob);
+                        link.setAttribute("href", url);
+                        link.setAttribute("download", fileName);
+                        link.style = "visibility:hidden";
+                    }
+
+                    if (navigator.msSaveBlob) {
+                        link.addEventListener("click", function (event) {
+                            var blob = new Blob([CSV], {
+                                "type": "text/csv;charset=utf-8;"
+                            });
+                            navigator.msSaveBlob(blob, fileName);
+                        }, false);
+                    }
+
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            },
+            statusCode: {
+                404: function () {
+                    alert('Failed');
+                }
+            }
+        });
     }
 
     $(document).ready(function () {

@@ -10,7 +10,10 @@ namespace MagentaTrader.Models
         public int Id { get; set; }
         public int SymbolId { get; set; }
         public string Symbol { get; set; }
-        public int UserlId { get; set; }
+        public string SymbolDescription { get; set; }
+        public string Exchange { get; set; }
+        public int UserId { get; set; }
+        public string User { get; set; }
         public string Remarks { get; set; }
     }
 }
