@@ -130,7 +130,7 @@ namespace MagentaTrader.Controllers
                 {
                     var Events = from d in db.MstEvents
                                  orderby d.Id descending
-                                 where d.EventType == "WEBINAR" &&
+                                 where d.EventType == "WEB99" &&
                                        d.VideoURL != null &&
                                        d.IsRestricted == true &&
                                        d.IsArchived == true

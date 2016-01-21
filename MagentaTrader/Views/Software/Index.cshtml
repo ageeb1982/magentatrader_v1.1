@@ -1,11 +1,20 @@
 ﻿@{
     ViewBag.Title = "Software";
 
-    var Version = "v.Beta.1.20151115";
+    var Version = "v.Beta.1.20160115";
     var Symbol = Request.QueryString["symbol"];
     var TradierScope = Request.QueryString["scope"];
     var TradierState = Request.QueryString["state"];
     var TradierCode = Request.QueryString["code"];
+    
+    var Broker = Request.QueryString["broker"];
+    var BrokerCode = Request.QueryString["code"];
+
+    var Questrade_access_token = Request.QueryString["access_token"];
+    var Questrade_refresh_token = Request.QueryString["refresh_token"];
+    var Questrade_token_type = Request.QueryString["token_type"];
+    var Questrade_expires_in = Request.QueryString["expires_in"];
+    var Questrade_api_server = Request.QueryString["api_server"];   
 }
 
 <link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -121,7 +130,7 @@
                         <hr style="margin: 10px 0 10px 0;" />
                         <a href="#">
                             <div><strong>Questrade</strong></div>
-                            @if (TradierCode != null)
+                            @if (Broker == "Questrade" && BrokerCode != null)
                             {
                                 <input class="btn btn-sm btn-primary" title="View Account" value="View Account" type="submit" onclick="viewTradierAccount()" />
                             }
@@ -698,6 +707,15 @@
     var TradierOrdersGrid;
     var TradierPositionsGrid;
 
+    // Questrade variables
+
+    var QuestradeAccessToken;
+    var QuestradeRefreshToken;
+    var QuestradeTokenType;
+    var QuestradeExpiresIn;
+    var QuestradeApiServer;
+    var QuestradeOptionChain;
+
     // Options
 
     var OptionCallGrid;
@@ -765,7 +783,7 @@
             function (xhr, textStatus, err) {
                 alert(err);
                 $('#UserEdit').modal('hide');
-        });
+            });
     }
     function userEditOk() {
         if (confirm("Save Information?") == true) {
@@ -824,25 +842,67 @@
         });
     }
 
-    // Questrade
-    function connectQuestrade() {
-        location.href = "https://login.questrade.com/oauth2/authorize?client_id=0ruqHEnVEdI2SwCZqTleWkwAt8pnoQ&redirect_uri=https://www.magentatrader.com/Software&response_type=code";
+    // Option chain
+
+    function openBrokerOptionChain() {
+        var broker = getCookie("Broker");
+        if (broker == "Questrade") {
+            if (QuestradeAccessToken != "") {
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/GetQuestradeSymbolId/' + QuestradeApiServer + '/' + QuestradeAccessToken + '/' + chartSymbol,
+                    success: function (result) {
+                        if (result.symbolId > 0) {
+                            openQuestradeOptionChain(result.symbolId.toString());
+                        } else {
+                            alert("No Broker connection.");
+                        }
+                    }
+                });
+            } else {
+                alert("No Broker connection.");
+            }
+        } else {
+            openTradierOptionChain();
+        }
     }
 
-    //function GetValue(value) {
-    //    var variable = window.location.search.substring(1);
-    //    var variableArr = variable.split('?');
-    //    for (var i = 0; i < variableArr.length; i++) {
-    //        var keyValue = variableArr[i].split('=');
-    //        if (keyValue[0] == value) {
-    //            return keyValue[1];
-    //        }
-    //    }
-    //}
+    // Questrade
 
-    //function GetRefreshKey(code) {
-    //    location.href = "https://login.questrade.com/oauth2/token?grant_type=authorization_code&client_id=0ruqHEnVEdI2SwCZqTleWkwAt8pnoQ&code=" + code + "&redirect_uri=https://www.magentatrader.com&responsetype=refresh_token";
-    //}
+    function connectQuestrade() {
+        //location.href = "https://login.questrade.com/oauth2/authorize?client_id=-4dSSId_7SQg-AAAB0OlUIBvHBZqXQ&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade&response_type=code";
+        location.href = "https://practicelogin.questrade.com/oauth2/authorize?client_id=-4dSSId_7SQg-AAAB0OlUIBvHBZqXQ&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade&response_type=token";
+    }
+    function openQuestradeOptionChain(symbolId) {
+        $.ajax({
+            type: 'GET',
+            url: '/api/GetQuestradeOptions/' + QuestradeApiServer + '/' + QuestradeAccessToken + '/' + symbolId,
+            success: function (result) {
+                $('#TradierOptionChain').modal({
+                    show: true,
+                    backdrop: false
+                });
+
+                var change = plotData[125].close - plotData[124].close;
+                if (change >= 0) {
+                    $("#TradierOptionChainTitle").html(dataSymbol + " Option Chain: " + "<font color='" + GreenColor + "'>" + plotData[125].close + "(" + change.toFixed(2) + ")</font>");
+                } else {
+                    $("#TradierOptionChainTitle").html(dataSymbol + " Option Chain: " + "<font color='" + RedColor + "'>" + plotData[125].close + "(" + change.toFixed(2) + ")</font>");
+                }
+
+                $('#optionExpirationDates').empty();
+                $('#OptionCallGrid').empty();
+                $('#OptionPutGrid').empty();
+
+                if (result.optionChain.length > 0) {
+                    for (var i = 0; i < result.optionChain.length; i++) {
+                        $('#optionExpirationDates').append("<option value='" + result.optionChain[i].expiryDate + "'>" + result.optionChain[i].expiryDate + "</option>");
+                    }
+                    QuestradeOptionChain = result;
+                }
+            }
+        });
+    }
 
     // Tradier
 
@@ -873,71 +933,71 @@
                 contentType: 'application/json; charset=utf-8',
                 data: {},
                 success: function (result) {
-                            if (result) {
-                                var TradierUserProfileData = new wijmo.collections.ObservableArray();
+                    if (result) {
+                        var TradierUserProfileData = new wijmo.collections.ObservableArray();
 
-                                TradierUserProfileData.push({
-                                    account_number: result.profile.account.account_number,
-                                    name: result.profile.name,
-                                    classification: result.profile.account.classification,
-                                    type: result.profile.account.type,
-                                    day_trader: result.profile.account.day_trader,
-                                });
+                        TradierUserProfileData.push({
+                            account_number: result.profile.account.account_number,
+                            name: result.profile.name,
+                            classification: result.profile.account.classification,
+                            type: result.profile.account.type,
+                            day_trader: result.profile.account.day_trader,
+                        });
 
-                                var TradierUserProfileCollection = new wijmo.collections.CollectionView(TradierUserProfileData);
+                        var TradierUserProfileCollection = new wijmo.collections.CollectionView(TradierUserProfileData);
 
-                                $('.nav-tabs a[href="#TradierAccount"]').tab('show');
-                                TradierUserProfileGrid.dispose();
-                                TradierUserProfileGrid = new wijmo.grid.FlexGrid('#TradierAccountGrid');
+                        $('.nav-tabs a[href="#TradierAccount"]').tab('show');
+                        TradierUserProfileGrid.dispose();
+                        TradierUserProfileGrid = new wijmo.grid.FlexGrid('#TradierAccountGrid');
 
-                                TradierUserProfileGrid.initialize({
-                                    columns: [
-                                                {
-                                                    "header": "Account No.",
-                                                    "binding": "account_number",
-                                                    "width": "1*",
-                                                    "isContentHtml": true
-                                                },
-                                                {
-                                                    "header": "Name",
-                                                    "binding": "name",
-                                                    "width": "2*",
-                                                    "isContentHtml": true
-                                                },
-                                                {
-                                                    "header": "Classification",
-                                                    "binding": "classification",
-                                                    "width": "1*",
-                                                    "isContentHtml": true
-                                                },
-                                                {
-                                                    "header": "Type",
-                                                    "binding": "type",
-                                                    "width": "1*",
-                                                    "isContentHtml": true
-                                                },
-                                                {
-                                                    "header": "Day Trader",
-                                                    "binding": "day_trader",
-                                                    "width": "1*",
-                                                    "isContentHtml": true
-                                                }
-                                    ],
-                                    autoGenerateColumns: false,
-                                    itemsSource: TradierUserProfileCollection,
-                                    isReadOnly: true,
-                                    selectionMode: wijmo.grid.SelectionMode.Row
-                                });
+                        TradierUserProfileGrid.initialize({
+                            columns: [
+                                        {
+                                            "header": "Account No.",
+                                            "binding": "account_number",
+                                            "width": "1*",
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Name",
+                                            "binding": "name",
+                                            "width": "2*",
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Classification",
+                                            "binding": "classification",
+                                            "width": "1*",
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Type",
+                                            "binding": "type",
+                                            "width": "1*",
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Day Trader",
+                                            "binding": "day_trader",
+                                            "width": "1*",
+                                            "isContentHtml": true
+                                        }
+                            ],
+                            autoGenerateColumns: false,
+                            itemsSource: TradierUserProfileCollection,
+                            isReadOnly: true,
+                            selectionMode: wijmo.grid.SelectionMode.Row
+                        });
 
-                                TradierUserProfileGrid.trackChanges = true;
+                        TradierUserProfileGrid.trackChanges = true;
 
-                                TradierUserProfileCollection.pageSize = 10;
+                        TradierUserProfileCollection.pageSize = 10;
 
-                                getTradierOrders(result.profile.account.account_number);
+                        getTradierOrders(result.profile.account.account_number);
 
-                                getTradierPositions(result.profile.account.account_number);                     
-                            }
+                        getTradierPositions(result.profile.account.account_number);
                     }
+                }
             });
         } else {
             alert("Not yet authenticated.");
@@ -1042,7 +1102,7 @@
                             description: ""
                         });
                     }
-                   
+
                     var TradierPositionDataCollection = new wijmo.collections.CollectionView(TradierPositionData);
 
                     $('.nav-tabs a[href="#TradierPositions"]').tab('show');
@@ -1051,11 +1111,11 @@
 
                     TradierPositionsGrid.initialize({
                         columns: [  {
-                                        "header": "Sell",
-                                        "binding": "sell_id",
-                                        "width": 60,
-                                        "isContentHtml": true
-                                    },
+                            "header": "Sell",
+                            "binding": "sell_id",
+                            "width": 60,
+                            "isContentHtml": true
+                        },
                                     {
                                         "header": "Symbol",
                                         "binding": "symbol",
@@ -1107,7 +1167,7 @@
                             if (wijmo.grid.CellType.Cell == panel.cellType && panel.columns[c].binding == 'gain_loss') {
                                 var cellData = panel.getCellData(r, c);
                                 cell.style.color = getGainLossColor(cellData);
-                            } 
+                            }
                         }
                     });
 
@@ -1243,20 +1303,20 @@
                 show: true,
                 backdrop: false
             });
-            
+
             $("#TradierOrderTitle").html("<font color='" + GreenColor + "'><b>BUY: " + dataSymbol + "</b></font>");
             getTradierQuote();
 
             document.getElementById('TradierOrder_Class').value = 'equity';
             document.getElementById('TradierOrder_Class').disabled = true;
-            
+
             document.getElementById('TradierOrder_Symbol').value = dataSymbol;
             document.getElementById('TradierOrder_Symbol').disabled = true;
 
             document.getElementById('TradierOrder_OptionSymbol').disabled = true;
             document.getElementById('TradierOrder_OptionSymbol').style.visibility = 'hidden';
             document.getElementById('TradierOrder_OptionSymbol_Label').style.visibility = 'hidden';
-            
+
             document.getElementById('TradierOrder_Side').value = 'buy';
             document.getElementById('TradierOrder_Side').disabled = true;
 
@@ -1271,7 +1331,7 @@
             disableConfirm(true);
         } else {
 
-            alert("No Tradier connection.");
+            alert("No Broker connection.");
 
         }
     }
@@ -1335,7 +1395,7 @@
             }
 
         } else {
-            alert("No Tradier connection.");
+            alert("No Broker connection.");
         }
     }
     function confirmTradierEquity() {
@@ -1396,9 +1456,9 @@
                 }
 
             } else {
-                alert("No Tradier connection.");
+                alert("No Broker connection.");
             }
-        } 
+        }
     }
     function disableConfirm(disable) {
         $('#confirmTradierEquity').prop('disabled', disable);
@@ -1441,7 +1501,7 @@
             } else {
                 $("#TradierOptionChainTitle").html(dataSymbol + " Option Chain: " + "<font color='" + RedColor + "'>" + plotData[125].close + "(" + change.toFixed(2) + ")</font>");
             }
-            
+
             $('#optionExpirationDates').empty();
             $('#OptionCallGrid').empty();
             $('#OptionPutGrid').empty();
@@ -1460,62 +1520,44 @@
                 }
             });
         } else {
-            alert("No Tradier connection.");
+            alert("No Broker connection.");
         }
     }
     function createOptionChain() {
-        var expirationDate = document.getElementById("optionExpirationDates").value;
-        $.ajax({
-            url: '/api/GetTradierOptionChain/' + dataSymbol + '/' + expirationDate + '/' + TradierAccessToken,
-            cache: false,
-            type: 'GET',
-            contentType: 'application/json; charset=utf-8',
-            data: {},
-            success: function (result) {
+        var broker = getCookie("Broker");
+        if (broker == "Questrade") {
+            var expirationDate = document.getElementById("optionExpirationDates").value;
+            if (QuestradeOptionChain != "") {
                 var dataCalls = [];
-                var dataPuts = new wijmo.collections.ObservableArray();
-
-                for (var i = 0; i < result.options.option.length; i++) {
-                    if (result.options.option[i].option_type == "call") {
-                        dataCalls.push({
-                            symbol: result.options.option[i].symbol,
-                            description: result.options.option[i].description,
-                            type: result.options.option[i].type,
-                            last: result.options.option[i].last,
-                            change: result.options.option[i].change,
-                            volume: result.options.option[i].volume,
-                            bid: result.options.option[i].bid,
-                            bidsize: result.options.option[i].bidsize,
-                            ask: result.options.option[i].ask,
-                            asksize: result.options.option[i].asksize,
-                            open_interest: result.options.option[i].open_interest,
-                            strike: result.options.option[i].strike,
-                            contract_size: result.options.option[i].contract_size,
-                            expiration_date: result.options.option[i].expiration_date,
-                            expiration_type: result.options.option[i].expiration_type,
-                            option_type: result.options.option[i].option_type,
-                            root_symbol: result.options.option[i].root_symbol
-                        })
-                    } else {
-                        dataPuts.push({
-                            symbol: result.options.option[i].symbol,
-                            description: result.options.option[i].description,
-                            type: result.options.option[i].type,
-                            last: result.options.option[i].last,
-                            change: result.options.option[i].change,
-                            volume: result.options.option[i].volume,
-                            bid: result.options.option[i].bid,
-                            bidsize: result.options.option[i].bidsize,
-                            ask: result.options.option[i].ask,
-                            asksize: result.options.option[i].asksize,
-                            open_interest: result.options.option[i].open_interest,
-                            strike: result.options.option[i].strike,
-                            contract_size: result.options.option[i].contract_size,
-                            expiration_date: result.options.option[i].expiration_date,
-                            expiration_type: result.options.option[i].expiration_type,
-                            option_type: result.options.option[i].option_type,
-                            root_symbol: result.options.option[i].root_symbol
-                        })
+                var dataPuts = [];
+                for (var i = 0; i < QuestradeOptionChain.optionChain.length; i++) {
+                    if (expirationDate == QuestradeOptionChain.optionChain[i].expiryDate) {
+                        if (QuestradeOptionChain.optionChain[i].chainPerRoot.length > 0) {
+                            if (QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice.length) {
+                                for (var s = 0; s < QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice.length; s++) {
+                                    var strikePrice = QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice[s];
+                                    dataCalls.push({
+                                        symbol: QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice[s].callSymbolId,
+                                        description: QuestradeOptionChain.optionChain[i].chainPerRoot[0].optionRoot + "-CALL(" + QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice[s].callSymbolId + ") @@" + strikePrice.strikePrice,
+                                        type: "OPTION",
+                                        last: 0,
+                                        change: 0,
+                                        volume: 0,
+                                        bid: 0,
+                                        bidsize: 0,
+                                        ask: 0,
+                                        asksize: 0,
+                                        open_interest: 0,
+                                        strike: strikePrice.strikePrice,
+                                        contract_size: 0,
+                                        expiration_date: QuestradeOptionChain.optionChain[i].expiryDate,
+                                        expiration_type: "NA",
+                                        option_type: "CALL",
+                                        root_symbol: QuestradeOptionChain.optionChain[i].chainPerRoot[0].optionRoot
+                                    });
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -1527,21 +1569,9 @@
                     return 0;
                 });
 
-                dataPuts.sort(function compare(a, b) {
-                    if (a.strike < b.strike)
-                        return -1;
-                    if (a.strike > b.strike)
-                        return 1;
-                    return 0;
-                });
-
                 sortedDataCalls = new wijmo.collections.ObservableArray();
-                sortedDataPuts = new wijmo.collections.ObservableArray();
-
                 sortedDataCalls = extractOptionChain(dataCalls);
-                sortedDataPuts = extractOptionChain(dataPuts);
 
-                // Call Grid
                 var Calls = new wijmo.collections.CollectionView(sortedDataCalls);
 
                 OptionCallGrid.dispose();
@@ -1607,75 +1637,221 @@
                 OptionCallGrid.trackChanges = true;
 
                 Calls.pageSize = 10;
-
-                // Put Grid
-                var Puts = new wijmo.collections.CollectionView(sortedDataPuts);
-
-                OptionPutGrid.dispose();
-                OptionPutGrid = new wijmo.grid.FlexGrid('#OptionPutGrid');
-
-                OptionPutGrid.initialize({
-                    columns: [
-                                {
-                                    "header": "Description",
-                                    "binding": "description",
-                                    "width": "*",
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Bid",
-                                    "binding": "bid",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Ask",
-                                    "binding": "ask",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Last",
-                                    "binding": "last",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Change",
-                                    "binding": "change",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Vol.",
-                                    "binding": "volume",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Op Int.",
-                                    "binding": "open_interest",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Strike",
-                                    "binding": "strike",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                }
-                    ],
-                    autoGenerateColumns: false,
-                    itemsSource: Puts,
-                    isReadOnly: true,
-                    selectionMode: wijmo.grid.SelectionMode.Row
-                });
-
-                OptionPutGrid.trackChanges = true;
-
-                Puts.pageSize = 10;
             }
-        });
+        } else {
+            var expirationDate = document.getElementById("optionExpirationDates").value;
+            $.ajax({
+                url: '/api/GetTradierOptionChain/' + dataSymbol + '/' + expirationDate + '/' + TradierAccessToken,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (result) {
+                    var dataCalls = [];
+                    var dataPuts = new wijmo.collections.ObservableArray();
+
+                    for (var i = 0; i < result.options.option.length; i++) {
+                        if (result.options.option[i].option_type == "call") {
+                            dataCalls.push({
+                                symbol: result.options.option[i].symbol,
+                                description: result.options.option[i].description,
+                                type: result.options.option[i].type,
+                                last: result.options.option[i].last,
+                                change: result.options.option[i].change,
+                                volume: result.options.option[i].volume,
+                                bid: result.options.option[i].bid,
+                                bidsize: result.options.option[i].bidsize,
+                                ask: result.options.option[i].ask,
+                                asksize: result.options.option[i].asksize,
+                                open_interest: result.options.option[i].open_interest,
+                                strike: result.options.option[i].strike,
+                                contract_size: result.options.option[i].contract_size,
+                                expiration_date: result.options.option[i].expiration_date,
+                                expiration_type: result.options.option[i].expiration_type,
+                                option_type: result.options.option[i].option_type,
+                                root_symbol: result.options.option[i].root_symbol
+                            })
+                        } else {
+                            dataPuts.push({
+                                symbol: result.options.option[i].symbol,
+                                description: result.options.option[i].description,
+                                type: result.options.option[i].type,
+                                last: result.options.option[i].last,
+                                change: result.options.option[i].change,
+                                volume: result.options.option[i].volume,
+                                bid: result.options.option[i].bid,
+                                bidsize: result.options.option[i].bidsize,
+                                ask: result.options.option[i].ask,
+                                asksize: result.options.option[i].asksize,
+                                open_interest: result.options.option[i].open_interest,
+                                strike: result.options.option[i].strike,
+                                contract_size: result.options.option[i].contract_size,
+                                expiration_date: result.options.option[i].expiration_date,
+                                expiration_type: result.options.option[i].expiration_type,
+                                option_type: result.options.option[i].option_type,
+                                root_symbol: result.options.option[i].root_symbol
+                            })
+                        }
+                    }
+
+                    dataCalls.sort(function compare(a, b) {
+                        if (a.strike < b.strike)
+                            return -1;
+                        if (a.strike > b.strike)
+                            return 1;
+                        return 0;
+                    });
+
+                    dataPuts.sort(function compare(a, b) {
+                        if (a.strike < b.strike)
+                            return -1;
+                        if (a.strike > b.strike)
+                            return 1;
+                        return 0;
+                    });
+
+                    sortedDataCalls = new wijmo.collections.ObservableArray();
+                    sortedDataPuts = new wijmo.collections.ObservableArray();
+
+                    sortedDataCalls = extractOptionChain(dataCalls);
+                    sortedDataPuts = extractOptionChain(dataPuts);
+
+                    // Call Grid
+                    var Calls = new wijmo.collections.CollectionView(sortedDataCalls);
+
+                    OptionCallGrid.dispose();
+                    OptionCallGrid = new wijmo.grid.FlexGrid('#OptionCallGrid');
+
+                    OptionCallGrid.initialize({
+                        columns: [
+                                    {
+                                        "header": "Description",
+                                        "binding": "description",
+                                        "width": "*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Bid",
+                                        "binding": "bid",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Ask",
+                                        "binding": "ask",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Last",
+                                        "binding": "last",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Change",
+                                        "binding": "change",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Vol.",
+                                        "binding": "volume",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Op Int.",
+                                        "binding": "open_interest",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Strike",
+                                        "binding": "strike",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    }
+                        ],
+                        autoGenerateColumns: false,
+                        itemsSource: Calls,
+                        isReadOnly: true,
+                        selectionMode: wijmo.grid.SelectionMode.Row
+                    });
+
+                    OptionCallGrid.trackChanges = true;
+
+                    Calls.pageSize = 10;
+
+                    // Put Grid
+                    var Puts = new wijmo.collections.CollectionView(sortedDataPuts);
+
+                    OptionPutGrid.dispose();
+                    OptionPutGrid = new wijmo.grid.FlexGrid('#OptionPutGrid');
+
+                    OptionPutGrid.initialize({
+                        columns: [
+                                    {
+                                        "header": "Description",
+                                        "binding": "description",
+                                        "width": "*",
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Bid",
+                                        "binding": "bid",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Ask",
+                                        "binding": "ask",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Last",
+                                        "binding": "last",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Change",
+                                        "binding": "change",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Vol.",
+                                        "binding": "volume",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Op Int.",
+                                        "binding": "open_interest",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "Strike",
+                                        "binding": "strike",
+                                        "width": 100,
+                                        "isContentHtml": true
+                                    }
+                        ],
+                        autoGenerateColumns: false,
+                        itemsSource: Puts,
+                        isReadOnly: true,
+                        selectionMode: wijmo.grid.SelectionMode.Row
+                    });
+
+                    OptionPutGrid.trackChanges = true;
+
+                    Puts.pageSize = 10;
+                }
+            });
+        }
     }
     function extractOptionChain(chain) {
         var sortedChain = new wijmo.collections.ObservableArray();
@@ -2193,6 +2369,7 @@
     }
 
     // Earnings
+
     function openEarnings() {
         $("#EarningsTitle").text(dataSymbol + " Earnings Percentage (%)");
         $('#Earnings').modal({
@@ -2972,7 +3149,7 @@
         var ema1_closePrices = 0;
         var ema1_previous = 0;
         var ema1 = 0;
-        
+
         var ema2_closePrices = 0;
         var ema2_previous = 0;
         var ema2 = 0;
@@ -3241,7 +3418,7 @@
         dataSet.dataProvider = plotData;
         dataSet.categoryField = "date";
         dataSet.stockEvents = [chartEvent1];
-        
+
         chart.dataSets = [dataSet];
 
         // AMChart Panels
@@ -3456,7 +3633,7 @@
         graphMACD.color = BlueColor;
         graphMACD.lineColor = BlueColor;
         graphMACD.type = "line";
-        graphMACD.lineThickness = 1;      
+        graphMACD.lineThickness = 1;
         graphMACD.showBalloon = false;
         graphMACD.valueAxis = valueAxisMACD;
 
@@ -3559,7 +3736,7 @@
         stockLegend2.color = BlueColor;
 
         stockPanel2.stockLegend = stockLegend2;
-        
+
         chart.panels = [stockPanel1, stockPanel2];
 
         // AMChart scrollbar settings
@@ -3826,7 +4003,7 @@
                 $('#scannerYear').empty();
                 displayScannerYears(seasonYearData, currentYear, xValue, dateValue);
             }
-            
+
         });
 
     }
@@ -3852,7 +4029,7 @@
             sumOfY2 = sumOfY2 + (Y * Y);
         }
         //r = Σ (xy) / sqrt [ ( Σ x2 ) * ( Σ y2 ) ]
-        // return sumOfXY / Math.sqrt(sumOfX2 * sumOfY2); // Simple 
+        // return sumOfXY / Math.sqrt(sumOfX2 * sumOfY2); // Simple
         return (sumOfXY - ((sumOfX * sumOfY) / X)) / Math.sqrt(((sumOfX2 - ((sumOfX * sumOfX) / X)) * (sumOfY2 - ((sumOfY * sumOfY) / X)))); // Pearson
     }
     function drawTrendLines(stockPanel, plotData, startIndex, endIndex, upChannelLine, downChannelLine, midChannelLine) {
@@ -3898,7 +4075,7 @@
         }
         //debugger;
         chartChannelNoOfDays = NumberOfDays; // Use to display the number of days in the channel.
-        
+
         // Compute for the slope
         if (endIndex > 126) {
             m = (parseFloat(plotData[125]["close"]) - parseFloat(plotData[startIndex - 1]["close"])) / NumberOfDays;
@@ -3981,7 +4158,7 @@
         $("#symbolInfoSeasonalityCorrelation").empty();
 
         //$("#symbol").html("<span><b>" + chartSymbol + "</b></span>");
-        $("#symbol").html("<span><b>" + chartSymbol + ":</b>&nbsp;<button class='btn btn-success btn-xs' data-toggle='modal' id='openTradierEquity' onclick='openTradierEquity()'>Buy</button>&nbsp;<button class='btn btn-info btn-xs' data-toggle='modal' id='openTradierOptionChain' onclick='openTradierOptionChain()'>Option Chain</button></span>");
+        $("#symbol").html("<span><b>" + chartSymbol + ":</b>&nbsp;<button class='btn btn-success btn-xs' data-toggle='modal' id='openTradierEquity' onclick='openTradierEquity()'>Buy</button>&nbsp;<button class='btn btn-info btn-xs' data-toggle='modal' id='openBrokerOptionChain' onclick='openBrokerOptionChain()'>Option Chain</button></span>");
         $("#symbolInfoChart").html("<a href='#' style='padding: 2px 20px'><span>Chart:</span><span class='pull-right'>" + chartNoOfDays + "</span></a>");
         $("#symbolInfoChannel").html("<a href='#' style='padding: 2px 20px'><span>Channel:</span><span class='pull-right'>" + chartChannelNoOfDays + "</span></a>");
         if (chartSlopePercentage >= 0) {
@@ -4001,7 +4178,7 @@
             }
             $("#symbolSlopePercentage").html("<a href='#' style='padding: 2px 20px'><font color='" + RedColor + "'><span>ADR:</span><span class='pull-right'>" + ADR.toFixed(2) + "%</span></font></a>");
         }
-        
+
         $("#symbolInfoCoefficient").html("<a href='#' style='padding: 2px 20px'><span>Linear:</span><span class='pull-right'>" + chartCoefficient.toFixed(2) + "</span></a>");
         $("#symbolInfoRange").html("<a href='#' style='padding: 2px 20px'><span>Range:</span><span class='pull-right'>" + chartChannelRange.toFixed(2) + "%</span></a>");
 
@@ -4242,81 +4419,81 @@
                 alert("Invalid range of number of days.");
             } else {
                 // if (confirm("Compute variable scanner?") == true) {
-                    var highestUp = 0;
-                    var highestUpAverage = 0;
-                    var highestUpIndex = 0;
-                    var highestUpDaySpan = 0;
-                    var highestDown = 0;
-                    var highestDownAverage = 0;
-                    var highestDownIndex = 0;
-                    var highestDownDaySpan = 0;
+                var highestUp = 0;
+                var highestUpAverage = 0;
+                var highestUpIndex = 0;
+                var highestUpDaySpan = 0;
+                var highestDown = 0;
+                var highestDownAverage = 0;
+                var highestDownIndex = 0;
+                var highestDownDaySpan = 0;
 
-                    // Process result
-                    for (var d = startNoOfDay; d <= endNoOfDay; d++) {
-                        for (var i = 125 ; i < NumberOfDaysInYear - d ; i++) {
-                            // Get the yearly result
-                            var seasonTenYear = parseFloat(plotData[i]["season"]);
-                            var seasonTenYearPlusVarDays = parseFloat(plotData[i + d - 1]["season"]);
-                            var result = [];
-                            if (seasonTenYearPlusVarDays > seasonTenYear) {
-                                //result = scanYearlyData(seasonYearData, 10, i, d, "up");
-                                result = scanYearlyData(closeYearData, noOfYears, i, d, "up");
-                            } else {
-                                //result = scanYearlyData(seasonYearData, 10, i, d, "down");
-                                result = scanYearlyData(closeYearData, noOfYears, i, d, "down");
-                            }
-                            // Compare the yearly result
-                            if (result[0] > 0) {
-                                if (result[0] > highestUp || (result[0] == highestUp && result[1] > highestUpAverage)) {
-                                    highestUp = result[0];
-                                    highestUpAverage = result[1];
-                                    highestUpIndex = i;
-                                    highestUpDaySpan = d;
-                                }
-                            } else if (result[2] > 0) {
-                                if (result[2] > highestDown || (result[2] == highestDown && result[3] > highestDownAverage)) {
-                                    highestDown = result[2];
-                                    highestDownAverage = result[3];
-                                    highestDownIndex = i;
-                                    highestDownDaySpan = d;
-                                }
-                            }
-
+                // Process result
+                for (var d = startNoOfDay; d <= endNoOfDay; d++) {
+                    for (var i = 125 ; i < NumberOfDaysInYear - d ; i++) {
+                        // Get the yearly result
+                        var seasonTenYear = parseFloat(plotData[i]["season"]);
+                        var seasonTenYearPlusVarDays = parseFloat(plotData[i + d - 1]["season"]);
+                        var result = [];
+                        if (seasonTenYearPlusVarDays > seasonTenYear) {
+                            //result = scanYearlyData(seasonYearData, 10, i, d, "up");
+                            result = scanYearlyData(closeYearData, noOfYears, i, d, "up");
+                        } else {
+                            //result = scanYearlyData(seasonYearData, 10, i, d, "down");
+                            result = scanYearlyData(closeYearData, noOfYears, i, d, "down");
                         }
+                        // Compare the yearly result
+                        if (result[0] > 0) {
+                            if (result[0] > highestUp || (result[0] == highestUp && result[1] > highestUpAverage)) {
+                                highestUp = result[0];
+                                highestUpAverage = result[1];
+                                highestUpIndex = i;
+                                highestUpDaySpan = d;
+                            }
+                        } else if (result[2] > 0) {
+                            if (result[2] > highestDown || (result[2] == highestDown && result[3] > highestDownAverage)) {
+                                highestDown = result[2];
+                                highestDownAverage = result[3];
+                                highestDownIndex = i;
+                                highestDownDaySpan = d;
+                            }
+                        }
+
                     }
+                }
 
-                    // Plot result
-                    if (highestUp > 0) {
-                        if (!varScannerUp) varScannerUp = new AmCharts.Guide();
-                        else stockPanel1.categoryAxis.removeGuide(varScannerUp);
+                // Plot result
+                if (highestUp > 0) {
+                    if (!varScannerUp) varScannerUp = new AmCharts.Guide();
+                    else stockPanel1.categoryAxis.removeGuide(varScannerUp);
 
-                        varScannerUp.date = plotData[highestUpIndex]["date"];
-                        varScannerUp.toDate = plotData[highestUpIndex + highestUpDaySpan]["date"];
-                        varScannerUp.fillColor = positiveGuideColor;
-                        varScannerUp.fillAlpha = 0.6;
-                        //varScannerUp.labelRotation = 90;
-                        varScannerUp.inside = true;
-                        varScannerUp.label = "Variable Scanner\nUp: " + highestUp + "/" + (noOfYears - highestUp) + " " + highestUpAverage.toFixed(2) + "%\nRange: " + highestUpDaySpan + " Days";
-                        varScannerUp.position = "top";
-                        stockPanel1.categoryAxis.addGuide(varScannerUp);
-                    }
-                    if (highestDown > 0) {
-                        if (!varScannerDown) varScannerDown = new AmCharts.Guide();
-                        else stockPanel1.categoryAxis.removeGuide(varScannerDown);
+                    varScannerUp.date = plotData[highestUpIndex]["date"];
+                    varScannerUp.toDate = plotData[highestUpIndex + highestUpDaySpan]["date"];
+                    varScannerUp.fillColor = positiveGuideColor;
+                    varScannerUp.fillAlpha = 0.6;
+                    //varScannerUp.labelRotation = 90;
+                    varScannerUp.inside = true;
+                    varScannerUp.label = "Variable Scanner\nUp: " + highestUp + "/" + (noOfYears - highestUp) + " " + highestUpAverage.toFixed(2) + "%\nRange: " + highestUpDaySpan + " Days";
+                    varScannerUp.position = "top";
+                    stockPanel1.categoryAxis.addGuide(varScannerUp);
+                }
+                if (highestDown > 0) {
+                    if (!varScannerDown) varScannerDown = new AmCharts.Guide();
+                    else stockPanel1.categoryAxis.removeGuide(varScannerDown);
 
-                        varScannerDown.date = plotData[highestDownIndex]["date"];
-                        varScannerDown.toDate = plotData[highestDownIndex + highestDownDaySpan]["date"];
-                        varScannerDown.fillColor = negativeGuideColor;
-                        varScannerDown.fillAlpha = 0.6;
-                        //varScannerDown.labelRotation = 90;
-                        varScannerDown.inside = true;
-                        varScannerDown.label = "Variable Scanner\nDown: " + highestDown + "/" + (noOfYears - highestDown) + " " + highestDownAverage.toFixed(2) + "%\nRange: " + highestDownDaySpan + " Days";
-                        varScannerDown.position = "top";
-                        stockPanel1.categoryAxis.addGuide(varScannerDown);
-                    }
-                    stockPanel1.validateNow();
+                    varScannerDown.date = plotData[highestDownIndex]["date"];
+                    varScannerDown.toDate = plotData[highestDownIndex + highestDownDaySpan]["date"];
+                    varScannerDown.fillColor = negativeGuideColor;
+                    varScannerDown.fillAlpha = 0.6;
+                    //varScannerDown.labelRotation = 90;
+                    varScannerDown.inside = true;
+                    varScannerDown.label = "Variable Scanner\nDown: " + highestDown + "/" + (noOfYears - highestDown) + " " + highestDownAverage.toFixed(2) + "%\nRange: " + highestDownDaySpan + " Days";
+                    varScannerDown.position = "top";
+                    stockPanel1.categoryAxis.addGuide(varScannerDown);
+                }
+                stockPanel1.validateNow();
 
-                } // Compute?
+            } // Compute?
             // } // Process = true?
         }  // Chart
     }
@@ -4388,25 +4565,57 @@
         OptionCallGrid = new wijmo.grid.FlexGrid('#OptionCallGrid');
         OptionPutGrid = new wijmo.grid.FlexGrid('#OptionPutGrid');
 
-        // Tradier Authorization Code
-        TradierAccessToken = getCookie("TradierAccessToken");
-        if (TradierAccessToken == "") {
-            var code = "@TradierCode";
-            if (code != "") {
-                $.ajax({
-                    type: 'GET',
-                    url: '/api/GetTradierAccessToken/' + code,
-                    success: function (Result) {
-                        TradierAccessToken = Result.access_token == null ? '' : Result.access_token;
-                        setCookie("TradierAccessToken", TradierAccessToken, 1);
-
-                        getTradierAccountNumber(TradierAccessToken);
-                    }
-                });
+        // Broker Authorization Code
+        var url = window.location.href;
+        var queryString = url.substring(url.indexOf('#') + 1);
+        var broker = "";
+        if (queryString.length > 0) {
+            var params = {}, queries, temp, i, l;
+            queries = queryString.split("&");
+            for (i = 0, l = queries.length; i < l; i++) {
+                temp = queries[i].split('=');
+                params[temp[0]] = temp[1];
             }
+            broker = params.broker;
+            setCookie("Broker", broker, 1);
         } else {
-            getTradierAccountNumber(TradierAccessToken);
+            broker = "@Broker";
+            setCookie("Broker", broker, 1);
         }
+
+        if (broker == "Questrade") {
+            QuestradeAccessToken = params.access_token;
+            QuestradeRefreshToken = params.refresh_token;
+            QuestradeTokenType = params.token_type;
+            QuestradeExpiresIn = params.expires_in;
+            QuestradeApiServer = params.api_server.replace(/^https?:\/\//, '').replace("/", "");
+
+            setCookie("QuestradeAccessToken", QuestradeAccessToken, 1);
+            setCookie("QuestradeRefreshToken", QuestradeRefreshToken, 1);
+            setCookie("QuestradeTokenType", QuestradeTokenType, 1);
+            setCookie("QuestradeExpiresIn", QuestradeExpiresIn, 1);
+            setCookie("QuestradeApiServer", QuestradeApiServer, 1);
+        } else {
+            TradierAccessToken = getCookie("TradierAccessToken");
+            if (TradierAccessToken == "") {
+                var code = "@TradierCode";
+                if (code != "") {
+                    $.ajax({
+                        type: 'GET',
+                        url: '/api/GetTradierAccessToken/' + code,
+                        success: function (Result) {
+                            TradierAccessToken = Result.access_token == null ? '' : Result.access_token;
+                            setCookie("TradierAccessToken", TradierAccessToken, 1);
+
+                            getTradierAccountNumber(TradierAccessToken);
+                        }
+                    });
+                }
+            } else {
+                getTradierAccountNumber(TradierAccessToken);
+            }
+        }
+
 
         $("a[href='#OptionCall']").on('shown.bs.tab', function (e) {
             OptionCallGrid.invalidate();

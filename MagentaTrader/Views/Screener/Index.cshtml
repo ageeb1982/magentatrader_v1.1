@@ -38,7 +38,7 @@
                 <option value="MEU">Magenta Early Up</option>
                 <option value="MED">Magenta Early Down</option>
                 <option value="UPL">Upload Symbols</option>
-                <option value="FAV">Favorites</option>
+                @*<option value="FAV">Favorites</option>*@
             </select>
         </div>
     </div>  
@@ -110,9 +110,11 @@
                 <option value="100">1.00</option>
             </select>
         </div>
-        <div class="col-lg-2">
-            <p>Favorite Code</p>
-            <input type="text" class="form-control" id="FavoriteCode" placeholder="Code">
+        <div class="col-lg-4">
+            <p><a href='javascript:;' onclick='Favorites_OnClick();'>Favorites</a></p>
+            <input type="hidden" class="form-control" id="Favorite_UserId" placeholder="None" >
+            <input type="hidden" class="form-control" id="Favorite_Remarks" placeholder="None" >
+            <input type="text" class="form-control" id="FavoriteCode" placeholder="None" disabled="disabled">
         </div>
     </div>
     <br />
@@ -156,6 +158,7 @@
     <br />
 </div>
 
+@*Loading*@
 <div class="modal fade" id="loading" tabindex="-1" role="dialog" aria-labelledby="Loading..." aria-hidden="true">
     <div class="modal-dialog" style="width: 220px;">
         <div class="modal-content">
@@ -169,6 +172,7 @@
     </div>
 </div>
 
+@*Yearly Win/Loss*@
 <div class="modal" id="YearlyWinLoss" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -190,6 +194,7 @@
     </div>
 </div>
 
+@*Favorite Code*@
 <div class="modal" id="Favorites" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -219,6 +224,46 @@
     </div>
 </div>
 
+@*Shared Favorites*@
+<div class="modal" id="SharedFavorites" tabindex="-1" role="dialog">
+    <div class="modal-dialog" style="width: 1100px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 id="SharedFavoritesTitle" class="modal-title">Shared Favorites</h4>
+            </div>
+            <div class="modal-body">
+                <div id="SharedFavoritesGrid" class="grid"></div>
+                <br />
+                <div class="row">
+                    <div class="btn-group col-md-7" id="sfNav">
+                        <button type="button" class="btn btn-default" id="sfNavMoveToFirst">
+                            <span class="glyphicon glyphicon-fast-backward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" id="sfNavMoveToPrevious">
+                            <span class="glyphicon glyphicon-step-backward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" disabled style="width:100px" id="sfNavMoveToCurrent"></button>
+                        <button type="button" class="btn btn-default" id="sfNavMoveToNext">
+                            <span class="glyphicon glyphicon-step-forward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" id="sfNavMoveToLast">
+                            <span class="glyphicon glyphicon-fast-forward"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     var ScreenerData;
     var ScreenerGrid;
@@ -232,6 +277,10 @@
     var btnNextPageEvent;
     var btnLastPageEvent;
     var btnCurrentPageEvent;
+
+    var SharedFavoritesData;
+    var SharedFavoritesCollection;
+    var SharedFavoritesGrid;
 
     function GetRateColor(Rate) {
         var GreenColor = "#0FB203";
@@ -268,13 +317,27 @@
         }
         return Math.round(returnResult);
     }
-    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears, Correlation30, Strategy, FavoriteCode) {
+    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears, Correlation30, Strategy, FavoriteUserId, FavoriteRemarks) {
         $('#loading').modal('show');
         var d = new wijmo.collections.ObservableArray();
 
+        var p = [];
+
+        p.push(Exchange);
+        p.push(Price);
+        p.push(Volume);
+        p.push(GrowthDecayRate);
+        p.push(GrowthDecayTime);
+        p.push(NoOfYears);
+        p.push(Correlation30);
+        p.push(Strategy);
+        p.push(FavoriteUserId);
+        p.push(FavoriteRemarks);
+
         $.ajax({
-            url: '/api/SymbolScreener/' + Exchange + '/' + Price + '/' + Volume + '/' + GrowthDecayRate + '/' + GrowthDecayTime + '/' + NoOfYears + '/' + Correlation30 + '/' + Strategy + '/' + FavoriteCode,
+            url: '/api/SymbolScreenerV2',
             type: 'GET',
+            data: { Parameters: p },
             dataType: 'json',
             success: function (result) {
                 for (i = 0; i < result.length; i++) {
@@ -719,7 +782,8 @@
         var $noOfYears = parseInt(document.getElementById('NoOfYears').value);
         var $correlation30 = parseFloat(document.getElementById('Correlation30').value);
         var $strategy = document.getElementById('Strategy').value;
-        var $favoriteCode = document.getElementById('FavoriteCode').value;
+        var $favoriteUserId = document.getElementById('Favorite_UserId').value;
+        var $favoriteRemarks = document.getElementById('Favorite_Remarks').value;
 
         $closePrice = !$closePrice ? 10 : $closePrice;
         $volume = !$volume ? 1000000 : $volume;
@@ -727,9 +791,10 @@
         $growthDecayTime = !$growthDecayTime ? "C0" : $growthDecayTime;
         $noOfYears = !$noOfYears ? 8 : $noOfYears;
         $correlation30 = !$correlation30 ? 10 : $correlation30;
-        $favoriteCode = !$favoriteCode ? 0 : $favoriteCode;
+        $favoriteUserId = !$favoriteUserId ? 0 : $favoriteUserId;
+        $favoriteRemarks = !$favoriteRemarks ? "NA" : $favoriteRemarks;
 
-        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears, $correlation30, $strategy, $favoriteCode);
+        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears, $correlation30, $strategy, $favoriteUserId, $favoriteRemarks);
     }
     function CmdSaveXLS_OnClick() {
         var CSV = '';
@@ -898,6 +963,134 @@
                 $('#loading').modal('hide');
                 MakeScreenerGrid();
             }
+        });
+    }
+    function CmdPickSharedFavorites_OnClick() {
+        SharedFavoritesCollection.editItem(SharedFavoritesCollection.currentItem);
+        var PickedFavorite = SharedFavoritesCollection.currentEditItem;
+
+        document.getElementById('Favorite_UserId').value = PickedFavorite.UserId;
+        document.getElementById('Favorite_Remarks').value = PickedFavorite.Remarks;
+        document.getElementById('FavoriteCode').value = PickedFavorite.Remarks;
+
+        $('#SharedFavorites').modal('hide');
+    }
+
+    function Favorites_OnClick() {
+        $('#SharedFavorites').modal({
+            show: true,
+            backdrop: false
+        });
+
+        $("#SharedFavoritesGrid").empty();
+
+        $.ajax({
+            url: '/api/SharedFavorites',
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            success: function (result) {
+                if (result.length > 0)
+                {
+                    // Data
+                    while (SharedFavoritesData.length > 0) SharedFavoritesData.pop();
+                    for (var i = 0; i < result.length; i++) {
+                        SharedFavoritesData.push({
+                            PickId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdPickSharedFavorites' onclick='CmdPickSharedFavorites_OnClick()'>Pick</button>",
+                            Remarks: result[i].Remarks,
+                            User: result[i].User,
+                            UserId: result[i].UserId,
+                            NoOfSymbols: result[i].NoOfSymbols,
+                        });
+                    }
+                    // Collection
+                    SharedFavoritesCollection = new wijmo.collections.CollectionView(SharedFavoritesData);
+                    SharedFavoritesCollection.pageSize = 10;
+                    SharedFavoritesCollection.collectionChanged.addHandler(function (sender, args) {
+                        UpdateSFNav();
+                    });
+                    // Grid
+                    SharedFavoritesGrid.dispose();
+                    SharedFavoritesGrid = new wijmo.grid.FlexGrid('#SharedFavoritesGrid');
+                    SharedFavoritesGrid.initialize({
+                        columns: [
+                                    {
+                                        "header": "Pick",
+                                        "binding": "PickId",
+                                        "width": 60,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "User",
+                                        "binding": "User",
+                                        "width": 120,
+                                        "allowSorting": true
+                                    },
+                                    {
+                                        "header": "Favorite Name",
+                                        "binding": "Remarks",
+                                        "width": "*",
+                                        "allowSorting": true
+                                    },
+                                    {
+                                        "header": "Symbol(s)",
+                                        "binding": "NoOfSymbols",
+                                        "width": 80
+                                    }
+                                ],
+                        autoGenerateColumns: false,
+                        itemsSource: SharedFavoritesCollection,
+                        isReadOnly: true,
+                        selectionMode: wijmo.grid.SelectionMode.Row
+                    });
+                    SharedFavoritesGrid.trackChanges = true;
+                }
+            }
+        });
+    }
+    function UpdateSFNav() {
+        var Records = SharedFavoritesCollection;
+        if (Records.pageSize <= 0) {
+            document.getElementById('sfNav').style.display = 'none';
+            return;
+        }
+        document.getElementById('sfNav').style.display = 'block';
+        if (Records.pageIndex === 0) {
+            sfNavMoveToFirst.setAttribute('disabled', 'disabled');
+            sfNavMoveToPrevious.setAttribute('disabled', 'disabled');
+            sfNavMoveToNext.removeAttribute('disabled');
+            sfNavMoveToLast.removeAttribute('disabled');
+        }
+        else if (Records.pageIndex === (Records.pageCount - 1)) {
+            sfNavMoveToFirst.removeAttribute('disabled');
+            sfNavMoveToPrevious.removeAttribute('disabled');
+            sfNavMoveToNext.setAttribute('disabled', 'disabled');
+            sfNavMoveToLast.setAttribute('disabled', 'disabled');
+        }
+        else {
+            sfNavMoveToFirst.removeAttribute('disabled');
+            sfNavMoveToPrevious.removeAttribute('disabled');
+            sfNavMoveToNext.removeAttribute('disabled');
+            sfNavMoveToLast.removeAttribute('disabled');
+        }
+        sfNavMoveToCurrent.innerHTML = (Records.pageIndex + 1) + ' / ' + Records.pageCount;
+    }
+    function AddSFNavListeners() {
+        sfNavMoveToFirst.addEventListener('click', function () {
+            SharedFavoritesCollection.moveToFirstPage();
+            UpdateSFNav();
+        });
+        sfNavMoveToPrevious.addEventListener('click', function () {
+            SharedFavoritesCollection.moveToPreviousPage();
+            UpdateSFNav();
+        });
+        sfNavMoveToNext.addEventListener('click', function () {
+            SharedFavoritesCollection.moveToNextPage();
+            UpdateSFNav();
+        });
+        sfNavMoveToLast.addEventListener('click', function () {
+            SharedFavoritesCollection.moveToLastPage();
+            UpdateSFNav();
         });
     }
 
@@ -1116,6 +1309,15 @@
             ScreenerData.moveToLastPage();
             UpdateNavigateButtonsEvent();
         });
+
+        // Shared Favorites Grid
+        SharedFavoritesData = new wijmo.collections.ObservableArray();
+        SharedFavoritesCollection = new wijmo.collections.CollectionView();
+        SharedFavoritesCollection.collectionChanged.addHandler(function (sender, args) {
+            UpdateSFNav();
+        });
+        SharedFavoritesGrid = new wijmo.grid.FlexGrid('#SharedFavoritesGrid');
+        AddSFNavListeners();
 
         $("#GetButton").show();
         $("#SaveButton").show();

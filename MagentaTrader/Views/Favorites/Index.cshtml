@@ -1,5 +1,7 @@
 ﻿@{
     ViewBag.Title = "Index";
+
+    var Favorites = Request.QueryString["Favorites"];    
 }
 
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
@@ -46,16 +48,20 @@
     <br />
     <div class="row">
         <div class="col-lg-4">
-            <div class="input-group">
-                <span class="input-group-btn">
-                    <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
-                </span>
-                <input type="text" class="form-control" id="InputFilter" placeholder="Search...">
-            </div>
+            <select id="FavoriteName" class="full-width form-control" onchange="FavoriteName_OnChange(this)"></select>
         </div>
         <div class="col-lg-8">
+            <button id="CmdChangeFavoriteName" class="btn btn-primary" onclick="CmdChangeFavoriteName_OnClick()">
+                Change Favorite Name
+            </button> 
+            <button id="CmdShareFavorites" class="btn btn-primary" style="margin-left: 10px;" onclick="CmdShareFavorites_OnClick()">
+                Share Favorites
+            </button> 
             <button id="CmdAddFavorites" type="submit" class="btn btn-primary pull-right" onclick="CmdFavoritesAdd_OnClick()">
                 Add
+            </button>
+            <button id="CmdFavoritesDeleteAll" type="submit" class="btn btn-danger pull-right" style="margin-right: 10px;" onclick="CmdFavoritesDeleteAll_OnClick()">
+                Delete All
             </button>
             <button id="CmdDownloadFavorites" class="btn btn-primary pull-right" style="margin-right: 10px;" onclick="CmdFavoritesDownload_OnClick()">
                 Download
@@ -123,9 +129,22 @@
                         <input class="form-control" id="FavoritesEdit_Id" type="hidden" />
                         <input class="form-control" id="FavoritesEdit_Symbol" type="text" />
                     </dd>
+                    <dt>Trend</dt>
+                    <dd>
+                        <select class="form-control custom-width" id="FavoritesEdit_Trend" name="FavoritesEdit_Trend">
+                            <option value="UP">UP ▲</option>
+                            <option value="DOWN">DOWN ▼</option>
+                            <option value="SIDEWAYS">SIDEWAYS</option>
+                        </select>
+                    </dd>
+                    <dt>Encoded Date</dt>
+                    <dd>
+                        <input class="form-control" id="FavoritesEdit_EncodedDate_Data" type="hidden" />
+                        <input class="form-control" id="FavoritesEdit_EncodedDate" type="text" />
+                    </dd>
                     <dt>Remarks</dt>
                     <dd>
-                        <input class="form-control" id="FavoritesEdit_Remarks" type="text" />
+                        <input class="form-control" id="FavoritesEdit_Remarks" type="text" disabled="disabled"/>
                     </dd>
                 </dl>
             </div>
@@ -141,17 +160,179 @@
     </div>
 </div>
 
+@*Edit Favorite Name*@
+<div class="modal fade" id="FavoriteNameEdit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title">Edit Favorite Name</h4>
+            </div>
+            <div class="modal-body">
+                <dl class="dl-horizontal">
+                    <dt>Name</dt>
+                    <dd>
+                        <input class="form-control" id="FavoriteNameEdit_Name" type="text" />
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="CmdFavoriteNameEditOk" onclick="CmdFavoriteNameEditOk_OnClick()">
+                    Ok
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="CmdFavoriteNameEditCancel">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Edit Favorite Share Status*@
+<div class="modal fade" id="FavoriteShareEdit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title">Edit Favorite Share Status</h4>
+            </div>
+            <div class="modal-body">
+                <dl class="dl-horizontal">
+                    <dt>Share</dt>
+                    <dd>
+                        <input class="form-control" id="FavoriteShareEdit_IsShared" name="FavoriteShareEdit_IsShared" type="checkbox" />
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="CmdFavoriteShareEditOk" onclick="CmdFavoriteShareEditOk_OnClick()">
+                    Ok
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="CmdFavoriteShareEditCancel">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Shared Favorites*@
+<div class="modal" id="SharedFavorites" tabindex="-1" role="dialog">
+    <div class="modal-dialog" style="width: 1100px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 id="SharedFavoritesTitle" class="modal-title">Shared Favorites</h4>
+            </div>
+            <div class="modal-body">
+                <div id="SharedFavoritesGrid" class="grid"></div>
+                <br />
+                <div class="row">
+                    <div class="btn-group col-md-7" id="sfNav">
+                        <button type="button" class="btn btn-default" id="sfNavMoveToFirst">
+                            <span class="glyphicon glyphicon-fast-backward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" id="sfNavMoveToPrevious">
+                            <span class="glyphicon glyphicon-step-backward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" disabled style="width:100px" id="sfNavMoveToCurrent"></button>
+                        <button type="button" class="btn btn-default" id="sfNavMoveToNext">
+                            <span class="glyphicon glyphicon-step-forward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" id="sfNavMoveToLast">
+                            <span class="glyphicon glyphicon-fast-forward"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @*Module*@
 <script type="text/javascript">
     var Favorites;
     var FavoritesGrid;
     var FavoritesData;
 
-    function GetFavorites() {
+    var navMoveToFirst;
+    var navMoveToPrevious;
+    var navMoveToNext;
+    var navMoveToLast;
+    var navMoveToCurrent;
+
+    var SharedFavoritesCollection;
+    var SharedFavoritesGrid;
+    var SharedFavoritesData;
+
+    var sfNavMoveToFirst;
+    var sfNavMoveToPrevious;
+    var sfNavMoveToNext;
+    var sfNavMoveToLast;
+    var sfNavMoveToCurrent;
+
+    var FavoritesEdit_EncodedDate;
+
+    function GetFavoriteNames() {
+        var defaultFavoriteGroup = "@Favorites";
+        $('#loading').modal('show');
+        $.ajax({
+            url: '/api/UserFavoriteNames',
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            data: {},
+            success: function (Results) {
+                $('#loading').modal('hide');
+                if (Results.length > 0) {
+                    $('#FavoriteName').empty();
+                    for (i = 0; i < Results.length; i++) {
+                        if (defaultFavoriteGroup != "") {
+                            if (Results[i]["Remarks"] == defaultFavoriteGroup) {
+                                $('#FavoriteName').append('<option selected="selected" value="' + Results[i]["Remarks"] + '">' + Results[i]["Remarks"] + '</option>')
+                            } else {
+                                $('#FavoriteName').append('<option value="' + Results[i]["Remarks"] + '">' + Results[i]["Remarks"] + '</option>')
+                            }
+                        } else {
+                            if (i == 0) {
+                                $('#FavoriteName').append('<option selected="selected" value="' + Results[i]["Remarks"] + '">' + Results[i]["Remarks"] + '</option>')
+                            } else {
+                                $('#FavoriteName').append('<option value="' + Results[i]["Remarks"] + '">' + Results[i]["Remarks"] + '</option>')
+                            }
+                        }
+                    }
+                    $('#FavoriteName').append('<option value=New>[New]</option>')
+                    $('#FavoriteName').append('<option value=[Shared]>[Shared List]</option>')
+                    FavoriteName_OnChange(document.getElementById('FavoriteName'));
+                } else {
+                    $('#FavoriteName').append('<option value=New>[New]</option>')
+                    $('#FavoriteName').append('<option value=[Shared]>[Shared List]</option>')
+                    FavoriteName_OnChange(document.getElementById('FavoriteName'));
+                }
+            }
+        }).fail(
+            function (xhr, textStatus, err) {
+                $('#loading').modal('hide');
+                alert(err);
+            }
+        );
+    }
+    function GetFavorites(favoriteName) {
         var favorites = new wijmo.collections.ObservableArray();
         $('#loading').modal('show');
         $.ajax({
-            url: '/api/UserFavorites',
+            url: '/api/UserFavorites/' + favoriteName,
             cache: false,
             type: 'GET',
             contentType: 'application/json; charset=utf-8',
@@ -166,27 +347,37 @@
                             Id: Results[i]["Id"],
                             SymbolId: Results[i]["SymbolId"],
                             Symbol: Results[i]["Symbol"],
+                            SymbolLink: "<a href='/Software?symbol=" + Results[i]["Symbol"] + "' target='_blank'><font color='black'>" + Results[i]["Symbol"] + "</font></a>",
                             SymbolDescription: Results[i]["SymbolDescription"],
                             Exchange: Results[i]["Exchange"],
                             UserId: Results[i]["UserId"],
-                            Remarks: Results[i]["Remarks"]
+                            Remarks: Results[i]["Remarks"],
+                            IsShared: Results[i]["IsShared"],
+                            EncodedDate: Results[i]["EncodedDate"],
+                            Trend: Results[i]["Trend"],
+                            ColoredTrend: Results[i]["Trend"] == "UP" ? "<font color='green'>UP ▲</font>" : Results[i]["Trend"] == "DOWN" ? "<font color='red'>DOWN ▼</font>" : Results[i]["Trend"]
                         });
                     }
                     var favoriteCode = document.getElementById("FavoriteCode");
                     favoriteCode.innerHTML = "Your Favorite Code: " + favorites[0].UserId;
                 } else {
-                    alert("No data.");
+                    // alert("No data.");
                 }
             }
         }).fail(
             function (xhr, textStatus, err) {
-                alert(err);
+                $('#loading').modal('hide');
+                // alert(err);
             }
         );
         return favorites;
     }
-    function CreateFavoritesGrid() {
-        FavoritesData = GetFavorites();
+    function CreateFavoritesGrid(favoriteName, userName) {
+        if (!userName) {
+            FavoritesData = GetFavorites(favoriteName);
+        } else {
+            FavoritesData = GetSharedFavorites(favoriteName, userName);
+        }
         Favorites = new wijmo.collections.CollectionView(FavoritesData);
         Favorites.pageSize = 15;
 
@@ -210,9 +401,17 @@
                         },
                         {
                             "header": "Symbol",
-                            "binding": "Symbol",
+                            "binding": "SymbolLink",
                             "allowSorting": true,
+                            "isContentHtml": true,
                             "width": 80
+                        },
+                        {
+                            "header": "Trend",
+                            "binding": "ColoredTrend",
+                            "allowSorting": true,
+                            "isContentHtml": true,
+                            "width": 100
                         },
                         {
                             "header": "Description",
@@ -227,10 +426,16 @@
                             "width": 120
                         },
                         {
-                            "header": "Remarks",
-                            "binding": "Remarks",
+                            "header": "Date",
+                            "binding": "EncodedDate",
                             "allowSorting": true,
-                            "width": "2*"
+                            "width": 120
+                        },
+                        {
+                            "header": "Shared",
+                            "binding": "IsShared",
+                            "allowSorting": false,
+                            "width": 80
                         }
             ],
             autoGenerateColumns: false,
@@ -240,7 +445,286 @@
         });
         FavoritesGrid.trackChanges = true;
     }
+    function GetSharedFavorites(favoriteName, userName) {
+        var favorites = new wijmo.collections.ObservableArray();
+        $('#loading').modal('show');
+        $.ajax({
+            url: '/api/UserFavoritesByUser/' + favoriteName + '/' + userName,
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            data: {},
+            success: function (Results) {
+                $('#loading').modal('hide');
+                if (Results.length > 0) {
+                    for (i = 0; i < Results.length; i++) {
+                        favorites.push({
+                            EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditFavorites' onclick='CmdFavoritesEdit_OnClick()' disabled>Edit</button>",
+                            DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteFavorites' onclick='CmdFavoritesDelete_OnClick()' disabled>Delete</button>",
+                            Id: Results[i]["Id"],
+                            SymbolId: Results[i]["SymbolId"],
+                            Symbol: Results[i]["Symbol"],
+                            SymbolLink: "<a href='/Software?symbol=" + Results[i]["Symbol"] + "' target='_blank'><font color='black'>" + Results[i]["Symbol"] + "</font></a>",
+                            SymbolDescription: Results[i]["SymbolDescription"],
+                            Exchange: Results[i]["Exchange"],
+                            UserId: Results[i]["UserId"],
+                            Remarks: Results[i]["Remarks"],
+                            IsShared: Results[i]["IsShared"],
+                            EncodedDate: Results[i]["EncodedDate"],
+                            Trend: Results[i]["Trend"],
+                            ColoredTrend: Results[i]["Trend"] == "UP" ? "<font color='green'>UP ▲</font>" : Results[i]["Trend"] == "DOWN" ? "<font color='red'>DOWN ▼</font>" : Results[i]["Trend"]
+                        });
+                    }
+                    var favoriteCode = document.getElementById("FavoriteCode");
+                    favoriteCode.innerHTML = "Shared List";
+                } else {
+                    // alert("No data.");
+                }
+            }
+        }).fail(
+            function (xhr, textStatus, err) {
+                $('#loading').modal('hide');
+                // alert(err);
+            }
+        );
+        return favorites;
+    }
 
+    function FavoriteName_OnChange(favoriteName) {
+        if (favoriteName.value == "[Shared]") {
+            DisableButtons(true);
+            $('#SharedFavorites').modal({
+                show: true,
+                backdrop: false
+            });
+            $("#SharedFavoritesGrid").empty();
+            $.ajax({
+                url: '/api/SharedFavorites',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (result) {
+                    if (result.length > 0) {
+                        // Data
+                        while (SharedFavoritesData.length > 0) SharedFavoritesData.pop();
+                        for (var i = 0; i < result.length; i++) {
+                            SharedFavoritesData.push({
+                                PickId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdPickSharedFavorites' onclick='CmdPickSharedFavorites_OnClick()'>Pick</button>",
+                                Remarks: result[i].Remarks,
+                                User: result[i].User,
+                                UserId: result[i].UserId,
+                                NoOfSymbols: result[i].NoOfSymbols,
+                            });
+                        }
+                        // Collection
+                        SharedFavoritesCollection = new wijmo.collections.CollectionView(SharedFavoritesData);
+                        SharedFavoritesCollection.pageSize = 10;
+                        SharedFavoritesCollection.collectionChanged.addHandler(function (sender, args) {
+                            UpdateSFNav();
+                        });
+                        // Grid
+                        SharedFavoritesGrid.dispose();
+                        SharedFavoritesGrid = new wijmo.grid.FlexGrid('#SharedFavoritesGrid');
+                        SharedFavoritesGrid.initialize({
+                            columns: [
+                                        {
+                                            "header": "Pick",
+                                            "binding": "PickId",
+                                            "width": 60,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "User",
+                                            "binding": "User",
+                                            "width": 120,
+                                            "allowSorting": true
+                                        },
+                                        {
+                                            "header": "Favorite Name",
+                                            "binding": "Remarks",
+                                            "width": "*",
+                                            "allowSorting": true
+                                        },
+                                        {
+                                            "header": "Symbol(s)",
+                                            "binding": "NoOfSymbols",
+                                            "width": 80
+                                        }
+                            ],
+                            autoGenerateColumns: false,
+                            itemsSource: SharedFavoritesCollection,
+                            isReadOnly: true,
+                            selectionMode: wijmo.grid.SelectionMode.Row
+                        });
+                        SharedFavoritesGrid.trackChanges = true;
+                    }
+                }
+            });
+            CreateFavoritesGrid(favoriteName.value);
+            Favorites.collectionChanged.addHandler(function (sender, args) {
+                updateNavigationButtons();
+            });
+        } else {
+            DisableButtons(false);
+            CreateFavoritesGrid(favoriteName.value);
+            Favorites.collectionChanged.addHandler(function (sender, args) {
+                updateNavigationButtons();
+            });           
+        }
+    }
+
+    function UpdateSFNav() {
+        var Records = SharedFavoritesCollection;
+        if (Records.pageSize <= 0) {
+            document.getElementById('sfNav').style.display = 'none';
+            return;
+        }
+        document.getElementById('sfNav').style.display = 'block';
+        if (Records.pageIndex === 0) {
+            sfNavMoveToFirst.setAttribute('disabled', 'disabled');
+            sfNavMoveToPrevious.setAttribute('disabled', 'disabled');
+            sfNavMoveToNext.removeAttribute('disabled');
+            sfNavMoveToLast.removeAttribute('disabled');
+        }
+        else if (Records.pageIndex === (Records.pageCount - 1)) {
+            sfNavMoveToFirst.removeAttribute('disabled');
+            sfNavMoveToPrevious.removeAttribute('disabled');
+            sfNavMoveToNext.setAttribute('disabled', 'disabled');
+            sfNavMoveToLast.setAttribute('disabled', 'disabled');
+        }
+        else {
+            sfNavMoveToFirst.removeAttribute('disabled');
+            sfNavMoveToPrevious.removeAttribute('disabled');
+            sfNavMoveToNext.removeAttribute('disabled');
+            sfNavMoveToLast.removeAttribute('disabled');
+        }
+        sfNavMoveToCurrent.innerHTML = (Records.pageIndex + 1) + ' / ' + Records.pageCount;
+    }
+    function AddSFNavListeners() {
+        sfNavMoveToFirst.addEventListener('click', function () {
+            SharedFavoritesCollection.moveToFirstPage();
+            UpdateSFNav();
+        });
+        sfNavMoveToPrevious.addEventListener('click', function () {
+            SharedFavoritesCollection.moveToPreviousPage();
+            UpdateSFNav();
+        });
+        sfNavMoveToNext.addEventListener('click', function () {
+            SharedFavoritesCollection.moveToNextPage();
+            UpdateSFNav();
+        });
+        sfNavMoveToLast.addEventListener('click', function () {
+            SharedFavoritesCollection.moveToLastPage();
+            UpdateSFNav();
+        });
+    }
+
+    function CmdPickSharedFavorites_OnClick() {
+        SharedFavoritesCollection.editItem(SharedFavoritesCollection.currentItem);
+        var PickedFavorite = SharedFavoritesCollection.currentEditItem;
+
+        $('#SharedFavorites').modal('hide');
+
+        CreateFavoritesGrid(PickedFavorite.Remarks, PickedFavorite.User)
+        Favorites.collectionChanged.addHandler(function (sender, args) {
+            updateNavigationButtons();
+        });
+    }
+
+    function DisableButtons(disable) {
+        document.getElementById("CmdChangeFavoriteName").disabled = disable;
+        document.getElementById("CmdShareFavorites").disabled = disable;
+        document.getElementById("CmdAddFavorites").disabled = disable;
+        document.getElementById("CmdFavoritesDeleteAll").disabled = disable;
+        document.getElementById("CmdUploadFavorites").disabled = disable;
+        //document.getElementById("CmdEditFavorites").disabled = disable;
+        //document.getElementById("CmdDeleteFavorites").disabled = disable;
+    }
+    function HideButtons(hide) {
+        if (hide == true) {
+            $("#CmdChangeFavoriteName").hide();
+            $("#CmdShareFavorites").hide();
+            $("#CmdAddFavorites").hide();
+            $("#CmdFavoritesDeleteAll").hide();
+            $("#CmdUploadFavorites").hide();
+        } else {
+            $("#CmdChangeFavoriteName").show();
+            $("#CmdShareFavorites").show();
+            $("#CmdAddFavorites").show();
+            $("#CmdFavoritesDeleteAll").show();
+            $("#CmdUploadFavorites").show();
+        }
+    }
+
+    function CmdChangeFavoriteName_OnClick() {
+        $('#FavoriteNameEdit').modal({
+            show: true,
+            backdrop: false
+        });
+
+        document.getElementById('FavoriteNameEdit_Name').value = document.getElementById('FavoriteName').value ? document.getElementById('FavoriteName').value : 'No Name';
+    }
+    function CmdFavoriteNameEditOk_OnClick() {
+        var data = [];
+
+        data.push(document.getElementById('FavoriteName').value);
+        data.push(document.getElementById('FavoriteNameEdit_Name').value);
+
+        $.ajax({
+            type: "GET",
+            url: "/api/ChangeFavoriteName",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: { FavoriteNames: data },
+            statusCode: {
+                200: function () {
+                    location.reload();
+                },
+                400: function () {
+                    alert("Unable to change name.");
+                }
+            }
+        });
+    }
+
+    function CmdShareFavorites_OnClick() {
+        if (Favorites.items.length > 0) {
+            $('#FavoriteShareEdit').modal({
+                show: true,
+                backdrop: false
+            });
+            document.getElementById('FavoriteShareEdit_IsShared').checked = Favorites.items[0].IsShared ? Favorites.items[0].IsShared : false;
+        }
+    }
+    function CmdFavoriteShareEditOk_OnClick() {
+        var data = [];
+
+        data.push(document.getElementById('FavoriteShareEdit_IsShared').checked);
+        data.push(document.getElementById('FavoriteName').value);
+
+        $.ajax({
+            type: "GET",
+            url: "/api/ChangeFavoriteShareStatus",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: { Status: data },
+            statusCode: {
+                200: function () {
+                    location.reload();
+                },
+                400: function () {
+                    alert("Unable to change share status.");
+                }
+            }
+        });
+    }
+
+    function CmdSharedList_OnClick() {
+        $('#SharedFavorites').modal({
+            show: true,
+            backdrop: false
+        });
+    }
     function CmdFavoritesAdd_OnClick() {
         $('#FavoritesEdit').modal({
             show: true,
@@ -249,7 +733,47 @@
 
         document.getElementById('FavoritesEdit_Id').value = 0;
         document.getElementById('FavoritesEdit_Symbol').value = "";
-        document.getElementById('FavoritesEdit_Remarks').value = "";
+        document.getElementById('FavoritesEdit_Remarks').value = document.getElementById('FavoriteName').value;
+        document.getElementById('FavoritesEdit_Trend').value = "SIDEWAYS";
+        document.getElementById('FavoritesEdit_EncodedDate').value = "";
+
+        if (document.getElementById('FavoriteName').value == "New") {
+            document.getElementById("FavoritesEdit_Remarks").disabled = false;
+        } else {
+            document.getElementById("FavoritesEdit_Remarks").disabled = true;
+        }
+
+        FavoritesEdit_EncodedDate.dispose();
+        FavoritesEdit_EncodedDate = new wijmo.input.InputDate('#FavoritesEdit_EncodedDate', {
+            format: 'MM/dd/yyyy',
+            value: new Date(),
+            onValueChanged: function () {
+                document.getElementById('FavoritesEdit_EncodedDate_Data').value = this.value.toString("MM/dd/yyyy");
+            }
+        });
+
+        document.getElementById('FavoritesEdit_EncodedDate_Data').value = (new Date()).toString("MM/dd/yyyy");
+    }
+    function CmdFavoritesDeleteAll_OnClick() {
+        var favoriteName = document.getElementById('FavoriteName').value;
+        if (confirm("Delete all symbols of " + favoriteName  + "?") == true) {
+            $('#loading').modal('show');
+            $.ajax({
+                url: '/api/DeleteUserFavorites/' + favoriteName,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                statusCode: {
+                    200: function () {
+                        location.reload();
+                    },
+                    400: function () {
+                        alert("Unable to delete some or all symbols.");
+                    }
+                }
+            })
+        }
     }
     function CmdFavoritesEdit_OnClick() {
         Favorites.editItem(Favorites.currentItem);
@@ -263,12 +787,37 @@
         document.getElementById('FavoritesEdit_Id').value = EditFavorites.Id !== null && typeof (EditFavorites.Id) != 'undefined' ? wijmo.Globalize.format(EditFavorites.Id) : '';
         document.getElementById('FavoritesEdit_Symbol').value = EditFavorites.Symbol ? EditFavorites.Symbol : '';
         document.getElementById('FavoritesEdit_Remarks').value = EditFavorites.Remarks ? EditFavorites.Remarks : '';
+        document.getElementById('FavoritesEdit_Trend').value = EditFavorites.Trend ? EditFavorites.Trend : '';
+        document.getElementById('FavoritesEdit_EncodedDate').value = EditFavorites.EncodedDate ? EditFavorites.EncodedDate : '';
+
+        if (document.getElementById('FavoriteName').value == "New") {
+            document.getElementById("FavoritesEdit_Remarks").disabled = false;
+        } else {
+            document.getElementById("FavoritesEdit_Remarks").disabled = true;
+        }
+
+        var EncodedDate = new Date();
+        if (EditFavorites.EncodedDate != "NA") {
+            var splitDate = EditFavorites.EncodedDate.split("-");
+            EncodedDate = new Date(splitDate[0], splitDate[1] - 1, splitDate[2])
+        }
+
+        FavoritesEdit_EncodedDate.dispose();
+        FavoritesEdit_EncodedDate = new wijmo.input.InputDate('#FavoritesEdit_EncodedDate', {
+            format: 'MM/dd/yyyy',
+            value: EncodedDate,
+            onValueChanged: function () {
+                document.getElementById('FavoritesEdit_EncodedDate_Data').value = this.value.toString("MM/dd/yyyy");
+            }
+        });
+
+        document.getElementById('FavoritesEdit_EncodedDate_Data').value = EncodedDate.toString("MM/dd/yyyy");
     }
     function CmdFavoritesDelete_OnClick() {
         Favorites.editItem(Favorites.currentItem);
 
         var Id = Favorites.currentEditItem.Id;
-        var Symbol = Favorites.currentEditItem.Symbol;
+        var Symbol = Favorites.currentEditItem.SymbolDescription;
 
         if (confirm("Delete " + Symbol + "?") == true) {
             $.ajax({
@@ -298,6 +847,8 @@
             Favorite.Id = document.getElementById('FavoritesEdit_Id').value;
             Favorite.Symbol = document.getElementById('FavoritesEdit_Symbol').value.toUpperCase();
             Favorite.Remarks = document.getElementById('FavoritesEdit_Remarks').value;
+            Favorite.EncodedDate = document.getElementById('FavoritesEdit_EncodedDate_Data').value;
+            Favorite.Trend = document.getElementById('FavoritesEdit_Trend').value;
             Favorite.User = '@User.Identity.Name';
 
             var data = JSON.stringify(Favorite);
@@ -312,7 +863,8 @@
                     data: data,
                     success: function (id) {
                         if (id > 0) {
-                            location.reload();
+                            window.location.href = window.location.href.replace(/[\?#].*|$/, "?Favorites=" + Favorite.Remarks);
+                            //location.reload();
                         } else {
                             alert("Not added");
                         }
@@ -329,7 +881,8 @@
                     data: data,
                     statusCode: {
                         200: function () {
-                            location.reload();
+                            window.location.href = window.location.href.replace(/[\?#].*|$/, "?Favorites=" + Favorite.Remarks);
+                            //location.reload();
                         },
                         404: function () {
                             alert("Not found");
@@ -386,19 +939,18 @@
     }
 
     function updateNavigationButtons() {
-        var Records = Favorites;
-        if (Records.pageSize <= 0) {
+        if (Favorites.pageSize <= 0) {
             document.getElementById('navigationButton').style.display = 'none';
             return;
         }
         document.getElementById('navigationButton').style.display = 'block';
-        if (Records.pageIndex === 0) {
+        if (Favorites.pageIndex === 0) {
             navMoveToFirst.setAttribute('disabled', 'disabled');
             navMoveToPrevious.setAttribute('disabled', 'disabled');
             navMoveToNext.removeAttribute('disabled');
             navMoveToLast.removeAttribute('disabled');
         }
-        else if (Records.pageIndex === (Records.pageCount - 1)) {
+        else if (Favorites.pageIndex === (Favorites.pageCount - 1)) {
             navMoveToFirst.removeAttribute('disabled');
             navMoveToPrevious.removeAttribute('disabled');
             navMoveToNext.setAttribute('disabled', 'disabled');
@@ -410,7 +962,7 @@
             navMoveToNext.removeAttribute('disabled');
             navMoveToLast.removeAttribute('disabled');
         }
-        navMoveToCurrent.innerHTML = (Records.pageIndex + 1) + ' / ' + Records.pageCount;
+        navMoveToCurrent.innerHTML = (Favorites.pageIndex + 1) + ' / ' + Favorites.pageCount;
     }
     function addNavigationListeners() {
         navMoveToFirst.addEventListener('click', function () {
@@ -432,14 +984,46 @@
     }
 
     $(document).ready(function () {
+        // Favorites Grid
+        navMoveToFirst = document.getElementById('navMoveToFirst');
+        navMoveToPrevious = document.getElementById('navMoveToPrevious');
+        navMoveToNext = document.getElementById('navMoveToNext');
+        navMoveToLast = document.getElementById('navMoveToLast');
+        navMoveToCurrent = document.getElementById('navMoveToCurrent');
+
+        GetFavoriteNames();
+
+        Favorites = new wijmo.collections.CollectionView();
         FavoritesData = new wijmo.collections.ObservableArray();
         FavoritesGrid = new wijmo.grid.FlexGrid('#FavoritesGrid');
-        CreateFavoritesGrid();
-        updateNavigationButtons();
+
         addNavigationListeners();
         Favorites.collectionChanged.addHandler(function (sender, args) {
             updateNavigationButtons();
         });
+
+        // Shared Favorites Grid
+        sfNavMoveToFirst = document.getElementById('sfNavMoveToFirst');
+        sfNavMoveToPrevious = document.getElementById('sfNavMoveToPrevious');
+        sfNavMoveToNext = document.getElementById('sfNavMoveToNext');
+        sfNavMoveToLast = document.getElementById('sfNavMoveToLast');
+        sfNavMoveToCurrent = document.getElementById('sfNavMoveToCurrent');
+
+        SharedFavoritesData = new wijmo.collections.ObservableArray();
+        SharedFavoritesCollection = new wijmo.collections.CollectionView();
+        SharedFavoritesCollection.collectionChanged.addHandler(function (sender, args) {
+            UpdateSFNav();
+        });
+
+        AddSFNavListeners();
+
+        SharedFavoritesGrid = new wijmo.grid.FlexGrid('#SharedFavoritesGrid');
+
+        FavoritesEdit_EncodedDate = new wijmo.input.InputDate('#FavoritesEdit_EncodedDate', {
+            format: 'MM/dd/yyyy',
+            value: new Date()
+        });
+
         document.getElementById('CmdUploadFavorites').onchange = function () {
             var file = this.files[0];
             var reader = new FileReader();
@@ -450,13 +1034,14 @@
                 for (var line = 0; line < lines.length; line++) {
                     var buf = lines[line].replace(/['"]+/g, '');
                     data.push(buf.replace(/(\r\n|\n|\r)/gm, ""));
-                    if (line === 399) { break; }
+                    if (line == 100) { alert("Your file exceeds 100 symbol limit."); break; }
                 }
                 $.ajax({
-                    url: '/api/UploadFavorites',
-                    type: 'GET',
+                    type: "GET",
+                    url: "/api/UploadFavorites",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
                     data: { Symbols: data },
-                    traditional: true,
                     success: function (id) {
                         if (id > 0) {
                             location.reload();

@@ -109,7 +109,7 @@
         <classShapeMoniker Id="4d55214f-4827-4688-a908-2dda9dc04b1c" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(5.5 : 11.6642976888021); (6.25 : 11.6642976888021)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+    <associationConnector edgePoints="[(5.5 : 11.6642976888021); (5.79166916666667 : 11.6642976888021 : JumpStart); (5.95833583333333 : 11.6642976888021 : JumpEnd); (6.25 : 11.6642976888021)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/MagentaTradersDBDataContext/MstUser/MstUser_TrnAffiliate" />
       <nodes>
         <classShapeMoniker Id="4d55214f-4827-4688-a908-2dda9dc04b1c" />
@@ -142,14 +142,14 @@
         <elementListCompartment Id="f8284ec8-774f-4f39-a0a1-9339ef7fd953" absoluteBounds="9.39, 12.46, 1.9700000000000002, 2.941609700520833" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(6.25 : 15.0008048502604); (9.375 : 15.0008048502604)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+    <associationConnector edgePoints="[(6.25 : 15.0008048502604); (7.19791666666667 : 15.0008048502604 : JumpStart); (7.36458333333333 : 15.0008048502604 : JumpEnd); (9.375 : 15.0008048502604)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/MagentaTradersDBDataContext/MstProductPackage/MstProductPackage_TrnSale" />
       <nodes>
         <classShapeMoniker Id="307a4c78-c5dc-4e6b-af67-0e540dc89e94" />
         <classShapeMoniker Id="49d36762-ff35-4ab0-beda-1dde5dfc800c" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(5.5 : 12.5857975260417); (9.375 : 12.5857975260417)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+    <associationConnector edgePoints="[(5.5 : 12.5857975260417); (7.19791666666667 : 12.5857975260417 : JumpStart); (7.36458333333333 : 12.5857975260417 : JumpEnd); (9.375 : 12.5857975260417)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/MagentaTradersDBDataContext/MstUser/MstUser_TrnSale" />
       <nodes>
         <classShapeMoniker Id="4d55214f-4827-4688-a908-2dda9dc04b1c" />
@@ -169,7 +169,7 @@
         <classShapeMoniker Id="ff407a76-8bd7-45a1-bc02-57eb556185a4" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(7.375 : 3.125); (7.375 : 1.53125); (9.5 : 1.53125)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+    <associationConnector edgePoints="[(7.90625 : 3.125); (7.90625 : 1.28125); (9.5 : 1.28125)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/MagentaTradersDBDataContext/MstSymbol/MstSymbol_TrnStockEarning" />
       <nodes>
         <classShapeMoniker Id="451140bb-0e36-4def-92b8-ff667f29de58" />
@@ -189,24 +189,24 @@
         <classShapeMoniker Id="bd2453c7-1db3-420a-8ab0-9bad3766e9cc" />
       </nodes>
     </associationConnector>
-    <classShape Id="f42d230b-f654-4502-9d6d-a26835381655" absoluteBounds="4, 1.25, 2, 1.9631982421875">
+    <classShape Id="e26c0806-be8f-4b39-b188-50a261208284" absoluteBounds="5.125, 2.625, 2, 2.3478011067708335">
       <DataClassMoniker Name="/MagentaTradersDBDataContext/TrnFavorite" />
       <nestedChildShapes>
-        <elementListCompartment Id="2abe8fbd-b9f6-451e-9e83-3fdd65043e85" absoluteBounds="4.015, 1.71, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+        <elementListCompartment Id="2dd81323-a8ef-49ce-8db6-1b70c03db7c6" absoluteBounds="5.14, 3.085, 1.9700000000000002, 1.7878011067708335" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(6.843748 : 3.125); (6.843748 : 2.156248); (6 : 2.156248)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(6.375 : 7.37572347005208); (5.95833583333333 : 7.37572347005208 : JumpStart); (5.79166916666667 : 7.37572347005208 : JumpEnd); (4.875 : 7.37572347005208); (4.875 : 3.79890055338542); (5.125 : 3.79890055338542)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/MagentaTradersDBDataContext/MstSymbol/MstSymbol_TrnFavorite" />
       <nodes>
         <classShapeMoniker Id="451140bb-0e36-4def-92b8-ff667f29de58" />
-        <classShapeMoniker Id="f42d230b-f654-4502-9d6d-a26835381655" />
+        <classShapeMoniker Id="e26c0806-be8f-4b39-b188-50a261208284" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(5.5 : 11.050896344401); (5.7812525 : 11.050896344401); (5.7812525 : 3.2131982421875)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(5.5 : 12.5545450260417); (5.8750025 : 12.5545450260417); (5.8750025 : 4.97280110677083)]" fixedFrom="Algorithm" fixedTo="Algorithm">
       <AssociationMoniker Name="/MagentaTradersDBDataContext/MstUser/MstUser_TrnFavorite" />
       <nodes>
         <classShapeMoniker Id="4d55214f-4827-4688-a908-2dda9dc04b1c" />
-        <classShapeMoniker Id="f42d230b-f654-4502-9d6d-a26835381655" />
+        <classShapeMoniker Id="e26c0806-be8f-4b39-b188-50a261208284" />
       </nodes>
     </associationConnector>
   </nestedChildShapes>

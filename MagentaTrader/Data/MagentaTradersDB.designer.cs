@@ -4875,6 +4875,12 @@ namespace MagentaTrader.Data
 		
 		private string _Remarks;
 		
+		private bool _IsShared;
+		
+		private System.Nullable<System.DateTime> _EncodedDate;
+		
+		private string _Trend;
+		
 		private EntityRef<MstSymbol> _MstSymbol;
 		
 		private EntityRef<MstUser> _MstUser;
@@ -4893,6 +4899,12 @@ namespace MagentaTrader.Data
     partial void OnUserIdChanged();
     partial void OnRemarksChanging(string value);
     partial void OnRemarksChanged();
+    partial void OnIsSharedChanging(bool value);
+    partial void OnIsSharedChanged();
+    partial void OnEncodedDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnEncodedDateChanged();
+    partial void OnTrendChanging(string value);
+    partial void OnTrendChanged();
     #endregion
 		
 		public TrnFavorite()
@@ -4990,7 +5002,7 @@ namespace MagentaTrader.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Remarks", DbType="NVarChar(255)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Remarks", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
 		public string Remarks
 		{
 			get
@@ -5006,6 +5018,66 @@ namespace MagentaTrader.Data
 					this._Remarks = value;
 					this.SendPropertyChanged("Remarks");
 					this.OnRemarksChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsShared", DbType="Bit NOT NULL")]
+		public bool IsShared
+		{
+			get
+			{
+				return this._IsShared;
+			}
+			set
+			{
+				if ((this._IsShared != value))
+				{
+					this.OnIsSharedChanging(value);
+					this.SendPropertyChanging();
+					this._IsShared = value;
+					this.SendPropertyChanged("IsShared");
+					this.OnIsSharedChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EncodedDate", DbType="DateTime")]
+		public System.Nullable<System.DateTime> EncodedDate
+		{
+			get
+			{
+				return this._EncodedDate;
+			}
+			set
+			{
+				if ((this._EncodedDate != value))
+				{
+					this.OnEncodedDateChanging(value);
+					this.SendPropertyChanging();
+					this._EncodedDate = value;
+					this.SendPropertyChanged("EncodedDate");
+					this.OnEncodedDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Trend", DbType="NVarChar(50)")]
+		public string Trend
+		{
+			get
+			{
+				return this._Trend;
+			}
+			set
+			{
+				if ((this._Trend != value))
+				{
+					this.OnTrendChanging(value);
+					this.SendPropertyChanging();
+					this._Trend = value;
+					this.SendPropertyChanged("Trend");
+					this.OnTrendChanged();
 				}
 			}
 		}

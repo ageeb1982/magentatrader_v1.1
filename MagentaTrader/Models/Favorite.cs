@@ -15,5 +15,8 @@ namespace MagentaTrader.Models
         public int UserId { get; set; }
         public string User { get; set; }
         public string Remarks { get; set; }
+        public bool IsShared { get; set; }
+        public string EncodedDate { get; set; }
+        public string Trend { get; set; }
     }
 }

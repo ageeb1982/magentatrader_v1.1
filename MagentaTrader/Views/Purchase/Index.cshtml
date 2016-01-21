@@ -148,6 +148,12 @@
         });
 
         purchases.push({
+            Product: "Annual Web99",
+            Price: "US$ 995",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='42987815-3718-4461-bfcb-cb700e66d49d' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        });
+
+        purchases.push({
             Product: "<font color='#CC009C'>One-time Purchases</font>",
             Purchase: ""
         });
@@ -318,7 +324,7 @@
         } else if (CouponCode == "2015") {
             $("#CouponLink").empty();
             $("#CouponLink1").empty();
-            $("#CouponLink").append("Web99 Coupon - $85/Month <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='4a8411f8-4996-45cf-8b45-caabbc05f499' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
+            //$("#CouponLink").append("Web99 Coupon - $85/Month <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='4a8411f8-4996-45cf-8b45-caabbc05f499' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
             $("#CouponLink1").append("Annual Web99 Coupon - $849/Year <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='499a6e23-4e05-4ed8-8a67-109b9f0da08a' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
         } else {
             $("#CouponLink").empty();
