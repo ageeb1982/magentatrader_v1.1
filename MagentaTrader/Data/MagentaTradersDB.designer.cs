@@ -81,6 +81,12 @@ namespace MagentaTrader.Data
     partial void InsertTrnFavorite(TrnFavorite instance);
     partial void UpdateTrnFavorite(TrnFavorite instance);
     partial void DeleteTrnFavorite(TrnFavorite instance);
+    partial void InsertTrnSector(TrnSector instance);
+    partial void UpdateTrnSector(TrnSector instance);
+    partial void DeleteTrnSector(TrnSector instance);
+    partial void InsertTrnSectorSymbol(TrnSectorSymbol instance);
+    partial void UpdateTrnSectorSymbol(TrnSectorSymbol instance);
+    partial void DeleteTrnSectorSymbol(TrnSectorSymbol instance);
     #endregion
 		
 		public MagentaTradersDBDataContext() : 
@@ -246,6 +252,22 @@ namespace MagentaTrader.Data
 			get
 			{
 				return this.GetTable<TrnFavorite>();
+			}
+		}
+		
+		public System.Data.Linq.Table<TrnSector> TrnSectors
+		{
+			get
+			{
+				return this.GetTable<TrnSector>();
+			}
+		}
+		
+		public System.Data.Linq.Table<TrnSectorSymbol> TrnSectorSymbols
+		{
+			get
+			{
+				return this.GetTable<TrnSectorSymbol>();
 			}
 		}
 	}
@@ -3694,6 +3716,8 @@ namespace MagentaTrader.Data
 		
 		private EntitySet<TrnFavorite> _TrnFavorites;
 		
+		private EntitySet<TrnSectorSymbol> _TrnSectorSymbols;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -3785,6 +3809,7 @@ namespace MagentaTrader.Data
 			this._TrnStockPrices = new EntitySet<TrnStockPrice>(new Action<TrnStockPrice>(this.attach_TrnStockPrices), new Action<TrnStockPrice>(this.detach_TrnStockPrices));
 			this._TrnStockEarnings = new EntitySet<TrnStockEarning>(new Action<TrnStockEarning>(this.attach_TrnStockEarnings), new Action<TrnStockEarning>(this.detach_TrnStockEarnings));
 			this._TrnFavorites = new EntitySet<TrnFavorite>(new Action<TrnFavorite>(this.attach_TrnFavorites), new Action<TrnFavorite>(this.detach_TrnFavorites));
+			this._TrnSectorSymbols = new EntitySet<TrnSectorSymbol>(new Action<TrnSectorSymbol>(this.attach_TrnSectorSymbols), new Action<TrnSectorSymbol>(this.detach_TrnSectorSymbols));
 			OnCreated();
 		}
 		
@@ -4627,6 +4652,19 @@ namespace MagentaTrader.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnSectorSymbol", Storage="_TrnSectorSymbols", ThisKey="Id", OtherKey="SymbolId")]
+		public EntitySet<TrnSectorSymbol> TrnSectorSymbols
+		{
+			get
+			{
+				return this._TrnSectorSymbols;
+			}
+			set
+			{
+				this._TrnSectorSymbols.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -4678,6 +4716,18 @@ namespace MagentaTrader.Data
 		}
 		
 		private void detach_TrnFavorites(TrnFavorite entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = null;
+		}
+		
+		private void attach_TrnSectorSymbols(TrnSectorSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = this;
+		}
+		
+		private void detach_TrnSectorSymbols(TrnSectorSymbol entity)
 		{
 			this.SendPropertyChanging();
 			entity.MstSymbol = null;
@@ -5146,6 +5196,360 @@ namespace MagentaTrader.Data
 						this._UserId = default(int);
 					}
 					this.SendPropertyChanged("MstUser");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.TrnSector")]
+	public partial class TrnSector : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private string _Sector;
+		
+		private string _Definition;
+		
+		private EntitySet<TrnSectorSymbol> _TrnSectorSymbols;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnSectorChanging(string value);
+    partial void OnSectorChanged();
+    partial void OnDefinitionChanging(string value);
+    partial void OnDefinitionChanged();
+    #endregion
+		
+		public TrnSector()
+		{
+			this._TrnSectorSymbols = new EntitySet<TrnSectorSymbol>(new Action<TrnSectorSymbol>(this.attach_TrnSectorSymbols), new Action<TrnSectorSymbol>(this.detach_TrnSectorSymbols));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Sector", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string Sector
+		{
+			get
+			{
+				return this._Sector;
+			}
+			set
+			{
+				if ((this._Sector != value))
+				{
+					this.OnSectorChanging(value);
+					this.SendPropertyChanging();
+					this._Sector = value;
+					this.SendPropertyChanged("Sector");
+					this.OnSectorChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Definition", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		public string Definition
+		{
+			get
+			{
+				return this._Definition;
+			}
+			set
+			{
+				if ((this._Definition != value))
+				{
+					this.OnDefinitionChanging(value);
+					this.SendPropertyChanging();
+					this._Definition = value;
+					this.SendPropertyChanged("Definition");
+					this.OnDefinitionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnSector_TrnSectorSymbol", Storage="_TrnSectorSymbols", ThisKey="Id", OtherKey="SectorId")]
+		public EntitySet<TrnSectorSymbol> TrnSectorSymbols
+		{
+			get
+			{
+				return this._TrnSectorSymbols;
+			}
+			set
+			{
+				this._TrnSectorSymbols.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_TrnSectorSymbols(TrnSectorSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.TrnSector = this;
+		}
+		
+		private void detach_TrnSectorSymbols(TrnSectorSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.TrnSector = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.TrnSectorSymbol")]
+	public partial class TrnSectorSymbol : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private int _SectorId;
+		
+		private int _SymbolId;
+		
+		private string _Symbol;
+		
+		private EntityRef<MstSymbol> _MstSymbol;
+		
+		private EntityRef<TrnSector> _TrnSector;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnSectorIdChanging(int value);
+    partial void OnSectorIdChanged();
+    partial void OnSymbolIdChanging(int value);
+    partial void OnSymbolIdChanged();
+    partial void OnSymbolChanging(string value);
+    partial void OnSymbolChanged();
+    #endregion
+		
+		public TrnSectorSymbol()
+		{
+			this._MstSymbol = default(EntityRef<MstSymbol>);
+			this._TrnSector = default(EntityRef<TrnSector>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SectorId", DbType="Int NOT NULL")]
+		public int SectorId
+		{
+			get
+			{
+				return this._SectorId;
+			}
+			set
+			{
+				if ((this._SectorId != value))
+				{
+					if (this._TrnSector.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnSectorIdChanging(value);
+					this.SendPropertyChanging();
+					this._SectorId = value;
+					this.SendPropertyChanged("SectorId");
+					this.OnSectorIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SymbolId", DbType="Int NOT NULL")]
+		public int SymbolId
+		{
+			get
+			{
+				return this._SymbolId;
+			}
+			set
+			{
+				if ((this._SymbolId != value))
+				{
+					if (this._MstSymbol.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnSymbolIdChanging(value);
+					this.SendPropertyChanging();
+					this._SymbolId = value;
+					this.SendPropertyChanged("SymbolId");
+					this.OnSymbolIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Symbol", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string Symbol
+		{
+			get
+			{
+				return this._Symbol;
+			}
+			set
+			{
+				if ((this._Symbol != value))
+				{
+					this.OnSymbolChanging(value);
+					this.SendPropertyChanging();
+					this._Symbol = value;
+					this.SendPropertyChanged("Symbol");
+					this.OnSymbolChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnSectorSymbol", Storage="_MstSymbol", ThisKey="SymbolId", OtherKey="Id", IsForeignKey=true)]
+		public MstSymbol MstSymbol
+		{
+			get
+			{
+				return this._MstSymbol.Entity;
+			}
+			set
+			{
+				MstSymbol previousValue = this._MstSymbol.Entity;
+				if (((previousValue != value) 
+							|| (this._MstSymbol.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._MstSymbol.Entity = null;
+						previousValue.TrnSectorSymbols.Remove(this);
+					}
+					this._MstSymbol.Entity = value;
+					if ((value != null))
+					{
+						value.TrnSectorSymbols.Add(this);
+						this._SymbolId = value.Id;
+					}
+					else
+					{
+						this._SymbolId = default(int);
+					}
+					this.SendPropertyChanged("MstSymbol");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnSector_TrnSectorSymbol", Storage="_TrnSector", ThisKey="SectorId", OtherKey="Id", IsForeignKey=true)]
+		public TrnSector TrnSector
+		{
+			get
+			{
+				return this._TrnSector.Entity;
+			}
+			set
+			{
+				TrnSector previousValue = this._TrnSector.Entity;
+				if (((previousValue != value) 
+							|| (this._TrnSector.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._TrnSector.Entity = null;
+						previousValue.TrnSectorSymbols.Remove(this);
+					}
+					this._TrnSector.Entity = value;
+					if ((value != null))
+					{
+						value.TrnSectorSymbols.Add(this);
+						this._SectorId = value.Id;
+					}
+					else
+					{
+						this._SectorId = default(int);
+					}
+					this.SendPropertyChanged("TrnSector");
 				}
 			}
 		}

@@ -184,6 +184,7 @@
     <Compile Include="Controllers\FreeWebinarsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NewsController.cs" />
+    <Compile Include="Controllers\PremiumWebinarsController.cs" />
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Controllers\ProductPackageController.cs" />
     <Compile Include="Controllers\PurchaseController.cs" />
@@ -226,6 +227,7 @@
     <Compile Include="Models\QuestradeOption.cs" />
     <Compile Include="Models\QuestradeOptionChainPerRoot.cs" />
     <Compile Include="Models\QuestradeOptionChainPerStrikePrice.cs" />
+    <Compile Include="Models\QuestradeOptionFilter.cs" />
     <Compile Include="Models\QuestradeOptionList.cs" />
     <Compile Include="Models\QuestradeOptionQuote.cs" />
     <Compile Include="Models\QuestradeOptionQuoteList.cs" />
@@ -233,6 +235,8 @@
     <Compile Include="Models\QuestradeSymbolList.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\Sales.cs" />
+    <Compile Include="Models\Sector.cs" />
+    <Compile Include="Models\SectorSymbol.cs" />
     <Compile Include="Models\StockEarning.cs" />
     <Compile Include="Models\StockPrice.cs" />
     <Compile Include="Models\StockPriceWrapper.cs" />
@@ -1501,6 +1505,7 @@
     <Content Include="Views\Campaign\Tradier.cshtml" />
     <Content Include="Views\Favorites\Index.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
+    <Content Include="Views\PremiumWebinars\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

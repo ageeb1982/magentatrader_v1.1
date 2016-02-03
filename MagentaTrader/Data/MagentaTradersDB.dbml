@@ -208,6 +208,7 @@
       <Association Name="MstSymbol_TrnStockPrice" Member="TrnStockPrices" ThisKey="Id" OtherKey="SymbolId" Type="TrnStockPrice" />
       <Association Name="MstSymbol_TrnStockEarning" Member="TrnStockEarnings" ThisKey="Id" OtherKey="SymbolId" Type="TrnStockEarning" />
       <Association Name="MstSymbol_TrnFavorite" Member="TrnFavorites" ThisKey="Id" OtherKey="SymbolId" Type="TrnFavorite" />
+      <Association Name="MstSymbol_TrnSectorSymbol" Member="TrnSectorSymbols" ThisKey="Id" OtherKey="SymbolId" Type="TrnSectorSymbol" />
     </Type>
   </Table>
   <Table Name="dbo.SysAcessLog" Member="SysAcessLogs">
@@ -231,6 +232,24 @@
       <Column Name="Trend" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Association Name="MstSymbol_TrnFavorite" Member="MstSymbol" ThisKey="SymbolId" OtherKey="Id" Type="MstSymbol" IsForeignKey="true" />
       <Association Name="MstUser_TrnFavorite" Member="MstUser" ThisKey="UserId" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TrnSector" Member="TrnSectors">
+    <Type Name="TrnSector">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Sector" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Definition" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Association Name="TrnSector_TrnSectorSymbol" Member="TrnSectorSymbols" ThisKey="Id" OtherKey="SectorId" Type="TrnSectorSymbol" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TrnSectorSymbol" Member="TrnSectorSymbols">
+    <Type Name="TrnSectorSymbol">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="SectorId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SymbolId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Symbol" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Association Name="MstSymbol_TrnSectorSymbol" Member="MstSymbol" ThisKey="SymbolId" OtherKey="Id" Type="MstSymbol" IsForeignKey="true" />
+      <Association Name="TrnSector_TrnSectorSymbol" Member="TrnSector" ThisKey="SectorId" OtherKey="Id" Type="TrnSector" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

@@ -870,8 +870,8 @@
     // Questrade
 
     function connectQuestrade() {
-        //location.href = "https://login.questrade.com/oauth2/authorize?client_id=-4dSSId_7SQg-AAAB0OlUIBvHBZqXQ&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade&response_type=code";
-        location.href = "https://practicelogin.questrade.com/oauth2/authorize?client_id=-4dSSId_7SQg-AAAB0OlUIBvHBZqXQ&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade&response_type=token";
+        //location.href = "https://practicelogin.questrade.com/oauth2/authorize?client_id=-4dSSId_7SQg-AAAB0OlUIBvHBZqXQ&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade&response_type=token";
+        location.href = "https://login.questrade.com/oauth2/authorize?client_id=-4dSSId_7SQg-AAAB0OlUIBvHBZqXQ&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade&response_type=token";
     }
     function openQuestradeOptionChain(symbolId) {
         $.ajax({
@@ -1523,13 +1523,18 @@
             alert("No Broker connection.");
         }
     }
+
+    // Option chain grid
+
     function createOptionChain() {
         var broker = getCookie("Broker");
         if (broker == "Questrade") {
             var expirationDate = document.getElementById("optionExpirationDates").value;
             if (QuestradeOptionChain != "") {
+
                 var dataCalls = [];
                 var dataPuts = [];
+
                 for (var i = 0; i < QuestradeOptionChain.optionChain.length; i++) {
                     if (expirationDate == QuestradeOptionChain.optionChain[i].expiryDate) {
                         if (QuestradeOptionChain.optionChain[i].chainPerRoot.length > 0) {
@@ -1550,9 +1555,28 @@
                                         open_interest: 0,
                                         strike: strikePrice.strikePrice,
                                         contract_size: 0,
-                                        expiration_date: QuestradeOptionChain.optionChain[i].expiryDate,
+                                        expiration_date: QuestradeOptionChain.optionChain[i].expiryDate.substring(0,10),
                                         expiration_type: "NA",
                                         option_type: "CALL",
+                                        root_symbol: QuestradeOptionChain.optionChain[i].chainPerRoot[0].optionRoot
+                                    });
+                                    dataPuts.push({
+                                        symbol: QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice[s].putSymbolId,
+                                        description: QuestradeOptionChain.optionChain[i].chainPerRoot[0].optionRoot + "-PUT(" + QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice[s].putSymbolId + ") @@" + strikePrice.strikePrice,
+                                        type: "OPTION",
+                                        last: 0,
+                                        change: 0,
+                                        volume: 0,
+                                        bid: 0,
+                                        bidsize: 0,
+                                        ask: 0,
+                                        asksize: 0,
+                                        open_interest: 0,
+                                        strike: strikePrice.strikePrice,
+                                        contract_size: 0,
+                                        expiration_date: QuestradeOptionChain.optionChain[i].expiryDate.substring(0, 10),
+                                        expiration_type: "NA",
+                                        option_type: "PUT",
                                         root_symbol: QuestradeOptionChain.optionChain[i].chainPerRoot[0].optionRoot
                                     });
                                 }
@@ -1568,75 +1592,220 @@
                         return 1;
                     return 0;
                 });
+                dataPuts.sort(function compare(a, b) {
+                    if (a.strike < b.strike)
+                        return -1;
+                    if (a.strike > b.strike)
+                        return 1;
+                    return 0;
+                });
 
                 sortedDataCalls = new wijmo.collections.ObservableArray();
                 sortedDataCalls = extractOptionChain(dataCalls);
+                sortedDataPuts = new wijmo.collections.ObservableArray();
+                sortedDataPuts = extractOptionChain(dataPuts);
 
-                var Calls = new wijmo.collections.CollectionView(sortedDataCalls);
+                // Plot Calls
 
-                OptionCallGrid.dispose();
-                OptionCallGrid = new wijmo.grid.FlexGrid('#OptionCallGrid');
+                var callOptionListData = [];
 
-                OptionCallGrid.initialize({
-                    columns: [
-                                {
-                                    "header": "Description",
-                                    "binding": "description",
-                                    "width": "*",
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Bid",
-                                    "binding": "bid",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Ask",
-                                    "binding": "ask",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Last",
-                                    "binding": "last",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Change",
-                                    "binding": "change",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Vol.",
-                                    "binding": "volume",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Op Int.",
-                                    "binding": "open_interest",
-                                    "width": 100,
-                                    "isContentHtml": true
-                                },
-                                {
-                                    "header": "Strike",
-                                    "binding": "strike",
-                                    "width": 100,
-                                    "isContentHtml": true
+                callOptionListData.push(QuestradeApiServer);
+                callOptionListData.push(QuestradeAccessToken);
+                for(var x = 0; x < sortedDataCalls.length; x++ ) {
+                    callOptionListData.push(sortedDataCalls[x].symbol.toString());
+                }
+
+                $.ajax({
+                    type: 'GET',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/GetQuestradeOptionQuotes',
+                    dataType: "json",
+                    data: { optionList: callOptionListData },
+                    success: function (result) {
+                        for (var i = 0; i < result.optionQuotes.length; i++) {
+                            for (var s = 0; s < sortedDataCalls.length; s++) {
+                                if (result.optionQuotes[i].symbolId == sortedDataCalls[s].symbol) {
+                                    sortedDataCalls[s].description = result.optionQuotes[i].symbol;
+                                    sortedDataCalls[s].type = "Call";
+                                    sortedDataCalls[s].last = Math.abs(result.optionQuotes[i].lastTradePrice);
+                                    sortedDataCalls[s].change = Math.abs(result.optionQuotes[i].bidPrice) - Math.abs(result.optionQuotes[i].lastTradePrice);
+                                    sortedDataCalls[s].volume = Math.abs(result.optionQuotes[i].volume);
+                                    sortedDataCalls[s].bid = Math.abs(result.optionQuotes[i].bidPrice);
+                                    sortedDataCalls[s].bidsize = Math.abs(result.optionQuotes[i].bidSize);
+                                    sortedDataCalls[s].ask = Math.abs(result.optionQuotes[i].askPrice);
+                                    sortedDataCalls[s].asksize = Math.abs(result.optionQuotes[i].askSize);
+                                    sortedDataCalls[s].open_interest = Math.abs(result.optionQuotes[i].openInterest);
+                                    sortedDataCalls[s].contract_size = Math.abs(result.optionQuotes[i].bidSize) + Math.abs(result.optionQuotes[i].askSize);
                                 }
-                    ],
-                    autoGenerateColumns: false,
-                    itemsSource: Calls,
-                    isReadOnly: true,
-                    selectionMode: wijmo.grid.SelectionMode.Row
+                            }
+                        }
+                        var Calls = new wijmo.collections.CollectionView(sortedDataCalls);
+
+                        OptionCallGrid.dispose();
+                        OptionCallGrid = new wijmo.grid.FlexGrid('#OptionCallGrid');
+
+                        OptionCallGrid.initialize({
+                            columns: [
+                                        {
+                                            "header": "Description",
+                                            "binding": "description",
+                                            "width": "*",
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Bid",
+                                            "binding": "bid",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Ask",
+                                            "binding": "ask",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Last",
+                                            "binding": "last",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Change",
+                                            "binding": "change",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Vol.",
+                                            "binding": "volume",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Op Int.",
+                                            "binding": "open_interest",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Strike",
+                                            "binding": "strike",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        }
+                            ],
+                            autoGenerateColumns: false,
+                            itemsSource: Calls,
+                            isReadOnly: true,
+                            selectionMode: wijmo.grid.SelectionMode.Row
+                        });
+
+                        OptionCallGrid.trackChanges = true;
+                        Calls.pageSize = 10;
+                    }
                 });
 
-                OptionCallGrid.trackChanges = true;
+                // Plot Puts
 
-                Calls.pageSize = 10;
+                var putOptionListData = [];
+
+                putOptionListData.push(QuestradeApiServer);
+                putOptionListData.push(QuestradeAccessToken);
+                for (var x = 0; x < sortedDataPuts.length; x++) {
+                    putOptionListData.push(sortedDataPuts[x].symbol.toString());
+                }
+
+                $.ajax({
+                    type: 'GET',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/GetQuestradeOptionQuotes',
+                    dataType: "json",
+                    data: { optionList: putOptionListData },
+                    success: function (result) {
+                        for (var i = 0; i < result.optionQuotes.length; i++) {
+                            for (var s = 0; s < sortedDataPuts.length; s++) {
+                                if (result.optionQuotes[i].symbolId == sortedDataPuts[s].symbol) {
+                                    sortedDataPuts[s].description = result.optionQuotes[i].symbol;
+                                    sortedDataPuts[s].type = "Put";
+                                    sortedDataPuts[s].last = Math.abs(result.optionQuotes[i].lastTradePrice);
+                                    sortedDataPuts[s].change = Math.abs(result.optionQuotes[i].bidPrice) - Math.abs(result.optionQuotes[i].lastTradePrice);
+                                    sortedDataPuts[s].volume = Math.abs(result.optionQuotes[i].volume);
+                                    sortedDataPuts[s].bid = Math.abs(result.optionQuotes[i].bidPrice);
+                                    sortedDataPuts[s].bidsize = Math.abs(result.optionQuotes[i].bidSize);
+                                    sortedDataPuts[s].ask = Math.abs(result.optionQuotes[i].askPrice);
+                                    sortedDataPuts[s].asksize = Math.abs(result.optionQuotes[i].askSize);
+                                    sortedDataPuts[s].open_interest = Math.abs(result.optionQuotes[i].openInterest);
+                                    sortedDataPuts[s].contract_size = Math.abs(result.optionQuotes[i].bidSize) + Math.abs(result.optionQuotes[i].askSize);
+                                }
+                            }
+                        }
+                        var Puts = new wijmo.collections.CollectionView(sortedDataPuts);
+
+                        OptionPutGrid.dispose();
+                        OptionPutGrid = new wijmo.grid.FlexGrid('#OptionPutGrid');
+
+                        OptionPutGrid.initialize({
+                            columns: [
+                                        {
+                                            "header": "Description",
+                                            "binding": "description",
+                                            "width": "*",
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Bid",
+                                            "binding": "bid",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Ask",
+                                            "binding": "ask",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Last",
+                                            "binding": "last",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Change",
+                                            "binding": "change",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Vol.",
+                                            "binding": "volume",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Op Int.",
+                                            "binding": "open_interest",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        },
+                                        {
+                                            "header": "Strike",
+                                            "binding": "strike",
+                                            "width": 100,
+                                            "isContentHtml": true
+                                        }
+                            ],
+                            autoGenerateColumns: false,
+                            itemsSource: Puts,
+                            isReadOnly: true,
+                            selectionMode: wijmo.grid.SelectionMode.Row
+                        });
+
+                        OptionPutGrid.trackChanges = true;
+                        Puts.pageSize = 10;
+                    }
+                });
             }
         } else {
             var expirationDate = document.getElementById("optionExpirationDates").value;

@@ -11,28 +11,28 @@ namespace MagentaTrader.Models
         public long underlyingId { get; set; }
         public string symbol { get; set; }
         public long symbolId { get; set; }
-        public decimal bidPrice { get; set; }
-        public decimal bidSize { get; set; }
-        public decimal askPrice { get; set; }
-        public decimal askSize { get; set; }
-        public decimal lastTradePriceTrHrs { get; set; }
-        public decimal lastTradePrice { get; set; }
-        public decimal lastTradeSize { get; set; }
+        public double? bidPrice { get; set; }
+        public long? bidSize { get; set; }
+        public double? askPrice { get; set; }
+        public long? askSize { get; set; }
+        public double? lastTradePriceTrHrs { get; set; }
+        public double? lastTradePrice { get; set; }
+        public long? lastTradeSize { get; set; }
         public string lastTradeTick { get; set; }
         public string lastTradeTime { get; set; }
-        public long volume { get; set; }
-        public decimal openPrice { get; set; }
-        public decimal highPrice { get; set; }
-        public decimal lowPrice { get; set; }
-        public decimal volatility { get; set; }
-        public decimal delta { get; set; }
-        public decimal gamma { get; set; }
-        public decimal theta { get; set; }
-        public decimal vega { get; set; }
-        public decimal rho { get; set; }
-        public long openInterest { get; set; }
-        public long delay { get; set; }
-        public bool isHalted { get; set; }
-        public long VWAP { get; set; }
+        public long? volume { get; set; }
+        public double? openPrice { get; set; }
+        public double? highPrice { get; set; }
+        public double? lowPrice { get; set; }
+        public double? volatility { get; set; }
+        public long? delta { get; set; }
+        public long? gamma { get; set; }
+        public long? theta { get; set; }
+        public long? vega { get; set; }
+        public long? rho { get; set; }
+        public long? openInterest { get; set; }
+        public long? delay { get; set; }
+        public bool? isHalted { get; set; }
+        public double? VWAP { get; set; }
     }
 }
