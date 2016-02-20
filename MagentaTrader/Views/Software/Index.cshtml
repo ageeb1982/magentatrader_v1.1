@@ -92,6 +92,13 @@
                             <div>Create your favorite symbol list</div>
                         </a>
                     </li>
+                    <li>
+                        <hr style="margin: 10px 0 10px 0;" />
+                        <a href="/Sector">
+                            <div><strong>Sector</strong></div>
+                            <div>Graph sector and associated symbol</div>
+                        </a>
+                    </li>
                 </ul>
                 <!-- /.dropdown-messages -->
             </li>
@@ -870,8 +877,8 @@
     // Questrade
 
     function connectQuestrade() {
-        //location.href = "https://practicelogin.questrade.com/oauth2/authorize?client_id=-4dSSId_7SQg-AAAB0OlUIBvHBZqXQ&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade&response_type=token";
-        location.href = "https://login.questrade.com/oauth2/authorize?client_id=-4dSSId_7SQg-AAAB0OlUIBvHBZqXQ&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade&response_type=token";
+        location.href = "https://practicelogin.questrade.com/oauth2/authorize?client_id=-4dSSId_7SQg-AAAB0OlUIBvHBZqXQ&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade&response_type=token";
+        //location.href = "https://login.questrade.com/oauth2/authorize?client_id=-4dSSId_7SQg-AAAB0OlUIBvHBZqXQ&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade&response_type=token";
     }
     function openQuestradeOptionChain(symbolId) {
         $.ajax({

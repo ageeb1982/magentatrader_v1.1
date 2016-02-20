@@ -11,5 +11,6 @@ namespace MagentaTrader.Models
         public int SectorId { get; set; }
         public int SymbolId { get; set; }
         public string Symbol { get; set; }
+        public string Description { get; set; }
     }
 }

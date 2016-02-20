@@ -193,6 +193,8 @@
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\SalesController.cs" />
     <Compile Include="Controllers\ScreenerController.cs" />
+    <Compile Include="Controllers\SectorAPIController.cs" />
+    <Compile Include="Controllers\SectorController.cs" />
     <Compile Include="Controllers\SoftwareController.cs" />
     <Compile Include="Controllers\StockEarningController.cs" />
     <Compile Include="Controllers\StockPriceController.cs" />
@@ -238,7 +240,9 @@
     <Compile Include="Models\Sector.cs" />
     <Compile Include="Models\SectorSymbol.cs" />
     <Compile Include="Models\StockEarning.cs" />
+    <Compile Include="Models\SectorPrice.cs" />
     <Compile Include="Models\StockPrice.cs" />
+    <Compile Include="Models\SectorPriceWrapper.cs" />
     <Compile Include="Models\StockPriceWrapper.cs" />
     <Compile Include="Models\Symbol.cs" />
     <Compile Include="Models\QuestradeAccessToken.cs" />
@@ -1506,6 +1510,7 @@
     <Content Include="Views\Favorites\Index.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
     <Content Include="Views\PremiumWebinars\Index.cshtml" />
+    <Content Include="Views\Sector\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

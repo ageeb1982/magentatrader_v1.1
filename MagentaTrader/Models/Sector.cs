@@ -8,7 +8,7 @@ namespace MagentaTrader.Models
     public class Sector
     {
         public int Id { get; set; }
-        public string Sector { get; set; }
-        public string Definition { get; set; }
+        public string SectorCode { get; set; }
+        public string SectorDefinition { get; set; }
     }
 }

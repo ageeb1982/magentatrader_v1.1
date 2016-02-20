@@ -250,13 +250,13 @@
             <div class="clearfix"></div>
             <h2 class="section-heading">News</h2>
             <p class="lead">
-                Nov. 5, 2015:
+                February 15, 2016:
                 <ul class="list-group">
                     @*<li class="list-group-item">Magenta Trader.com | 5/4/2015-5/10/2015 | <a href="https://www2.tuscanylasvegas.com/smsworld/wc.dll?smsWorld~Availbox~&wsi=port">1387I1 - Tuscany Suites & Casino Group Code</a></li>*@
                     <li class="list-group-item"><a href="https://brokerage.tradier.com/platforms/magenta-trader">Tradier Brokerage Integration</a></li>
-                    <li class="list-group-item">Chart to include 5 years of data</li>
-                    <li class="list-group-item">Magenta Las Vegas Workshop Nov 11-13 2015 Coupon Code: 1387I1</li>
-                    <li class="list-group-item">Magenta Las Vegas Workshop Nov 11-13 2015 (Wed-Fri): Wed-Thu (6AM-2PM), Fri (6AM-1PM)</li>
+                    <li class="list-group-item">Introducing our new Web99 Coach: <a href="http://finance.yahoo.com/news/olopade-similar-patterns-between-2008-181655521.html">Wally olopade</a></li>
+                    <li class="list-group-item">Magenta Duet Workshop Bradenton (April 23 - 24, 2016 Sat and Sun) Speakers: Derek Pilger, Wally Olopade, and Ron Apelle</li>
+                    <li class="list-group-item">Magenta Duet Workshop Orange County (April 30 - May 1, 2016 Sat and Sun 9-5) Speakers: Derek Pilger, Sue McClarin and Darsak Jeya</li>
                 </ul>
             </p>
         </div>
@@ -519,6 +519,7 @@
                 <dl class="dl-horizontal">
                     <dt>User Name</dt>
                     <dd>
+                        <input class="form-control" id="UserEdit_EventType" type="hidden" />
                         <input class="form-control" id="UserEdit_Id" type="hidden" />
                         <input class="form-control" id="UserEdit_UserName" type="text" readonly />
                     </dd>
@@ -803,7 +804,7 @@
         window.location.href = "https://attendee.gotowebinar.com/register/4720442380575466753";
     }
 
-    function userEdit(username) {
+    function userEdit(username, eventType) {
         $('#loading').modal({
             show: true,
             backdrop: false
@@ -824,6 +825,7 @@
                 });
 
                 if (Results.length > 0) {
+                    document.getElementById('UserEdit_EventType').value = eventType;
                     document.getElementById('UserEdit_Id').value = Results[0].Id !== null && typeof (Results[0].Id) != 'undefined' ? wijmo.Globalize.format(Results[0].Id) : '';
                     document.getElementById('UserEdit_UserName').value = Results[0].UserName ? Results[0].UserName : '';
                     document.getElementById('UserEdit_FirstName').value = Results[0].FirstName ? Results[0].FirstName : '';
@@ -843,6 +845,8 @@
         if (confirm("Save Information?") == true) {
             var User = new Object();
 
+            var eventType = document.getElementById('UserEdit_EventType').value;
+
             User.Id = document.getElementById('UserEdit_Id').value;
             User.UserName = document.getElementById('UserEdit_UserName').value;
             User.FirstName = document.getElementById('UserEdit_FirstName').value;
@@ -861,9 +865,18 @@
                 statusCode: {
                     200: function () {
                         var username = '@User.Identity.Name';
+
                         $('#UserEdit').modal('hide');
-                        userCheck(username,"WEB99");
-                        window.location.href = WebinarURL;
+
+                        if (eventType = "WORKSHOP") {
+                            userRoles(username, "Workshop");
+                        } else if (eventType = "WEB99") {
+                            userRoles(username, "Web99");
+                        } else if (eventType = "WEBINAR") {
+                            userRoles(username, "Chart");
+                        } else {
+                            window.location.href = WebinarURL;
+                        }
                     },
                     404: function () {
                         alert("Not found");
@@ -893,10 +906,12 @@
                         Results[0].EmailAddress == "NA" || Results[0].EmailAddress == "" ||
                         Results[0].PhoneNumber == "NA" || Results[0].PhoneNumber == "") {
                         alert("To remove this prompt, you must fill in all user information.");
-                        userEdit(username);
+                        userEdit(username, eventType);
                     } else {
                         if (eventType = "WORKSHOP") {
                             userRoles(username, "Workshop");
+                        } else if (eventType = "WEB99") {
+                            userRoles(username, "Web99");
                         } else if (eventType = "WEBINAR") {
                             userRoles(username, "Chart");
                         } else {

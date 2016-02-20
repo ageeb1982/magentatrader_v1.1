@@ -1,0 +1,1397 @@
+﻿
+@{
+    ViewBag.Title = "Sector";
+
+    var Version = "v.Beta.1.20160206";
+}
+
+<link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+<link href="/dist/css/sb-admin-2.css" rel="stylesheet">
+<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link href="/css/styles.css" rel="stylesheet" />
+<link href="/css/bootstrap-toggle.min.css" rel="stylesheet">
+<link href="~/css/toastr.css" rel="stylesheet" />
+
+<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/bower_components/metisMenu/dist/metisMenu.min.js"></script>
+<script src="/bower_components/raphael/raphael-min.js"></script>
+<script src="/js/toastr.js"></script>
+
+<script src="/dist/js/sb-admin-2.js"></script>
+<script src="/js/jquery.slimscroll.min.js"></script>
+<script src="/js/bootstrap-toggle.min.js"></script>
+
+<div id="wrapper">
+    <nav id="menu-wrapper" class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/Home" style="font-size:smaller"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs">Sector - @Version</span></a>
+        </div>
+
+        <ul class="nav navbar-top-links navbar-right">
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-globe fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-messages">
+                    <li>                        
+                        <a href="#" onclick="openSectorModal()">
+                            <div><strong>Sector Symbol</strong></div>
+                            <div>Adding, Editing and Updating Sector Symbols</div>
+                        </a>
+                    </li>
+                    <li>
+                        <hr style="margin: 10px 0 10px 0;" />
+                        <a href="/Software">
+                            <div><strong>Seasonality Chart</strong></div>
+                            <div>30-Day Seasonal Scanner Chart</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <div id="sidebar-wrapper" class="navbar-default sidebar" role="navigation">
+            <div class="sidebar-nav navbar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li class="sidebar-search">
+                        <div class="input-group custom-search-form">
+                            <input id="Sector" type="text" class="form-control" style="padding-right:2px" placeholder="Sector...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" id="plotSectorChart" onclick="plotSectorChart()">
+                                    <i class="fa fa-refresh"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div id="page-wrapper">
+        <div id="SectorChart" style="width: 100%; height: 93vh; padding: 20px 10px 10px 10px;"></div>
+    </div>
+</div>
+
+<div class="modal" id="SectorModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" style="width: 1100px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 id="SectorModalTitle" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="SectorGrid" class="grid"></div>
+                <br />
+                <div class="btn-group pull-left" id="navSector">
+                    <button type="button" class="btn btn-default" id="navSectorFirst">
+                        <span class="glyphicon glyphicon-fast-backward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" id="navSectorPrevious">
+                        <span class="glyphicon glyphicon-step-backward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" disabled style="width:100px" id="navSectorCurrent"></button>
+                    <button type="button" class="btn btn-default" id="navSectorNext">
+                        <span class="glyphicon glyphicon-step-forward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" id="navSectorLast">
+                        <span class="glyphicon glyphicon-fast-forward"></span>
+                    </button>
+                </div>
+                <br />
+                <br />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnOpenSectorEdit" onclick="btnOpenSectorEdit_OnClick()">
+                    Add
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="SectorEdit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title">Edit Sector</h4>
+            </div>
+            <div class="modal-body">
+                <dl class="dl-horizontal">
+                    <dt>Sector</dt>
+                    <dd>
+                        <input class="form-control" id="SectorEdit_Id" type="hidden" />
+                        <input class="form-control" id="SectorEdit_Sector" type="text" />
+                    </dd>
+                    <dt>Definition</dt>
+                    <dd>
+                        <input class="form-control" id="SectorEdit_Definition" type="text" />
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btnUpdateSector" onclick="btnUpdateSector_OnClick()">
+                    Ok
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="SectorSymbolModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" style="width: 1100px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 id="SectorSymbolTitle" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <dl class="dl-horizontal">
+                    <dt>Sector</dt>
+                    <dd>
+                        <input class="form-control" id="SectorSymbol_Id" type="hidden" />
+                        <input class="form-control" id="SectorSymbol_Sector" type="text" readonly />
+                    </dd>
+                    <dt>Definition</dt>
+                    <dd>
+                        <input class="form-control" id="SectorSymbol_Definition" type="text" readonly />
+                    </dd>
+                </dl>           
+                <div id="SectorSymbolGrid" class="grid"></div>
+                <br />
+                <div class="btn-group pull-left" id="navSectorSymbol">
+                    <button type="button" class="btn btn-default" id="navSectorSymbolFirst">
+                        <span class="glyphicon glyphicon-fast-backward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" id="navSectorSymbolPrevious">
+                        <span class="glyphicon glyphicon-step-backward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" disabled style="width:100px" id="navSectorSymbolCurrent"></button>
+                    <button type="button" class="btn btn-default" id="navSectorSymbolNext">
+                        <span class="glyphicon glyphicon-step-forward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" id="navSectorSymbolLast">
+                        <span class="glyphicon glyphicon-fast-forward"></span>
+                    </button>
+                </div>
+                <br />
+                <br />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnAddSectorSymbol" onclick="btnAddSectorSymbol_OnClick()">
+                    Add
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="SectorSymbolEdit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title">Edit Sector Symbol</h4>
+            </div>
+            <div class="modal-body">
+                <dl class="dl-horizontal">
+                    <dt>Symbol</dt>
+                    <dd>
+                        <input class="form-control" id="SectorSymbolEdit_Id" type="hidden" />
+                        <input class="form-control" id="SectorSymbolEdit_SectorId" type="hidden" />
+                        <input class="form-control" id="SectorSymbolEdit_SymbolId" type="hidden" />
+                        <input class="form-control" id="SectorSymbolEdit_Symbol" type="text" />
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btnUpdateSectorSymbol" onclick="btnUpdateSectorSymbol_OnClick()">
+                    Ok
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="loading" tabindex="-1" role="dialog" aria-labelledby="Loading..." aria-hidden="true">
+    <div class="modal-dialog" style="width: 220px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Loading...</h4>
+            </div>
+            <div class="modal-body">
+                <img src="/img/progress_bar.gif" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/date.js"></script>
+
+<link rel="stylesheet" href="/amcharts/amcharts/style.css" type="text/css">
+<script src="/amcharts/amcharts/amcharts.js" type="text/javascript"></script>
+<script src="/amcharts/amcharts/serial.js" type="text/javascript"></script>
+<script src="/amcharts/amcharts/amstock.js" type="text/javascript"></script>
+
+<link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
+<script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.input.min.js"></script>
+
+<script type="text/javascript">
+    var SectorData;
+    var SectorCollection;
+    var SectorGrid;
+    var SectorSymbolData;
+    var SectorSymbolCollection;
+    var SectorSymbolGrid;
+
+    var SectorChartData = [];
+    var SectorClosingPriceDivisor = [];
+    var SectorChartPlotData = [];
+    var SectorSeasonYearData = [];
+    var SectorSeasonTenYearData = [];
+    var SectorSeasonFiveYearData = [];
+    var SectorNoOfYears = 12;
+    var SectorNoOfDaysInYear = 252;
+
+    var SectorChart;
+    var SectorChartStockPanel1;
+    var SectorChartStockPanel2;
+
+    var GoldColor = "#FFA200";
+    var GrayColor = "#858583";
+    var YellowColor = "#FFFF00";
+    var GreenColor = "#00FF00";
+    var BlueColor = "#0000FF";
+    var RedColor = "#FF0000";
+    var DarkGreenColor = "#65BF04";
+    var MagentaColor = "#9C0063";
+
+    function parseDate(input) {
+        var parts = input.split('-');
+        return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+
+    function openSectorModal() {
+        $("#SectorModalTitle").text("Sector");
+        $('#SectorModal').modal({
+            show: true,
+            backdrop: false
+        });
+        createSectorGrid();
+    }
+    function getSectorData() {
+        var data = new wijmo.collections.ObservableArray();
+        $.ajax({
+            url: '/api/Sector',
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            data: {},
+            success: function (results) {
+                if (results.length > 0) {
+                    for (i = 0; i < results.length; i++) {
+                        data.push({
+                            EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='btnEditSector' onclick='btnEditSector_OnClick()'>Edit</button>",
+                            SymbolId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='btnSymbolSector' onclick='btnSymbolSector_OnClick()'>Symbol</button>",
+                            DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='btnDeleteSector' onclick='btnDeleteSector_OnClick()'>Delete</button>",
+                            Id: results[i]["Id"],
+                            Sector: results[i]["SectorCode"],
+                            Definition: results[i]["SectorDefinition"]
+                        });
+                    }
+                }
+            }
+        });
+        return data;
+    }
+    function updateNavSector() {
+        document.getElementById('navSector').style.display = 'block';
+        if (SectorCollection.pageIndex === 0) {
+            navSectorFirst.setAttribute('disabled', 'disabled');
+            navSectorPrevious.setAttribute('disabled', 'disabled');
+            navSectorNext.removeAttribute('disabled');
+            navSectorLast.removeAttribute('disabled');
+        } else if (SectorCollection.pageIndex === (SectorCollection.pageCount - 1)) {
+            navSectorFirst.removeAttribute('disabled');
+            navSectorPrevious.removeAttribute('disabled');
+            navSectorNext.setAttribute('disabled', 'disabled');
+            navSectorLast.setAttribute('disabled', 'disabled');
+        } else {
+            navSectorFirst.removeAttribute('disabled');
+            navSectorPrevious.removeAttribute('disabled');
+            navSectorNext.removeAttribute('disabled');
+            navSectorLast.removeAttribute('disabled');
+        }
+        navSectorCurrent.innerHTML = (SectorCollection.pageIndex + 1) + ' / ' + SectorCollection.pageCount;
+    }
+    function eventNavSector() {
+        navSectorFirst.addEventListener('click', function () {
+            SectorCollection.moveToFirstPage();
+            updateNavSector();
+        });
+        navSectorPrevious.addEventListener('click', function () {
+            SectorCollection.moveToPreviousPage();
+            updateNavSector();
+        });
+        navSectorNext.addEventListener('click', function () {
+            SectorCollection.moveToNextPage();
+            updateNavSector();
+        });
+        navSectorLast.addEventListener('click', function () {
+            SectorCollection.moveToLastPage();
+            updateNavSector();
+        });
+    }
+    function createSectorGrid() {
+        SectorCollection = new wijmo.collections.CollectionView(getSectorData());
+        SectorCollection.pageSize = 15;
+        SectorCollection.collectionChanged.addHandler(function (sender, args) {
+            updateNavSector();
+        });
+
+        SectorGrid.dispose();
+        SectorGrid = new wijmo.grid.FlexGrid('#SectorGrid');
+        SectorGrid.initialize({
+            columns: [
+                        {
+                            "header": "Edit",
+                            "binding": "EditId",
+                            "width": 60,
+                            "allowSorting": false,
+                            "isContentHtml": true
+                        },
+                        {
+                            "header": "Symbol",
+                            "binding": "SymbolId",
+                            "width": 60,
+                            "allowSorting": false,
+                            "isContentHtml": true
+                        },
+                        {
+                            "header": "Delete",
+                            "binding": "DeleteId",
+                            "width": 60,
+                            "allowSorting": false,
+                            "isContentHtml": true
+                        },
+                        {
+                            "header": "Sector",
+                            "binding": "Sector",
+                            "allowSorting": true,
+                            "width": 100
+                        },
+                        {
+                            "header": "Definition",
+                            "binding": "Definition",
+                            "allowSorting": true,
+                            "width": "*"
+                        }
+            ],
+            autoGenerateColumns: false,
+            itemsSource: SectorCollection,
+            isReadOnly: true,
+            selectionMode: wijmo.grid.SelectionMode.Row
+        });
+        SectorGrid.trackChanges = true;
+    }
+
+    function getSectorSymbolData(Id) {
+        var data = new wijmo.collections.ObservableArray();
+        $.ajax({
+            url: '/api/SectorSymbols/' + Id,
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            data: {},
+            success: function (results) {
+                if (results.length > 0) {
+                    for (i = 0; i < results.length; i++) {
+                        data.push({
+                            EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='btnEditSectorSymbol' onclick='btnEditSectorSymbol_OnClick()'>Edit</button>",
+                            DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='btnDeleteSectorSymbol' onclick='btnDeleteSectorSymbol_OnClick()'>Delete</button>",
+                            Id: results[i]["Id"],
+                            SectorId: results[i]["SectorId"],
+                            SymbolId: results[i]["SymbolId"],
+                            Symbol: results[i]["Symbol"],
+                            Description: results[i]["Description"],
+                        });
+                    }
+                }
+            }
+        });
+        return data;
+    }
+    function createSectorSymbolGrid(Id) {
+        SectorSymbolCollection = new wijmo.collections.CollectionView(getSectorSymbolData(Id));
+        SectorSymbolCollection.pageSize = 15;
+        SectorSymbolCollection.collectionChanged.addHandler(function (sender, args) {
+            updateNavSectorSymbol();
+        });
+
+        SectorSymbolGrid.dispose();
+        SectorSymbolGrid = new wijmo.grid.FlexGrid('#SectorSymbolGrid');
+        SectorSymbolGrid.initialize({
+            columns: [
+                        {
+                            "header": "Edit",
+                            "binding": "EditId",
+                            "width": 60,
+                            "allowSorting": false,
+                            "isContentHtml": true
+                        },
+                        {
+                            "header": "Delete",
+                            "binding": "DeleteId",
+                            "width": 60,
+                            "allowSorting": false,
+                            "isContentHtml": true
+                        },
+                        {
+                            "header": "Symbol",
+                            "binding": "Symbol",
+                            "allowSorting": true,
+                            "width": 100
+                        },
+                        {
+                            "header": "Description",
+                            "binding": "Description",
+                            "allowSorting": true,
+                            "width": "*"
+                        }
+            ],
+            autoGenerateColumns: false,
+            itemsSource: SectorSymbolCollection,
+            isReadOnly: true,
+            selectionMode: wijmo.grid.SelectionMode.Row
+        });
+        SectorSymbolGrid.trackChanges = true;
+    }
+    function updateNavSectorSymbol() {
+        document.getElementById('navSectorSymbol').style.display = 'block';
+        if (SectorSymbolCollection.pageIndex === 0) {
+            navSectorSymbolFirst.setAttribute('disabled', 'disabled');
+            navSectorSymbolPrevious.setAttribute('disabled', 'disabled');
+            navSectorSymbolNext.removeAttribute('disabled');
+            navSectorSymbolLast.removeAttribute('disabled');
+        } else if (SectorSymbolCollection.pageIndex === (SectorSymbolCollection.pageCount - 1)) {
+            navSectorSymbolFirst.removeAttribute('disabled');
+            navSectorSymbolPrevious.removeAttribute('disabled');
+            navSectorSymbolNext.setAttribute('disabled', 'disabled');
+            navSectorSymbolLast.setAttribute('disabled', 'disabled');
+        } else {
+            navSectorSymbolFirst.removeAttribute('disabled');
+            navSectorSymbolPrevious.removeAttribute('disabled');
+            navSectorSymbolNext.removeAttribute('disabled');
+            navSectorSymbolLast.removeAttribute('disabled');
+        }
+        navSectorSymbolCurrent.innerHTML = (SectorSymbolCollection.pageIndex + 1) + ' / ' + SectorSymbolCollection.pageCount;
+    }
+    function eventNavSectorSymbol() {
+        navSectorSymbolFirst.addEventListener('click', function () {
+            SectorSymbolCollection.moveToFirstPage();
+            updateNavSectorSymbol();
+        });
+        navSectorSymbolPrevious.addEventListener('click', function () {
+            SectorSymbolCollection.moveToPreviousPage();
+            updateNavSectorSymbol();
+        });
+        navSectorSymbolNext.addEventListener('click', function () {
+            SectorSymbolCollection.moveToNextPage();
+            updateNavSectorSymbol();
+        });
+        navSectorSymbolLast.addEventListener('click', function () {
+            SectorSymbolCollection.moveToLastPage();
+            updateNavSectorSymbol();
+        });
+    }
+
+    function btnOpenSectorEdit_OnClick() {
+        $('#SectorEdit').modal({
+            show: true,
+            backdrop: false
+        });
+
+        document.getElementById('SectorEdit_Id').value = 0;
+        document.getElementById('SectorEdit_Sector').value = "";
+        document.getElementById('SectorEdit_Definition').value = "";
+    }
+    function btnUpdateSector_OnClick() {
+        var sector = new Object();
+
+        sector.Id = document.getElementById('SectorEdit_Id').value;
+        sector.SectorCode = document.getElementById('SectorEdit_Sector').value;
+        sector.SectorDefinition = document.getElementById('SectorEdit_Definition').value;
+
+        var data = JSON.stringify(sector);
+
+        if (sector.Id > 0) {
+            $.ajax({
+                type: "PUT",
+                url: "/api/UpdateSector/" + sector.Id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: data,
+                success: function (id) {
+                    if (id > 0) {
+                        toastr.success('Success');
+                        $('#SectorGrid').empty();
+                        createSectorGrid();
+                    } else {
+                        toastr.success('Error');
+                    }
+                }
+            });
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "/api/AddSector",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: data,
+                success: function (id) {
+                    if (id > 0) {
+                        toastr.success('Success');
+                        $('#SectorGrid').empty();
+                        createSectorGrid();
+                    } else {
+                        toastr.success('Error');
+                    }
+                }
+            });
+        }
+
+    }
+    function btnDeleteSector_OnClick() {
+        SectorCollection.editItem(SectorCollection.currentItem);
+
+        var Id = SectorCollection.currentEditItem.Id;
+        var Sector = SectorCollection.currentEditItem.Sector;
+
+        if (confirm("Delete " + Sector + "?") == true) {
+            $.ajax({
+                type: "DELETE",
+                url: "/api/DeleteSector/" + Id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Success");
+                        $('#SectorGrid').empty();
+                        createSectorGrid();
+                    },
+                    404: function () {
+                        toastr.error("Error");
+                    },
+                    400: function () {
+                        toastr.error("Error");
+                    }
+                }
+            });
+        }
+    }
+    function btnEditSector_OnClick() {
+        SectorCollection.editItem(SectorCollection.currentItem);
+        var SectorSelected = SectorCollection.currentEditItem;
+
+        document.getElementById('SectorEdit_Id').value = SectorSelected.Id ? SectorSelected.Id : 0;
+        document.getElementById('SectorEdit_Sector').value = SectorSelected.Sector ? SectorSelected.Sector : "";
+        document.getElementById('SectorEdit_Definition').value = SectorSelected.Definition ? SectorSelected.Definition : "";
+
+        $('#SectorEdit').modal({
+            show: true,
+            backdrop: false
+        });
+    }
+    function btnSymbolSector_OnClick() {
+        SectorCollection.editItem(SectorCollection.currentItem);
+        var SectorSelected = SectorCollection.currentEditItem;
+
+        document.getElementById('SectorSymbol_Id').value = SectorSelected.Id ? SectorSelected.Id : 0;
+        document.getElementById('SectorSymbol_Sector').value = SectorSelected.Sector ? SectorSelected.Sector : "";
+        document.getElementById('SectorSymbol_Definition').value = SectorSelected.Definition ? SectorSelected.Definition : "";
+
+        $("#SectorSymbolTitle").text("Sector Symbols");
+        $("#SectorSymbolModal").modal({
+            show: true,
+            backdrop: false
+        });
+
+        createSectorSymbolGrid(SectorSelected.Id);
+    }
+    function btnAddSectorSymbol_OnClick() {
+        var sectorId = document.getElementById('SectorSymbol_Id').value;
+
+        if (sectorId > 0) {
+            $('#SectorSymbolEdit').modal({
+                show: true,
+                backdrop: false
+            });
+
+            document.getElementById('SectorSymbolEdit_Id').value = 0;
+            document.getElementById('SectorSymbolEdit_SectorId').value = sectorId;
+            document.getElementById('SectorSymbolEdit_SymbolId').value = 0;
+            document.getElementById('SectorSymbolEdit_Symbol').value = "";
+        } else {
+            toastr.success('No sector specified.');
+        }
+    }
+    function btnUpdateSectorSymbol_OnClick() {
+        var sectorSymbol = new Object();
+
+        sectorSymbol.Id = document.getElementById('SectorSymbolEdit_Id').value;
+        sectorSymbol.SectorId = document.getElementById('SectorSymbolEdit_SectorId').value;
+        sectorSymbol.SymbolId = document.getElementById('SectorSymbolEdit_SymbolId').value;
+        sectorSymbol.Symbol = document.getElementById('SectorSymbolEdit_Symbol').value;
+        sectorSymbol.Description = "NA";
+
+        var data = JSON.stringify(sectorSymbol);
+
+        if (sectorSymbol.Id > 0) {
+            $.ajax({
+                type: "PUT",
+                url: "/api/UpdateSectorSymbol/" + sectorSymbol.Id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: data,
+                success: function (id) {
+                    if (id > 0) {
+                        toastr.success('Success');
+                        $('#SectorSymbolGrid').empty();
+                        createSectorSymbolGrid(sectorSymbol.SectorId);
+                    } else {
+                        toastr.success('Error adding');
+                    }
+                }
+            });
+        } else {
+            if (sectorSymbol.SectorId > 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/AddSectorSymbol",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: data,
+                    success: function (id) {
+                        if (id > 0) {
+                            toastr.success('Success');
+                            $('#SectorSymbolGrid').empty();
+                            createSectorSymbolGrid(sectorSymbol.SectorId);
+                        } else {
+                            toastr.success('Error updating');
+                        }
+                    }
+                });
+            } else {
+                toastr.success('No sector specified.');
+            }
+        }
+    }
+    function btnEditSectorSymbol_OnClick() {
+        SectorSymbolCollection.editItem(SectorSymbolCollection.currentItem);
+        var SectorSymbolSelected = SectorSymbolCollection.currentEditItem;
+
+        document.getElementById('SectorSymbolEdit_Id').value = SectorSymbolSelected.Id ? SectorSymbolSelected.Id : 0;
+        document.getElementById('SectorSymbolEdit_SectorId').value = SectorSymbolSelected.SectorId ? SectorSymbolSelected.SectorId : 0;
+        document.getElementById('SectorSymbolEdit_SymbolId').value = SectorSymbolSelected.SymbolId ? SectorSymbolSelected.SymbolId : 0;
+        document.getElementById('SectorSymbolEdit_Symbol').value = SectorSymbolSelected.Symbol ? SectorSymbolSelected.Symbol : "";
+
+        $('#SectorSymbolEdit').modal({
+            show: true,
+            backdrop: false
+        });
+    }
+    function btnDeleteSectorSymbol_OnClick() {
+        SectorSymbolCollection.editItem(SectorSymbolCollection.currentItem);
+
+        var Id = SectorSymbolCollection.currentEditItem.Id;
+        var SectorId = SectorSymbolCollection.currentEditItem.SectorId;
+        var Symbol = SectorSymbolCollection.currentEditItem.Symbol;
+
+        if (confirm("Delete " + Symbol + "?") == true) {
+            $.ajax({
+                type: "DELETE",
+                url: "/api/DeleteSectorSymbol/" + Id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Success");
+                        $('#SectorSymbolGrid').empty();
+                        createSectorSymbolGrid(SectorId);
+                    },
+                    404: function () {
+                        toastr.error("Error deleting");
+                    },
+                    400: function () {
+                        toastr.error("Error deleting");
+                    }
+                }
+            });
+        }
+    }
+
+    function plotSectorChart() {
+        var sector = document.getElementById('Sector').value;
+
+        if (!!sector) {
+
+            $('#loading').modal({
+                show: true,
+                backdrop: false
+            });
+
+            $.ajax({
+                url: '/api/SectorPrice/' + sector,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (result) {
+                    $('#loading').modal('hide');
+                    if (result.SectorPrices.length > 0) {
+                        var sector = result.Sector;
+                        var sectorDescription = result.SectorDescription;
+                        var sectorPrices = result.SectorPrices;
+
+                        // Clean the chart
+
+                        $('#SectorChart').empty();
+
+                        // Sector Chart Data
+
+                        while (SectorChartData.length > 0) SectorChartData.pop();
+                        SectorChartData = getSectorChartData(sectorPrices);
+
+                        // Closing Price Divisor
+
+                        while (SectorClosingPriceDivisor.length > 0) SectorClosingPriceDivisor.pop();
+                        SectorClosingPriceDivisor = getClosingPriceDivisor(sectorPrices);
+
+                        // Seasonality Data
+
+                        while (SectorSeasonTenYearData.length > 0) SectorSeasonTenYearData.pop();
+                        for (var i = 0; i < SectorNoOfDaysInYear; i++) SectorSeasonTenYearData.push(0);
+
+                        while (SectorSeasonFiveYearData.length > 0) SectorSeasonFiveYearData.pop();
+                        for (var i = 0; i < SectorNoOfDaysInYear; i++) SectorSeasonFiveYearData.push(0);
+
+                        while (SectorSeasonYearData.length > 0) SectorSeasonYearData.pop();
+                        for (var i = 0; i < SectorNoOfYears; i++) {
+                            SectorSeasonYearData[i] = [];
+                            for (var d = 0; d < SectorNoOfDaysInYear; d++) SectorSeasonYearData[i].push(0);
+                        }
+                        computeSeasonalityData();
+
+                        // Sector Chart Plot Data
+
+                        while (SectorChartPlotData.length > 0) SectorChartPlotData.pop();
+                        computeSectorChartPlotData();
+
+                        // Chart Init
+
+                        var dataSet = new AmCharts.DataSet();
+                        dataSet.title = sector;
+                        dataSet.color = "#7f8da9";
+                        dataSet.fieldMappings = [{
+                            fromField: "open",
+                            toField: "open"
+                        }, {
+                            fromField: "high",
+                            toField: "high"
+                        }, {
+                            fromField: "low",
+                            toField: "low"
+                        }, {
+                            fromField: "close",
+                            toField: "close"
+                        }, {
+                            fromField: "season",
+                            toField: "season"
+                        }, {
+                            fromField: "season5Year",
+                            toField: "season5Year"
+                        }, {
+                            fromField: "seasonY0",
+                            toField: "seasonY0"
+                        }, {
+                            fromField: "seasonY1",
+                            toField: "seasonY1"
+                        }, {
+                            fromField: "seasonY2",
+                            toField: "seasonY2"
+                        }, {
+                            fromField: "seasonY3",
+                            toField: "seasonY3"
+                        }, {
+                            fromField: "seasonY4",
+                            toField: "seasonY4"
+                        }, {
+                            fromField: "seasonY5",
+                            toField: "seasonY5"
+                        }, {
+                            fromField: "seasonY6",
+                            toField: "seasonY6"
+                        }, {
+                            fromField: "seasonY7",
+                            toField: "seasonY7"
+                        }, {
+                            fromField: "seasonY8",
+                            toField: "seasonY8"
+                        }, {
+                            fromField: "seasonY9",
+                            toField: "seasonY9"
+                        }, {
+                            fromField: "volume",
+                            toField: "volume"
+                        }, {
+                            fromField: "earnings",
+                            toField: "earnings"
+                        }, {
+                            fromField: "macd",
+                            toField: "macd"
+                        }, {
+                            fromField: "macdSignal",
+                            toField: "macdSignal"
+                        }, {
+                            fromField: "ma1",
+                            toField: "ma1"
+                        }, {
+                            fromField: "ma2",
+                            toField: "ma2"
+                        }, {
+                            fromField: "ma3",
+                            toField: "ma3"
+                        }, {
+                            fromField: "ma4",
+                            toField: "ma4"
+                        }, {
+                            fromField: "ma5",
+                            toField: "ma5"
+                        }];
+                        dataSet.dataProvider = SectorChartPlotData;
+                        dataSet.categoryField = "date";
+
+                        // Chart Panels
+
+                        SectorChartStockPanel1 = new AmCharts.StockPanel();
+
+                        SectorChartStockPanel1.showCategoryAxis = false;
+                        SectorChartStockPanel1.title = sectorDescription;
+                        SectorChartStockPanel1.percentHeight = 70;
+                        SectorChartStockPanel1.recalculateToPercents = "never";
+
+                        SectorChartStockPanel2 = new AmCharts.StockPanel();
+                        SectorChartStockPanel2.allowTurningOff = true;
+                        SectorChartStockPanel2.percentHeight = 30;
+
+                        // Mid (Current Date) Chart Guide
+
+                        var guideCurrentDate = new AmCharts.Guide();
+
+                        guideCurrentDate.date = SectorChartPlotData[125]["date"];
+                        guideCurrentDate.lineColor = RedColor;
+                        guideCurrentDate.lineAlpha = 1;
+                        guideCurrentDate.dashLength = 2;
+                        guideCurrentDate.inside = true;
+                        guideCurrentDate.labelRotation = 90;
+                        guideCurrentDate.label = "";
+                        SectorChartStockPanel1.categoryAxis.addGuide(guideCurrentDate);
+
+                        // Sector Season Ten Year Value Axis
+
+                        var minValue = 0;
+                        var maxValue = 0;
+                        var upDistance = 0;
+                        var downDistance = 0;
+                        var addInterval = 0;
+
+                        var sectorSeasonTenYearDataValueAxis = new AmCharts.ValueAxis();
+
+                        for (var i = 0; i < SectorNoOfDaysInYear; i++) {
+                            if (i == 0) {
+                                minValue = parseFloat(SectorChartPlotData[i]["season"]);
+                                maxValue = parseFloat(SectorChartPlotData[i]["season"]);
+                            } else {
+                                if (parseFloat(SectorChartPlotData[i]["season"]) < minValue) minValue = parseFloat(SectorChartPlotData[i]["season"]);
+                                if (parseFloat(SectorChartPlotData[i]["season"]) > maxValue) maxValue = parseFloat(SectorChartPlotData[i]["season"]);
+                            }
+                        }
+
+                        upDistance = maxValue - parseFloat(SectorChartPlotData[125]["season"]);
+                        downDistance = parseFloat(SectorChartPlotData[125]["season"]) - minValue;
+                        addInterval = 0;
+
+                        if (upDistance > downDistance) {
+                            sectorSeasonTenYearDataValueAxis.maximum = maxValue;
+                            sectorSeasonTenYearDataValueAxis.minimum = minValue - (upDistance - downDistance);
+                        } else if (upDistance < downDistance) {
+                            sectorSeasonTenYearDataValueAxis.maximum = maxValue + (downDistance - upDistance);
+                            sectorSeasonTenYearDataValueAxis.minimum = minValue;
+                        }
+
+                        sectorSeasonTenYearDataValueAxis.labelsEnabled = false;
+                        sectorSeasonTenYearDataValueAxis.position = "right";
+                        sectorSeasonTenYearDataValueAxis.gridThickness = 0;
+                        sectorSeasonTenYearDataValueAxis.axisThickness = 0;
+                        SectorChartStockPanel1.addValueAxis(sectorSeasonTenYearDataValueAxis);
+
+                        // Sector Season Ten Year Value Axis
+
+                        var valueAxisPrice = new AmCharts.ValueAxis();
+                        for (var i = 0; i < SectorNoOfDaysInYear / 2; i++) {
+                            if (i == 0) {
+                                minValue = parseFloat(SectorChartPlotData[i]["close"]);
+                                maxValue = parseFloat(SectorChartPlotData[i]["close"]);
+                            } else {
+                                if (parseFloat(SectorChartPlotData[i]["close"]) < minValue) minValue = parseFloat(SectorChartPlotData[i]["close"]);
+                                if (parseFloat(SectorChartPlotData[i]["close"]) > maxValue) maxValue = parseFloat(SectorChartPlotData[i]["close"]);
+                            }
+                        }
+                        upDistance = maxValue - parseFloat(SectorChartPlotData[125]["close"]);
+                        downDistance = parseFloat(SectorChartPlotData[125]["close"]) - minValue;
+                        addInterval = 0;
+                        if (upDistance > downDistance) {
+                            valueAxisPrice.maximum = maxValue;
+                            valueAxisPrice.minimum = minValue - (upDistance - downDistance);
+                        } else if (upDistance < downDistance) {
+                            valueAxisPrice.maximum = maxValue + (downDistance - upDistance);
+                            valueAxisPrice.minimum = minValue;
+                        }
+                        valueAxisPrice.color = BlueColor;
+                        SectorChartStockPanel1.addValueAxis(valueAxisPrice);
+
+                        // Volume Value Axis
+
+                        var valueAxisVolume = new AmCharts.ValueAxis();
+                        valueAxisVolume.labelsEnabled = false;
+                        valueAxisVolume.position = "right";
+                        valueAxisVolume.gridThickness = 0;
+                        valueAxisVolume.axisThickness = 0;
+                        SectorChartStockPanel1.addValueAxis(valueAxisVolume);
+
+                        // MACD Value Axis
+
+                        var valueAxisMACD = new AmCharts.ValueAxis();
+                        valueAxisMACD.labelsEnabled = false;
+                        valueAxisMACD.position = "right";
+                        valueAxisMACD.gridThickness = 0;
+                        valueAxisMACD.axisThickness = 0;
+                        SectorChartStockPanel2.addValueAxis(valueAxisMACD);
+
+                        // Category Axes Settings
+
+                        var categoryAxesSettings = new AmCharts.CategoryAxesSettings()
+
+                        categoryAxesSettings.maxSeries = 0;
+                        categoryAxesSettings.groupToPeriods = ["DD", "WW"]
+                        categoryAxesSettings.equalSpacing = true;
+                        categoryAxesSettings.color = BlueColor;
+                        categoryAxesSettings.inside = true;
+
+                        // Chart Cursor Settings
+
+                        var chartCursorSettings = new AmCharts.ChartCursorSettings();
+
+                        chartCursorSettings.valueLineEnabled = true;
+                        chartCursorSettings.valueBalloonsEnabled = true;
+
+                        // Chart Period Selector Settings
+
+                        var periodSelector = new AmCharts.PeriodSelector();
+
+                        periodSelector.position = "top";
+                        periodSelector.inputFieldsEnabled = false;
+                        periodSelector.color = BlueColor;
+                        periodSelector.periods = [
+                        {
+                            period: "MAX",
+                            selected: true,
+                            label: "MAX"
+                        }];
+
+                        // Panel 1 Stock Legend
+
+                        var stockLegend1 = new AmCharts.StockLegend();
+                        stockLegend1.color = BlueColor;
+                        SectorChartStockPanel1.stockLegend = stockLegend1;
+
+                        // Panel 2 Stock Legend
+
+                        var stockLegend2 = new AmCharts.StockLegend();
+                        stockLegend2.color = BlueColor;
+                        SectorChartStockPanel2.stockLegend = stockLegend2;
+
+                        // Sector Season Ten Year Graph
+
+                        var graphSeason = new AmCharts.StockGraph();
+                        graphSeason.id = "graphSeason";
+                        graphSeason.title = "10-Years Sector Seasonality";
+                        graphSeason.valueField = "season";
+                        graphSeason.useDataSetColors = false;
+                        graphSeason.color = GoldColor;
+                        graphSeason.lineColor = GoldColor;
+                        graphSeason.type = "line";
+                        graphSeason.lineThickness = 2;
+                        graphSeason.showBalloon = false;
+                        graphSeason.valueAxis = sectorSeasonTenYearDataValueAxis;
+                        SectorChartStockPanel1.addStockGraph(graphSeason);
+
+                        var graphPrice = new AmCharts.StockGraph();
+                        graphPrice.id = "graphPrice";
+                        graphPrice.title = "Price";
+                        graphPrice.type = "candlestick";
+                        graphPrice.openField = "open";
+                        graphPrice.closeField = "close";
+                        graphPrice.highField = "high";
+                        graphPrice.lowField = "low";
+                        graphPrice.valueField = "close";
+                        graphPrice.lineColor = "#0FB203";
+                        graphPrice.fillColors = "#0FB203";
+                        graphPrice.negativeLineColor = "#A80008";
+                        graphPrice.negativeFillColors = "#A80008";
+                        graphPrice.fillAlphas = 1;
+                        graphPrice.useDataSetColors = false;
+                        graphPrice.showBalloon = true;
+                        graphPrice.proCandlesticks = false;
+                        graphPrice.valueAxis = valueAxisPrice;
+                        SectorChartStockPanel1.addStockGraph(graphPrice);
+
+                        var graphVolume = new AmCharts.StockGraph();
+                        graphVolume.id = "graphVolume";
+                        graphVolume.title = "Volume (M)";
+                        graphVolume.valueField = "volume";
+                        graphVolume.type = "column";
+                        graphVolume.useDataSetColors = false;
+                        graphVolume.color = GrayColor;
+                        graphVolume.lineColor = GrayColor;
+                        graphVolume.showBalloon = false;
+                        graphVolume.lineAlpha = 0;
+                        graphVolume.fillAlphas = 0.3;
+                        graphVolume.valueAxis = valueAxisVolume;
+                        SectorChartStockPanel1.addStockGraph(graphVolume);
+
+                        var graphMACD = new AmCharts.StockGraph();
+                        graphMACD.id = "graphMACD";
+                        graphMACD.title = "MACD";
+                        graphMACD.valueField = "macd";
+                        graphMACD.useDataSetColors = false;
+                        graphMACD.color = BlueColor;
+                        graphMACD.lineColor = BlueColor;
+                        graphMACD.type = "line";
+                        graphMACD.lineThickness = 1;
+                        graphMACD.showBalloon = false;
+                        graphMACD.valueAxis = valueAxisMACD;
+                        SectorChartStockPanel2.addStockGraph(graphMACD);
+
+                        var graphMACDSignal = new AmCharts.StockGraph();
+                        graphMACDSignal.id = "graphMACDSignal";
+                        graphMACDSignal.title = "Signal";
+                        graphMACDSignal.valueField = "macdSignal";
+                        graphMACDSignal.useDataSetColors = false;
+                        graphMACDSignal.color = RedColor;
+                        graphMACDSignal.lineColor = RedColor;
+                        graphMACDSignal.type = "line";
+                        graphMACDSignal.lineThickness = 1;
+                        graphMACDSignal.showBalloon = false;
+                        graphMACDSignal.valueAxis = valueAxisMACD;
+                        SectorChartStockPanel2.addStockGraph(graphMACDSignal);
+
+                        // Draw Chart
+
+                        SectorChart = new AmCharts.AmStockChart();
+
+                        SectorChart.pathToImages = "/amcharts/amcharts/images/";
+                        SectorChart.hideStockEvents();
+                        SectorChart.dataSets = [dataSet];
+                        SectorChart.chartScrollbarSettings.enabled = false;
+                        SectorChart.panels = [SectorChartStockPanel1, SectorChartStockPanel2];
+                        SectorChart.categoryAxesSettings = categoryAxesSettings;
+                        SectorChart.chartCursorSettings = chartCursorSettings;
+                        SectorChart.periodSelector = periodSelector;
+
+                        SectorChart.write('SectorChart');
+
+                    } else {
+                        toastr.error("Sector does not exist.");
+                    }
+                }
+            }).fail(
+                function (xhr, textStatus, err) {
+                    toastr.error("Sector does not exist.");
+                });
+        }
+    }
+
+    function getClosingPriceDivisor(sectorPrices) {
+        var data = [];
+        var dayIndex = 126;
+        var countYear = 0;
+
+        for (var i = 0; i < sectorPrices.length; i++) {
+            dayIndex--;
+            if (dayIndex == 0) {
+                dayIndex = 252;
+
+                if (countYear > 0) {
+                    data.push(sectorPrices[i]["ClosePrice"]);
+                }
+                countYear++;
+            } else {
+                if (i == sectorPrices.length - 1) {
+                    if (countYear > 0) {
+                        data.push(sectorPrices[i]["ClosePrice"]);
+                    }
+                }
+            }
+        }
+        return data;
+    }
+    function getSectorChartData(sectorPrices) {
+        var data = [];
+
+        for (var i = 0; i < sectorPrices.length; i++) {
+            data.push({
+                date: parseDate(sectorPrices[i]["QuoteDate"]),
+                open: sectorPrices[i]["OpenPrice"],
+                high: sectorPrices[i]["HighPrice"],
+                low: sectorPrices[i]["LowPrice"],
+                close: sectorPrices[i]["ClosePrice"],
+                season: 0,
+                season5Year: 0,
+                seasonCount: 0,
+                volume: AmCharts.roundTo(sectorPrices[i]["Volume"] / 1000000, 2),
+                ema1: 0,
+                ema2: 0,
+                macd: 0,
+                macdSignal: 0,
+                ma1: 0,
+                ma2: 0,
+                ma3: 0,
+                ma4: 0,
+                ma5: 0
+            });
+        }
+
+        // Compute for the MACD data
+
+        var macd_index = 0;
+
+        var ema1_closePrices = 0;
+        var ema1_previous = 0;
+        var ema1 = 0;
+
+        var ema2_closePrices = 0;
+        var ema2_previous = 0;
+        var ema2 = 0;
+
+        var macd_values = 0;
+        var macd_sginal = 0;
+        var macd_sginal_previous = 0;
+
+        for (var i = data.length - 1; i >= 0; i--) {
+            if (macd_index < 11) {
+                ema1_closePrices = ema1_closePrices + data[i].close;
+            } else if (macd_index == 11) {
+                ema1 = ema1_closePrices / 12;
+                ema1_previous = ema1;
+                data[i].ema1 = ema1;
+            } else if (macd_index > 11) {
+                ema1 = (data[i].close * (2 / (12 + 1)) + ema1_previous * (1 - (2 / (12 + 1))));
+                ema1_previous = ema1;
+                data[i].ema1 = ema1;
+            }
+
+            if (macd_index < 25) {
+                ema2_closePrices = ema2_closePrices + data[i].close;
+            } else if (macd_index == 25) {
+                ema2 = ema2_closePrices / 26;
+                ema2_previous = ema2;
+                data[i].ema2 = ema2;
+                data[i].macd = data[i].ema1 - ema2;
+            } else if (macd_index > 25) {
+                ema2 = (data[i].close * (2 / (26 + 1)) + ema2_previous * (1 - (2 / (26 + 1))));
+                ema2_previous = ema2;
+                data[i].ema2 = ema2;
+                data[i].macd = data[i].ema1 - ema2;
+            }
+
+            if (macd_index < 34) {
+                macd_values = macd_values + data[i].macd;
+            } else if (macd_index == 34) {
+                macd_sginal = macd_values / 9;
+                macd_sginal_previous = macd_sginal;
+                data[i].macdSignal = macd_sginal;
+            } else if (macd_index > 34) {
+                macd_sginal = (data[i].macd * (2 / (9 + 1)) + macd_sginal * (1 - (2 / (9 + 1))));
+                macd_sginal_previous = macd_sginal;
+                data[i].macdSignal = macd_sginal;
+            }
+
+            macd_index++;
+        }
+
+        return data;
+    }
+    function computeSeasonalityData() {
+        var season = 0;
+        var season5Year = 0;
+        var countYear = 0;
+        var dayIndex = 251;
+
+        for (var i = 126; i < SectorChartData.length; i++) {
+            if (SectorClosingPriceDivisor[countYear] > 0) {
+                season = ((parseFloat(SectorChartData[i]["close"]) - SectorClosingPriceDivisor[countYear]) / SectorClosingPriceDivisor[countYear]) * 100;
+            } else {
+                season = 0;
+            }
+
+            if (countYear < 5) season5Year = season;
+
+            SectorChartData[i]["season"] = season;
+            SectorChartData[i]["season5Year"] = season5Year;
+
+            SectorSeasonYearData[countYear][dayIndex] = season;
+
+            dayIndex--;
+            if (dayIndex == -1) {
+                dayIndex = 251;
+                countYear++;
+            }
+        }
+
+        for (i = 0; i < SectorNoOfDaysInYear; i++) {
+            season = 0;
+            season5Year = 0;
+            for (y = 0; y < 10; y++) {
+                season = season + SectorSeasonYearData[y][i];
+                if (y < 5) season5Year = season5Year + SectorSeasonYearData[y][i];
+            }
+            SectorSeasonTenYearData[i] = season;
+            SectorSeasonFiveYearData[i] = season5Year;
+        }
+    }
+    function computeSectorChartPlotData() {
+        var futureDate = new Date((new Date(SectorChartData[0]["date"])).add(1).days());
+
+        for (i = 0; i < SectorNoOfDaysInYear; i++) {
+            if (i > 125) {
+                if (new Date(futureDate).getDay() == 0 || new Date(futureDate).getDay() == 6) {
+                    i--;
+                } else {
+                    SectorChartPlotData.push({
+                        date: new Date(futureDate),
+                        season: (SectorSeasonTenYearData[i] / 10).toFixed(2),
+                        season5Year: (SectorSeasonFiveYearData[i] / 5).toFixed(2),
+                        seasonCount: i + 1,
+                        seasonY0: SectorSeasonYearData[0][i].toFixed(2),
+                        seasonY1: SectorSeasonYearData[1][i].toFixed(2),
+                        seasonY2: SectorSeasonYearData[2][i].toFixed(2),
+                        seasonY3: SectorSeasonYearData[3][i].toFixed(2),
+                        seasonY4: SectorSeasonYearData[4][i].toFixed(2),
+                        seasonY5: SectorSeasonYearData[5][i].toFixed(2),
+                        seasonY6: SectorSeasonYearData[6][i].toFixed(2),
+                        seasonY7: SectorSeasonYearData[7][i].toFixed(2),
+                        seasonY8: SectorSeasonYearData[8][i].toFixed(2),
+                        seasonY9: SectorSeasonYearData[9][i].toFixed(2),
+                        earnings: 'NaN'
+                    });
+                }
+                futureDate = futureDate.add(1).day();
+            } else {
+                SectorChartPlotData.push({
+                    date: SectorChartData[125 - i]["date"],
+                    open: SectorChartData[125 - i]["open"],
+                    high: SectorChartData[125 - i]["high"],
+                    low: SectorChartData[125 - i]["low"],
+                    close: SectorChartData[125 - i]["close"],
+                    season: (SectorSeasonTenYearData[i] / 10).toFixed(2),
+                    season5Year: (SectorSeasonFiveYearData[i] / 5).toFixed(2),
+                    seasonCount: i + 1,
+                    seasonY0: SectorSeasonYearData[0][i].toFixed(2),
+                    seasonY1: SectorSeasonYearData[1][i].toFixed(2),
+                    seasonY2: SectorSeasonYearData[2][i].toFixed(2),
+                    seasonY3: SectorSeasonYearData[3][i].toFixed(2),
+                    seasonY4: SectorSeasonYearData[4][i].toFixed(2),
+                    seasonY5: SectorSeasonYearData[5][i].toFixed(2),
+                    seasonY6: SectorSeasonYearData[6][i].toFixed(2),
+                    seasonY7: SectorSeasonYearData[7][i].toFixed(2),
+                    seasonY8: SectorSeasonYearData[8][i].toFixed(2),
+                    seasonY9: SectorSeasonYearData[9][i].toFixed(2),
+                    earnings: 'NaN',
+                    volume: SectorChartData[125 - i]["volume"],
+                    volumeDescription: AmCharts.roundTo(SectorChartData[125 - i]["volume"] / 1000000, 2).toString() + "M",
+                    macd: AmCharts.roundTo(SectorChartData[125 - i]["macd"], 2),
+                    macdSignal: AmCharts.roundTo(SectorChartData[125 - i]["macdSignal"], 2),
+                    ma1: 0,
+                    ma2: 0,
+                    ma3: 0,
+                    ma4: 0,
+                    ma5: 0
+                });
+            }
+        }
+    }
+
+    $(document).ready(function () {
+        SectorCollection = new wijmo.collections.CollectionView();       
+        SectorCollection.collectionChanged.addHandler(function (sender, args) {
+            updateNavSector();
+        });
+
+        SectorGrid = new wijmo.grid.FlexGrid('#SectorGrid');
+
+        eventNavSector();
+
+        SectorSymbolCollection = new wijmo.collections.CollectionView();
+        SectorSymbolCollection.collectionChanged.addHandler(function (sender, args) {
+            updateNavSectorSymbol();
+        });
+
+        SectorSymbolGrid = new wijmo.grid.FlexGrid('#SectorSymbolGrid');
+
+        eventNavSectorSymbol();
+
+        $("#Sector").blur(function () {
+            plotSectorChart();
+        });
+
+        $("#Sector").keyup(function (e) {
+            if (e.which != 13) {
+                return;
+            } else {
+                this.blur();
+            }
+        });
+    });
+</script>
+
