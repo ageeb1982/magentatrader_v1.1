@@ -71,6 +71,17 @@
                             </span>
                         </div>
                     </li>
+                    <li class="sidebar-item">
+                        <div id="Symbol" class="input-group-btn" style="padding: 2px 15px;">
+                            <button id="SymbolSelect" class="col-sm-10 btn btn-default">
+                                <b>Symbols</b>
+                            </button>
+                            <button class="col-sm-2 btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                            </button>
+                            <ul id="SymbolSelectItem" class="dropdown-menu pull-left" style="height: auto; max-height: 200px; overflow-x: hidden; padding:10px"></ul>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -965,7 +976,35 @@
                         sectorSeasonTenYearDataValueAxis.axisThickness = 0;
                         SectorChartStockPanel1.addValueAxis(sectorSeasonTenYearDataValueAxis);
 
-                        // Sector Season Ten Year Value Axis
+                        // Sector Season Five Year Value Axis
+
+                        var sectorSeasonFiveYearDataValueAxis = new AmCharts.ValueAxis();
+                        for (var i = 0; i < SectorNoOfDaysInYear; i++) {
+                            if (i == 0) {
+                                minValue = parseFloat(SectorChartPlotData[i]["season5Year"]);
+                                maxValue = parseFloat(SectorChartPlotData[i]["season5Year"]);
+                            } else {
+                                if (parseFloat(SectorChartPlotData[i]["season5Year"]) < minValue) minValue = parseFloat(SectorChartPlotData[i]["season5Year"]);
+                                if (parseFloat(SectorChartPlotData[i]["season5Year"]) > maxValue) maxValue = parseFloat(SectorChartPlotData[i]["season5Year"]);
+                            }
+                        }
+                        upDistance = maxValue - parseFloat(SectorChartPlotData[125]["season5Year"]);
+                        downDistance = parseFloat(SectorChartPlotData[125]["season5Year"]) - minValue;
+                        addInterval = 0;
+                        if (upDistance > downDistance) {
+                            sectorSeasonFiveYearDataValueAxis.maximum = maxValue;
+                            sectorSeasonFiveYearDataValueAxis.minimum = minValue - (upDistance - downDistance);
+                        } else if (upDistance < downDistance) {
+                            sectorSeasonFiveYearDataValueAxis.maximum = maxValue + (downDistance - upDistance);
+                            sectorSeasonFiveYearDataValueAxis.minimum = minValue;
+                        }
+                        sectorSeasonFiveYearDataValueAxis.labelsEnabled = false;
+                        sectorSeasonFiveYearDataValueAxis.position = "right";
+                        sectorSeasonFiveYearDataValueAxis.gridThickness = 0;
+                        sectorSeasonFiveYearDataValueAxis.axisThickness = 0;
+                        SectorChartStockPanel1.addValueAxis(sectorSeasonFiveYearDataValueAxis);
+
+                        // Sector Price Value Axis
 
                         var valueAxisPrice = new AmCharts.ValueAxis();
                         for (var i = 0; i < SectorNoOfDaysInYear / 2; i++) {
@@ -1051,7 +1090,7 @@
                         stockLegend2.color = BlueColor;
                         SectorChartStockPanel2.stockLegend = stockLegend2;
 
-                        // Sector Season Ten Year Graph
+                        // Graphs
 
                         var graphSeason = new AmCharts.StockGraph();
                         graphSeason.id = "graphSeason";
@@ -1065,6 +1104,19 @@
                         graphSeason.showBalloon = false;
                         graphSeason.valueAxis = sectorSeasonTenYearDataValueAxis;
                         SectorChartStockPanel1.addStockGraph(graphSeason);
+
+                        var graphSeason5Year = new AmCharts.StockGraph();
+                        graphSeason5Year.id = "graphSeason5Year";
+                        graphSeason5Year.title = "5-Years Seasonality";
+                        graphSeason5Year.valueField = "season5Year";
+                        graphSeason5Year.useDataSetColors = false;
+                        graphSeason5Year.color = DarkGreenColor;
+                        graphSeason5Year.lineColor = DarkGreenColor;
+                        graphSeason5Year.type = "line";
+                        graphSeason5Year.lineThickness = 1;
+                        graphSeason5Year.showBalloon = false;
+                        graphSeason5Year.valueAxis = sectorSeasonFiveYearDataValueAxis;
+                        SectorChartStockPanel1.addStockGraph(graphSeason5Year);
 
                         var graphPrice = new AmCharts.StockGraph();
                         graphPrice.id = "graphPrice";
@@ -1140,6 +1192,8 @@
                         SectorChart.periodSelector = periodSelector;
 
                         SectorChart.write('SectorChart');
+
+                        getSymbols(sector);
 
                     } else {
                         toastr.error("Sector does not exist.");
@@ -1362,6 +1416,12 @@
         }
     }
 
+    function getSymbols(sector) {
+        for (var i = 0 ; i < 5; i++) {
+            $("#SymbolSelectItem").append("<li><a href='#' data-value='" + (i + 1) + "'><b>" + (i + 1) + " Symbol</b></a></li>");
+        }
+    }
+
     $(document).ready(function () {
         SectorCollection = new wijmo.collections.CollectionView();       
         SectorCollection.collectionChanged.addHandler(function (sender, args) {
@@ -1391,6 +1451,11 @@
             } else {
                 this.blur();
             }
+        });
+
+        $("#SymbolSelectItem li a").click(function () {
+            $("#SymbolSelect").html("<b>" + $(this).text() + "</b>");
+            $("#SymbolSelect").val($(this).data('value'));
         });
     });
 </script>

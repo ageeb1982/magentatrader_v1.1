@@ -19,8 +19,9 @@ namespace MagentaTrader.Controllers
         [Route("api/GetQuestradeAccessToken/{code}")]
         public Models.QuestradeAccessToken GetQuestradeAccessToken(string code) 
         {
-            byte[] buffer = Encoding.ASCII.GetBytes("client_id=client id=-4dSSId_7SQg-AAAB0OlUIBvHBZqXQ&code=" + code + "&grant_type=authorization_code&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade");
-
+            byte[] buffer = Encoding.ASCII.GetBytes("client_id=client id=kaHYGqLhISsA2i3YsvVwKu0kfwAAOA&code=" + code + "&grant_type=authorization_code&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade");
+            //byte[] buffer = Encoding.ASCII.GetBytes("client_id=client id=-4dSSId_7SQg-AAAB0OlUIBvHBZqXQ&code=" + code + "&grant_type=authorization_code&redirect_uri=https://www.magentatrader.com/Software?broker=Questrade");
+             
             HttpWebRequest webReq = (HttpWebRequest)WebRequest.Create("https://practicelogin.questrade.com/oauth2/token");
             //HttpWebRequest webReq = (HttpWebRequest)WebRequest.Create("https://login.questrade.com/oauth2/token");
             webReq.Method = "POST";

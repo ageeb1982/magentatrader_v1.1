@@ -132,11 +132,11 @@ namespace MagentaTrader.Controllers
                             {
                                 Models.SectorPrice p = new Models.SectorPrice();
                                 p.QuoteDate = QuoteDate[i];
-                                p.OpenPrice = OpenPrice[i];
-                                p.HighPrice = HighPrice[i];
-                                p.LowPrice = LowPrice[i];
-                                p.ClosePrice = ClosePrice[i];
-                                p.Volume = Volume[i];
+                                p.OpenPrice = decimal.Round(OpenPrice[i],2);
+                                p.HighPrice = decimal.Round(HighPrice[i],2);
+                                p.LowPrice = decimal.Round(LowPrice[i],2);
+                                p.ClosePrice = decimal.Round(ClosePrice[i],2);
+                                p.Volume = decimal.Round(Volume[i],2);
 
                                 prices.Add(p);
                             }

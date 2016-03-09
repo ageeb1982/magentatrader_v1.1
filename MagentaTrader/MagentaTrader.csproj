@@ -40,6 +40,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="reCAPTCHA.MVC">
+      <HintPath>..\packages\reCAPTCH.MVC.1.0.1\lib\net45\reCAPTCHA.MVC.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
@@ -175,6 +178,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AffiliateController.cs" />
+    <Compile Include="Controllers\BrokerLoginController.cs" />
     <Compile Include="Controllers\CalendarController.cs" />
     <Compile Include="Controllers\CampaignController.cs" />
     <Compile Include="Controllers\EarningController.cs" />
@@ -866,6 +870,7 @@
     <Content Include="img\magenta-tradier.png" />
     <Content Include="img\phones.png" />
     <Content Include="img\progress_bar.gif" />
+    <Content Include="img\questrade-logo-smaller.png" />
     <Content Include="img\software-1.png" />
     <Content Include="img\software.png" />
     <Content Include="img\te.jpg" />
@@ -1406,8 +1411,10 @@
     <None Include="Properties\PublishProfiles\magentatrader - Web Deploy %284%29.pubxml" />
     <None Include="Properties\PublishProfiles\magentatrader - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\MagentaTrader2016 - FTP %282%29.pubxml" />
+    <None Include="Properties\PublishProfiles\MagentaTrader2016 - FTP %283%29.pubxml" />
     <None Include="Properties\PublishProfiles\MagentaTrader2016 - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\MagentaTrader2016 - Web Deploy %282%29.pubxml" />
+    <None Include="Properties\PublishProfiles\MagentaTrader2016 - Web Deploy %283%29.pubxml" />
     <None Include="Properties\PublishProfiles\MagentaTrader2016 - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\magentatraders - FTP %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\magentatraders - FTP %283%29.pubxml" />
@@ -1511,6 +1518,7 @@
     <Content Include="Views\Account\ChangePassword.cshtml" />
     <Content Include="Views\PremiumWebinars\Index.cshtml" />
     <Content Include="Views\Sector\Index.cshtml" />
+    <Content Include="Views\BrokerLogin\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

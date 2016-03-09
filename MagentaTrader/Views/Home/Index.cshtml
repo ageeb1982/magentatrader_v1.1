@@ -746,17 +746,28 @@
         for (var i = 0; i < WebinarData.length; i++) {
             var webinarDate = new Date(WebinarData[i]["EventDate"]);
             if (parseDate(dayDate).equals(webinarDate) == true) {
-                if (WebinarData[i]["IsRestricted"] == true) {
-                    if (WebinarData[i]["EventType"] == "WORKSHOP") {
-                        webinars = webinars + "<a href='#' onclick='OpenWorkshopLink(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
-                    } else if (WebinarData[i]["EventType"] == "WEB99") {
-                        webinars = webinars + "<a href='#' onclick='OpenWeb99Link(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
-                    } else {
-                        webinars = webinars + "<a href='#' onclick='OpenWebinarLink(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
-                    }
+                if (WebinarData[i]["EventType"] == "WORKSHOP") {
+                    webinars = webinars + "<a href='#' onclick='OpenWorkshopLink(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
+                } else if (WebinarData[i]["EventType"] == "WEB99") {
+                    webinars = webinars + "<a href='#' onclick='OpenWeb99Link(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
                 } else {
-                    webinars = webinars + "<a href='" + WebinarData[i]["URL"] + "'>" + WebinarData[i]["EventDescription"] + "</a><br />";
-                } 
+                    if (WebinarData[i]["IsRestricted"] == true) {
+                        webinars = webinars + "<a href='#' onclick='OpenWebinarLink(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
+                    } else {
+                        webinars = webinars + "<a href='" + WebinarData[i]["URL"] + "'>" + WebinarData[i]["EventDescription"] + "</a><br />";
+                    }    
+                }
+                //if (WebinarData[i]["IsRestricted"] == true) {
+                //    if (WebinarData[i]["EventType"] == "WORKSHOP") {
+                //        webinars = webinars + "<a href='#' onclick='OpenWorkshopLink(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
+                //    } else if (WebinarData[i]["EventType"] == "WEB99") {
+                //        webinars = webinars + "<a href='#' onclick='OpenWeb99Link(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
+                //    } else {
+                //        webinars = webinars + "<a href='#' onclick='OpenWebinarLink(\"" + WebinarData[i]["URL"] + "\");return false;'>" + WebinarData[i]["EventDescription"] + "</a><br />";
+                //    }
+                //} else {
+                //    webinars = webinars + "<a href='" + WebinarData[i]["URL"] + "'>" + WebinarData[i]["EventDescription"] + "</a><br />";
+                //} 
             }
         }
         return webinars;
@@ -868,11 +879,11 @@
 
                         $('#UserEdit').modal('hide');
 
-                        if (eventType = "WORKSHOP") {
+                        if (eventType == "WORKSHOP") {
                             userRoles(username, "Workshop");
-                        } else if (eventType = "WEB99") {
+                        } else if (eventType == "WEB99") {
                             userRoles(username, "Web99");
-                        } else if (eventType = "WEBINAR") {
+                        } else if (eventType == "WEBINAR") {
                             userRoles(username, "Chart");
                         } else {
                             window.location.href = WebinarURL;
@@ -908,11 +919,11 @@
                         alert("To remove this prompt, you must fill in all user information.");
                         userEdit(username, eventType);
                     } else {
-                        if (eventType = "WORKSHOP") {
+                        if (eventType == "WORKSHOP") {
                             userRoles(username, "Workshop");
-                        } else if (eventType = "WEB99") {
+                        } else if (eventType == "WEB99") {
                             userRoles(username, "Web99");
-                        } else if (eventType = "WEBINAR") {
+                        } else if (eventType == "WEBINAR") {
                             userRoles(username, "Chart");
                         } else {
                             window.location.href = WebinarURL;

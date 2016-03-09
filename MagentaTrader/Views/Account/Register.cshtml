@@ -40,11 +40,13 @@
     @Scripts.Render("~/bundles/jqueryval")
 }*@
 
+<script src='https://www.google.com/recaptcha/api.js'></script>
 
 <link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 <link href="/dist/css/sb-admin-2.css" rel="stylesheet">
 <link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
 
 @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
@@ -73,6 +75,8 @@
                             <input id="Password" class="form-control" placeholder="Password" name="Password" type="password" value="">
                             <br />
                             <input id="ConfirmPassword" class="form-control" placeholder="Confirm Password" name="ConfirmPassword" type="password" value="">
+                            <br />
+                            <div class="g-recaptcha" data-sitekey="6Lc5GBoTAAAAAAEQ98bJVGjZJOgt_WlfZOgkVAM9"></div>
                             <br />
                             <input type="submit" value="Register" class="btn btn-lg btn-success btn-block" />
                         </fieldset>

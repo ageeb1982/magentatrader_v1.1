@@ -11,6 +11,8 @@ using Microsoft.Owin.Security;
 using MagentaTrader.Models;
 using MagentaTrader.IdentityExtensions;
 using System.Web.Security;
+using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace MagentaTrader.Controllers
 {
@@ -124,7 +126,6 @@ namespace MagentaTrader.Controllers
             return View();
         }
 
-        //
         // POST: /Account/Register
         [HttpPost]
         //[AllowAnonymous]
@@ -136,46 +137,67 @@ namespace MagentaTrader.Controllers
             {
                 var user = new ApplicationUser() { UserName = model.UserName };
                 var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+
+                var response = HttpContext.Request.Form["g-recaptcha-response"];
+                string secretKey = "6Lc5GBoTAAAAAOQFNfUBzRtzN_I-vmyJzGugEx65";
+                var client = new System.Net.WebClient();
+                var verificationResultJson = client.DownloadString(string.Format("https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}", secretKey, response));
+                var verificationResult = JsonConvert.DeserializeObject<CaptchaVerificationResult>(verificationResultJson);
+                
+                if (!verificationResult.Success)
                 {
-                    await SignInAsync(user, isPersistent: false);
-
-                    // Add or update MstUser table
-                    Data.MagentaTradersDBDataContext db = new Data.MagentaTradersDBDataContext();
-
-                    var Users = from d in db.MstUsers where d.UserName == model.UserName select d;
-
-                    if (Users.Any())
-                    {
-                        var UpdatedUser = Users.FirstOrDefault();
-
-                        UpdatedUser.AspNetUserId = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault().Id;
-
-                        db.SubmitChanges();
-                    }
-                    else
-                    {
-                        Data.MstUser NewUser = new Data.MstUser();
-
-                        NewUser.UserName = model.UserName;
-                        NewUser.FirstName = model.FirstName == null || model.FirstName.Length == 0 ? "NA" : model.FirstName;
-                        NewUser.LastName = model.LastName == null || model.LastName.Length == 0 ? "NA" : model.LastName;
-                        NewUser.EmailAddress = model.EmailAddress == null || model.EmailAddress.Length == 0 ? "NA" : model.EmailAddress;
-                        NewUser.PhoneNumber = model.PhoneNumber == null || model.PhoneNumber.Length == 0 ? "NA" : model.PhoneNumber;
-                        NewUser.AspNetUserId = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault().Id;
-
-                        db.MstUsers.InsertOnSubmit(NewUser);
-                        db.SubmitChanges();
-                    }
-
-                    return RedirectToAction("Index", "Home");
+                    ModelState.AddModelError("", "Invalid recaptcha challenge.");
                 }
                 else
                 {
-                    AddErrors(result);
+                    if (result.Succeeded)
+                    {
+                        await SignInAsync(user, isPersistent: false);
+
+                        // Add or update MstUser table
+                        Data.MagentaTradersDBDataContext db = new Data.MagentaTradersDBDataContext();
+
+                        var Users = from d in db.MstUsers where d.UserName == model.UserName select d;
+
+                        if (Users.Any())
+                        {
+                            var UpdatedUser = Users.FirstOrDefault();
+
+                            UpdatedUser.AspNetUserId = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault().Id;
+
+                            db.SubmitChanges();
+                        }
+                        else
+                        {
+                            Data.MstUser NewUser = new Data.MstUser();
+
+                            NewUser.UserName = model.UserName;
+                            NewUser.FirstName = model.FirstName == null || model.FirstName.Length == 0 ? "NA" : model.FirstName;
+                            NewUser.LastName = model.LastName == null || model.LastName.Length == 0 ? "NA" : model.LastName;
+                            NewUser.EmailAddress = model.EmailAddress == null || model.EmailAddress.Length == 0 ? "NA" : model.EmailAddress;
+                            NewUser.PhoneNumber = model.PhoneNumber == null || model.PhoneNumber.Length == 0 ? "NA" : model.PhoneNumber;
+                            NewUser.AspNetUserId = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault().Id;
+
+                            db.MstUsers.InsertOnSubmit(NewUser);
+                            db.SubmitChanges();
+
+                            Data.AspNetUserRole NewRole = new Data.AspNetUserRole();
+
+                            NewRole.AspNetUser = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault();
+                            NewRole.AspNetRole = db.AspNetRoles.Where(d => d.Name == "Broker").FirstOrDefault();
+
+                            db.AspNetUserRoles.InsertOnSubmit(NewRole);
+                            db.SubmitChanges();
+                        }
+
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        AddErrors(result);
+                    }
                 }
             }
-
             // If we got this far, something failed, redisplay form
             return View(model);
         }
@@ -489,5 +511,14 @@ namespace MagentaTrader.Controllers
             }
         }
         #endregion
+    }
+
+    public class CaptchaVerificationResult
+    {
+        [JsonProperty("success")]
+        public bool Success { get; set; }
+
+        [JsonProperty("error-codes")]
+        public List<string> ErrorCodes { get; set; }
     }
 }
