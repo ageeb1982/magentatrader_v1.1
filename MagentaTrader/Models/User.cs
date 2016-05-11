@@ -14,6 +14,8 @@ namespace MagentaTrader.Models
         public string EmailAddress { get; set; }
         public string PhoneNumber { get; set; }
         public string AspNetUserId { get; set; }
+        public string Address { get; set; }
+        public string ReferralUserName { get; set; }
         public string LastPurchase { get; set; }
         public DateTime dateLP { get; set; }
         

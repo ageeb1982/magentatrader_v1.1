@@ -92,6 +92,14 @@
                 </div>
                 <div class="info-div-ledger">
                     <div class="user-fieldLabel-ledger">
+                        <div class="text-ledger">Address</div>
+                    </div>
+                    <div class="box-ledger">
+                        <textarea class="form-control" id="Address" disabled></textarea>
+                    </div>
+                </div>
+                <div class="info-div-ledger">
+                    <div class="user-fieldLabel-ledger">
                         <div class="text-ledger">Phone Number</div>
                     </div>
                     <div class="box-ledger">
@@ -252,10 +260,11 @@
                     $('#FirstName').val(Results[0].FirstName);
                     $('#LastName').val(Results[0].LastName);
                     $('#EmailAdd').val(Results[0].EmailAddress);
+                    $('#Address').val(Results[0].Address);
                     $('#PhoneNum').val(Results[0].PhoneNumber);
                 }
                 else {
-                    $('#Username, #FirstName, #LastName, #EmailAdd, #PhoneNum').text("");
+                    $('#Username, #FirstName, #LastName, #EmailAdd, #Address, #PhoneNum').text("");
                 }
             }
         }).fail(

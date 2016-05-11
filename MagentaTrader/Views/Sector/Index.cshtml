@@ -71,6 +71,7 @@
                             </span>
                         </div>
                     </li>
+                    
                     <li class="sidebar-item">
                         <div id="Symbol" class="input-group-btn" style="padding: 2px 15px;">
                             <button id="SymbolSelect" class="col-sm-10 btn btn-default">
@@ -82,6 +83,7 @@
                             <ul id="SymbolSelectItem" class="dropdown-menu pull-left" style="height: auto; max-height: 200px; overflow-x: hidden; padding:10px"></ul>
                         </div>
                     </li>
+
                 </ul>
             </div>
         </div>
@@ -1193,6 +1195,7 @@
 
                         SectorChart.write('SectorChart');
 
+                        $("#SymbolSelect").val($(this).data('Symbols'));
                         getSymbols(sector);
 
                     } else {
@@ -1377,7 +1380,8 @@
                         seasonY7: SectorSeasonYearData[7][i].toFixed(2),
                         seasonY8: SectorSeasonYearData[8][i].toFixed(2),
                         seasonY9: SectorSeasonYearData[9][i].toFixed(2),
-                        earnings: 'NaN'
+                        earnings: 'NaN',
+                        symbolSeason: 0
                     });
                 }
                 futureDate = futureDate.add(1).day();
@@ -1410,16 +1414,50 @@
                     ma2: 0,
                     ma3: 0,
                     ma4: 0,
-                    ma5: 0
+                    ma5: 0,
+                    symbolSeason: 0
                 });
             }
         }
     }
 
     function getSymbols(sector) {
-        for (var i = 0 ; i < 5; i++) {
-            $("#SymbolSelectItem").append("<li><a href='#' data-value='" + (i + 1) + "'><b>" + (i + 1) + " Symbol</b></a></li>");
-        }
+        $.ajax({
+            url: '/api/PickSectorSymbols/' + sector,
+            type: 'GET',
+            data: {},
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (Results) {
+                if (Results.length > 0) {
+                    $("#SymbolSelectItem").empty();
+                    for (var i = 0; i < Results.length; i++) {
+                        $("#SymbolSelectItem").append("<li><a href='#' data-value='" + Results[i].Symbol + "'><b>" + Results[i].Symbol + "</b></a></li>");
+                    }
+                    $("#SymbolSelectItem li a").click(function () {
+                        $("#SymbolSelect").html("<b>" + $(this).text() + "</b>");
+                        $("#SymbolSelect").val($(this).data('value'));
+                        plotSymbols($(this).data('value'));
+                    });
+                }
+            }
+        });
+    }
+    function plotSymbols(symbol) {
+        $.ajax({
+            url: '/api/StockPrice/' + symbol,
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            data: {},
+            success: function (results) {
+                if (results.length > 0) {
+                    toastr.success('Ploting ' + symbol);
+                    //for (i = 0; i < results.length; i++) {
+                    //}
+                }
+            }
+        });
     }
 
     $(document).ready(function () {
@@ -1451,11 +1489,6 @@
             } else {
                 this.blur();
             }
-        });
-
-        $("#SymbolSelectItem li a").click(function () {
-            $("#SymbolSelect").html("<b>" + $(this).text() + "</b>");
-            $("#SymbolSelect").val($(this).data('value'));
         });
     });
 </script>

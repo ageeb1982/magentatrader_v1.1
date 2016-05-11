@@ -134,6 +134,10 @@
                         <dd>
                             <input class="form-control" id="UserEdit_EmailAddress" type="text" />
                         </dd>
+                        <dt>Address</dt>
+                        <dd>
+                            <textarea class="form-control" id="UserEdit_Address" ></textarea>
+                        </dd>
                         <dt>Phone Number</dt>
                         <dd>
                             <input class="form-control" id="UserEdit_PhoneNumber" type="text" />
@@ -195,6 +199,7 @@
         document.getElementById('UserEdit_FirstName').value = User.FirstName ? User.FirstName : '';
         document.getElementById('UserEdit_LastName').value = User.LastName ? User.LastName : '';
         document.getElementById('UserEdit_EmailAddress').value = User.EmailAddress ? User.EmailAddress : '';
+        document.getElementById('UserEdit_Address').value = User.Address ? User.Address : '';
         document.getElementById('UserEdit_PhoneNumber').value = User.PhoneNumber ? User.PhoneNumber : '';
     }
 
@@ -218,8 +223,8 @@
                 User.FirstName = document.getElementById('UserEdit_FirstName').value;
                 User.LastName = document.getElementById('UserEdit_LastName').value;
                 User.EmailAddress = document.getElementById('UserEdit_EmailAddress').value;
+                User.Address = document.getElementById('UserEdit_Address').value;
                 User.PhoneNumber = document.getElementById('UserEdit_PhoneNumber').value;
-
 
                 var data = JSON.stringify(User);
 
@@ -302,6 +307,7 @@
                             FirstName: Results[i]["FirstName"],
                             LastName: Results[i]["LastName"],
                             EmailAddress: Results[i]["EmailAddress"],
+                            Address: Results[i]["Address"],
                             PhoneNumber: Results[i]["PhoneNumber"],
                             LastPurchase: Results[i]["LastPurchase"]
                         });
@@ -365,6 +371,11 @@
         if (!filter.test(email)) {
             errortext += "\n Invalid Email Address";
         }
+        //Lastname
+        var address = document.getElementById('UserEdit_Address').value;
+        if (!(isNaN(address))) {
+            errortext += "\n Invalid Address";
+        }
         //Phone number
         var phone = document.getElementById('UserEdit_PhoneNumber').value;
         if (isNaN(phone)) {
@@ -385,6 +396,7 @@
                 FirstName: UserListSaveData[i].FirstName,
                 LastName: UserListSaveData[i].LastName,
                 EmailAddress: UserListSaveData[i].EmailAddress,
+                Address: UserListSaveData[i].Address,
                 PhoneNumber: UserListSaveData[i].PhoneNumber,
                 LastPurchase: UserListSaveData[i].LastPurchase,
             });

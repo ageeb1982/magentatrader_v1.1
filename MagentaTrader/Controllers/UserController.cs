@@ -33,6 +33,7 @@ namespace MagentaTrader.Controllers
                                      LastName = u.LastName,
                                      EmailAddress = u.EmailAddress,
                                      PhoneNumber = u.PhoneNumber,
+                                     Address = u.Address
                                  }).ToList();
 
                     var MaxLastPurchase = (from u in db.MstUsers.Where(x => x.AspNetUserId != null)
@@ -93,6 +94,7 @@ namespace MagentaTrader.Controllers
                 NewUser.LastName = value.LastName;
                 NewUser.EmailAddress = value.EmailAddress;
                 NewUser.PhoneNumber = value.PhoneNumber;
+                NewUser.Address = value.Address;
 
                 db.MstUsers.InsertOnSubmit(NewUser);
                 db.SubmitChanges();
@@ -126,6 +128,7 @@ namespace MagentaTrader.Controllers
                     UpdatedUser.LastName = value.LastName;
                     UpdatedUser.EmailAddress = value.EmailAddress;
                     UpdatedUser.PhoneNumber = value.PhoneNumber;
+                    UpdatedUser.Address = value.Address;
 
                     db.SubmitChanges();
                 }
@@ -170,7 +173,7 @@ namespace MagentaTrader.Controllers
         // GET api/GetUser/dpilger
         [Authorize]
         [Route("api/GetUser/{username}")]
-        public List<Models.User> GetUserInfo( String UserName )
+        public List<Models.User> GetUserInfo(String UserName)
         {
             //List<Models.User> UserInfo = null;
             //var Info = from m in db.MstUsers
@@ -202,7 +205,58 @@ namespace MagentaTrader.Controllers
                                    FirstName = m.FirstName,
                                    LastName = m.LastName,
                                    EmailAddress = m.EmailAddress,
-                                   PhoneNumber = m.PhoneNumber
+                                   PhoneNumber = m.PhoneNumber,
+                                   Address = m.Address
+                               };
+                    if (Info.Count() > 0)
+                    {
+                        values = Info.ToList();
+                    }
+                    else
+                    {
+                        values = new List<Models.User>();
+                    }
+                    break;
+                }
+                catch
+                {
+                    if (retryCounter == 3)
+                    {
+                        values = new List<Models.User>();
+                        break;
+                    }
+
+                    System.Threading.Thread.Sleep(1000);
+                    retryCounter++;
+                }
+            }
+
+            return values;
+        }
+
+        // GET api/GetRoleUsers/Web99
+        [Authorize]
+        [Route("api/GetRoleUsers/{role}")]
+        public List<Models.User> GetRoleUsers(String Role)
+        {
+            var retryCounter = 0;
+            List<Models.User> values;
+
+            while (true)
+            {
+                try
+                {
+                    var Info = from m in db.MstUsers
+                               where m.AspNetUser.AspNetUserRoles.Count(d=>d.AspNetRole.Name==Role) > 0
+                               select new Models.User
+                               {
+                                   Id = m.Id,
+                                   UserName = m.UserName,
+                                   FirstName = m.FirstName,
+                                   LastName = m.LastName,
+                                   EmailAddress = m.EmailAddress,
+                                   PhoneNumber = m.PhoneNumber,
+                                   Address = m.Address
                                };
                     if (Info.Count() > 0)
                     {

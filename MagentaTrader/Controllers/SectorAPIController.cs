@@ -218,6 +218,54 @@ namespace MagentaTrader.Controllers
         }
 
         [Authorize]
+        [HttpGet]
+        [Route("api/PickSectorSymbols/{Sector}")]
+        public List<Models.SectorSymbol> GetPickSectorSymbols(String Sector)
+        {
+            var retryCounter = 0;
+            List<Models.SectorSymbol> values;
+
+            while (true)
+            {
+                try
+                {
+                    var SectorSymbols = from d in db.TrnSectorSymbols
+                                        where d.TrnSector.Sector == Sector
+                                        orderby d.Symbol
+                                        select new Models.SectorSymbol
+                                        {
+                                            Id = d.Id,
+                                            SectorId = d.SectorId,
+                                            Symbol = d.Symbol,
+                                            SymbolId = d.SymbolId,
+                                            Description = d.MstSymbol.Description
+                                        };
+                    if (SectorSymbols.Count() > 0)
+                    {
+                        values = SectorSymbols.ToList();
+                    }
+                    else
+                    {
+                        values = new List<Models.SectorSymbol>();
+                    }
+                    break;
+                }
+                catch
+                {
+                    if (retryCounter == 3)
+                    {
+                        values = new List<Models.SectorSymbol>();
+                        break;
+                    }
+
+                    System.Threading.Thread.Sleep(1000);
+                    retryCounter++;
+                }
+            }
+            return values;
+        }
+
+        [Authorize]
         [HttpPost]
         [Route("api/AddSector")]
         public int Post(Models.Sector Value)

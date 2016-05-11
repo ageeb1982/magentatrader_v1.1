@@ -10,5 +10,6 @@ namespace MagentaTrader.Models
         public string Sector { get; set; }
         public string SectorDescription { get; set; }
         public List<Models.SectorPrice> SectorPrices { get; set; }
+        public List<Models.StockPriceWrapper> CurrentStockPrices { get; set; }
     }
 }

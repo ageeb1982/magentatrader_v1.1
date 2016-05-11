@@ -88,30 +88,14 @@
       <Association Name="MstProduct_MstProductPackage" Member="MstProductPackages" ThisKey="Id" OtherKey="ProductId" Type="MstProductPackage" />
     </Type>
   </Table>
-  <Table Name="dbo.MstUser" Member="MstUsers">
-    <Type Name="MstUser">
-      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="UserName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="FirstName" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="LastName" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="EmailAddress" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="PhoneNumber" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="AspNetUserId" Type="System.String" DbType="NVarChar(128)" CanBeNull="true" />
-      <Association Name="MstUser_TrnAffiliate" Member="TrnAffiliates" ThisKey="Id" OtherKey="UserId" Type="TrnAffiliate" />
-      <Association Name="MstUser_TrnSale" Member="TrnSales" ThisKey="Id" OtherKey="UserId" Type="TrnSale" />
-      <Association Name="MstUser_SysAcessLog" Member="SysAcessLogs" ThisKey="Id" OtherKey="UserId" Type="SysAcessLog" />
-      <Association Name="MstUser_TrnFavorite" Member="TrnFavorites" ThisKey="Id" OtherKey="UserId" Type="TrnFavorite" />
-      <Association Name="AspNetUser_MstUser" Member="AspNetUser" ThisKey="AspNetUserId" OtherKey="Id" Type="AspNetUser" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.TrnAffiliate" Member="TrnAffiliates">
     <Type Name="TrnAffiliate">
       <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="ProductPackageId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="UserId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="AffiliateURL" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
-      <Association Name="MstUser_TrnAffiliate" Member="MstUser" ThisKey="UserId" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
       <Association Name="MstProductPackage_TrnAffiliate" Member="MstProductPackage" ThisKey="ProductPackageId" OtherKey="Id" Type="MstProductPackage" IsForeignKey="true" />
+      <Association Name="MstUser_TrnAffiliate" Member="MstUser" ThisKey="UserId" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.TrnStockEarning" Member="TrnStockEarnings">
@@ -250,6 +234,24 @@
       <Column Name="Symbol" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Association Name="MstSymbol_TrnSectorSymbol" Member="MstSymbol" ThisKey="SymbolId" OtherKey="Id" Type="MstSymbol" IsForeignKey="true" />
       <Association Name="TrnSector_TrnSectorSymbol" Member="TrnSector" ThisKey="SectorId" OtherKey="Id" Type="TrnSector" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MstUser" Member="MstUsers">
+    <Type Name="MstUser">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UserName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="FirstName" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="LastName" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="EmailAddress" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="PhoneNumber" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="AspNetUserId" Type="System.String" DbType="NVarChar(128)" CanBeNull="true" />
+      <Column Name="Address" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="ReferralUserName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Association Name="MstUser_TrnAffiliate" Member="TrnAffiliates" ThisKey="Id" OtherKey="UserId" Type="TrnAffiliate" />
+      <Association Name="MstUser_TrnSale" Member="TrnSales" ThisKey="Id" OtherKey="UserId" Type="TrnSale" />
+      <Association Name="MstUser_SysAcessLog" Member="SysAcessLogs" ThisKey="Id" OtherKey="UserId" Type="SysAcessLog" />
+      <Association Name="MstUser_TrnFavorite" Member="TrnFavorites" ThisKey="Id" OtherKey="UserId" Type="TrnFavorite" />
+      <Association Name="AspNetUser_MstUser" Member="AspNetUser" ThisKey="AspNetUserId" OtherKey="Id" Type="AspNetUser" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

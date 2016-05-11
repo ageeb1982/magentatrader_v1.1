@@ -28,10 +28,10 @@ namespace MagentaTrader.Controllers
                 DateTime date1 = ((date2.AddDays(1)).AddYears(-10)).AddMonths(-5);
 
                 var StockPrices = (from d in db.TrnStockPrices
-                                    where (d.Symbol == symbol) &&
+                                   where (d.Symbol == symbol) &&
                                         (d.QuoteDate >= date1 && d.QuoteDate <= date2)
-                                    orderby d.QuoteDate descending
-                                    select new Models.StockPrice
+                                   orderby d.QuoteDate descending
+                                   select new Models.StockPrice
                                     {
                                         QuoteDate = Convert.ToString(d.QuoteDate.Year) + "-" + Convert.ToString(d.QuoteDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.QuoteDate.Day + 100).Substring(1, 2),
                                         OpenPrice = d.OpenPrice,

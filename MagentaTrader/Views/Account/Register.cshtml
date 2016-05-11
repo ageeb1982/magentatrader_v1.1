@@ -1,6 +1,8 @@
 ﻿@model MagentaTrader.Models.RegisterViewModel
 @{
     ViewBag.Title = "Register";
+
+    var Referral = Request.QueryString["referral"];
 }
 
 @*<h2>@ViewBag.Title.</h2>*@
@@ -64,18 +66,22 @@
                         <fieldset>
                             <input id="UserName" class="form-control" placeholder="Username" name="UserName" type="text" autofocus>
                             <br />
-                            <input id="FirstName" class="form-control" placeholder="First Name" name="FirstName" type="text" autofocus>
-                            <br />
-                            <input id="LastName" class="form-control" placeholder="Last Name" name="LastName" type="text" autofocus>
-                            <br />
-                            <input id="EmailAddress" class="form-control" placeholder="Email Address" name="EmailAddress" type="text" autofocus>
-                            <br />
-                            <input id="PhoneNumber" class="form-control" placeholder="Phone Number" name="PhoneNumber" type="text" autofocus>
-                            <br />
                             <input id="Password" class="form-control" placeholder="Password" name="Password" type="password" value="">
                             <br />
                             <input id="ConfirmPassword" class="form-control" placeholder="Confirm Password" name="ConfirmPassword" type="password" value="">
+                            <hr />
+                            <input id="FirstName" class="form-control" placeholder="First Name" name="FirstName" type="text">
                             <br />
+                            <input id="LastName" class="form-control" placeholder="Last Name" name="LastName" type="text">
+                            <br />
+                            <input id="EmailAddress" class="form-control" placeholder="Email Address" name="EmailAddress" type="text">
+                            <br />
+                            <textarea id="Address" class="form-control" placeholder="Address" name="Address"></textarea>
+                            <br />
+                            <input id="PhoneNumber" class="form-control" placeholder="Phone Number" name="PhoneNumber" type="text">
+                            <br />
+                            <input id="ReferralUserName" class="form-control" placeholder="Referred By" name="ReferralUserName" type="text">
+                            <hr />
                             <div class="g-recaptcha" data-sitekey="6Lc5GBoTAAAAAAEQ98bJVGjZJOgt_WlfZOgkVAM9"></div>
                             <br />
                             <input type="submit" value="Register" class="btn btn-lg btn-success btn-block" />
@@ -91,3 +97,10 @@
 <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="/bower_components/metisMenu/dist/metisMenu.min.js"></script>
 <script src="/dist/js/sb-admin-2.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var referral = "@Referral";
+        document.getElementById('ReferralUserName').value = referral.toUpperCase();
+    });
+</script>

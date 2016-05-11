@@ -25,13 +25,13 @@ namespace MagentaTrader.Models
         public double? highPrice { get; set; }
         public double? lowPrice { get; set; }
         public double? volatility { get; set; }
-        public long? delta { get; set; }
-        public long? gamma { get; set; }
-        public long? theta { get; set; }
-        public long? vega { get; set; }
-        public long? rho { get; set; }
-        public long? openInterest { get; set; }
-        public long? delay { get; set; }
+        public double? delta { get; set; }
+        public double? gamma { get; set; }
+        public double? theta { get; set; }
+        public double? vega { get; set; }
+        public double? rho { get; set; }
+        public double? openInterest { get; set; }
+        public double? delay { get; set; }
         public bool? isHalted { get; set; }
         public double? VWAP { get; set; }
     }

@@ -205,6 +205,7 @@
     <Compile Include="Controllers\SymbolController.cs" />
     <Compile Include="Controllers\TradierController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\VariableScannerController.cs" />
     <Compile Include="Controllers\VideoController.cs" />
     <Compile Include="Controllers\Web99Controller.cs" />
     <Compile Include="Controllers\WorkshopController.cs" />
@@ -274,6 +275,7 @@
     <Compile Include="Models\TradierUserAccount.cs" />
     <Compile Include="Models\TradierUserProfile.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Models\VariableScanner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\SimpleStatistics.cs" />
@@ -866,6 +868,8 @@
     <Content Include="img\logo-1.png" />
     <Content Include="img\logo-2.png" />
     <Content Include="img\logo.png" />
+    <Content Include="img\lv-nov13-16-seatingplan.png" />
+    <Content Include="img\lvnov132016.jpg" />
     <Content Include="img\magenta-screen.png" />
     <Content Include="img\magenta-tradier.png" />
     <Content Include="img\phones.png" />
@@ -1519,10 +1523,12 @@
     <Content Include="Views\PremiumWebinars\Index.cshtml" />
     <Content Include="Views\Sector\Index.cshtml" />
     <Content Include="Views\BrokerLogin\Index.cshtml" />
+    <Content Include="Views\Campaign\LV20161113.cshtml" />
+    <Content Include="Views\Campaign\BetaTesters.cshtml" />
+    <Content Include="Views\Admin\Roles.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Roles\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

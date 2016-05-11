@@ -42,5 +42,19 @@ namespace MagentaTrader.Controllers
         {
             return View();
         }
+
+        //
+        // GET: /Campaign/BetaTesters
+        public ActionResult BetaTesters()
+        {
+            return View();
+        }
+
+        //
+        // GET: /Campaign/LV20161113
+        public ActionResult LV20161113()
+        {
+            return View();
+        }
 	}
 }

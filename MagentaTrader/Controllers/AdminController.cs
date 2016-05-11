@@ -81,5 +81,12 @@ namespace MagentaTrader.Controllers
             return View();
         }
 
+        //
+        // GET: /Admin/Roles
+        [Authorize]
+        public ActionResult Roles()
+        {
+            return View();
+        }
     }
 }

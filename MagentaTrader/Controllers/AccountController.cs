@@ -119,8 +119,8 @@ namespace MagentaTrader.Controllers
 
         //
         // GET: /Account/Register
-        //[AllowAnonymous]
-        [Authorize]
+        [AllowAnonymous]
+        //[Authorize]
         public ActionResult Register()
         {
             return View();
@@ -128,8 +128,8 @@ namespace MagentaTrader.Controllers
 
         // POST: /Account/Register
         [HttpPost]
-        //[AllowAnonymous]
-        [Authorize]
+        [AllowAnonymous]
+        //[Authorize]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
@@ -146,51 +146,60 @@ namespace MagentaTrader.Controllers
                 
                 if (!verificationResult.Success)
                 {
-                    ModelState.AddModelError("", "Invalid recaptcha challenge.");
+                    ModelState.AddModelError("", "ERROR: Invalid recaptcha challenge.");
                 }
                 else
                 {
                     if (result.Succeeded)
                     {
-                        await SignInAsync(user, isPersistent: false);
-
                         // Add or update MstUser table
-                        Data.MagentaTradersDBDataContext db = new Data.MagentaTradersDBDataContext();
-
-                        var Users = from d in db.MstUsers where d.UserName == model.UserName select d;
-
-                        if (Users.Any())
+                        try
                         {
-                            var UpdatedUser = Users.FirstOrDefault();
+                            await SignInAsync(user, isPersistent: false);
 
-                            UpdatedUser.AspNetUserId = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault().Id;
+                            Data.MagentaTradersDBDataContext db = new Data.MagentaTradersDBDataContext();
 
-                            db.SubmitChanges();
+                            var Users = from d in db.MstUsers where d.UserName == model.UserName select d;
+
+                            if (Users.Any())
+                            {
+                                var UpdatedUser = Users.FirstOrDefault();
+
+                                UpdatedUser.AspNetUserId = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault().Id;
+
+                                db.SubmitChanges();
+                            }
+                            else
+                            {
+                                Data.MstUser NewUser = new Data.MstUser();
+
+                                NewUser.UserName = model.UserName;
+                                NewUser.FirstName = model.FirstName == null || model.FirstName.Length == 0 ? "NA" : model.FirstName;
+                                NewUser.LastName = model.LastName == null || model.LastName.Length == 0 ? "NA" : model.LastName;
+                                NewUser.EmailAddress = model.EmailAddress == null || model.EmailAddress.Length == 0 ? "NA" : model.EmailAddress;
+                                NewUser.PhoneNumber = model.PhoneNumber == null || model.PhoneNumber.Length == 0 ? "NA" : model.PhoneNumber;
+                                NewUser.Address = model.Address == null || model.Address.Length == 0 ? "" : model.Address;
+                                NewUser.ReferralUserName = model.ReferralUserName == null || model.ReferralUserName.Length == 0 ? "" : model.ReferralUserName;
+                                NewUser.AspNetUserId = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault().Id;
+
+                                db.MstUsers.InsertOnSubmit(NewUser);
+                                db.SubmitChanges();
+
+                                Data.AspNetUserRole NewRole = new Data.AspNetUserRole();
+
+                                NewRole.AspNetUser = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault();
+                                NewRole.AspNetRole = db.AspNetRoles.Where(d => d.Name == "Broker").FirstOrDefault();
+
+                                db.AspNetUserRoles.InsertOnSubmit(NewRole);
+                                db.SubmitChanges();
+                            }
+
+                            return RedirectToAction("Index", "Home");
                         }
-                        else
+                        catch(Exception e)
                         {
-                            Data.MstUser NewUser = new Data.MstUser();
-
-                            NewUser.UserName = model.UserName;
-                            NewUser.FirstName = model.FirstName == null || model.FirstName.Length == 0 ? "NA" : model.FirstName;
-                            NewUser.LastName = model.LastName == null || model.LastName.Length == 0 ? "NA" : model.LastName;
-                            NewUser.EmailAddress = model.EmailAddress == null || model.EmailAddress.Length == 0 ? "NA" : model.EmailAddress;
-                            NewUser.PhoneNumber = model.PhoneNumber == null || model.PhoneNumber.Length == 0 ? "NA" : model.PhoneNumber;
-                            NewUser.AspNetUserId = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault().Id;
-
-                            db.MstUsers.InsertOnSubmit(NewUser);
-                            db.SubmitChanges();
-
-                            Data.AspNetUserRole NewRole = new Data.AspNetUserRole();
-
-                            NewRole.AspNetUser = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault();
-                            NewRole.AspNetRole = db.AspNetRoles.Where(d => d.Name == "Broker").FirstOrDefault();
-
-                            db.AspNetUserRoles.InsertOnSubmit(NewRole);
-                            db.SubmitChanges();
+                            ModelState.AddModelError("", "ERROR: Try again. " + e.ToString());
                         }
-
-                        return RedirectToAction("Index", "Home");
                     }
                     else
                     {
