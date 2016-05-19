@@ -516,8 +516,9 @@
                 </div>
                 <div>&nbsp;</div>
                 <ul class="nav nav-tabs">
-                    <li class="active"><a data-toggle="tab" href="#OptionCall">Calls</a></li>
-                    <li><a data-toggle="tab" href="#OptionPut">Puts</a></li>
+                    <li class="active"><a data-toggle="tab" href="#OptionCall" onclick="OptionTab_OnClick(1)">Calls</a></li>
+                    <li><a data-toggle="tab" href="#OptionPut" onclick="OptionTab_OnClick(2)">Puts</a></li>
+                    <li><a data-toggle="tab" href="#MultipleExpirations" onclick="OptionTab_OnClick(3)">Multiple Expiration Dates</a></li>
                 </ul>
                 <div id="OptionChainTab" class="tab-content">
                     <div id="OptionCall" class="tab-pane active">
@@ -525,6 +526,19 @@
                     </div>
                     <div id="OptionPut" class="tab-pane">
                         <div id="OptionPutGrid" class="grid"></div>
+                    </div>
+                    <div id="MultipleExpirations" class="tab-pane">
+                        <div>
+                            <br />
+                            <p>First Expiration Date</p>
+                            <select class="form-control custom-width" id="optionExpirationDate1"></select>
+                            <br />
+                            <p>Second Expiration Date</p>
+                            <select class="form-control custom-width" id="optionExpirationDate2"></select>
+                            <br />
+                            <p>Third Expiration Date</p>
+                            <select class="form-control custom-width" id="optionExpirationDate3"></select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -536,6 +550,9 @@
                         </button>
                         <button type="button" class="btn btn-primary" id="plotPuts" onclick="plotPutOptionChain()">
                             Plot Puts
+                        </button>
+                        <button type="button" class="btn btn-primary" id="plotExpiryDates" onclick="plotExpiryDates()">
+                            Plot Exiry Dates
                         </button>
                     </span>
                 </span>
@@ -894,6 +911,8 @@
                     backdrop: false
                 });
 
+                OptionTab_OnClick(1);
+
                 var change = plotData[125].close - plotData[124].close;
                 if (change >= 0) {
                     $("#TradierOptionChainTitle").html(dataSymbol + " Option Chain: " + "<font color='" + GreenColor + "'>" + plotData[125].close + "(" + change.toFixed(2) + ")</font>");
@@ -902,12 +921,18 @@
                 }
 
                 $('#optionExpirationDates').empty();
+                $('#optionExpirationDate1').empty();
+                $('#optionExpirationDate2').empty();
+                $('#optionExpirationDate3').empty();
                 $('#OptionCallGrid').empty();
                 $('#OptionPutGrid').empty();
 
                 if (result.optionChain.length > 0) {
                     for (var i = 0; i < result.optionChain.length; i++) {
                         $('#optionExpirationDates').append("<option value='" + result.optionChain[i].expiryDate + "'>" + result.optionChain[i].expiryDate + "</option>");
+                        $('#optionExpirationDate1').append("<option value='" + result.optionChain[i].expiryDate + "'>" + result.optionChain[i].expiryDate + "</option>");
+                        $('#optionExpirationDate2').append("<option value='" + result.optionChain[i].expiryDate + "'>" + result.optionChain[i].expiryDate + "</option>");
+                        $('#optionExpirationDate3').append("<option value='" + result.optionChain[i].expiryDate + "'>" + result.optionChain[i].expiryDate + "</option>");
                     }
                     QuestradeOptionChain = result;
                 }
@@ -1506,6 +1531,8 @@
                 backdrop: false
             });
 
+            OptionTab_OnClick(1);
+
             var change = plotData[125].close - plotData[124].close;
             if (change >= 0) {
                 $("#TradierOptionChainTitle").html(dataSymbol + " Option Chain: " + "<font color='" + GreenColor + "'>" + plotData[125].close + "(" + change.toFixed(2) + ")</font>");
@@ -1514,6 +1541,9 @@
             }
 
             $('#optionExpirationDates').empty();
+            $('#optionExpirationDate1').empty();
+            $('#optionExpirationDate2').empty();
+            $('#optionExpirationDate3').empty();
             $('#OptionCallGrid').empty();
             $('#OptionPutGrid').empty();
             $.ajax({
@@ -1526,6 +1556,9 @@
                     if (result.expirations.date.length > 0) {
                         for (var i = 0; i < result.expirations.date.length; i++) {
                             $('#optionExpirationDates').append("<option value='" + result.expirations.date[i] + "'>" + result.expirations.date[i] + "</option>");
+                            $('#optionExpirationDate1').append("<option value='" + result.expirations.date[i] + "'>" + result.expirations.date[i] + "</option>");
+                            $('#optionExpirationDate2').append("<option value='" + result.expirations.date[i] + "'>" + result.expirations.date[i] + "</option>");
+                            $('#optionExpirationDate3').append("<option value='" + result.expirations.date[i] + "'>" + result.expirations.date[i] + "</option>");
                         }
                     }
                 }
@@ -4698,6 +4731,30 @@
                 }
             }
         });
+    }
+
+    function plotExpiryDates() {
+
+    }
+
+    function OptionTab_OnClick(tab) {
+        switch (tab) {
+            case 1:
+                document.getElementById('plotCalls').style.visibility = 'visible';
+                document.getElementById('plotPuts').style.visibility = 'hidden';
+                document.getElementById('plotExpiryDates').style.visibility = 'hidden';
+                break;
+            case 2:
+                document.getElementById('plotCalls').style.visibility = 'hidden';
+                document.getElementById('plotPuts').style.visibility = 'visible';
+                document.getElementById('plotExpiryDates').style.visibility = 'hidden';
+                break;
+            case 3:
+                document.getElementById('plotCalls').style.visibility = 'hidden';
+                document.getElementById('plotPuts').style.visibility = 'hidden';
+                document.getElementById('plotExpiryDates').style.visibility = 'visible';
+                break;
+        }
     }
 
     $(document).ready(function () {

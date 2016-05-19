@@ -314,7 +314,8 @@ namespace MagentaTrader.Controllers
                     var symbolId = from d in db.MstSymbols where d.Symbol.Equals(Symbols[i].Trim()) select d;
                     if (symbolId.Any())
                     {
-                        SqlDateTime EncodedDate = new SqlDateTime();
+                        DateTime d = DateTime.Now;
+                        SqlDateTime EncodedDate = new SqlDateTime(new DateTime(d.Year, d.Month, d.Day));
 
                         NewFavorite.SymbolId = symbolId.FirstOrDefault().Id;
                         NewFavorite.Symbol = Symbols[i].ToUpper();
@@ -330,7 +331,10 @@ namespace MagentaTrader.Controllers
                         returnId = NewFavorite.Id;
                     }
 
-                    if (i > 450 - countFavorites) break;
+                    if (currentUserName.ToUpper()!="DPILGER") {
+                        if (i > 450 - countFavorites) break;
+                    }
+                    
                 }
             }
             catch

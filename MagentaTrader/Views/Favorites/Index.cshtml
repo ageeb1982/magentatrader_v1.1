@@ -71,7 +71,15 @@
                 Upload
             </label>
         </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-lg-12">
+            <button id="CmdDownloadVarScan" class="btn btn-primary pull-right" onclick="CmdDownloadVarScan_OnClick()">
+                Download (Variable Scan Result)
+            </button>
         </div>
+    </div>
     <br />
     <div class="row">
         <div class="col-lg-12">
@@ -936,6 +944,121 @@
             link.click();
             document.body.removeChild(link);
         }
+    }
+    function CmdDownloadVarScan_OnClick() {
+        $('#loading').modal('show');
+
+        var data = [];
+        var CSV = '';
+
+        for (var i = 0; i < Favorites.items.length; i++) {
+            data.push(Favorites.items[i].Symbol);
+        }
+
+        var filteredData = [];
+        for (i = 0; i < 100; i++) {
+            filteredData.push(data[i]);
+        }
+
+        $.ajax({
+            type: "GET",
+            url: "/api/VariableScanner",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: { Symbols: filteredData },
+            success: function (result) {
+
+                // Data
+                data = [];
+                for (i = 0; i < result.length; i++) {
+                    data.push({
+                        Symbol: result[i].Symbol,
+                        UpDate: result[i].UpDate,
+                        UpNoOfDays: result[i].UpNoOfDays,
+                        UpRate: result[i].UpRate,
+                        UpPercentage: result[i].UpPercentage,
+                        UpYear0: result[i].UpYearPercentage.length > 0 ? result[i].UpYearPercentage[0].Percentage : 0,
+                        UpYear1: result[i].UpYearPercentage.length > 1 ? result[i].UpYearPercentage[1].Percentage : 0,
+                        UpYear2: result[i].UpYearPercentage.length > 2 ? result[i].UpYearPercentage[2].Percentage : 0,
+                        UpYear3: result[i].UpYearPercentage.length > 3 ? result[i].UpYearPercentage[3].Percentage : 0,
+                        UpYear4: result[i].UpYearPercentage.length > 4 ? result[i].UpYearPercentage[4].Percentage : 0,
+                        UpYear5: result[i].UpYearPercentage.length > 5 ? result[i].UpYearPercentage[5].Percentage : 0,
+                        UpYear6: result[i].UpYearPercentage.length > 6 ? result[i].UpYearPercentage[6].Percentage : 0,
+                        UpYear7: result[i].UpYearPercentage.length > 7 ? result[i].UpYearPercentage[7].Percentage : 0,
+                        UpYear8: result[i].UpYearPercentage.length > 8 ? result[i].UpYearPercentage[8].Percentage : 0,
+                        UpYear9: result[i].UpYearPercentage.length > 9 ? result[i].UpYearPercentage[9].Percentage : 0,
+                        DownDate: result[i].DownDate,
+                        DownNoOfDays: result[i].DownNoOfDays,
+                        DownRate: result[i].DownRate,
+                        DownPercentage: result[i].DownPercentage,
+                        DownYear0: result[i].DownYearPercentage.length > 0 ? result[i].DownYearPercentage[0].Percentage : 0,
+                        DownYear1: result[i].DownYearPercentage.length > 1 ? result[i].DownYearPercentage[1].Percentage : 0,
+                        DownYear2: result[i].DownYearPercentage.length > 2 ? result[i].DownYearPercentage[2].Percentage : 0,
+                        DownYear3: result[i].DownYearPercentage.length > 3 ? result[i].DownYearPercentage[3].Percentage : 0,
+                        DownYear4: result[i].DownYearPercentage.length > 4 ? result[i].DownYearPercentage[4].Percentage : 0,
+                        DownYear5: result[i].DownYearPercentage.length > 5 ? result[i].DownYearPercentage[5].Percentage : 0,
+                        DownYear6: result[i].DownYearPercentage.length > 6 ? result[i].DownYearPercentage[6].Percentage : 0,
+                        DownYear7: result[i].DownYearPercentage.length > 7 ? result[i].DownYearPercentage[7].Percentage : 0,
+                        DownYear8: result[i].DownYearPercentage.length > 8 ? result[i].DownYearPercentage[8].Percentage : 0,
+                        DownYear9: result[i].DownYearPercentage.length > 9 ? result[i].DownYearPercentage[9].Percentage : 0
+                    });
+                }
+
+                // Label
+                var label = '';
+                for (var d in data[0]) {
+                    label += d + ',';
+                }
+                label = label.slice(0, -1);
+                CSV += label + '\r\n';
+
+                // Rows
+                for (var i = 0; i < data.length; i++) {
+                    var row = '';
+                    for (var d in data[i]) {
+                        row += '"' + data[i][d] + '",';
+                    }
+                    row.slice(0, row.length - 1);
+                    CSV += row + '\r\n';
+                }
+
+                // Filename
+                var $favoriteName = document.getElementById('FavoriteName').value;
+
+                var fileName = 'variable_scanner_' + $favoriteName  + '.CSV';
+
+                // <a> Tag to download
+                var link = document.createElement("a");
+
+                if (link.download !== undefined) {
+                    var blob = new Blob([CSV], { type: 'text/csv;charset=utf-8;' });
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", fileName);
+                    link.style = "visibility:hidden";
+                }
+
+                if (navigator.msSaveBlob) {
+                    link.addEventListener("click", function (event) {
+                        var blob = new Blob([CSV], {
+                            "type": "text/csv;charset=utf-8;"
+                        });
+                        navigator.msSaveBlob(blob, fileName);
+                    }, false);
+                }
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                $('#loading').modal('hide');
+            },
+            statusCode: {
+                404: function () {
+                    alert('Failed');
+                }
+            }
+        });
     }
 
     function updateNavigationButtons() {
