@@ -515,10 +515,10 @@
                     </div>
                 </div>
                 <div>&nbsp;</div>
-                <ul class="nav nav-tabs">
-                    <li class="active"><a data-toggle="tab" href="#OptionCall" onclick="OptionTab_OnClick(1)">Calls</a></li>
-                    <li><a data-toggle="tab" href="#OptionPut" onclick="OptionTab_OnClick(2)">Puts</a></li>
-                    <li><a data-toggle="tab" href="#MultipleExpirations" onclick="OptionTab_OnClick(3)">Multiple Expiration Dates</a></li>
+                <ul id="optionTabs" class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#OptionCall" onclick="optionTab_OnClick(1)">Calls</a></li>
+                    <li><a data-toggle="tab" href="#OptionPut" onclick="optionTab_OnClick(2)">Puts</a></li>
+                    <li><a data-toggle="tab" href="#MultipleExpirations" onclick="optionTab_OnClick(3)">Multiple Expiration Dates</a></li>
                 </ul>
                 <div id="OptionChainTab" class="tab-content">
                     <div id="OptionCall" class="tab-pane active">
@@ -528,16 +528,19 @@
                         <div id="OptionPutGrid" class="grid"></div>
                     </div>
                     <div id="MultipleExpirations" class="tab-pane">
-                        <div>
+                        <div class="controls form-inline">
                             <br />
                             <p>First Expiration Date</p>
                             <select class="form-control custom-width" id="optionExpirationDate1"></select>
+                            @*<label><input type="radio" name="optionExpirationStrike" value="1" checked>Compte Strike Prices</label>*@
                             <br />
                             <p>Second Expiration Date</p>
                             <select class="form-control custom-width" id="optionExpirationDate2"></select>
+                            @*<label><input type="radio" name="optionExpirationStrike" value="2">Compte Strike Prices</label>*@
                             <br />
                             <p>Third Expiration Date</p>
                             <select class="form-control custom-width" id="optionExpirationDate3"></select>
+                            @*<label><input type="radio" name="optionExpirationStrike" value="3">Compte Strike Prices</label>*@
                         </div>
                     </div>
                 </div>
@@ -551,8 +554,11 @@
                         <button type="button" class="btn btn-primary" id="plotPuts" onclick="plotPutOptionChain()">
                             Plot Puts
                         </button>
-                        <button type="button" class="btn btn-primary" id="plotExpiryDates" onclick="plotExpiryDates()">
-                            Plot Exiry Dates
+                        <button type="button" class="btn btn-primary" id="plotExpiryDatesCalls" onclick="plotExpiryDates(0)">
+                            Plot Exiry Dates - Calls
+                        </button>
+                        <button type="button" class="btn btn-primary" id="plotExpiryDatesPuts" onclick="plotExpiryDates(1)">
+                            Plot Exiry Dates - Puts
                         </button>
                     </span>
                 </span>
@@ -742,7 +748,7 @@
     var QuestradeApiServer;
     var QuestradeOptionChain;
 
-    // Options
+    // Options Single Expiry
 
     var OptionCallGrid;
     var OptionPutGrid;
@@ -753,6 +759,16 @@
     var guideExpiryDate;
     var guideTargetDate;
     var trendTarget;
+
+    // Options Multiple Expiry
+
+    var guideExpiryDate1;
+    var guideExpiryDate2;
+    var guideExpiryDate3;
+
+    var expiryDate1Strike = [];
+    var expiryDate2Strike = [];
+    var expiryDate3Strike = [];
 
     // Moving Average
 
@@ -911,7 +927,7 @@
                     backdrop: false
                 });
 
-                OptionTab_OnClick(1);
+                optionTab_OnClick(1);
 
                 var change = plotData[125].close - plotData[124].close;
                 if (change >= 0) {
@@ -1531,7 +1547,8 @@
                 backdrop: false
             });
 
-            OptionTab_OnClick(1);
+            $('#optionTabs a[href="#OptionCall"]').tab('show');
+            optionTab_OnClick(1);
 
             var change = plotData[125].close - plotData[124].close;
             if (change >= 0) {
@@ -2138,7 +2155,28 @@
             stockPanel1.valueAxes[1].removeGuide(guideRiskReward[i]);
         }
         stockPanel1.categoryAxis.removeGuide(guideExpiryDate);
+        stockPanel1.categoryAxis.removeGuide(guideExpiryDate1);
+        stockPanel1.categoryAxis.removeGuide(guideExpiryDate2);
+        stockPanel1.categoryAxis.removeGuide(guideExpiryDate3);
         stockPanel1.categoryAxis.removeGuide(guideTargetDate);
+        for (var i = 0; i < expiryDate1Strike.length; i++) {
+            stockPanel1.removeStockGraph(expiryDate1Strike[i]);
+        }
+        for (var i = 0; i < expiryDate2Strike.length; i++) {
+            stockPanel1.removeStockGraph(expiryDate2Strike[i]);
+        }
+        for (var i = 0; i < expiryDate3Strike.length; i++) {
+            stockPanel1.removeStockGraph(expiryDate3Strike[i]);
+        }
+        for (var t = 0; t < plotData.length; t++) {
+            for (var s = 0; s <= 9; s++) {
+                plotData[t]["s1_" + s.toString()] = 'NaN';
+                plotData[t]["s2_" + s.toString()] = 'NaN';
+                plotData[t]["s3_" + s.toString()] = 'NaN';
+            }
+        }
+
+        chart.validateData();
         stockPanel1.validateNow();
         // Compute for the max
         var maxVolume = 0;
@@ -2237,6 +2275,7 @@
     }
     function plotPutOptionChain() {
         var putColor = "#A51717";
+
         // Remove existing plot
         for (var i = 0; i < trendStrike.length; i++) {
             stockPanel1.removeTrendLine(trendStrike[i]);
@@ -2244,10 +2283,31 @@
         for (var i = 0; i < guideRiskReward.length; i++) {
             stockPanel1.valueAxes[1].removeGuide(guideRiskReward[i]);
         }
-        //stockPanel1.removeTrendLine(trendTarget);
         stockPanel1.categoryAxis.removeGuide(guideExpiryDate);
+        stockPanel1.categoryAxis.removeGuide(guideExpiryDate1);
+        stockPanel1.categoryAxis.removeGuide(guideExpiryDate2);
+        stockPanel1.categoryAxis.removeGuide(guideExpiryDate3);
         stockPanel1.categoryAxis.removeGuide(guideTargetDate);
+        for (var i = 0; i < expiryDate1Strike.length; i++) {
+            stockPanel1.removeStockGraph(expiryDate1Strike[i]);
+        }
+        for (var i = 0; i < expiryDate2Strike.length; i++) {
+            stockPanel1.removeStockGraph(expiryDate2Strike[i]);
+        }
+        for (var i = 0; i < expiryDate3Strike.length; i++) {
+            stockPanel1.removeStockGraph(expiryDate3Strike[i]);
+        }
+        for (var t = 0; t < plotData.length; t++) {
+            for (var s = 0; s <= 9; s++) {
+                plotData[t]["s1_" + s.toString()] = 'NaN';
+                plotData[t]["s2_" + s.toString()] = 'NaN';
+                plotData[t]["s3_" + s.toString()] = 'NaN';
+            }
+        }
+
+        chart.validateData();
         stockPanel1.validateNow();
+
         // Compute for the max volumen
         var maxVolume = 0;
         for (var i = 0; i < sortedDataPuts.length; i++) {
@@ -2343,6 +2403,895 @@
         }
         // Hide modal
         $('#TradierOptionChain').modal('hide');
+    }
+    function plotExpiryDates(optionType) {
+        var expirationDate1 = document.getElementById("optionExpirationDate1").value.substring(0, 10);
+        var expirationDate2 = document.getElementById("optionExpirationDate2").value.substring(0, 10);
+        var expirationDate3 = document.getElementById("optionExpirationDate3").value.substring(0, 10);
+        var lineColor = BlueColor;
+        //var optionExpiryDatePick = parseInt(document.querySelector('input[name="optionExpirationStrike"]:checked').value);
+
+        if (optionType == 0) {
+            lineColor = "#00B92C"; //Call Color
+        } else {
+            lineColor = "#A51717"; //Put Color
+        }
+
+        // Remove existing plot
+        for (var i = 0; i < trendStrike.length; i++) {
+            stockPanel1.removeTrendLine(trendStrike[i]);
+        }
+        for (var i = 0; i < guideRiskReward.length; i++) {
+            stockPanel1.valueAxes[1].removeGuide(guideRiskReward[i]);
+        }
+        stockPanel1.categoryAxis.removeGuide(guideExpiryDate);
+        stockPanel1.categoryAxis.removeGuide(guideExpiryDate1);
+        stockPanel1.categoryAxis.removeGuide(guideExpiryDate2);
+        stockPanel1.categoryAxis.removeGuide(guideExpiryDate3);
+        stockPanel1.categoryAxis.removeGuide(guideTargetDate);
+        for (var i = 0; i < expiryDate1Strike.length; i++) {
+            stockPanel1.removeStockGraph(expiryDate1Strike[i]);
+        }
+        for (var i = 0; i < expiryDate2Strike.length; i++) {
+            stockPanel1.removeStockGraph(expiryDate2Strike[i]);
+        }
+        for (var i = 0; i < expiryDate3Strike.length; i++) {
+            stockPanel1.removeStockGraph(expiryDate3Strike[i]);
+        }
+        stockPanel1.validateNow();
+
+        var $optionTime = document.getElementById('optionTime').value;
+        $optionTime = !$optionTime ? 10 : $optionTime;
+
+        var d1 = new Date(parseDate(expirationDate1)); var nd1 = new Date(d1);
+        var d2 = new Date(parseDate(expirationDate2)); var nd2 = new Date(d2);
+        var d3 = new Date(parseDate(expirationDate3)); var nd3 = new Date(d3);
+
+        nd1.setDate(nd1.getDate() - $optionTime);
+        nd2.setDate(nd2.getDate() - $optionTime);
+        nd3.setDate(nd3.getDate() - $optionTime);
+
+        var nd1dd = nd1.getDate(); var nd1mm = nd1.getMonth() + 1; var nd1yy = nd1.getFullYear();
+        var nd2dd = nd2.getDate(); var nd2mm = nd2.getMonth() + 1; var nd2yy = nd2.getFullYear();
+        var nd3dd = nd3.getDate(); var nd3mm = nd3.getMonth() + 1; var nd3yy = nd3.getFullYear();
+
+        var exp1Date = parseDate(nd1yy + '-' + nd1mm + '-' + nd1dd);
+        var exp2Date = parseDate(nd2yy + '-' + nd2mm + '-' + nd2dd);
+        var exp3Date = parseDate(nd3yy + '-' + nd3mm + '-' + nd3dd);
+
+        guideExpiryDate1 = new AmCharts.Guide();
+        guideExpiryDate1.date = exp1Date;
+        guideExpiryDate1.lineColor = lineColor;
+        guideExpiryDate1.lineAlpha = 1;
+        guideExpiryDate1.lineThickness = 4;
+        guideExpiryDate1.inside = true;
+        guideExpiryDate1.labelRotation = 90;
+        guideExpiryDate1.label = $optionTime.toString() + " Days prior to expiry: " + expirationDate1;
+        stockPanel1.categoryAxis.addGuide(guideExpiryDate1);
+
+        guideExpiryDate2 = new AmCharts.Guide();
+        guideExpiryDate2.date = exp2Date;
+        guideExpiryDate2.lineColor = lineColor;
+        guideExpiryDate2.lineAlpha = 1;
+        guideExpiryDate2.lineThickness = 4;
+        guideExpiryDate2.inside = true;
+        guideExpiryDate2.labelRotation = 90;
+        guideExpiryDate2.label = $optionTime.toString() + " Days prior to expiry: " + expirationDate2;
+        stockPanel1.categoryAxis.addGuide(guideExpiryDate2);
+
+        guideExpiryDate3 = new AmCharts.Guide();
+        guideExpiryDate3.date = exp3Date;
+        guideExpiryDate3.lineColor = lineColor;
+        guideExpiryDate3.lineAlpha = 1;
+        guideExpiryDate3.lineThickness = 4;
+        guideExpiryDate3.inside = true;
+        guideExpiryDate3.labelRotation = 90;
+        guideExpiryDate3.label = $optionTime.toString() + " Days prior to expiry: " + expirationDate3;
+        stockPanel1.categoryAxis.addGuide(guideExpiryDate3);
+
+        stockPanel1.validateNow();
+        $('#TradierOptionChain').modal('hide');
+
+        plotExpiryDateStrikes(1, expirationDate1, optionType, false);
+    }
+    function plotExpiryDateStrikes(id, expirationDate, optionType, refreshChart) {
+        var broker = getCookie("Broker");
+
+        var dataCalls = [];
+        var dataPuts = [];
+
+        var callColor = "#00B92C";
+        var putColor = "#A51717";
+
+        var $optionTime;
+        var $optionTargePrice;
+        var $optionVolatility;
+        var $optionRate;
+
+        var option_price;
+        var change;
+        var percentage;
+
+        var callOptionListData = [];
+        var putOptionListData = [];
+
+        if (broker == "Questrade") {
+            // =========
+            // Questrade
+            // =========
+
+            // Set dataCalls and Puts
+            for (var i = 0; i < QuestradeOptionChain.optionChain.length; i++) {
+                if (expirationDate == QuestradeOptionChain.optionChain[i].expiryDate) {
+                    if (QuestradeOptionChain.optionChain[i].chainPerRoot.length > 0) {
+                        if (QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice.length) {
+                            for (var s = 0; s < QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice.length; s++) {
+                                var strikePrice = QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice[s];
+                                dataCalls.push({
+                                    symbol: QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice[s].callSymbolId,
+                                    description: QuestradeOptionChain.optionChain[i].chainPerRoot[0].optionRoot + "-CALL(" + QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice[s].callSymbolId + ") @@" + strikePrice.strikePrice,
+                                    type: "OPTION",
+                                    last: 0,
+                                    change: 0,
+                                    volume: 0,
+                                    bid: 0,
+                                    bidsize: 0,
+                                    ask: 0,
+                                    asksize: 0,
+                                    open_interest: 0,
+                                    strike: strikePrice.strikePrice,
+                                    contract_size: 0,
+                                    expiration_date: QuestradeOptionChain.optionChain[i].expiryDate.substring(0, 10),
+                                    expiration_type: "NA",
+                                    option_type: "CALL",
+                                    root_symbol: QuestradeOptionChain.optionChain[i].chainPerRoot[0].optionRoot
+                                });
+                                dataPuts.push({
+                                    symbol: QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice[s].putSymbolId,
+                                    description: QuestradeOptionChain.optionChain[i].chainPerRoot[0].optionRoot + "-PUT(" + QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice[s].putSymbolId + ") @@" + strikePrice.strikePrice,
+                                    type: "OPTION",
+                                    last: 0,
+                                    change: 0,
+                                    volume: 0,
+                                    bid: 0,
+                                    bidsize: 0,
+                                    ask: 0,
+                                    asksize: 0,
+                                    open_interest: 0,
+                                    strike: strikePrice.strikePrice,
+                                    contract_size: 0,
+                                    expiration_date: QuestradeOptionChain.optionChain[i].expiryDate.substring(0, 10),
+                                    expiration_type: "NA",
+                                    option_type: "PUT",
+                                    root_symbol: QuestradeOptionChain.optionChain[i].chainPerRoot[0].optionRoot
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            dataCalls.sort(function compare(a, b) {
+                if (a.strike < b.strike)
+                    return -1;
+                if (a.strike > b.strike)
+                    return 1;
+                return 0;
+            });
+            dataPuts.sort(function compare(a, b) {
+                if (a.strike < b.strike)
+                    return -1;
+                if (a.strike > b.strike)
+                    return 1;
+                return 0;
+            });
+
+            sortedDataCalls = new wijmo.collections.ObservableArray();
+            sortedDataPuts = new wijmo.collections.ObservableArray();
+
+            sortedDataCalls = extractOptionChain(dataCalls);
+            sortedDataPuts = extractOptionChain(dataPuts);
+
+            // Black-Schole Default Values
+
+            $optionTime = document.getElementById('optionTime').value;
+            $optionTargePrice = document.getElementById('optionTargePrice').value;
+            $optionVolatility = document.getElementById('optionVolatility').value;
+            $optionRate = document.getElementById('optionRate').value;
+
+            option_price = 0;
+            change = 0;
+            percentage = 0;
+
+            $optionTime = !$optionTime ? 0.027 : $optionTime / 360;                                 // Annualize
+            $optionTargePrice = !$optionTargePrice ? plotData[125]["close"] : $optionTargePrice;    // Stock Price
+            $optionVolatility = !$optionVolatility ? 0.20 : $optionVolatility / 100;                // Percentage
+            $optionRate = !$optionRate ? 0.05 : $optionRate / 100;                                  // Percentage
+
+            // Calls
+            if (optionType == 0) {
+
+                // Calls Parameter
+                callOptionListData.push(QuestradeApiServer);
+                callOptionListData.push(QuestradeAccessToken);
+                for (var x = 0; x < sortedDataCalls.length; x++) {
+                    callOptionListData.push(sortedDataCalls[x].symbol.toString());
+                }
+
+                $.ajax({
+                    type: 'GET',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/GetQuestradeOptionQuotes',
+                    dataType: "json",
+                    data: { optionList: callOptionListData },
+                    success: function (result) {
+
+                        // Modify dataCalls
+                        for (var i = 0; i < result.optionQuotes.length; i++) {
+                            for (var s = 0; s < sortedDataCalls.length; s++) {
+                                if (result.optionQuotes[i].symbolId == sortedDataCalls[s].symbol) {
+                                    sortedDataCalls[s].description = result.optionQuotes[i].symbol;
+                                    sortedDataCalls[s].type = "Call";
+                                    sortedDataCalls[s].last = Math.abs(result.optionQuotes[i].lastTradePrice);
+                                    sortedDataCalls[s].change = Math.abs(result.optionQuotes[i].bidPrice) - Math.abs(result.optionQuotes[i].lastTradePrice);
+                                    sortedDataCalls[s].volume = Math.abs(result.optionQuotes[i].volume);
+                                    sortedDataCalls[s].bid = Math.abs(result.optionQuotes[i].bidPrice);
+                                    sortedDataCalls[s].bidsize = Math.abs(result.optionQuotes[i].bidSize);
+                                    sortedDataCalls[s].ask = Math.abs(result.optionQuotes[i].askPrice);
+                                    sortedDataCalls[s].asksize = Math.abs(result.optionQuotes[i].askSize);
+                                    sortedDataCalls[s].open_interest = Math.abs(result.optionQuotes[i].openInterest);
+                                    sortedDataCalls[s].contract_size = Math.abs(result.optionQuotes[i].bidSize) + Math.abs(result.optionQuotes[i].askSize);
+                                }
+                            }
+                        }
+
+                        // Plot
+                        expiryDateStrike = [];
+                        for (var s = 0; s < sortedDataCalls.length; s++) {
+
+                            option_price = black_scholes.calculate(true, $optionTargePrice, sortedDataCalls[s].strike, $optionRate, $optionTime, $optionVolatility);
+                            change = option_price - sortedDataCalls[s].last;
+                            percentage = 0;
+                            change = Math.round(change * 100) / 100;
+
+                            if (sortedDataCalls[s].last > 0) {
+                                percentage = (change / sortedDataCalls[s].last) * 100;
+                            } else {
+                                if (change > 0) {
+                                    percentage = 100;
+                                } else if (change == 0) {
+                                    percentage = 0;
+                                } else {
+                                    percentage = -100;
+                                }
+                            }
+
+                            if (percentage < -100) {
+                                percentage = -100;
+                            }
+
+                            for (var t = 0; t < plotData.length; t++) {
+                                plotData[t]["s" + id.toString() + "_" + s.toString()] = 'NaN';
+                            }
+                            for (var t = 0; t < plotData.length; t++) {
+                                var $priorday1 = document.getElementById('optionTime').value;
+                                $priorday1 = !$priorday1 ? 10 : $priorday1;
+
+                                var d1 = new Date(parseDate(expirationDate)); var nd1 = new Date(d1);
+
+                                nd1.setDate(nd1.getDate() - $priorday1);
+
+                                var nd1dd = nd1.getDate(); var nd1mm = nd1.getMonth() + 1; var nd1yy = nd1.getFullYear();
+
+                                var expDate = parseDate(nd1yy + '-' + nd1mm + '-' + nd1dd);
+
+                                if (plotData[t]["date"] >= expDate) {
+                                    plotData[t]["s" + id.toString() + "_" + s.toString()] = sortedDataCalls[s].strike;
+                                    break;
+                                }
+                            }
+
+                            if (id == 1) {
+                                expiryDate1Strike[s] = new AmCharts.StockGraph();
+                                expiryDate1Strike[s].type = "candlestick";
+                                expiryDate1Strike[s].openField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].closeField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].highField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].lowField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].valueField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].balloonText = "$" + sortedDataCalls[s].strike.toString() + "  :  " + AmCharts.roundTo(percentage, 2) + "%   ";
+                                expiryDate1Strike[s].lineColor = callColor;
+                                expiryDate1Strike[s].fillColors = callColor;
+                                expiryDate1Strike[s].fillAlphas = 1;
+                                expiryDate1Strike[s].proCandlesticks = false;
+                                expiryDate1Strike[s].visibleInLegend = false;
+                                expiryDate1Strike[s].bullet = "round";
+                                expiryDate1Strike[s].bulletColor = callColor;
+                                expiryDate1Strike[s].bulletBorderColor = callColor;
+
+                                stockPanel1.addStockGraph(expiryDate1Strike[s]);
+                            } else if (id == 2) {
+                                expiryDate2Strike[s] = new AmCharts.StockGraph();
+                                expiryDate2Strike[s].type = "candlestick";
+                                expiryDate2Strike[s].openField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].closeField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].highField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].lowField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].valueField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].balloonText = "$" + sortedDataCalls[s].strike.toString() + "  :  " + AmCharts.roundTo(percentage, 2) + "%   ";
+                                expiryDate2Strike[s].lineColor = callColor;
+                                expiryDate2Strike[s].fillColors = callColor;
+                                expiryDate2Strike[s].fillAlphas = 1;
+                                expiryDate2Strike[s].proCandlesticks = false;
+                                expiryDate2Strike[s].visibleInLegend = false;
+                                expiryDate2Strike[s].bullet = "round";
+                                expiryDate2Strike[s].bulletColor = callColor;
+                                expiryDate2Strike[s].bulletBorderColor = callColor;
+
+                                stockPanel1.addStockGraph(expiryDate2Strike[s]);
+                            } else if (id == 3) {
+                                expiryDate3Strike[s] = new AmCharts.StockGraph();
+                                expiryDate3Strike[s].type = "candlestick";
+                                expiryDate3Strike[s].openField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].closeField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].highField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].lowField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].valueField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].balloonText = "$" + sortedDataCalls[s].strike.toString() + "  :  " + AmCharts.roundTo(percentage, 2) + "%   ";
+                                expiryDate3Strike[s].lineColor = callColor;
+                                expiryDate3Strike[s].fillColors = callColor;
+                                expiryDate3Strike[s].fillAlphas = 1;
+                                expiryDate3Strike[s].proCandlesticks = false;
+                                expiryDate3Strike[s].visibleInLegend = false;
+                                expiryDate3Strike[s].bullet = "round";
+                                expiryDate3Strike[s].bulletColor = callColor;
+                                expiryDate3Strike[s].bulletBorderColor = callColor;
+
+                                stockPanel1.addStockGraph(expiryDate3Strike[s]);
+                            }
+                        }
+                        if (refreshChart == true) {
+                            chart.validateData();
+                            stockPanel1.validateNow();
+                            $('#loading').modal('hide');
+                        } else {
+                            if (id == 1) {
+                                $('#loading').modal({
+                                    show: true,
+                                    backdrop: false
+                                });
+                                var expirationDate2 = document.getElementById("optionExpirationDate2").value.substring(0, 10);
+                                plotExpiryDateStrikes(2, expirationDate2, optionType, false);
+                            } else if (id == 2) {
+                                var expirationDate3 = document.getElementById("optionExpirationDate3").value.substring(0, 10);
+                                plotExpiryDateStrikes(3, expirationDate3, optionType, true);
+                            }
+                        }
+                    }
+                });
+
+            // Puts
+            } else {
+
+                // Puts Parameter
+                putOptionListData.push(QuestradeApiServer);
+                putOptionListData.push(QuestradeAccessToken);
+                for (var x = 0; x < sortedDataPuts.length; x++) {
+                    putOptionListData.push(sortedDataPuts[x].symbol.toString());
+                }
+
+                $.ajax({
+                    type: 'GET',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/GetQuestradeOptionQuotes',
+                    dataType: "json",
+                    data: { optionList: putOptionListData },
+                    success: function (result) {
+
+                        // Modify dataPuts
+                        for (var i = 0; i < result.optionQuotes.length; i++) {
+                            for (var s = 0; s < sortedDataPuts.length; s++) {
+                                if (result.optionQuotes[i].symbolId == sortedDataPuts[s].symbol) {
+                                    sortedDataPuts[s].description = result.optionQuotes[i].symbol;
+                                    sortedDataPuts[s].type = "Put";
+                                    sortedDataPuts[s].last = Math.abs(result.optionQuotes[i].lastTradePrice);
+                                    sortedDataPuts[s].change = Math.abs(result.optionQuotes[i].bidPrice) - Math.abs(result.optionQuotes[i].lastTradePrice);
+                                    sortedDataPuts[s].volume = Math.abs(result.optionQuotes[i].volume);
+                                    sortedDataPuts[s].bid = Math.abs(result.optionQuotes[i].bidPrice);
+                                    sortedDataPuts[s].bidsize = Math.abs(result.optionQuotes[i].bidSize);
+                                    sortedDataPuts[s].ask = Math.abs(result.optionQuotes[i].askPrice);
+                                    sortedDataPuts[s].asksize = Math.abs(result.optionQuotes[i].askSize);
+                                    sortedDataPuts[s].open_interest = Math.abs(result.optionQuotes[i].openInterest);
+                                    sortedDataPuts[s].contract_size = Math.abs(result.optionQuotes[i].bidSize) + Math.abs(result.optionQuotes[i].askSize);
+                                }
+                            }
+                        }
+
+                        // Plot
+                        expiryDateStrike = [];
+                        for (var s = 0; s < sortedDataPuts.length; s++) {
+
+                            option_price = black_scholes.calculate(true, $optionTargePrice, sortedDataPuts[s].strike, $optionRate, $optionTime, $optionVolatility);
+                            change = option_price - sortedDataPuts[s].last;
+                            percentage = 0;
+                            change = Math.round(change * 100) / 100;
+
+                            if (sortedDataCalls[s].last > 0) {
+                                percentage = (change / sortedDataPuts[s].last) * 100;
+                            } else {
+                                if (change > 0) {
+                                    percentage = 100;
+                                } else if (change == 0) {
+                                    percentage = 0;
+                                } else {
+                                    percentage = -100;
+                                }
+                            }
+
+                            if (percentage < -100) {
+                                percentage = -100;
+                            }
+
+                            for (var t = 0; t < plotData.length; t++) {
+                                plotData[t]["s" + id.toString() + "_" + s.toString()] = 'NaN';
+                            }
+                            for (var t = 0; t < plotData.length; t++) {
+                                var $priorday2 = document.getElementById('optionTime').value;
+                                $priorday2 = !$priorday2 ? 10 : $priorday2;
+
+                                var d2 = new Date(parseDate(expirationDate)); var nd2 = new Date(d2);
+
+                                nd2.setDate(nd2.getDate() - $priorday2);
+
+                                var nd2dd = nd2.getDate(); var nd2mm = nd2.getMonth() + 1; var nd2yy = nd2.getFullYear();
+
+                                var expDate2 = parseDate(nd2yy + '-' + nd2mm + '-' + nd2dd);
+
+                                if (plotData[t]["date"] >= expDate2) {
+                                    plotData[t]["s" + id.toString() + "_" + s.toString()] = sortedDataPuts[s].strike;
+                                    break;
+                                }
+                            }
+
+                            if (id == 1) {
+                                expiryDate1Strike[s] = new AmCharts.StockGraph();
+                                expiryDate1Strike[s].type = "candlestick";
+                                expiryDate1Strike[s].openField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].closeField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].highField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].lowField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].valueField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].balloonText = "$" + sortedDataPuts[s].strike.toString() + "  :  " + AmCharts.roundTo(percentage, 2) + "%   ";
+                                expiryDate1Strike[s].lineColor = putColor;
+                                expiryDate1Strike[s].fillColors = putColor;
+                                expiryDate1Strike[s].fillAlphas = 1;
+                                expiryDate1Strike[s].proCandlesticks = false;
+                                expiryDate1Strike[s].visibleInLegend = false;
+                                expiryDate1Strike[s].bullet = "round";
+                                expiryDate1Strike[s].bulletColor = putColor;
+                                expiryDate1Strike[s].bulletBorderColor = putColor;
+
+                                stockPanel1.addStockGraph(expiryDate1Strike[s]);
+                            } else if (id == 2) {
+                                expiryDate2Strike[s] = new AmCharts.StockGraph();
+                                expiryDate2Strike[s].type = "candlestick";
+                                expiryDate2Strike[s].openField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].closeField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].highField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].lowField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].valueField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].balloonText = "$" + sortedDataPuts[s].strike.toString() + "  :  " + AmCharts.roundTo(percentage, 2) + "%   ";
+                                expiryDate2Strike[s].lineColor = putColor;
+                                expiryDate2Strike[s].fillColors = putColor;
+                                expiryDate2Strike[s].fillAlphas = 1;
+                                expiryDate2Strike[s].proCandlesticks = false;
+                                expiryDate2Strike[s].visibleInLegend = false;
+                                expiryDate2Strike[s].bullet = "round";
+                                expiryDate2Strike[s].bulletColor = putColor;
+                                expiryDate2Strike[s].bulletBorderColor = putColor;
+
+                                stockPanel1.addStockGraph(expiryDate2Strike[s]);
+                            } else if (id == 3) {
+                                expiryDate3Strike[s] = new AmCharts.StockGraph();
+                                expiryDate3Strike[s].type = "candlestick";
+                                expiryDate3Strike[s].openField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].closeField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].highField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].lowField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].valueField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].balloonText = "$" + sortedDataPuts[s].strike.toString() + "  :  " + AmCharts.roundTo(percentage, 2) + "%   ";
+                                expiryDate3Strike[s].lineColor = putColor;
+                                expiryDate3Strike[s].fillColors = putColor;
+                                expiryDate3Strike[s].fillAlphas = 1;
+                                expiryDate3Strike[s].proCandlesticks = false;
+                                expiryDate3Strike[s].visibleInLegend = false;
+                                expiryDate3Strike[s].bullet = "round";
+                                expiryDate3Strike[s].bulletColor = putColor;
+                                expiryDate3Strike[s].bulletBorderColor = putColor;
+
+                                stockPanel1.addStockGraph(expiryDate3Strike[s]);
+                            }
+                        }
+                        if (refreshChart == true) {
+                            chart.validateData();
+                            stockPanel1.validateNow();
+                            $('#loading').modal('hide');
+                        } else {
+                            if (id == 1) {
+                                $('#loading').modal({
+                                    show: true,
+                                    backdrop: false
+                                });
+                                var expirationDate2 = document.getElementById("optionExpirationDate2").value.substring(0, 10);
+                                plotExpiryDateStrikes(2, expirationDate2, optionType, false);
+                            } else if (id == 2) {
+                                var expirationDate3 = document.getElementById("optionExpirationDate3").value.substring(0, 10);
+                                plotExpiryDateStrikes(3, expirationDate3, optionType, true);
+                            }
+                        }
+                    }
+                });
+            }
+
+        } else {
+
+            // Tradier
+            $.ajax({
+                url: '/api/GetTradierOptionChain/' + dataSymbol + '/' + expirationDate + '/' + TradierAccessToken,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (result) {
+                    for (var r = 0; r < result.options.option.length; r++) {
+                        if (result.options.option[r].option_type == "call") {
+                            dataCalls.push({
+                                symbol: result.options.option[r].symbol,
+                                description: result.options.option[r].description,
+                                type: result.options.option[r].type,
+                                last: result.options.option[r].last,
+                                change: result.options.option[r].change,
+                                volume: result.options.option[r].volume,
+                                bid: result.options.option[r].bid,
+                                bidsize: result.options.option[r].bidsize,
+                                ask: result.options.option[r].ask,
+                                asksize: result.options.option[r].asksize,
+                                open_interest: result.options.option[r].open_interest,
+                                strike: result.options.option[r].strike,
+                                contract_size: result.options.option[r].contract_size,
+                                expiration_date: result.options.option[r].expiration_date,
+                                expiration_type: result.options.option[r].expiration_type,
+                                option_type: result.options.option[r].option_type,
+                                root_symbol: result.options.option[r].root_symbol
+                            })
+                        } else {
+                            dataPuts.push({
+                                symbol: result.options.option[r].symbol,
+                                description: result.options.option[r].description,
+                                type: result.options.option[r].type,
+                                last: result.options.option[r].last,
+                                change: result.options.option[r].change,
+                                volume: result.options.option[r].volume,
+                                bid: result.options.option[r].bid,
+                                bidsize: result.options.option[r].bidsize,
+                                ask: result.options.option[r].ask,
+                                asksize: result.options.option[r].asksize,
+                                open_interest: result.options.option[r].open_interest,
+                                strike: result.options.option[r].strike,
+                                contract_size: result.options.option[r].contract_size,
+                                expiration_date: result.options.option[r].expiration_date,
+                                expiration_type: result.options.option[r].expiration_type,
+                                option_type: result.options.option[r].option_type,
+                                root_symbol: result.options.option[r].root_symbol
+                            })
+                        }
+                    }
+
+                    dataCalls.sort(function compare(a, b) {
+                        if (a.strike < b.strike)
+                            return -1;
+                        if (a.strike > b.strike)
+                            return 1;
+                        return 0;
+                    });
+                    dataPuts.sort(function compare(a, b) {
+                        if (a.strike < b.strike)
+                            return -1;
+                        if (a.strike > b.strike)
+                            return 1;
+                        return 0;
+                    });
+
+                    sortedDataCalls = new wijmo.collections.ObservableArray();
+                    sortedDataPuts = new wijmo.collections.ObservableArray();
+
+                    sortedDataCalls = extractOptionChain(dataCalls);
+                    sortedDataPuts = extractOptionChain(dataPuts);
+
+                    // Black-Schole Default Values
+                    $optionTime = document.getElementById('optionTime').value;
+                    $optionTargePrice = document.getElementById('optionTargePrice').value;
+                    $optionVolatility = document.getElementById('optionVolatility').value;
+                    $optionRate = document.getElementById('optionRate').value;
+
+                    option_price = 0;
+                    change = 0;
+                    percentage = 0;
+
+                    $optionTime = !$optionTime ? 0.027 : $optionTime / 360;                                 // Annualize
+                    $optionTargePrice = !$optionTargePrice ? plotData[125]["close"] : $optionTargePrice;    // Stock Price
+                    $optionVolatility = !$optionVolatility ? 0.20 : $optionVolatility / 100;                // Percentage
+                    $optionRate = !$optionRate ? 0.05 : $optionRate / 100;                                  // Percentage
+
+                    if (optionType == 0) {
+                        expiryDateStrike = [];
+                        for (var s = 0; s < sortedDataCalls.length; s++) {
+
+                            option_price = black_scholes.calculate(true, $optionTargePrice, sortedDataCalls[s].strike, $optionRate, $optionTime, $optionVolatility);
+                            change = option_price - sortedDataCalls[s].last;
+                            percentage = 0;
+                            change = Math.round(change * 100) / 100;
+
+                            if (sortedDataCalls[s].last > 0) {
+                                percentage = (change / sortedDataCalls[s].last) * 100;
+                            } else {
+                                if (change > 0) {
+                                    percentage = 100;
+                                } else if (change == 0) {
+                                    percentage = 0;
+                                } else {
+                                    percentage = -100;
+                                }
+                            }
+
+                            if (percentage < -100) {
+                                percentage = -100;
+                            }
+
+                            for (var t = 0; t < plotData.length; t++) {
+                                plotData[t]["s" + id.toString() + "_" + s.toString()] = 'NaN';
+                            }
+                            for (var t = 0; t < plotData.length; t++) {
+                                var $priorday1 = document.getElementById('optionTime').value;
+                                $priorday1 = !$priorday1 ? 10 : $priorday1;
+
+                                var d1 = new Date(parseDate(expirationDate)); var nd1 = new Date(d1);
+
+                                nd1.setDate(nd1.getDate() - $priorday1);
+
+                                var nd1dd = nd1.getDate(); var nd1mm = nd1.getMonth() + 1; var nd1yy = nd1.getFullYear();
+
+                                var expDate = parseDate(nd1yy + '-' + nd1mm + '-' + nd1dd);
+
+                                if (plotData[t]["date"] >= expDate) {
+                                    plotData[t]["s" + id.toString()  + "_" + s.toString()] = sortedDataCalls[s].strike;
+                                    break;
+                                }
+                            }
+
+                            if (id == 1) {
+                                expiryDate1Strike[s] = new AmCharts.StockGraph();
+                                expiryDate1Strike[s].type = "candlestick";
+                                expiryDate1Strike[s].openField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].closeField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].highField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].lowField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].valueField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].balloonText = "$" + sortedDataCalls[s].strike.toString() + "  :  " + AmCharts.roundTo(percentage, 2) + "%   ";
+                                expiryDate1Strike[s].lineColor = callColor;
+                                expiryDate1Strike[s].fillColors = callColor;
+                                expiryDate1Strike[s].fillAlphas = 1;
+                                expiryDate1Strike[s].proCandlesticks = false;
+                                expiryDate1Strike[s].visibleInLegend = false;
+                                expiryDate1Strike[s].bullet = "round";
+                                expiryDate1Strike[s].bulletColor = callColor;
+                                expiryDate1Strike[s].bulletBorderColor = callColor;
+
+                                stockPanel1.addStockGraph(expiryDate1Strike[s]);
+                            } else if (id == 2) {
+                                expiryDate2Strike[s] = new AmCharts.StockGraph();
+                                expiryDate2Strike[s].type = "candlestick";
+                                expiryDate2Strike[s].openField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].closeField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].highField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].lowField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].valueField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].balloonText = "$" + sortedDataCalls[s].strike.toString() + "  :  " + AmCharts.roundTo(percentage, 2) + "%   ";
+                                expiryDate2Strike[s].lineColor = callColor;
+                                expiryDate2Strike[s].fillColors = callColor;
+                                expiryDate2Strike[s].fillAlphas = 1;
+                                expiryDate2Strike[s].proCandlesticks = false;
+                                expiryDate2Strike[s].visibleInLegend = false;
+                                expiryDate2Strike[s].bullet = "round";
+                                expiryDate2Strike[s].bulletColor = callColor;
+                                expiryDate2Strike[s].bulletBorderColor = callColor;
+
+                                stockPanel1.addStockGraph(expiryDate2Strike[s]);
+                            } else if (id == 3) {
+                                expiryDate3Strike[s] = new AmCharts.StockGraph();
+                                expiryDate3Strike[s].type = "candlestick";
+                                expiryDate3Strike[s].openField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].closeField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].highField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].lowField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].valueField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].balloonText = "$" + sortedDataCalls[s].strike.toString() + "  :  " + AmCharts.roundTo(percentage, 2) + "%   ";
+                                expiryDate3Strike[s].lineColor = callColor;
+                                expiryDate3Strike[s].fillColors = callColor;
+                                expiryDate3Strike[s].fillAlphas = 1;
+                                expiryDate3Strike[s].proCandlesticks = false;
+                                expiryDate3Strike[s].visibleInLegend = false;
+                                expiryDate3Strike[s].bullet = "round";
+                                expiryDate3Strike[s].bulletColor = callColor;
+                                expiryDate3Strike[s].bulletBorderColor = callColor;
+
+                                stockPanel1.addStockGraph(expiryDate3Strike[s]);
+                            }
+                        }
+                        if (refreshChart == true) {
+                            chart.validateData();
+                            stockPanel1.validateNow();
+                            $('#loading').modal('hide');
+                        } else {
+                            if (id == 1) {
+                                $('#loading').modal({
+                                    show: true,
+                                    backdrop: false
+                                });
+                                var expirationDate2 = document.getElementById("optionExpirationDate2").value.substring(0, 10);
+                                plotExpiryDateStrikes(2, expirationDate2, optionType, false);
+                            } else if (id == 2) {
+                                var expirationDate3 = document.getElementById("optionExpirationDate3").value.substring(0, 10);
+                                plotExpiryDateStrikes(3, expirationDate3, optionType, true);
+                            }
+                        }
+                    } else {
+                        expiryDateStrike = [];
+                        for (var s = 0; s < sortedDataPuts.length; s++) {
+
+                            option_price = black_scholes.calculate(true, $optionTargePrice, sortedDataPuts[s].strike, $optionRate, $optionTime, $optionVolatility);
+                            change = option_price - sortedDataPuts[s].last;
+                            percentage = 0;
+                            change = Math.round(change * 100) / 100;
+                            
+                            if (sortedDataCalls[s].last > 0) {
+                                percentage = (change / sortedDataPuts[s].last) * 100;
+                            } else {
+                                if (change > 0) {
+                                    percentage = 100;
+                                } else if (change == 0) {
+                                    percentage = 0;
+                                } else {
+                                    percentage = -100;
+                                }
+                            }
+
+                            if (percentage < -100) {
+                                percentage = -100;
+                            }
+
+                            for (var t = 0; t < plotData.length; t++) {
+                                plotData[t]["s" + id.toString() + "_" + s.toString()] = 'NaN';
+                            }
+                            for (var t = 0; t < plotData.length; t++) {
+                                var $priorday2 = document.getElementById('optionTime').value;
+                                $priorday2 = !$priorday2 ? 10 : $priorday2;
+
+                                var d2 = new Date(parseDate(expirationDate)); var nd2 = new Date(d2);
+
+                                nd2.setDate(nd2.getDate() - $priorday2);
+
+                                var nd2dd = nd2.getDate(); var nd2mm = nd2.getMonth() + 1; var nd2yy = nd2.getFullYear();
+
+                                var expDate2 = parseDate(nd2yy + '-' + nd2mm + '-' + nd2dd);
+
+                                if (plotData[t]["date"] >= expDate2) {
+                                    plotData[t]["s" + id.toString() + "_" + s.toString()] = sortedDataPuts[s].strike;
+                                    break;
+                                }
+                            }
+
+                            if (id == 1) {
+                                expiryDate1Strike[s] = new AmCharts.StockGraph();
+                                expiryDate1Strike[s].type = "candlestick";
+                                expiryDate1Strike[s].openField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].closeField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].highField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].lowField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].valueField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate1Strike[s].balloonText = "$" + sortedDataPuts[s].strike.toString() + "  :  " + AmCharts.roundTo(percentage, 2) + "%   ";
+                                expiryDate1Strike[s].lineColor = putColor;
+                                expiryDate1Strike[s].fillColors = putColor;
+                                expiryDate1Strike[s].fillAlphas = 1;
+                                expiryDate1Strike[s].proCandlesticks = false;
+                                expiryDate1Strike[s].visibleInLegend = false;
+                                expiryDate1Strike[s].bullet = "round";
+                                expiryDate1Strike[s].bulletColor = putColor;
+                                expiryDate1Strike[s].bulletBorderColor = putColor;
+
+                                stockPanel1.addStockGraph(expiryDate1Strike[s]);
+                            } else if (id == 2) {
+                                expiryDate2Strike[s] = new AmCharts.StockGraph();
+                                expiryDate2Strike[s].type = "candlestick";
+                                expiryDate2Strike[s].openField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].closeField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].highField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].lowField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].valueField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate2Strike[s].balloonText = "$" + sortedDataPuts[s].strike.toString() + "  :  " + AmCharts.roundTo(percentage, 2) + "%   ";
+                                expiryDate2Strike[s].lineColor = putColor;
+                                expiryDate2Strike[s].fillColors = putColor;
+                                expiryDate2Strike[s].fillAlphas = 1;
+                                expiryDate2Strike[s].proCandlesticks = false;
+                                expiryDate2Strike[s].visibleInLegend = false;
+                                expiryDate2Strike[s].bullet = "round";
+                                expiryDate2Strike[s].bulletColor = putColor;
+                                expiryDate2Strike[s].bulletBorderColor = putColor;
+
+                                stockPanel1.addStockGraph(expiryDate2Strike[s]);
+                            } else if (id == 3) {
+                                expiryDate3Strike[s] = new AmCharts.StockGraph();
+                                expiryDate3Strike[s].type = "candlestick";
+                                expiryDate3Strike[s].openField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].closeField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].highField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].lowField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].valueField = 's' + id.toString() + '_' + s.toString();
+                                expiryDate3Strike[s].balloonText = "$" + sortedDataPuts[s].strike.toString() + "  :  " + AmCharts.roundTo(percentage, 2) + "%   ";
+                                expiryDate3Strike[s].lineColor = putColor;
+                                expiryDate3Strike[s].fillColors = putColor;
+                                expiryDate3Strike[s].fillAlphas = 1;
+                                expiryDate3Strike[s].proCandlesticks = false;
+                                expiryDate3Strike[s].visibleInLegend = false;
+                                expiryDate3Strike[s].bullet = "round";
+                                expiryDate3Strike[s].bulletColor = putColor;
+                                expiryDate3Strike[s].bulletBorderColor = putColor;
+
+                                stockPanel1.addStockGraph(expiryDate3Strike[s]);
+                            }
+                        }
+                        if (refreshChart == true) {
+                            chart.validateData();
+                            stockPanel1.validateNow();
+                            $('#loading').modal('hide');
+                        } else {
+                            if (id == 1) {
+                                $('#loading').modal({
+                                    show: true,
+                                    backdrop: false
+                                });
+                                var expirationDate2 = document.getElementById("optionExpirationDate2").value.substring(0, 10);
+                                plotExpiryDateStrikes(2, expirationDate2, optionType, false);
+                            } else if (id == 2) {
+                                var expirationDate3 = document.getElementById("optionExpirationDate3").value.substring(0, 10);
+                                plotExpiryDateStrikes(3, expirationDate3, optionType, true);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+    function optionTab_OnClick(tab) {
+        switch (tab) {
+            case 1:
+                document.getElementById('plotCalls').style.visibility = 'visible';
+                document.getElementById('plotPuts').style.visibility = 'hidden';
+                document.getElementById('plotExpiryDatesCalls').style.visibility = 'hidden';
+                document.getElementById('plotExpiryDatesPuts').style.visibility = 'hidden';
+                break;
+            case 2:
+                document.getElementById('plotCalls').style.visibility = 'hidden';
+                document.getElementById('plotPuts').style.visibility = 'visible';
+                document.getElementById('plotExpiryDatesCalls').style.visibility = 'hidden';
+                document.getElementById('plotExpiryDatesPuts').style.visibility = 'hidden';
+                break;
+            case 3:
+                document.getElementById('plotCalls').style.visibility = 'hidden';
+                document.getElementById('plotPuts').style.visibility = 'hidden';
+                document.getElementById('plotExpiryDatesCalls').style.visibility = 'visible';
+                document.getElementById('plotExpiryDatesPuts').style.visibility = 'visible';
+                break;
+        }
     }
 
     // Moving Average
@@ -3484,7 +4433,13 @@
                         seasonY7: seasonYearData[7][i].toFixed(2),
                         seasonY8: seasonYearData[8][i].toFixed(2),
                         seasonY9: seasonYearData[9][i].toFixed(2),
-                        earnings: earning == 0 ? 'NaN' : earning
+                        earnings: earning == 0 ? 'NaN' : earning,
+                        s1_0: 'NaN', s1_1: 'NaN', s1_2: 'NaN', s1_3: 'NaN', s1_4: 'NaN',
+                        s1_5: 'NaN', s1_6: 'NaN', s1_7: 'NaN', s1_8: 'NaN', s1_9: 'NaN',
+                        s2_0: 'NaN', s2_1: 'NaN', s2_2: 'NaN', s2_3: 'NaN', s2_4: 'NaN',
+                        s2_5: 'NaN', s2_6: 'NaN', s2_7: 'NaN', s2_8: 'NaN', s2_9: 'NaN',
+                        s3_0: 'NaN', s3_1: 'NaN', s3_2: 'NaN', s3_3: 'NaN', s3_4: 'NaN',
+                        s3_5: 'NaN', s3_6: 'NaN', s3_7: 'NaN', s3_8: 'NaN', s3_9: 'NaN'
                     });
                 }
                 futureDate = futureDate.add(1).day();
@@ -3524,7 +4479,13 @@
                     ma2: 0,
                     ma3: 0,
                     ma4: 0,
-                    ma5: 0
+                    ma5: 0,
+                    s1_0: 'NaN', s1_1: 'NaN', s1_2: 'NaN', s1_3: 'NaN', s1_4: 'NaN',
+                    s1_5: 'NaN', s1_6: 'NaN', s1_7: 'NaN', s1_8: 'NaN', s1_9: 'NaN',
+                    s2_0: 'NaN', s2_1: 'NaN', s2_2: 'NaN', s2_3: 'NaN', s2_4: 'NaN',
+                    s2_5: 'NaN', s2_6: 'NaN', s2_7: 'NaN', s2_8: 'NaN', s2_9: 'NaN',
+                    s3_0: 'NaN', s3_1: 'NaN', s3_2: 'NaN', s3_3: 'NaN', s3_4: 'NaN',
+                    s3_5: 'NaN', s3_6: 'NaN', s3_7: 'NaN', s3_8: 'NaN', s3_9: 'NaN'
                 });
             }
         }
@@ -3627,7 +4588,19 @@
         }, {
             fromField: "ma5",
             toField: "ma5"
-        }];
+        }, { fromField: "s1_0", toField: "s1_0" }, { fromField: "s1_1", toField: "s1_1" }, { fromField: "s1_2", toField: "s1_2" },
+           { fromField: "s1_3", toField: "s1_3" }, { fromField: "s1_4", toField: "s1_4" }, { fromField: "s1_5", toField: "s1_5" },
+           { fromField: "s1_6", toField: "s1_6" }, { fromField: "s1_7", toField: "s1_7" }, { fromField: "s1_8", toField: "s1_8" },
+           { fromField: "s1_9", toField: "s1_9" },
+           { fromField: "s2_0", toField: "s2_0" }, { fromField: "s2_1", toField: "s2_1" }, { fromField: "s2_2", toField: "s2_2" },
+           { fromField: "s2_3", toField: "s2_3" }, { fromField: "s2_4", toField: "s2_4" }, { fromField: "s2_5", toField: "s2_5" },
+           { fromField: "s2_6", toField: "s2_6" }, { fromField: "s2_7", toField: "s2_7" }, { fromField: "s2_8", toField: "s2_8" },
+           { fromField: "s2_9", toField: "s2_9" },
+           { fromField: "s3_0", toField: "s3_0" }, { fromField: "s3_1", toField: "s3_1" }, { fromField: "s3_2", toField: "s3_2" },
+           { fromField: "s3_3", toField: "s3_3" }, { fromField: "s3_4", toField: "s3_4" }, { fromField: "s3_5", toField: "s3_5" },
+           { fromField: "s3_6", toField: "s3_6" }, { fromField: "s3_7", toField: "s3_7" }, { fromField: "s3_8", toField: "s3_8" },
+           { fromField: "s3_9", toField: "s3_9" }
+        ];
         dataSet.dataProvider = plotData;
         dataSet.categoryField = "date";
         dataSet.stockEvents = [chartEvent1];
@@ -4731,30 +5704,6 @@
                 }
             }
         });
-    }
-
-    function plotExpiryDates() {
-
-    }
-
-    function OptionTab_OnClick(tab) {
-        switch (tab) {
-            case 1:
-                document.getElementById('plotCalls').style.visibility = 'visible';
-                document.getElementById('plotPuts').style.visibility = 'hidden';
-                document.getElementById('plotExpiryDates').style.visibility = 'hidden';
-                break;
-            case 2:
-                document.getElementById('plotCalls').style.visibility = 'hidden';
-                document.getElementById('plotPuts').style.visibility = 'visible';
-                document.getElementById('plotExpiryDates').style.visibility = 'hidden';
-                break;
-            case 3:
-                document.getElementById('plotCalls').style.visibility = 'hidden';
-                document.getElementById('plotPuts').style.visibility = 'hidden';
-                document.getElementById('plotExpiryDates').style.visibility = 'visible';
-                break;
-        }
     }
 
     $(document).ready(function () {

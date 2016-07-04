@@ -1,0 +1,106 @@
+﻿@{
+    ViewBag.Title = "Referral";
+}
+
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/styles.css" rel="stylesheet" />
+<link href="~/css/toastr.css" rel="stylesheet" />
+
+<script src="/js/jquery-1.10.2.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.js"></script>
+
+<script src="/js/date.js"></script>
+<script src="/js/jquery.validate.js"></script>
+<script src="~/js/toastr.js"></script>
+
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"> - Referral</span></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="col-lg-12">
+        <div class="row">
+            <hr class="section-heading-spacer">
+            <div class="clearfix"></div>
+            <div class="col-lg-12">
+                <br />
+                <p class="normal">
+                    <h4>Magenta Trader Referral</h4>
+                </p>
+                <br />
+                <p>To simplify the Beta Tester Referral Program we have content to email to your fellow traders.  Fill-in the Referral Name field and press the Create E-mail button.  Click and drag the highlight the email and then Copy so you can Paste this content in your email.  This personalizes the email and help us track the referrals.</p>
+                <br />
+                <div class="form-group">
+                    <label for="name">Referral Name:</label>
+                    <input type="text" class="form-control" id="name">
+                </div>
+                <br />
+                <button type="button" class="btn btn-primary" onclick="createEmail()">Create E-mail</button>
+                <br />
+                <hr />
+                <br />
+                <div id="email_name"></div>
+                <br />
+                <p>Would you be interested in joining a Seasonality Trading Group that is looking for Beta Testers to implement new ideas?</p>
+                <br />
+                <p>There is no charge to be a Beta Tester, but you need Real-time data from Tradier.  As a Beta Tester you will get full access to Magenta Trader Software and free data.  Tradier is a discount brokerage offering $0.35 option contracts.  </p>
+                <br />
+                <p>The Beta Test Program is for Real-time Data to calculate 10 different Strikes on 3 different Expirations with one touch of a button.  Future plans also include Debit and Credit Spreads.</p>
+                <br />
+                <p><img src="~/img/campaign/referral-magenta.png" /></p>
+                <br />
+                <p>To learn more about the Beta Tester Program, select the video or reserve a seat at the upcoming Webinar.</p>
+                <br />
+                <p><button type="button" class="btn btn-primary" onclick="gotoBetaTesterVideo()">Beta Tester</button></p>
+                <br />
+                <p>Webinar Link: <a href="https://attendee.gotowebinar.com/register/5403247901759250946">Sunday 9pm ET: https://attendee.gotowebinar.com/register/5403247901759250946</a></p>
+                <br />
+                <p>For additional information go to: <a href="http://www.magentatrader.com">http://www.magentatrader.com</a> <a href="http://www.tradier.com">http://www.tradier.com</a> or call: 941 201-7680</p>
+                <br />
+                <p>To register immediately as a Beta Tester just click on this link:  <a href="http://www.magentatrader.com/Account/Register?referral=@User.Identity.Name">http://www.magentatrader.com/Account/Register?referral=@User.Identity.Name</a></p>
+                <br />
+                <p>Thank you.</p>
+                <div id="email_sender"></div>
+                <br />
+                <br />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function createEmail() {
+        document.getElementById('email_name').innerHTML = document.getElementById('name').value;
+        getName();
+    }
+    function gotoBetaTesterVideo() {
+        location.href ="https://mediasvcmg26x4p1t4vmz.blob.core.windows.net/asset-9e0ee8c9-a288-49c3-b8a5-a55e13fe97c8/2016-06-07 11.12 Beta Tester Info.mp4?sv=2012-02-12&sr=c&si=d2c93a90-f039-4599-bb07-76542a3d2860&sig=I2twJ77GRxvBCl7O0WzDCZjwjqZC%2BjFAg0IzsWzoWfM%3D&se=2017-06-07T15%3A36%3A55Z"
+    }
+    function getName() {
+        var username = '@User.Identity.Name';
+        $.ajax({
+            url: '/api/GetUser/' + username,
+            type: 'GET',
+            data: {},
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (Results) {
+                if (Results.length > 0) {
+                    document.getElementById('email_sender').innerHTML = Results[0].FirstName + " " + Results[0].LastName;
+                }
+            }
+
+        });
+    }
+</script>
+

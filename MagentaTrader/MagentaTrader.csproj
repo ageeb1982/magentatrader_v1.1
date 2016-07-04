@@ -205,6 +205,9 @@
     <Compile Include="Controllers\SymbolController.cs" />
     <Compile Include="Controllers\TradierController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\UserFavoriteAPIController.cs" />
+    <Compile Include="Controllers\UserFavoriteController.cs" />
+    <Compile Include="Controllers\UserFavoriteSymbolAPIController.cs" />
     <Compile Include="Controllers\VariableScannerController.cs" />
     <Compile Include="Controllers\VideoController.cs" />
     <Compile Include="Controllers\Web99Controller.cs" />
@@ -275,6 +278,8 @@
     <Compile Include="Models\TradierUserAccount.cs" />
     <Compile Include="Models\TradierUserProfile.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Models\UserFavorite.cs" />
+    <Compile Include="Models\UserFavoriteSymbol.cs" />
     <Compile Include="Models\VariableScanner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -855,6 +860,8 @@
     <Content Include="img\alaska1.jpg" />
     <Content Include="img\banner-bg.jpg" />
     <Content Include="img\campaign\20150626.png" />
+    <Content Include="img\campaign\IW20160619.png" />
+    <Content Include="img\campaign\referral-magenta.png" />
     <Content Include="img\contact.jpg" />
     <Content Include="img\contact.png" />
     <Content Include="img\derekportrait-1.png" />
@@ -870,6 +877,7 @@
     <Content Include="img\logo.png" />
     <Content Include="img\lv-nov13-16-seatingplan.png" />
     <Content Include="img\lvnov132016.jpg" />
+    <Content Include="img\magenta-questrade.png" />
     <Content Include="img\magenta-screen.png" />
     <Content Include="img\magenta-tradier.png" />
     <Content Include="img\phones.png" />
@@ -1526,6 +1534,10 @@
     <Content Include="Views\Campaign\LV20161113.cshtml" />
     <Content Include="Views\Campaign\BetaTesters.cshtml" />
     <Content Include="Views\Admin\Roles.cshtml" />
+    <Content Include="Views\Campaign\Questrade.cshtml" />
+    <Content Include="Views\Campaign\Referral.cshtml" />
+    <Content Include="Views\Campaign\IW20160619.cshtml" />
+    <Content Include="Views\UserFavorite\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

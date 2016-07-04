@@ -346,7 +346,7 @@ namespace MagentaTrader.Controllers
                         newData.UpDate = Convert.ToString(plotData[highestUpIndex].QuoteDate.Year) + "-" + Convert.ToString(plotData[highestUpIndex].QuoteDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(plotData[highestUpIndex].QuoteDate.Day + 100).Substring(1, 2);
                         newData.UpNoOfDays = highestDownDaySpan;
                         newData.UpRate = "Up: " + highestUp + "/" + (noOfYears - highestUp);
-                        newData.UpPercentage = Math.Round(highestDownAverage, 2);
+                        newData.UpPercentage = Math.Round(highestUpAverage, 2);
                         newData.UpYearPercentage = upYearPercentage;
                     }
                     if (highestDown > 0)

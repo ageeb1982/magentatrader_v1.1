@@ -69,7 +69,11 @@
                     <option value="Admin">Admin</option>
                     <option value="Workshop">Workshop</option>
                     <option value="Broker">Broker</option>
+                    <option value="Tester">Tester</option>
                 </select>
+            </div>
+            <div class="col-lg-2">
+                <button id="CmdDownloadUser" type="submit" class="btn btn-primary btn-block" onclick="cmdDownloadUser_OnClick()">Save Users</button>
             </div>
         </div>
         <br />
@@ -121,6 +125,7 @@
 <script type="text/javascript">
 
     var UsersData;
+    var UsersCollection;
     var UsersGrid;
 
     var btnFirstPageUser;
@@ -149,11 +154,84 @@
     }
     
     function roles_OnChange() {
-        UsersData = new wijmo.collections.CollectionView(getUsers());
+        UsersData = getUsers();
+        UsersCollection = new wijmo.collections.CollectionView(UsersData);
         makeUserGrid();
     }
     function cmdLedgerView_OnClick(id) {
         window.location.href = '/Admin/UserLedger?user=' + id;
+    }
+    function cmdDownloadUser_OnClick() {
+        var CSV = '';
+        var data = [];
+        var role = document.getElementById('Roles').value;
+
+        for (i = 0; i < UsersData.length; i++) {
+            data.push({
+                UserName: UsersData[i].UserName,
+                FirstName: UsersData[i].FirstName,
+                LastName: UsersData[i].LastName,
+                EmailAddress: UsersData[i].EmailAddress,
+                Address: UsersData[i].Address,
+                PhoneNumber: UsersData[i].PhoneNumber
+            });
+        }
+
+        // Row Label
+
+        CSV += role + '\r\n\n';
+
+        var DataLabelRow = '';
+        for (var d in data[0]) {
+            DataLabelRow += d + ',';
+        }
+        DataLabelRow = DataLabelRow.slice(0, -1);
+        CSV += DataLabelRow + '\r\n';
+        
+        // Row
+
+        for (var i = 0; i < data.length; i++) {
+            var DataRow = '';
+            for (var d in data[i]) {
+                DataRow += '"' + data[i][d] + '",';
+            }
+            DataRow.slice(0, DataRow.length - 1);
+            CSV += DataRow + '\r\n';
+        }
+
+        if (CSV == '') {
+            alert("No data");
+            return;
+        }
+
+        // Create filename
+
+        var fileName = 'users_' + role + '.CSV';
+
+        // Download via <a> link
+
+        var link = document.createElement("a");
+
+        if (link.download !== undefined) {
+            var blob = new Blob([CSV], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style = "visibility:hidden";
+        }
+
+        if (navigator.msSaveBlob) {
+            link.addEventListener("click", function (event) {
+                var blob = new Blob([CSV], {
+                    "type": "text/csv;charset=utf-8;"
+                });
+                navigator.msSaveBlob(blob, fileName);
+            }, false);
+        }
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
     function getUsers() {
         var users = new wijmo.collections.ObservableArray();
@@ -182,7 +260,8 @@
                             LastName: Results[i]["LastName"],
                             EmailAddress: Results[i]["EmailAddress"],
                             Address: Results[i]["Address"],
-                            PhoneNumber: Results[i]["PhoneNumber"]
+                            PhoneNumber: Results[i]["PhoneNumber"],
+                            ReferralUserName: Results[i]["ReferralUserName"]
                         });
                     }
 
@@ -201,18 +280,18 @@
     }
 
     function updateNavigateButtonsUser() {
-        if (UsersData.pageSize <= 0) {
+        if (UsersCollection.pageSize <= 0) {
             document.getElementById('naviagtionPageUser').style.display = 'none';
             return;
         }
         document.getElementById('naviagtionPageUser').style.display = 'block';
-        if (UsersData.pageIndex === 0) {
+        if (UsersCollection.pageIndex === 0) {
             btnFirstPageUser.setAttribute('disabled', 'disabled');
             btnPreviousPageUser.setAttribute('disabled', 'disabled');
             btnNextPageUser.removeAttribute('disabled');
             btnLastPageUser.removeAttribute('disabled');
         }
-        else if (UsersData.pageIndex === (UsersData.pageCount - 1)) {
+        else if (UsersCollection.pageIndex === (UsersCollection.pageCount - 1)) {
             btnFirstPageUser.removeAttribute('disabled');
             btnPreviousPageUser.removeAttribute('disabled');
             btnLastPageUser.setAttribute('disabled', 'disabled');
@@ -224,7 +303,7 @@
             btnNextPageUser.removeAttribute('disabled');
             btnLastPageUser.removeAttribute('disabled');
         }
-        btnCurrentPageUser.innerHTML = (UsersData.pageIndex + 1) + ' / ' + UsersData.pageCount;
+        btnCurrentPageUser.innerHTML = (UsersCollection.pageIndex + 1) + ' / ' + UsersCollection.pageCount;
     }
     function makeUserGrid() {
         UsersGrid.dispose();
@@ -241,43 +320,49 @@
                             "header": "User Name",
                             "binding": "UserName",
                             "allowSorting": true,
-                            "width": "4*"
+                            "width": "*"
                         },
                         {
                             "header": "First Name",
                             "binding": "FirstName",
                             "allowSorting": true,
-                            "width": "4*"
+                            "width": "*"
                         },
                         {
                             "header": "Last Name",
                             "binding": "LastName",
                             "allowSorting": true,
-                            "width": "4*"
+                            "width": "*"
                         },
                         {
                             "header": "Email Address",
                             "binding": "EmailAddress",
                             "allowSorting": true,
-                            "width": "4*"
+                            "width": "*"
                         },
                         {
                             "header": "Phone Number",
                             "binding": "PhoneNumber",
                             "allowSorting": true,
-                            "width": "4*"
+                            "width": "*"
+                        },
+                        {
+                            "header": "Referred By",
+                            "binding": "ReferralUserName",
+                            "allowSorting": true,
+                            "width": "*"
                         }],
             autoGenerateColumns: false,
-            itemsSource: UsersData,
+            itemsSource: UsersCollection,
             isReadOnly: true,
             selectionMode: wijmo.grid.SelectionMode.Row
         });
 
         UsersGrid.trackChanges = true;
 
-        UsersData.pageSize = 15;
+        UsersCollection.pageSize = 15;
 
-        UsersData.collectionChanged.addHandler(function (sender, args) {
+        UsersCollection.collectionChanged.addHandler(function (sender, args) {
             updateNavigateButtonsUser();
         });
 
@@ -287,7 +372,8 @@
     $(document).ready(function () {
         toastr.options.preventDuplicates = true;
 
-        UsersData = new wijmo.collections.CollectionView(getUsers());
+        UsersData = getUsers();
+        UsersCollection = new wijmo.collections.CollectionView(UsersData);
 
         btnFirstPageUser = document.getElementById('btnMoveToFirstPageUser');
         btnPreviousPageUser = document.getElementById('btnMoveToPreviousPageUser');
@@ -299,19 +385,19 @@
         updateNavigateButtonsUser();
 
         btnFirstPageUser.addEventListener('click', function () {
-            UsersData.moveToFirstPage();
+            UsersCollection.moveToFirstPage();
             updateNavigateButtonsUser();
         });
         btnPreviousPageUser.addEventListener('click', function () {
-            UsersData.moveToPreviousPage();
+            UsersCollection.moveToPreviousPage();
             updateNavigateButtonsUser();
         });
         btnNextPageUser.addEventListener('click', function () {
-            UsersData.moveToNextPage();
+            UsersCollection.moveToNextPage();
             updateNavigateButtonsUser();
         });
         btnLastPageUser.addEventListener('click', function () {
-            UsersData.moveToLastPage();
+            UsersCollection.moveToLastPage();
             updateNavigateButtonsUser();
         });
 

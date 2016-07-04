@@ -42,6 +42,8 @@
 
             <br />
 
+            <br />
+
         </div>
 
         <div class="row">
@@ -72,6 +74,8 @@
                 <div id="CouponLink">&nbsp;</div>
                 <br />
                 <div id="CouponLink1">&nbsp;</div>
+                <br />
+                <div id="CouponLink2">&nbsp;</div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">
@@ -89,28 +93,28 @@
     function getPurchases() {
         var purchases = new wijmo.collections.ObservableArray();
 
-        purchases.push({
-            Product: "<font color='#CC009C'>Monthly Subscriptions</font>",
-            Purchase: ""
-        });
+        //purchases.push({
+        //    Product: "<font color='#CC009C'>Monthly Subscriptions</font>",
+        //    Purchase: ""
+        //});
 
-        purchases.push({
-            Product: "Magenta Charts",
-            Price: "US$ 98",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='ac14c158-a38a-4af6-898a-71a3e9d0a2fc' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
-        });
+        //purchases.push({
+        //    Product: "Magenta Charts",
+        //    Price: "US$ 98",
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='ac14c158-a38a-4af6-898a-71a3e9d0a2fc' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //});
 
-        purchases.push({
-            Product: "Web99",
-            Price: "US$ 99",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='f53a6465-07f9-4739-bb9d-048cf29816ec' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
-        });
+        //purchases.push({
+        //    Product: "Web99",
+        //    Price: "US$ 99",
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='f53a6465-07f9-4739-bb9d-048cf29816ec' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //});
 
-        purchases.push({
-            Product: "Realtime",
-            Price: "US$ 97",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='bfa29e49-cbc3-4334-b01b-2667d3313990' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
-        });
+        //purchases.push({
+        //    Product: "Realtime",
+        //    Price: "US$ 97",
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='bfa29e49-cbc3-4334-b01b-2667d3313990' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //});
 
         //purchases.push({
         //    Product: "Web99 and Realtime",
@@ -218,47 +222,47 @@
         //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='7c830599-199a-4591-bb4b-8732dd001067' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
         //});
 
+        purchases.push({
+            Product: "July 2016 Internet Workshop",
+            Price: "US$ 295",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='7c830599-199a-4591-bb4b-8732dd001067' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        });
+
         //purchases.push({
-        //    Product: "December 2015 Internet Workshop",
+        //    Product: "Magenta Duet Workshop Orange County (April 30 - May 1, 2016)",
         //    Price: "US$ 295",
-        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='7c830599-199a-4591-bb4b-8732dd001067' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='5b85c5d5-6715-4fbe-9f98-7dfaed905d28' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
         //});
 
-        purchases.push({
-            Product: "Magenta Duet Workshop Orange County (April 30 - May 1, 2016)",
-            Price: "US$ 295",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='5b85c5d5-6715-4fbe-9f98-7dfaed905d28' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
-        });
+        //purchases.push({
+        //    Product: "Magenta Duet Workshop Orange County (April 30 - May 1, 2016) - Couple",
+        //    Price: "US$ 445",
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='9abae95a-774e-4d51-967b-1a1457334df4' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //});
 
-        purchases.push({
-            Product: "Magenta Duet Workshop Orange County (April 30 - May 1, 2016) - Couple",
-            Price: "US$ 445",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='9abae95a-774e-4d51-967b-1a1457334df4' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
-        });
+        //purchases.push({
+        //    Product: "Magenta Duet Workshop Bradenton (April 23 - 24, 2016)",
+        //    Price: "US$ 295",
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='d80ed15e-09ec-46e8-8038-6372bc0f4f50' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //});
 
-        purchases.push({
-            Product: "Magenta Duet Workshop Bradenton (April 23 - 24, 2016)",
-            Price: "US$ 295",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='d80ed15e-09ec-46e8-8038-6372bc0f4f50' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
-        });
+        //purchases.push({
+        //    Product: "Magenta Duet Workshop Bradenton (April 23 - 24, 2016) - Couple",
+        //    Price: "US$ 445",
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='edc8df58-f93e-4799-b25a-ea23b8dc8e2c' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //});
 
-        purchases.push({
-            Product: "Magenta Duet Workshop Bradenton (April 23 - 24, 2016) - Couple",
-            Price: "US$ 445",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='edc8df58-f93e-4799-b25a-ea23b8dc8e2c' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
-        });
+        //purchases.push({
+        //    Product: "Magenta 7 Day Alaska Cruise Workshop (August 23, 2016) <button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditEvent1' onclick='CmdAlaskaCruise2016_OnClick()'>Details</button>",
+        //    Price: "US$ 995",
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='93a3a6ff-f249-49aa-8b31-85961f66b775' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //});
 
-        purchases.push({
-            Product: "Magenta 7 Day Alaska Cruise Workshop (August 23, 2016) <button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditEvent1' onclick='CmdAlaskaCruise2016_OnClick()'>Details</button>",
-            Price: "US$ 995",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='93a3a6ff-f249-49aa-8b31-85961f66b775' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
-        });
-
-        purchases.push({
-            Product: "Magenta 7 Day Alaska Cruise Workshop Couples (August 23, 2016) <button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditEvent1' onclick='CmdAlaskaCruise2016_OnClick()'>Details</button>",
-            Price: "US$ 1,495",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='53c868a4-ee26-4e2f-9531-f07498757d96' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
-        });
+        //purchases.push({
+        //    Product: "Magenta 7 Day Alaska Cruise Workshop Couples (August 23, 2016) <button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditEvent1' onclick='CmdAlaskaCruise2016_OnClick()'>Details</button>",
+        //    Price: "US$ 1,495",
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='53c868a4-ee26-4e2f-9531-f07498757d96' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //});
 
         purchases.push({
             Product: "Magenta Las Vegas Workshop - Nov 13-16, 2016",
@@ -312,27 +316,50 @@
         if (CouponCode == "Ron") {
             $("#CouponLink").empty();
             $("#CouponLink1").empty();
+            $("#CouponLink2").empty();
+
             $("#CouponLink").append("Platinum - Magenta Charts, Web99 and Realtime for Three (3) Months - $100/Month <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='f4b22f9b-7b4c-4ef0-87ed-c86d87f23f72' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
         } else if (CouponCode == "Quest") {
             $("#CouponLink").empty();
             $("#CouponLink1").empty();
+            $("#CouponLink2").empty();
+
             $("#CouponLink").append("Questrade - Magenta Charts, Web99 and Realtime - $99.50/Month <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='8ab10665-7348-4255-9820-19008f5dcac0' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
         } else if (CouponCode == "1387I1") {
             $("#CouponLink").empty();
             $("#CouponLink1").empty();
+            $("#CouponLink2").empty();
+
             $("#CouponLink").append("<a href='https://www2.tuscanylasvegas.com/smsworld/wc.dll?smsWorld~Availbox~&wsi=port' class='btn btn-primary btn-xs'>Tuscany Reservation</a>");
         } else if (CouponCode == "2015") {
             $("#CouponLink").empty();
             $("#CouponLink1").empty();
+            $("#CouponLink2").empty();
+
             //$("#CouponLink").append("Web99 Coupon - $85/Month <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='4a8411f8-4996-45cf-8b45-caabbc05f499' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
             $("#CouponLink1").append("Annual Web99 Coupon - $849/Year <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='499a6e23-4e05-4ed8-8a67-109b9f0da08a' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
         } else if (CouponCode == "2016") {
             $("#CouponLink").empty();
             $("#CouponLink1").empty();
+            $("#CouponLink2").empty();
+
             $("#CouponLink1").append("Personal Service from MagentaTrader.com <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='f16a1a7d-dabf-4aac-953b-8ed3bb7a759f' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
+        } else if (CouponCode.toUpperCase() == "JUNE") {
+            $("#CouponLink").empty();
+            $("#CouponLink1").empty();
+            $("#CouponLink2").empty();
+
+            $("#CouponLink2").append("Internet Workshop <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='c5f8eecf-7650-49da-ac33-8ce512a5722a' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
+        } else if(CouponCode.toUpperCase() == "WEB85") {
+            $("#CouponLink").empty();
+            $("#CouponLink1").empty();
+            $("#CouponLink2").empty();
+
+            $("#CouponLink").append("$85 per Month Web99 Coupon <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='4a8411f8-4996-45cf-8b45-caabbc05f499' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
         } else {
             $("#CouponLink").empty();
             $("#CouponLink1").empty();
+            $("#CouponLink2").empty();
         }
     }
 

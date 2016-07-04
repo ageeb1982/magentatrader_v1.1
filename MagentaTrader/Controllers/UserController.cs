@@ -256,7 +256,8 @@ namespace MagentaTrader.Controllers
                                    LastName = m.LastName,
                                    EmailAddress = m.EmailAddress,
                                    PhoneNumber = m.PhoneNumber,
-                                   Address = m.Address
+                                   Address = m.Address,
+                                   ReferralUserName = m.ReferralUserName
                                };
                     if (Info.Count() > 0)
                     {

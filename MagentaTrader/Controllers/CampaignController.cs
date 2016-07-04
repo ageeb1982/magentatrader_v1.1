@@ -44,6 +44,13 @@ namespace MagentaTrader.Controllers
         }
 
         //
+        // GET: /Campaign/Questrade
+        public ActionResult Questrade()
+        {
+            return View();
+        }
+
+        //
         // GET: /Campaign/BetaTesters
         public ActionResult BetaTesters()
         {
@@ -51,8 +58,23 @@ namespace MagentaTrader.Controllers
         }
 
         //
+        // GET: /Campaign/Referral
+        [Authorize]
+        public ActionResult Referral()
+        {
+            return View();
+        }
+
+        //
         // GET: /Campaign/LV20161113
         public ActionResult LV20161113()
+        {
+            return View();
+        }
+
+        //
+        // GET: /Campaign/IW20160619
+        public ActionResult IW20160619()
         {
             return View();
         }

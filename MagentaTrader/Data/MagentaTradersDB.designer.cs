@@ -87,6 +87,12 @@ namespace MagentaTrader.Data
     partial void InsertMstUser(MstUser instance);
     partial void UpdateMstUser(MstUser instance);
     partial void DeleteMstUser(MstUser instance);
+    partial void InsertTrnUserFavorite(TrnUserFavorite instance);
+    partial void UpdateTrnUserFavorite(TrnUserFavorite instance);
+    partial void DeleteTrnUserFavorite(TrnUserFavorite instance);
+    partial void InsertTrnUserFavoritesSymbol(TrnUserFavoritesSymbol instance);
+    partial void UpdateTrnUserFavoritesSymbol(TrnUserFavoritesSymbol instance);
+    partial void DeleteTrnUserFavoritesSymbol(TrnUserFavoritesSymbol instance);
     #endregion
 		
 		public MagentaTradersDBDataContext() : 
@@ -268,6 +274,22 @@ namespace MagentaTrader.Data
 			get
 			{
 				return this.GetTable<MstUser>();
+			}
+		}
+		
+		public System.Data.Linq.Table<TrnUserFavorite> TrnUserFavorites
+		{
+			get
+			{
+				return this.GetTable<TrnUserFavorite>();
+			}
+		}
+		
+		public System.Data.Linq.Table<TrnUserFavoritesSymbol> TrnUserFavoritesSymbols
+		{
+			get
+			{
+				return this.GetTable<TrnUserFavoritesSymbol>();
 			}
 		}
 	}
@@ -3359,6 +3381,8 @@ namespace MagentaTrader.Data
 		
 		private EntitySet<TrnSectorSymbol> _TrnSectorSymbols;
 		
+		private EntitySet<TrnUserFavoritesSymbol> _TrnUserFavoritesSymbols;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -3451,6 +3475,7 @@ namespace MagentaTrader.Data
 			this._TrnStockEarnings = new EntitySet<TrnStockEarning>(new Action<TrnStockEarning>(this.attach_TrnStockEarnings), new Action<TrnStockEarning>(this.detach_TrnStockEarnings));
 			this._TrnFavorites = new EntitySet<TrnFavorite>(new Action<TrnFavorite>(this.attach_TrnFavorites), new Action<TrnFavorite>(this.detach_TrnFavorites));
 			this._TrnSectorSymbols = new EntitySet<TrnSectorSymbol>(new Action<TrnSectorSymbol>(this.attach_TrnSectorSymbols), new Action<TrnSectorSymbol>(this.detach_TrnSectorSymbols));
+			this._TrnUserFavoritesSymbols = new EntitySet<TrnUserFavoritesSymbol>(new Action<TrnUserFavoritesSymbol>(this.attach_TrnUserFavoritesSymbols), new Action<TrnUserFavoritesSymbol>(this.detach_TrnUserFavoritesSymbols));
 			OnCreated();
 		}
 		
@@ -4306,6 +4331,19 @@ namespace MagentaTrader.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnUserFavoritesSymbol", Storage="_TrnUserFavoritesSymbols", ThisKey="Id", OtherKey="SymbolId")]
+		public EntitySet<TrnUserFavoritesSymbol> TrnUserFavoritesSymbols
+		{
+			get
+			{
+				return this._TrnUserFavoritesSymbols;
+			}
+			set
+			{
+				this._TrnUserFavoritesSymbols.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -4369,6 +4407,18 @@ namespace MagentaTrader.Data
 		}
 		
 		private void detach_TrnSectorSymbols(TrnSectorSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = null;
+		}
+		
+		private void attach_TrnUserFavoritesSymbols(TrnUserFavoritesSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = this;
+		}
+		
+		private void detach_TrnUserFavoritesSymbols(TrnUserFavoritesSymbol entity)
 		{
 			this.SendPropertyChanging();
 			entity.MstSymbol = null;
@@ -5248,6 +5298,8 @@ namespace MagentaTrader.Data
 		
 		private EntitySet<TrnFavorite> _TrnFavorites;
 		
+		private EntitySet<TrnUserFavorite> _TrnUserFavorites;
+		
 		private EntityRef<AspNetUser> _AspNetUser;
 		
     #region Extensibility Method Definitions
@@ -5280,6 +5332,7 @@ namespace MagentaTrader.Data
 			this._TrnSales = new EntitySet<TrnSale>(new Action<TrnSale>(this.attach_TrnSales), new Action<TrnSale>(this.detach_TrnSales));
 			this._SysAcessLogs = new EntitySet<SysAcessLog>(new Action<SysAcessLog>(this.attach_SysAcessLogs), new Action<SysAcessLog>(this.detach_SysAcessLogs));
 			this._TrnFavorites = new EntitySet<TrnFavorite>(new Action<TrnFavorite>(this.attach_TrnFavorites), new Action<TrnFavorite>(this.detach_TrnFavorites));
+			this._TrnUserFavorites = new EntitySet<TrnUserFavorite>(new Action<TrnUserFavorite>(this.attach_TrnUserFavorites), new Action<TrnUserFavorite>(this.detach_TrnUserFavorites));
 			this._AspNetUser = default(EntityRef<AspNetUser>);
 			OnCreated();
 		}
@@ -5520,6 +5573,19 @@ namespace MagentaTrader.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnUserFavorite", Storage="_TrnUserFavorites", ThisKey="Id", OtherKey="UserId")]
+		public EntitySet<TrnUserFavorite> TrnUserFavorites
+		{
+			get
+			{
+				return this._TrnUserFavorites;
+			}
+			set
+			{
+				this._TrnUserFavorites.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="AspNetUser_MstUser", Storage="_AspNetUser", ThisKey="AspNetUserId", OtherKey="Id", IsForeignKey=true)]
 		public AspNetUser AspNetUser
 		{
@@ -5620,6 +5686,485 @@ namespace MagentaTrader.Data
 		{
 			this.SendPropertyChanging();
 			entity.MstUser = null;
+		}
+		
+		private void attach_TrnUserFavorites(TrnUserFavorite entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = this;
+		}
+		
+		private void detach_TrnUserFavorites(TrnUserFavorite entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.TrnUserFavorites")]
+	public partial class TrnUserFavorite : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private int _UserId;
+		
+		private string _Description;
+		
+		private bool _IsShared;
+		
+		private System.Nullable<System.DateTime> _EncodedDate;
+		
+		private EntitySet<TrnUserFavoritesSymbol> _TrnUserFavoritesSymbols;
+		
+		private EntityRef<MstUser> _MstUser;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnUserIdChanging(int value);
+    partial void OnUserIdChanged();
+    partial void OnDescriptionChanging(string value);
+    partial void OnDescriptionChanged();
+    partial void OnIsSharedChanging(bool value);
+    partial void OnIsSharedChanged();
+    partial void OnEncodedDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnEncodedDateChanged();
+    #endregion
+		
+		public TrnUserFavorite()
+		{
+			this._TrnUserFavoritesSymbols = new EntitySet<TrnUserFavoritesSymbol>(new Action<TrnUserFavoritesSymbol>(this.attach_TrnUserFavoritesSymbols), new Action<TrnUserFavoritesSymbol>(this.detach_TrnUserFavoritesSymbols));
+			this._MstUser = default(EntityRef<MstUser>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserId", DbType="Int NOT NULL")]
+		public int UserId
+		{
+			get
+			{
+				return this._UserId;
+			}
+			set
+			{
+				if ((this._UserId != value))
+				{
+					if (this._MstUser.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnUserIdChanging(value);
+					this.SendPropertyChanging();
+					this._UserId = value;
+					this.SendPropertyChanged("UserId");
+					this.OnUserIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Description", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		public string Description
+		{
+			get
+			{
+				return this._Description;
+			}
+			set
+			{
+				if ((this._Description != value))
+				{
+					this.OnDescriptionChanging(value);
+					this.SendPropertyChanging();
+					this._Description = value;
+					this.SendPropertyChanged("Description");
+					this.OnDescriptionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsShared", DbType="Bit NOT NULL")]
+		public bool IsShared
+		{
+			get
+			{
+				return this._IsShared;
+			}
+			set
+			{
+				if ((this._IsShared != value))
+				{
+					this.OnIsSharedChanging(value);
+					this.SendPropertyChanging();
+					this._IsShared = value;
+					this.SendPropertyChanged("IsShared");
+					this.OnIsSharedChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EncodedDate", DbType="DateTime")]
+		public System.Nullable<System.DateTime> EncodedDate
+		{
+			get
+			{
+				return this._EncodedDate;
+			}
+			set
+			{
+				if ((this._EncodedDate != value))
+				{
+					this.OnEncodedDateChanging(value);
+					this.SendPropertyChanging();
+					this._EncodedDate = value;
+					this.SendPropertyChanged("EncodedDate");
+					this.OnEncodedDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnUserFavorite_TrnUserFavoritesSymbol", Storage="_TrnUserFavoritesSymbols", ThisKey="Id", OtherKey="UserFavoritesId")]
+		public EntitySet<TrnUserFavoritesSymbol> TrnUserFavoritesSymbols
+		{
+			get
+			{
+				return this._TrnUserFavoritesSymbols;
+			}
+			set
+			{
+				this._TrnUserFavoritesSymbols.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnUserFavorite", Storage="_MstUser", ThisKey="UserId", OtherKey="Id", IsForeignKey=true)]
+		public MstUser MstUser
+		{
+			get
+			{
+				return this._MstUser.Entity;
+			}
+			set
+			{
+				MstUser previousValue = this._MstUser.Entity;
+				if (((previousValue != value) 
+							|| (this._MstUser.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._MstUser.Entity = null;
+						previousValue.TrnUserFavorites.Remove(this);
+					}
+					this._MstUser.Entity = value;
+					if ((value != null))
+					{
+						value.TrnUserFavorites.Add(this);
+						this._UserId = value.Id;
+					}
+					else
+					{
+						this._UserId = default(int);
+					}
+					this.SendPropertyChanged("MstUser");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_TrnUserFavoritesSymbols(TrnUserFavoritesSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.TrnUserFavorite = this;
+		}
+		
+		private void detach_TrnUserFavoritesSymbols(TrnUserFavoritesSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.TrnUserFavorite = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.TrnUserFavoritesSymbols")]
+	public partial class TrnUserFavoritesSymbol : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private int _UserFavoritesId;
+		
+		private int _SymbolId;
+		
+		private string _Symbol;
+		
+		private string _Trend;
+		
+		private EntityRef<MstSymbol> _MstSymbol;
+		
+		private EntityRef<TrnUserFavorite> _TrnUserFavorite;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnUserFavoritesIdChanging(int value);
+    partial void OnUserFavoritesIdChanged();
+    partial void OnSymbolIdChanging(int value);
+    partial void OnSymbolIdChanged();
+    partial void OnSymbolChanging(string value);
+    partial void OnSymbolChanged();
+    partial void OnTrendChanging(string value);
+    partial void OnTrendChanged();
+    #endregion
+		
+		public TrnUserFavoritesSymbol()
+		{
+			this._MstSymbol = default(EntityRef<MstSymbol>);
+			this._TrnUserFavorite = default(EntityRef<TrnUserFavorite>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserFavoritesId", DbType="Int NOT NULL")]
+		public int UserFavoritesId
+		{
+			get
+			{
+				return this._UserFavoritesId;
+			}
+			set
+			{
+				if ((this._UserFavoritesId != value))
+				{
+					if (this._TrnUserFavorite.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnUserFavoritesIdChanging(value);
+					this.SendPropertyChanging();
+					this._UserFavoritesId = value;
+					this.SendPropertyChanged("UserFavoritesId");
+					this.OnUserFavoritesIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SymbolId", DbType="Int NOT NULL")]
+		public int SymbolId
+		{
+			get
+			{
+				return this._SymbolId;
+			}
+			set
+			{
+				if ((this._SymbolId != value))
+				{
+					if (this._MstSymbol.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnSymbolIdChanging(value);
+					this.SendPropertyChanging();
+					this._SymbolId = value;
+					this.SendPropertyChanged("SymbolId");
+					this.OnSymbolIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Symbol", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string Symbol
+		{
+			get
+			{
+				return this._Symbol;
+			}
+			set
+			{
+				if ((this._Symbol != value))
+				{
+					this.OnSymbolChanging(value);
+					this.SendPropertyChanging();
+					this._Symbol = value;
+					this.SendPropertyChanged("Symbol");
+					this.OnSymbolChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Trend", DbType="NVarChar(50)")]
+		public string Trend
+		{
+			get
+			{
+				return this._Trend;
+			}
+			set
+			{
+				if ((this._Trend != value))
+				{
+					this.OnTrendChanging(value);
+					this.SendPropertyChanging();
+					this._Trend = value;
+					this.SendPropertyChanged("Trend");
+					this.OnTrendChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnUserFavoritesSymbol", Storage="_MstSymbol", ThisKey="SymbolId", OtherKey="Id", IsForeignKey=true)]
+		public MstSymbol MstSymbol
+		{
+			get
+			{
+				return this._MstSymbol.Entity;
+			}
+			set
+			{
+				MstSymbol previousValue = this._MstSymbol.Entity;
+				if (((previousValue != value) 
+							|| (this._MstSymbol.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._MstSymbol.Entity = null;
+						previousValue.TrnUserFavoritesSymbols.Remove(this);
+					}
+					this._MstSymbol.Entity = value;
+					if ((value != null))
+					{
+						value.TrnUserFavoritesSymbols.Add(this);
+						this._SymbolId = value.Id;
+					}
+					else
+					{
+						this._SymbolId = default(int);
+					}
+					this.SendPropertyChanged("MstSymbol");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnUserFavorite_TrnUserFavoritesSymbol", Storage="_TrnUserFavorite", ThisKey="UserFavoritesId", OtherKey="Id", IsForeignKey=true)]
+		public TrnUserFavorite TrnUserFavorite
+		{
+			get
+			{
+				return this._TrnUserFavorite.Entity;
+			}
+			set
+			{
+				TrnUserFavorite previousValue = this._TrnUserFavorite.Entity;
+				if (((previousValue != value) 
+							|| (this._TrnUserFavorite.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._TrnUserFavorite.Entity = null;
+						previousValue.TrnUserFavoritesSymbols.Remove(this);
+					}
+					this._TrnUserFavorite.Entity = value;
+					if ((value != null))
+					{
+						value.TrnUserFavoritesSymbols.Add(this);
+						this._UserFavoritesId = value.Id;
+					}
+					else
+					{
+						this._UserFavoritesId = default(int);
+					}
+					this.SendPropertyChanged("TrnUserFavorite");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 }

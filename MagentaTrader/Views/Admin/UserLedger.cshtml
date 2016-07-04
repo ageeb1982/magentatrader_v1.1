@@ -269,7 +269,7 @@
             }
         }).fail(
             function (xhr, textStatus, err) {
-                alert(err);
+                toastr.error("Error getting user.");
             }
         );
     }
@@ -307,12 +307,12 @@
                     $("#AmountTotal").text("Total Amount: " + (Amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")));
                     
                 } else {
-                    alert("No Purchases");
+                    toastr.error("No purchases.");
                 }
             }
         }).fail(
             function (xhr, textStatus, err) {
-                alert(err);
+                toastr.error("Error getting sales record.");
             }
         );
 
@@ -343,7 +343,7 @@
 
         }).fail(
             function (xhr, textStatus, err) {
-                alert(err);
+                toastr.error("Error modifying user role.");
             }
         );
     }
@@ -371,7 +371,7 @@
            
         }).fail(
             function (xhr, textStatus, err) {
-                alert(err);
+                toastr.error("Error getting user roles.");
             }
         );
         return roles;
@@ -472,7 +472,7 @@
         ULR += '\r\n' + 'Total: ' + TotalAmount;
 
         if (ULR == '') {
-            alert("No data");
+            toastr.error("Empty error.");
             return;
         }
 
@@ -558,7 +558,7 @@
                     }
                 }
                 else {
-                    alert(error);
+                    toastr.error("Error getting role list.");
                 }
             }
         });

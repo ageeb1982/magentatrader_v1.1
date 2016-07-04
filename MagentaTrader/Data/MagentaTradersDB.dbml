@@ -193,6 +193,7 @@
       <Association Name="MstSymbol_TrnStockEarning" Member="TrnStockEarnings" ThisKey="Id" OtherKey="SymbolId" Type="TrnStockEarning" />
       <Association Name="MstSymbol_TrnFavorite" Member="TrnFavorites" ThisKey="Id" OtherKey="SymbolId" Type="TrnFavorite" />
       <Association Name="MstSymbol_TrnSectorSymbol" Member="TrnSectorSymbols" ThisKey="Id" OtherKey="SymbolId" Type="TrnSectorSymbol" />
+      <Association Name="MstSymbol_TrnUserFavoritesSymbol" Member="TrnUserFavoritesSymbols" ThisKey="Id" OtherKey="SymbolId" Type="TrnUserFavoritesSymbol" />
     </Type>
   </Table>
   <Table Name="dbo.SysAcessLog" Member="SysAcessLogs">
@@ -251,7 +252,30 @@
       <Association Name="MstUser_TrnSale" Member="TrnSales" ThisKey="Id" OtherKey="UserId" Type="TrnSale" />
       <Association Name="MstUser_SysAcessLog" Member="SysAcessLogs" ThisKey="Id" OtherKey="UserId" Type="SysAcessLog" />
       <Association Name="MstUser_TrnFavorite" Member="TrnFavorites" ThisKey="Id" OtherKey="UserId" Type="TrnFavorite" />
+      <Association Name="MstUser_TrnUserFavorite" Member="TrnUserFavorites" ThisKey="Id" OtherKey="UserId" Type="TrnUserFavorite" />
       <Association Name="AspNetUser_MstUser" Member="AspNetUser" ThisKey="AspNetUserId" OtherKey="Id" Type="AspNetUser" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TrnUserFavorites" Member="TrnUserFavorites">
+    <Type Name="TrnUserFavorite">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UserId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="IsShared" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="EncodedDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Association Name="TrnUserFavorite_TrnUserFavoritesSymbol" Member="TrnUserFavoritesSymbols" ThisKey="Id" OtherKey="UserFavoritesId" Type="TrnUserFavoritesSymbol" />
+      <Association Name="MstUser_TrnUserFavorite" Member="MstUser" ThisKey="UserId" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TrnUserFavoritesSymbols" Member="TrnUserFavoritesSymbols">
+    <Type Name="TrnUserFavoritesSymbol">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UserFavoritesId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SymbolId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Symbol" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Trend" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Association Name="MstSymbol_TrnUserFavoritesSymbol" Member="MstSymbol" ThisKey="SymbolId" OtherKey="Id" Type="MstSymbol" IsForeignKey="true" />
+      <Association Name="TrnUserFavorite_TrnUserFavoritesSymbol" Member="TrnUserFavorite" ThisKey="UserFavoritesId" OtherKey="Id" Type="TrnUserFavorite" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>
