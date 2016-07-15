@@ -13,5 +13,6 @@ namespace MagentaTrader.Models
         public string Symbol { get; set; }
         public string SymbolDescription { get; set; }
         public string Trend { get; set; }
+        public string EncodedDate { get; set; }
     }
 }

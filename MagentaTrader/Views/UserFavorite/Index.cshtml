@@ -60,11 +60,20 @@
                 <div class="tab-content">
                     <div id="myFavorites" class="tab-pane fade in active">
                         <div>
-                            <button id="cmdAddUserFavorite" type="submit" class="btn btn-primary pull-right" onclick="cmdAddUserFavorite_OnClick()">
-                                <span>Add</span>
-                            </button>
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button">
+                                        <span class="fa fa-search"></span>
+                                    </button>
+                                </span>
+                                <input type="text" class="form-control" id="searchMyFavorites" placeholder="Search">
+                                <span class="input-group-btn">
+                                    <button id="cmdAddUserFavorite" type="submit" class="btn btn-primary pull-right" onclick="cmdAddUserFavorite_OnClick()">
+                                        <span>Add</span>
+                                    </button>
+                                </span>
+                            </div>
                         </div>
-                        <br />
                         <br />
                         <div>
                             <div id="gridMyFavorites" class="grid"></div>
@@ -88,6 +97,17 @@
                         </div>
                     </div>
                     <div id="sharedFavorites" class="tab-pane fade">
+                        <div>
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button">
+                                        <span class="fa fa-search"></span>
+                                    </button>
+                                </span>
+                                <input type="text" class="form-control" id="searchSharedFavorites" placeholder="Search">
+                            </div>
+                        </div>
+                        <br />
                         <div id="gridSharedFavorites" class="grid"></div>
                         <br />
                         <div class="btn-group" id="navSharedFavorites">
@@ -108,6 +128,28 @@
                     </div>
                 </div>
             </div>
+            <br />
+            <div class="row">
+                <dl class="dl-horizontal">
+                    <dt>Favorite Name</dt>
+                    <dd>
+                        <input class="form-control" id="UserFavorite_Id" type="hidden" />
+                        <input class="form-control" id="UserFavorite_Description" type="text" disabled="disabled" />
+                    </dd>
+                    <dt>Created By</dt>
+                    <dd>
+                        <input class="form-control" id="UserFavorite_User" type="text" disabled="disabled" />
+                    </dd>
+                    <dt>Created Date</dt>
+                    <dd>
+                        <input class="form-control" id="UserFavorite_EncodedDate" type="text" disabled="disabled" />
+                    </dd>
+                    <dt>Is Shared?</dt>
+                    <dd>
+                        <input class="form-control" id="UserFavorite_IsShared" type="checkbox" disabled="disabled" />
+                    </dd>
+                </dl>
+            </div>
         </div>
 
         <div class="col-lg-6">
@@ -123,41 +165,37 @@
                 <div class="tab-content">
                     <div id="symbols" class="tab-pane fade in active">
                         <div>
-                            <dl class="dl-horizontal">
-                                <dt>Favorite Name</dt>
-                                <dd>
-                                    <input class="form-control" id="UserFavorite_Id" type="hidden" />
-                                    <input class="form-control" id="UserFavorite_Description" type="text" disabled="disabled" />
-                                </dd>
-                                <dt>Created By</dt>
-                                <dd>
-                                    <input class="form-control" id="UserFavorite_User" type="text" disabled="disabled" />
-                                </dd>
-                                <dt>Created Date</dt>
-                                <dd>
-                                    <input class="form-control" id="UserFavorite_EncodedDate" type="text" disabled="disabled" />
-                                </dd>
-                                <dt>Is Shared?</dt>
-                                <dd>
-                                    <input class="form-control" id="UserFavorite_IsShared" type="checkbox" disabled="disabled" />
-                                </dd>
-                            </dl>
-                        </div>
-                        <div>
-                            <button id="cmdAddUserFavoriteSymbol" type="submit" class="btn btn-primary pull-right" onclick="cmdAddUserFavoriteSymbol_OnClick()">
-                                Add
-                            </button>
-                            <button id="cmdUploadUserFavoriteSymbol" style="margin-right: 10px;" type="submit" class="btn btn-primary pull-right" onclick="cmdUploadUserFavoriteSymbol_OnClick()">
-                                Upload
-                            </button>
-                            <button id="cmdDownloadUserFavoriteSymbol" style="margin-right: 10px;" type="submit" class="btn btn-primary pull-right" onclick="cmdDownloadUserFavoriteSymbol_OnClick()">
-                                Download
-                            </button>
-                            <button id="cmdVarScanUserFavoriteSymbol" style="margin-right: 10px;" type="submit" class="btn btn-primary pull-right" onclick="cmdVarScanUserFavoriteSymbol_OnClick()">
-                                Var Scan Result
-                            </button>
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button">
+                                        <span class="fa fa-search"></span>
+                                    </button>
+                                </span>
+                                <input type="text" class="form-control" id="searchFavoriteSymbols" placeholder="Search">
+                                <span class="input-group-btn">
+                                    <button id="cmdAddUserFavoriteSymbol" type="submit" class="btn btn-primary pull-right" onclick="cmdAddUserFavoriteSymbol_OnClick()">
+                                        <span>Add</span>
+                                    </button>
+                                </span>
+                            </div>
                         </div>
                         <br />
+                        <div>
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <label class="btn btn-info pull-right" for="cmdUploadUserFavoriteSymbol" style="margin-right: 10px;">
+                                        <input id="cmdUploadUserFavoriteSymbol" type="file" style="display:none;">
+                                        Upload
+                                    </label>
+                                    <button id="cmdDownloadUserFavoriteSymbol" type="submit" class="btn btn-info pull-right" onclick="cmdDownloadUserFavoriteSymbol_OnClick()">
+                                        <span>Download</span>
+                                    </button>
+                                    <button id="cmdVarScanUserFavoriteSymbol" type="submit" class="btn btn-info pull-right" onclick="cmdVarScanUserFavoriteSymbol_OnClick()">
+                                        <span>Download Variable Scanner</span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
                         <br />
                         <div>
                             <div id="gridSymbols" class="grid"></div>
@@ -259,6 +297,10 @@
                             <option value="SIDEWAYS">SIDEWAYS</option>
                         </select>
                     </dd>
+                    <dt>Encoded Date</dt>
+                    <dd>
+                        <input class="form-control" id="UserFavoriteSymbol_Edit_EncodedDate" type="text" />
+                    </dd>
                 </dl>
             </div>
             <div class="modal-footer">
@@ -284,14 +326,19 @@ Module - v 2016.06.21
     var myFavorites;
     var myFavoritesCollection;
     var myFavoritesData;
+    var myFavoritesFilterText;
 
     var sharedFavorites;
     var sharedFavoritesCollection;
     var sharedFavoritesData;
+    var sharedFavoritesFilterText;
 
     var favoriteSymbols;
     var favoriteSymbolsCollection;
     var favoriteSymbolsData;
+    var favoriteSymbolsFilterText;
+
+    var favoriteSymbols_encodedDate;
 
     var navMyFavoritesFirst;
     var navMyFavoritesPrevious;
@@ -352,10 +399,15 @@ Module - v 2016.06.21
                     }
                     // Collection
                     myFavoritesCollection = new wijmo.collections.CollectionView(myFavoritesData);
-                    myFavoritesCollection.pageSize = 17;
+                    myFavoritesCollection.pageSize = 10;
                     myFavoritesCollection.collectionChanged.addHandler(function (sender, args) {
                         updateNavMyFavorites();
                     });
+                    myFavoritesCollection.canFilter = true;
+                    myFavoritesCollection.filter = function (item) {
+                        return !myFavoritesFilterText ||
+                               (item.Description.toLowerCase().indexOf(myFavoritesFilterText) > -1);
+                    }
                     // Grid
                     myFavorites.dispose();
                     myFavorites = new wijmo.grid.FlexGrid('#gridMyFavorites');
@@ -485,10 +537,16 @@ Module - v 2016.06.21
                     }
                     // Collection
                     sharedFavoritesCollection = new wijmo.collections.CollectionView(sharedFavoritesData);
-                    sharedFavoritesCollection.pageSize = 17;
+                    sharedFavoritesCollection.pageSize = 10;
                     sharedFavoritesCollection.collectionChanged.addHandler(function (sender, args) {
                         updateNavSharedFavorites();
                     });
+                    sharedFavoritesCollection.canFilter = true;
+                    sharedFavoritesCollection.filter = function (item) {
+                        return !sharedFavoritesFilterText ||
+                               (item.Description.toLowerCase().indexOf(sharedFavoritesFilterText) > -1) ||
+                               (item.User.toLowerCase().indexOf(sharedFavoritesFilterText) > -1);
+                    }
                     // Grid
                     sharedFavorites.dispose();
                     sharedFavorites = new wijmo.grid.FlexGrid('#gridSharedFavorites');
@@ -601,15 +659,23 @@ Module - v 2016.06.21
                             SymbolDescription: result[i].SymbolDescription,
                             SymbolLink: "<a href='/Software?symbol=" + result[i].Symbol + "' target='_blank'><font color='black'>" + result[i].Symbol + "</font></a>",
                             Trend: result[i].Trend,
-                            ColoredTrend: result[i].Trend == "UP" ? "<font color='green'>UP ▲</font>" : result[i].Trend == "DOWN" ? "<font color='red'>DOWN ▼</font>" : result[i].Trend
+                            ColoredTrend: result[i].Trend == "UP" ? "<font color='green'>UP ▲</font>" : result[i].Trend == "DOWN" ? "<font color='red'>DOWN ▼</font>" : "<font color='yellow'>SIDEWAYS</font>",
+                            EncodedDate: result[i].EncodedDate
                         });
                     }
                     // Collection
                     favoriteSymbolsCollection = new wijmo.collections.CollectionView(favoriteSymbolsData);
-                    favoriteSymbolsCollection.pageSize = 10;
+                    favoriteSymbolsCollection.pageSize = 19;
                     favoriteSymbolsCollection.collectionChanged.addHandler(function (sender, args) {
                         updateNavSymbols();
                     });
+                    favoriteSymbolsCollection.canFilter = true;
+                    favoriteSymbolsCollection.filter = function (item) {
+                        return !favoriteSymbolsFilterText ||
+                               (item.Symbol.toLowerCase().indexOf(favoriteSymbolsFilterText) > -1) ||
+                               (item.Trend.toLowerCase().indexOf(favoriteSymbolsFilterText) > -1) ||
+                               (item.SymbolDescription.toLowerCase().indexOf(favoriteSymbolsFilterText) > -1);
+                    }
                     // Grid
                     favoriteSymbols.dispose();
                     favoriteSymbols = new wijmo.grid.FlexGrid('#gridSymbols');
@@ -632,6 +698,12 @@ Module - v 2016.06.21
                                         "binding": "ColoredTrend",
                                         "isContentHtml": true,
                                         "width": 80
+                                    },
+                                    {
+                                        "header": "Date",
+                                        "binding": "EncodedDate",
+                                        "width": 85,
+                                        "allowSorting": true
                                     },
                                     {
                                         "header": "Symbol",
@@ -816,6 +888,11 @@ Module - v 2016.06.21
             document.getElementById('UserFavoriteSymbol_Edit_UserFavoriteId').value = myFavoritesCollection.currentItem.Id;
             document.getElementById("UserFavoriteSymbol_Edit_Symbol").value = "";
             document.getElementById("UserFavoriteSymbol_Edit_Trend").value = "UP";
+            document.getElementById('UserFavoriteSymbol_Edit_EncodedDate').value = "";
+
+            var EncodedDate = new Date();
+            document.getElementById("UserFavoriteSymbol_Edit_EncodedDate").value = EncodedDate.toString("MM/dd/yyyy");
+
         } else {
             toastr.error("Adding of symbol not allowed.");
         }
@@ -831,6 +908,21 @@ Module - v 2016.06.21
             document.getElementById('UserFavoriteSymbol_Edit_UserFavoriteId').value = favoriteSymbolsCollection.currentItem.UserFavoritesId;
             document.getElementById("UserFavoriteSymbol_Edit_Symbol").value = favoriteSymbolsCollection.currentItem.Symbol;
             document.getElementById("UserFavoriteSymbol_Edit_Trend").value = favoriteSymbolsCollection.currentItem.Trend;
+
+            var EncodedDate = new Date();
+            if (favoriteSymbolsCollection.currentItem.EncodedDate != "NA") {
+                var splitDate = favoriteSymbolsCollection.currentItem.EncodedDate.split("-");
+                EncodedDate = new Date(splitDate[0], splitDate[1] - 1, splitDate[2])
+            }
+            document.getElementById("UserFavoriteSymbol_Edit_EncodedDate").value = EncodedDate.toString("MM/dd/yyyy");
+            favoriteSymbols_encodedDate.dispose();
+            favoriteSymbols_encodedDate = new wijmo.input.InputDate('#UserFavoriteSymbol_Edit_EncodedDate', {
+                format: 'MM/dd/yyyy',
+                value: EncodedDate,
+                onValueChanged: function () {
+                    document.getElementById('UserFavoriteSymbol_Edit_EncodedDate').value = this.value.toString("MM/dd/yyyy");
+                }
+            });
         } else {
             toastr.error("Editing of symbol not allowed.");
         }
@@ -872,6 +964,7 @@ Module - v 2016.06.21
         userFavoriteSymbol.Symbol = document.getElementById('UserFavoriteSymbol_Edit_Symbol').value;
         userFavoriteSymbol.SymbolDescription = "";
         userFavoriteSymbol.Trend = document.getElementById('UserFavoriteSymbol_Edit_Trend').value;
+        userFavoriteSymbol.EncodedDate = document.getElementById('UserFavoriteSymbol_Edit_EncodedDate').value;
 
         var data = JSON.stringify(userFavoriteSymbol);
 
@@ -912,6 +1005,162 @@ Module - v 2016.06.21
         }
     }
 
+    function cmdVarScanUserFavoriteSymbol_OnClick() {
+        var data = [];
+        var CSV = '';
+
+        for (var i = 0; i < favoriteSymbolsCollection.items.length; i++) {
+            data.push(favoriteSymbolsCollection.items[i].Symbol);
+        }
+
+        var filteredData = [];
+        for (i = 0; i < 100; i++) {
+            filteredData.push(data[i]);
+        }
+
+        $.ajax({
+            type: "GET",
+            url: "/api/VariableScanner",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: { Symbols: filteredData },
+            success: function (result) {
+                data = [];
+                for (i = 0; i < result.length; i++) {
+                    data.push({
+                        Symbol: result[i].Symbol,
+                        UpDate: result[i].UpDate,
+                        UpNoOfDays: result[i].UpNoOfDays,
+                        UpRate: result[i].UpRate,
+                        UpPercentage: result[i].UpPercentage,
+                        UpYear0: result[i].UpYearPercentage.length > 0 ? result[i].UpYearPercentage[0].Percentage : 0,
+                        UpYear1: result[i].UpYearPercentage.length > 1 ? result[i].UpYearPercentage[1].Percentage : 0,
+                        UpYear2: result[i].UpYearPercentage.length > 2 ? result[i].UpYearPercentage[2].Percentage : 0,
+                        UpYear3: result[i].UpYearPercentage.length > 3 ? result[i].UpYearPercentage[3].Percentage : 0,
+                        UpYear4: result[i].UpYearPercentage.length > 4 ? result[i].UpYearPercentage[4].Percentage : 0,
+                        UpYear5: result[i].UpYearPercentage.length > 5 ? result[i].UpYearPercentage[5].Percentage : 0,
+                        UpYear6: result[i].UpYearPercentage.length > 6 ? result[i].UpYearPercentage[6].Percentage : 0,
+                        UpYear7: result[i].UpYearPercentage.length > 7 ? result[i].UpYearPercentage[7].Percentage : 0,
+                        UpYear8: result[i].UpYearPercentage.length > 8 ? result[i].UpYearPercentage[8].Percentage : 0,
+                        UpYear9: result[i].UpYearPercentage.length > 9 ? result[i].UpYearPercentage[9].Percentage : 0,
+                        DownDate: result[i].DownDate,
+                        DownNoOfDays: result[i].DownNoOfDays,
+                        DownRate: result[i].DownRate,
+                        DownPercentage: result[i].DownPercentage,
+                        DownYear0: result[i].DownYearPercentage.length > 0 ? result[i].DownYearPercentage[0].Percentage : 0,
+                        DownYear1: result[i].DownYearPercentage.length > 1 ? result[i].DownYearPercentage[1].Percentage : 0,
+                        DownYear2: result[i].DownYearPercentage.length > 2 ? result[i].DownYearPercentage[2].Percentage : 0,
+                        DownYear3: result[i].DownYearPercentage.length > 3 ? result[i].DownYearPercentage[3].Percentage : 0,
+                        DownYear4: result[i].DownYearPercentage.length > 4 ? result[i].DownYearPercentage[4].Percentage : 0,
+                        DownYear5: result[i].DownYearPercentage.length > 5 ? result[i].DownYearPercentage[5].Percentage : 0,
+                        DownYear6: result[i].DownYearPercentage.length > 6 ? result[i].DownYearPercentage[6].Percentage : 0,
+                        DownYear7: result[i].DownYearPercentage.length > 7 ? result[i].DownYearPercentage[7].Percentage : 0,
+                        DownYear8: result[i].DownYearPercentage.length > 8 ? result[i].DownYearPercentage[8].Percentage : 0,
+                        DownYear9: result[i].DownYearPercentage.length > 9 ? result[i].DownYearPercentage[9].Percentage : 0
+                    });
+                }
+
+                // Label
+                var label = '';
+                for (var d in data[0]) {
+                    label += d + ',';
+                }
+                label = label.slice(0, -1);
+                CSV += label + '\r\n';
+
+                // Rows
+                for (var i = 0; i < data.length; i++) {
+                    var row = '';
+                    for (var d in data[i]) {
+                        row += '"' + data[i][d] + '",';
+                    }
+                    row.slice(0, row.length - 1);
+                    CSV += row + '\r\n';
+                }
+
+                // Filename
+                var $favoriteName = document.getElementById('UserFavorite_Description').value;
+
+                var fileName = 'variable_scanner_' + $favoriteName + '.CSV';
+
+                // <a> Tag to download
+                var link = document.createElement("a");
+
+                if (link.download !== undefined) {
+                    var blob = new Blob([CSV], { type: 'text/csv;charset=utf-8;' });
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", fileName);
+                    link.style = "visibility:hidden";
+                }
+
+                if (navigator.msSaveBlob) {
+                    link.addEventListener("click", function (event) {
+                        var blob = new Blob([CSV], {
+                            "type": "text/csv;charset=utf-8;"
+                        });
+                        navigator.msSaveBlob(blob, fileName);
+                    }, false);
+                }
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                toastr.success("Download successful.");
+            },
+            statusCode: {
+                404: function () {
+                    toastr.error("Error downloading.");
+                }
+            }
+        });
+    }
+    function cmdDownloadUserFavoriteSymbol_OnClick() {
+        var CSV = '';
+        var symbols = [];
+        var fileName = 'favoriteList.CSV';
+
+        for (i = 0; i < favoriteSymbolsData.length; i++) {
+            symbols.push({
+                Symbol: favoriteSymbolsData[i].Symbol
+            });
+        }
+
+        for (var i = 0; i < symbols.length; i++) {
+            CSV += '"' + symbols[i].Symbol + '"\r\n';
+        }
+
+        if (CSV == '') {
+            toastr.error("No data.");
+        } else {
+            var link = document.createElement("a");
+
+            if (link.download !== undefined) {
+                var blob = new Blob([CSV], { type: 'text/csv;charset=utf-8;' });
+                var url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", fileName);
+                link.style = "visibility:hidden";
+            }
+
+            if (navigator.msSaveBlob) {
+                link.addEventListener("click", function (event) {
+                    var blob = new Blob([CSV], {
+                        "type": "text/csv;charset=utf-8;"
+                    });
+                    navigator.msSaveBlob(blob, fileName);
+                }, false);
+            }
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            toastr.success("Dowload successful.");
+        }
+    }
+
     $(document).ready(function () {
         currentUser = '@User.Identity.Name';
 
@@ -926,6 +1175,16 @@ Module - v 2016.06.21
         myFavoritesCollection = new wijmo.collections.CollectionView();
         myFavoritesData = new wijmo.collections.ObservableArray();
         myFavorites = new wijmo.grid.FlexGrid('#gridMyFavorites');
+
+        myFavoritesCollection.canFilter = true;
+        myFavoritesCollection.filter = function (item) {
+            return !myFavoritesFilterText ||
+                   (item.Description.toLowerCase().indexOf(myFavoritesFilterText) > -1);
+        }
+        $('#searchMyFavorites').keyup(function () {
+            myFavoritesFilterText = this.value.toLowerCase();
+            myFavoritesCollection.refresh();
+        });
 
         addNavMyFavoritesListeners();
 
@@ -947,12 +1206,22 @@ Module - v 2016.06.21
         sharedFavoritesData = new wijmo.collections.ObservableArray();
         sharedFavorites = new wijmo.grid.FlexGrid('#gridSharedFavorites');
 
+        sharedFavoritesCollection.canFilter = true;
+        sharedFavoritesCollection.filter = function (item) {
+            return !sharedFavoritesFilterText ||
+                   (item.Description.toLowerCase().indexOf(sharedFavoritesFilterText) > -1) ||
+                   (item.User.toLowerCase().indexOf(sharedFavoritesFilterText) > -1);
+        }
+        $('#searchSharedFavorites').keyup(function () {
+            sharedFavoritesFilterText = this.value.toLowerCase();
+            sharedFavoritesCollection.refresh();
+        });
+
         addNavSharedFavoritesListeners();
 
         sharedFavoritesCollection.collectionChanged.addHandler(function (sender, args) {
             updateNavSharedFavorites();
         });
-
 
         // Favorite Symbols
 
@@ -966,10 +1235,30 @@ Module - v 2016.06.21
         favoriteSymbolsData = new wijmo.collections.ObservableArray();
         favoriteSymbols = new wijmo.grid.FlexGrid('#gridSymbols');
 
+        favoriteSymbolsCollection.canFilter = true;
+        favoriteSymbolsCollection.filter = function (item) {
+            return !favoriteSymbolsFilterText ||
+                   (item.Symbol.toLowerCase().indexOf(favoriteSymbolsFilterText) > -1) ||
+                   (item.Trend.toLowerCase().indexOf(favoriteSymbolsFilterText) > -1) ||
+                   (item.SymbolDescription.toLowerCase().indexOf(favoriteSymbolsFilterText) > -1);
+        }
+        $('#searchFavoriteSymbols').keyup(function () {
+            favoriteSymbolsFilterText = this.value.toLowerCase();
+            favoriteSymbolsCollection.refresh();
+        });
+
         addNavSymbolsListeners();
 
         favoriteSymbolsCollection.collectionChanged.addHandler(function (sender, args) {
             updateNavSymbols();
+        });
+
+        favoriteSymbols_encodedDate = new wijmo.input.InputDate('#UserFavoriteSymbol_Edit_EncodedDate', {
+            format: 'MM/dd/yyyy',
+            value: new Date(),
+            onValueChanged: function () {
+                document.getElementById('UserFavoriteSymbol_Edit_EncodedDate').value = this.value.toString("MM/dd/yyyy");
+            }
         });
 
         $("a[href='#myFavorites']").on('shown.bs.tab', function (e) {
@@ -978,6 +1267,52 @@ Module - v 2016.06.21
         $("a[href='#sharedFavorites']").on('shown.bs.tab', function (e) {
             createSharedFavorites();
         });
+
+        document.getElementById('cmdUploadUserFavoriteSymbol').onchange = function () {
+            var file = this.files[0];
+            var reader = new FileReader();
+            var data = [];
+            var d = new wijmo.collections.ObservableArray();
+
+            reader.onload = function (progressEvent) {
+                var lines = this.result.split('\n');
+                var userFavoritesId = document.getElementById('UserFavorite_Id').value;
+
+                for (var line = 0; line < lines.length; line++) {
+                    var buf = lines[line].replace(/['"]+/g, '');
+                    data.push(buf.replace(/(\r\n|\n|\r)/gm, ""));
+                    if (line == 100) {
+                        toastr.error("More than 100 symbols found.");
+                        break;
+                    }
+                }
+
+                document.getElementById('cmdUploadUserFavoriteSymbol').value = "";
+
+                $.ajax({
+                    type: "GET",
+                    url: "/api/UserFavoriteSymbolUpload/" + userFavoritesId,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: { Symbols: data },
+                    statusCode: {
+                        200: function () {
+                            createFavoriteSymbols(userFavoritesId);
+                            //location.reload();
+                            toastr.success("Upload successful.");
+                        },
+                        404: function () {
+                            toastr.error("Not found");
+                        },
+                        400: function () {
+                            toastr.error("Bad request");
+                        }
+                    }
+                });
+            };
+
+            reader.readAsText(file);
+        };
 
     });
 </script>

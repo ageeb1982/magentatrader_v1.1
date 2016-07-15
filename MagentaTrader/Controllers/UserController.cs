@@ -6,6 +6,7 @@ using System.Web;
 using System.Security;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Security;
 
 namespace MagentaTrader.Controllers
 {
@@ -156,7 +157,22 @@ namespace MagentaTrader.Controllers
                 db.MstUsers.DeleteOnSubmit(DeleteUser);
                 try
                 {
-                    db.SubmitChanges();
+                    db.SubmitChanges(); // Delete MSTUSER
+
+                    var aspNetUser = from d in db.AspNetUsers where d.UserName == DeleteUser.UserName select d;
+
+                    if (aspNetUser.Any()) {
+                        var aspNetUserRoles = from d in db.AspNetUserRoles where d.UserId == aspNetUser.First().Id select d;
+                        foreach (Data.AspNetUserRole role in aspNetUserRoles)
+                        {
+                            db.AspNetUserRoles.DeleteOnSubmit(role); // Delete ASPNET User Roles
+                        }
+                        db.SubmitChanges();
+                    }
+
+                    db.AspNetUsers.DeleteOnSubmit(aspNetUser.First()); // Delete ASPNET User
+                    db.SubmitChanges(); 
+
                     return Request.CreateResponse(HttpStatusCode.OK);
                 }
                 catch

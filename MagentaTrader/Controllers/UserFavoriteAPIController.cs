@@ -190,6 +190,22 @@ namespace MagentaTrader.Controllers
 
             if (deleteUserFavorite != null)
             {
+                var userFavoritesSymbols = from d in db.TrnUserFavoritesSymbols where d.UserFavoritesId == deleteUserFavorite.Id select d;
+                if (userFavoritesSymbols.Any())
+                {
+                    foreach(Data.TrnUserFavoritesSymbol s in userFavoritesSymbols) {
+                        db.TrnUserFavoritesSymbols.DeleteOnSubmit(s);
+                    }
+                    try
+                    {
+                        db.SubmitChanges();
+                    }
+                    catch
+                    {
+                        // Do nothing.
+                    }
+                }
+
                 db.TrnUserFavorites.DeleteOnSubmit(deleteUserFavorite);
                 try
                 {

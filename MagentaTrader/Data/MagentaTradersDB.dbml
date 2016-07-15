@@ -274,6 +274,7 @@
       <Column Name="SymbolId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="Symbol" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Column Name="Trend" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="EncodedDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
       <Association Name="MstSymbol_TrnUserFavoritesSymbol" Member="MstSymbol" ThisKey="SymbolId" OtherKey="Id" Type="MstSymbol" IsForeignKey="true" />
       <Association Name="TrnUserFavorite_TrnUserFavoritesSymbol" Member="TrnUserFavorite" ThisKey="UserFavoritesId" OtherKey="Id" Type="TrnUserFavorite" IsForeignKey="true" />
     </Type>

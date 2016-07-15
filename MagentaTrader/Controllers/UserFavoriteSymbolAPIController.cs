@@ -31,7 +31,8 @@ namespace MagentaTrader.Controllers
                                SymbolId = d.SymbolId,
                                Symbol = d.MstSymbol.Symbol,
                                SymbolDescription = d.MstSymbol.Description,
-                               Trend = d.Trend
+                               Trend = d.Trend,
+                               EncodedDate = d.EncodedDate.HasValue ? Convert.ToString(d.EncodedDate.Value.Year) + "-" + Convert.ToString(d.EncodedDate.Value.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EncodedDate.Value.Day + 100).Substring(1, 2) : "NA",
                            };
 
                 userFavoriteSymbols = data.ToList();
@@ -62,7 +63,8 @@ namespace MagentaTrader.Controllers
                                SymbolId = d.SymbolId,
                                Symbol = d.MstSymbol.Symbol,
                                SymbolDescription = d.MstSymbol.Description,
-                               Trend = d.Trend == null ? "SIDEWAYS" : d.Trend
+                               Trend = d.Trend == null ? "SIDEWAYS" : d.Trend,
+                               EncodedDate = d.EncodedDate.HasValue ? Convert.ToString(d.EncodedDate.Value.Year) + "-" + Convert.ToString(d.EncodedDate.Value.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EncodedDate.Value.Day + 100).Substring(1, 2) : "NA",
                            };
 
                 userFavoriteSymbols = data.FirstOrDefault();
@@ -75,10 +77,56 @@ namespace MagentaTrader.Controllers
             return userFavoriteSymbols;
         }
 
+        // GET api/UserFavoriteSymbolUpload/1
+        [Authorize]
+        [Route("api/UserFavoriteSymbolUpload/{Id}")]
+        public HttpResponseMessage GetUserFavoriteSymbolUpload(String Id, [FromUri] List<String> Symbols)
+        {
+            Id = Id.Replace(",", "");
+            int userFavoritesId = Convert.ToInt32(Id);
+
+            try
+            {
+                if (userFavoritesId > 0)
+                {
+                    for (int i = 0; i < Symbols.Count; i++)
+                    {
+                        Data.TrnUserFavoritesSymbol newUserFavoriteSymbol = new Data.TrnUserFavoritesSymbol();
+
+                        var symbols = from d in db.MstSymbols where d.Symbol == Symbols[i].ToUpper() select d;
+
+                        if (symbols.Any())
+                        {
+                            newUserFavoriteSymbol.UserFavoritesId = userFavoritesId;
+                            newUserFavoriteSymbol.SymbolId = symbols.First().Id;
+                            newUserFavoriteSymbol.Symbol = symbols.First().Symbol;
+                            newUserFavoriteSymbol.Trend = "SIDEWAYS";
+
+                            //DateTime dt = new DateTime();
+                            //SqlDateTime EncodedDate = new SqlDateTime(new DateTime(dt.Year, dt.Month, dt.Day));
+                            //newUserFavoriteSymbol.EncodedDate = EncodedDate.Value;
+
+                            db.TrnUserFavoritesSymbols.InsertOnSubmit(newUserFavoriteSymbol);
+                            db.SubmitChanges();
+                        }
+                    }
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                }
+            }
+            catch
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+        }
+
         // POST api/UserFavoriteSymbolAdd
         [Authorize]
         [Route("api/UserFavoriteSymbolAdd")]
-        public int Post(Models.UserFavoriteSymbol value)
+        public long Post(Models.UserFavoriteSymbol value)
         {
             try
             {
@@ -91,6 +139,7 @@ namespace MagentaTrader.Controllers
                     newUserFavoriteSymbol.SymbolId = symbols.First().Id;
                     newUserFavoriteSymbol.Symbol = symbols.First().Symbol;
                     newUserFavoriteSymbol.Trend = value.Trend == null ? "SIDEWAYS" : value.Trend;
+                    newUserFavoriteSymbol.EncodedDate = Convert.ToDateTime(value.EncodedDate);
 
                     db.TrnUserFavoritesSymbols.InsertOnSubmit(newUserFavoriteSymbol);
                     db.SubmitChanges();
@@ -132,6 +181,7 @@ namespace MagentaTrader.Controllers
                         updatedUserFavoritesSymbols.SymbolId = symbols.First().Id;
                         updatedUserFavoritesSymbols.Symbol = symbols.First().Symbol;
                         updatedUserFavoritesSymbols.Trend = value.Trend == null ? "SIDEWAYS" : value.Trend;
+                        updatedUserFavoritesSymbols.EncodedDate = Convert.ToDateTime(value.EncodedDate);
 
                         db.SubmitChanges();
 

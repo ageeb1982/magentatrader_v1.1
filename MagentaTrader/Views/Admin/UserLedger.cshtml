@@ -53,7 +53,10 @@
 
         <div class="row">
             <div class="col-lg-8">
-                <h4 class="header">User Ledger</h4>
+                <h4 class="header">
+                    User Ledger
+                    <button class="btn btn-danger pull-right marginButton" onclick="CmdDeleteUser_OnClick()" style="margin-right: 60px;">Delete</button>
+                </h4>
             </div>
         </div>
         <div class="row">
@@ -63,6 +66,7 @@
                         <div class="text-ledger">Username</div>
                     </div>
                     <div class="box-ledger">
+                        <input class="form-control" id="UserID" disabled type="hidden" />
                         <input class="form-control" id="Username" disabled />
                     </div>
                 </div>
@@ -395,6 +399,31 @@
                     200: function () {
                         toastr.success('Successfully Deleted!');
                         window.setTimeout(function () { location.reload() }, 3000);
+                    },
+                    404: function () {
+                        toastr.error("Not found!");
+                    },
+                    400: function () {
+                        toastr.error("Bad request");
+                    }
+                }
+            });
+        }
+    }
+
+    function CmdDeleteUser_OnClick() {
+        var userId = $('#UserID').val();
+        var userName = $('#Username').val();
+        if (confirm("Delete "+userName+"?") == true) {
+            $.ajax({
+                type: "DELETE",
+                url: "/api/DeleteUser/" + userId,
+                contentType: "apllication/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success('Successfully Deleted!');
+                        window.setTimeout(function () { window.history.back(); }, 3000);
                     },
                     404: function () {
                         toastr.error("Not found!");

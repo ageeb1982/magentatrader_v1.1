@@ -87,7 +87,7 @@
                     </li>
                     <li>
                         <hr style="margin: 10px 0 10px 0;" />
-                        <a href="/Favorites">
+                        <a href="/Userfavorite">
                             <div><strong>Favorites</strong></div>
                             <div>Create your favorite symbol list</div>
                         </a>
@@ -897,7 +897,7 @@
                         if (result.symbolId > 0) {
                             openQuestradeOptionChain(result.symbolId.toString());
                         } else {
-                            alert("No Broker connection.");
+                            alert("Error extracting option chain.");
                         }
                     }
                 });
@@ -2522,7 +2522,7 @@
 
             // Set dataCalls and Puts
             for (var i = 0; i < QuestradeOptionChain.optionChain.length; i++) {
-                if (expirationDate == QuestradeOptionChain.optionChain[i].expiryDate) {
+                if (expirationDate == QuestradeOptionChain.optionChain[i].expiryDate.substring(0, 10)) {
                     if (QuestradeOptionChain.optionChain[i].chainPerRoot.length > 0) {
                         if (QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice.length) {
                             for (var s = 0; s < QuestradeOptionChain.optionChain[i].chainPerRoot[0].chainPerStrikePrice.length; s++) {

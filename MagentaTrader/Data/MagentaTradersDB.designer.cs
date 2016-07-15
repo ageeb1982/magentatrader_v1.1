@@ -5944,6 +5944,8 @@ namespace MagentaTrader.Data
 		
 		private string _Trend;
 		
+		private System.Nullable<System.DateTime> _EncodedDate;
+		
 		private EntityRef<MstSymbol> _MstSymbol;
 		
 		private EntityRef<TrnUserFavorite> _TrnUserFavorite;
@@ -5962,6 +5964,8 @@ namespace MagentaTrader.Data
     partial void OnSymbolChanged();
     partial void OnTrendChanging(string value);
     partial void OnTrendChanged();
+    partial void OnEncodedDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnEncodedDateChanged();
     #endregion
 		
 		public TrnUserFavoritesSymbol()
@@ -6075,6 +6079,26 @@ namespace MagentaTrader.Data
 					this._Trend = value;
 					this.SendPropertyChanged("Trend");
 					this.OnTrendChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EncodedDate", DbType="DateTime")]
+		public System.Nullable<System.DateTime> EncodedDate
+		{
+			get
+			{
+				return this._EncodedDate;
+			}
+			set
+			{
+				if ((this._EncodedDate != value))
+				{
+					this.OnEncodedDateChanging(value);
+					this.SendPropertyChanging();
+					this._EncodedDate = value;
+					this.SendPropertyChanged("EncodedDate");
+					this.OnEncodedDateChanged();
 				}
 			}
 		}
