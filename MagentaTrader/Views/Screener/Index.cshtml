@@ -48,9 +48,11 @@
             <p>Exchange</p>
             <select id="Exchange" class="form-control">
                 <option value="All">All</option>
+                <option value="AMEX">AMEX</option>
                 <option value="NASDAQ">NASDAQ</option>
                 <option value="NYSE">NYSE</option>
-                <option value="AMEX">AMEX</option>
+                <option value="PSE">PSE</option>
+                <option value="TSX">TSX</option>
             </select>
         </div>
         <div class="col-lg-2">
@@ -985,7 +987,7 @@
         $("#SharedFavoritesGrid").empty();
 
         $.ajax({
-            url: '/api/SharedFavorites',
+            url: '/api/UserFavoriteSharedList',
             cache: false,
             type: 'GET',
             contentType: 'application/json; charset=utf-8',
@@ -997,7 +999,7 @@
                     for (var i = 0; i < result.length; i++) {
                         SharedFavoritesData.push({
                             PickId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdPickSharedFavorites' onclick='CmdPickSharedFavorites_OnClick()'>Pick</button>",
-                            Remarks: result[i].Remarks,
+                            Remarks: result[i].Description,
                             User: result[i].User,
                             UserId: result[i].UserId,
                             NoOfSymbols: result[i].NoOfSymbols,
@@ -1006,6 +1008,7 @@
                     // Collection
                     SharedFavoritesCollection = new wijmo.collections.CollectionView(SharedFavoritesData);
                     SharedFavoritesCollection.pageSize = 10;
+                    UpdateSFNav();
                     SharedFavoritesCollection.collectionChanged.addHandler(function (sender, args) {
                         UpdateSFNav();
                     });
@@ -1049,19 +1052,18 @@
         });
     }
     function UpdateSFNav() {
-        var Records = SharedFavoritesCollection;
-        if (Records.pageSize <= 0) {
+        if (SharedFavoritesCollection.pageSize <= 0) {
             document.getElementById('sfNav').style.display = 'none';
             return;
         }
         document.getElementById('sfNav').style.display = 'block';
-        if (Records.pageIndex === 0) {
+        if (SharedFavoritesCollection.pageIndex === 0) {
             sfNavMoveToFirst.setAttribute('disabled', 'disabled');
             sfNavMoveToPrevious.setAttribute('disabled', 'disabled');
             sfNavMoveToNext.removeAttribute('disabled');
             sfNavMoveToLast.removeAttribute('disabled');
         }
-        else if (Records.pageIndex === (Records.pageCount - 1)) {
+        else if (SharedFavoritesCollection.pageIndex === (SharedFavoritesCollection.pageCount - 1)) {
             sfNavMoveToFirst.removeAttribute('disabled');
             sfNavMoveToPrevious.removeAttribute('disabled');
             sfNavMoveToNext.setAttribute('disabled', 'disabled');
@@ -1073,7 +1075,7 @@
             sfNavMoveToNext.removeAttribute('disabled');
             sfNavMoveToLast.removeAttribute('disabled');
         }
-        sfNavMoveToCurrent.innerHTML = (Records.pageIndex + 1) + ' / ' + Records.pageCount;
+        sfNavMoveToCurrent.innerHTML = (SharedFavoritesCollection.pageIndex + 1) + ' / ' + SharedFavoritesCollection.pageCount;
     }
     function AddSFNavListeners() {
         sfNavMoveToFirst.addEventListener('click', function () {

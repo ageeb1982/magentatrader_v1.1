@@ -1,7 +1,7 @@
 ﻿@{
     ViewBag.Title = "Software";
 
-    var Version = "v.Beta.1.20160115";
+    var Version = "v.Beta.1.20160819";
     var Symbol = Request.QueryString["symbol"];
     var TradierScope = Request.QueryString["scope"];
     var TradierState = Request.QueryString["state"];
@@ -23,6 +23,7 @@
 <link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 <link href="/css/styles.css" rel="stylesheet" />
 <link href="/css/bootstrap-toggle.min.css" rel="stylesheet">
+<link href="~/css/toastr.css" rel="stylesheet" />
 
 <script src="/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -32,6 +33,7 @@
 <script src="/dist/js/sb-admin-2.js"></script>
 <script src="/js/jquery.slimscroll.min.js"></script>
 <script src="/js/bootstrap-toggle.min.js"></script>
+<script src="~/js/toastr.js"></script>
 
 <div id="wrapper">
     <nav id="menu-wrapper" class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
@@ -192,6 +194,18 @@
             <div class="sidebar-nav navbar-collapse">
                 <ul class="nav" id="side-menu">
                     <li class="sidebar-search">
+                        <div class="input-group custom-search-form" style="width:100%">
+                            <select id="Exchange" class="form-control">
+                                <option value="AMEX">AMEX</option>
+                                <option value="NASDAQ">NASDAQ</option>
+                                <option value="NYSE">NYSE</option>
+                                <option value="US">ALL US EQUITIES</option>
+                                <option value="PSE">PSE</option>
+                                <option value="TSX">TSX</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li class="sidebar-search">
                         <div class="input-group custom-search-form">
                             <input id="searchSymbol" type="text" class="form-control" style="padding-right:2px" placeholder="Symbol...">
                             <span class="input-group-btn">
@@ -283,7 +297,8 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-lg-3"><input class="form-control" id="ChronologicalOrder" type="checkbox" onclick="clearEarningChart()" /></div>
-                    <div class="col-lg-9" style="padding-top: 10px;">In Chronological Order.</div>
+                    <div class="col-lg-6" style="padding-top: 10px;">In Chronological Order.</div>
+                    <div class="col-lg-3"><button class='btn btn-info btn-xs' onclick='updateZacksEarningHistory()'>Update Earnings</button></div>
                 </div>
                 <div id="DateButtons"class="row"></div>
                 <div id="earningChartdiv" style="width: 100%; height: 400px; padding: 20px 10px 10px 10px; "></div>
@@ -307,29 +322,33 @@
                 <h4 id="PrePostEarningsTitle" class="modal-title"></h4>
             </div>
             <div class="modal-body">
-                <div id="PrePostDateButtons" class="row"></div>
+                <div class="row">
+                    <div class="col-lg-9" id="PrePostDateButtons"></div>
+                    <div class="col-lg-3"><button class='btn btn-info btn-xs' onclick='updateZacksEarningHistory()'>Update Earnings</button></div>
+                </div>
                 <br />
-                <ul class="nav nav-tabs">
-                    <li class="active"><a data-toggle="tab" href="#PrePostEarningTableSection">Table</a></li>
-                    <li><a data-toggle="tab" href="#PrePostEarningGraphSection">Graph</a></li>
-                    <li><a data-toggle="tab" href="#PrePostEarningCandleStickSection">Candle Stick</a></li>
-                </ul>
-                <div class="tab-content">
-                    <div id="PrePostEarningTableSection" class="tab-pane active">
-                        <div id="PrePostEarningsGrid" class="grid"></div>
-                    </div>
-                    <div id="PrePostEarningGraphSection" class="tab-pane">
-                        <div id="prePostEarningChartdiv" style="width: 100%; height: 300px;"></div>
-                    </div>
-                    <div id="PrePostEarningCandleStickSection" class="tab-pane">
-                        <dl class="dl-horizontal">
-                            <dt style="padding-top:15px">Earning Dates</dt>
-                            <dd style="padding-top:5px">
-                                <select class="form-control custom-width" id="prePostEarningDates" onchange="createPrePostEarningCandleStick();">
-                                </select>
-                            </dd>
-                        </dl>
-                        <div id="prePostEarningCandleStickChartdiv" style="width: 100%; height: 300px;"></div>
+                <div class="row" style="padding-left:25px;padding-right:25px">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#PrePostEarningTableSection">Table</a></li>
+                        <li><a data-toggle="tab" href="#PrePostEarningGraphSection">Graph</a></li>
+                        <li><a data-toggle="tab" href="#PrePostEarningCandleStickSection">Candle Stick</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="PrePostEarningTableSection" class="tab-pane active">
+                            <div id="PrePostEarningsGrid" class="grid"></div>
+                        </div>
+                        <div id="PrePostEarningGraphSection" class="tab-pane">
+                            <div id="prePostEarningChartdiv" style="width: 100%; height: 300px;"></div>
+                        </div>
+                        <div id="PrePostEarningCandleStickSection" class="tab-pane">
+                            <dl class="dl-horizontal">
+                                <dt style="padding-top:15px">Earning Dates</dt>
+                                <dd style="padding-top:5px">
+                                    <select class="form-control custom-width" id="prePostEarningDates" onchange="createPrePostEarningCandleStick();"></select>
+                                </dd>
+                            </dl>
+                            <div id="prePostEarningCandleStickChartdiv" style="width: 100%; height: 300px;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -823,7 +842,7 @@
 
         }).fail(
             function (xhr, textStatus, err) {
-                alert(err);
+                toastr.error(err);
                 $('#UserEdit').modal('hide');
             });
     }
@@ -848,10 +867,10 @@
                 data: data,
                 statusCode: {
                     404: function () {
-                        alert("Not found");
+                        toastr.error("Not found");
                     },
                     400: function () {
-                        alert("Bad request");
+                        toastr.error("Bad request");
                     }
                 }
             });
@@ -875,7 +894,7 @@
                         Results[0].LastName == "NA" || Results[0].LastName == "" ||
                         Results[0].EmailAddress == "NA" || Results[0].EmailAddress == "" ||
                         Results[0].PhoneNumber == "NA" || Results[0].PhoneNumber == "") {
-                        alert("To remove this prompt, you must fill in all user information.");
+                        toastr.error("To remove this prompt, you must fill in all user information.");
                         userEdit();
                     }
                 }
@@ -897,12 +916,12 @@
                         if (result.symbolId > 0) {
                             openQuestradeOptionChain(result.symbolId.toString());
                         } else {
-                            alert("Error extracting option chain.");
+                            toastr.error("Error extracting option chain.");
                         }
                     }
                 });
             } else {
-                alert("No Broker connection.");
+                toastr.error("No Broker connection.");
             }
         } else {
             openTradierOptionChain();
@@ -1052,7 +1071,7 @@
                 }
             });
         } else {
-            alert("Not yet authenticated.");
+            toastr.error("Not yet authenticated.");
         }
     }
     function getTradierOrders(account_number) {
@@ -1383,7 +1402,7 @@
             disableConfirm(true);
         } else {
 
-            alert("No Broker connection.");
+            toastr.error("No Broker connection.");
 
         }
     }
@@ -1438,16 +1457,16 @@
                             disableConfirm(false);
                             $("#equityEstimatedCost").append("Est. Total Cost: $" + result.order.cost);
                         } else {
-                            alert("Invalid data.");
+                            toastr.error("Invalid data.");
                         }
                     }
                 });
             } else {
-                alert("Invalid order.");
+                toastr.error("Invalid order.");
             }
 
         } else {
-            alert("No Broker connection.");
+            toastr.error("No Broker connection.");
         }
     }
     function confirmTradierEquity() {
@@ -1497,18 +1516,18 @@
                         data: data,
                         success: function (result) {
                             if (result.order.status=="ok") {
-                                alert("Order successful.");
+                                toastr.success("Order successful.");
                             } else {
-                                alert("Order cancelled.");
+                                toastr.error("Order cancelled.");
                             }
                         }
                     });
                 } else {
-                    alert("Invalid order.");
+                    toastr.error("Invalid order.");
                 }
 
             } else {
-                alert("No Broker connection.");
+                toastr.error("No Broker connection.");
             }
         }
     }
@@ -1581,7 +1600,7 @@
                 }
             });
         } else {
-            alert("No Broker connection.");
+            toastr.error("No Broker connection.");
         }
     }
 
@@ -3651,6 +3670,28 @@
         }
         return AmCharts.roundTo(percentage,2);
     }
+    function updateZacksEarningHistory() {
+        if (confirm("Update earnings?") == true) {
+            clearEarningChart();
+            $.ajax({
+                type: "GET",
+                url: "/api/GetZacksEarningHistory/" + dataSymbol,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Success");
+                    },
+                    404: function () {
+                        toastr.error("Not found");
+                    },
+                    400: function () {
+                        toastr.error("Bad request");
+                    }
+                }
+            });
+        }
+    }
 
     // Pre/Post Earnings
 
@@ -4154,9 +4195,22 @@
     // Stock Chart
 
     function getSymbol() {
-        var symbol = $('#searchSymbol').val();
+        var symbol = $('#searchSymbol').val().toUpperCase();
+
+        symbol = symbol.replace(".", ",");
+
+        if (document.getElementById("Exchange").value == "TSX") {
+            document.getElementById("searchSymbol").value = symbol;
+            symbol = "TSX-" + symbol;
+        } else if (document.getElementById("Exchange").value == "PSE") {
+            document.getElementById("searchSymbol").value = symbol;
+            symbol = "PSE-" + symbol;
+        } else {
+            document.getElementById("searchSymbol").value = symbol;
+        }
+
         if (symbol != "") {
-            chartSymbol = $('#searchSymbol').val().toUpperCase();
+            chartSymbol = symbol;
             getEarningsSchedule(symbol);
             getData(symbol);
             userCheck();
@@ -4179,17 +4233,21 @@
                     dataSymbol = priceData.Symbol;
                     dataSymbolDescription = priceData.SymbolDescription;
                     data = priceData.StockPrices;
+
+                    document.getElementById("Exchange").value = priceData.Exchange;
+
                     $('#chartdiv').empty();
 
                     createStockChart(symbol, data);
                 } else {
-                    alert("Please retry.  Symbol not found.");
+                    toastr.error("Please retry.  Symbol not found.");
                 }
             }
         }).fail(
                 function (xhr, textStatus, err) {
-                    pleaseWaitDiv.modal('hide');
-                    alert(err);
+                    //pleaseWaitDiv.modal('hide');
+                    $('#loading').modal('hide');
+                    toastr.error(err);
                 }
         );
     }
@@ -5602,7 +5660,7 @@
             }
             // Processing
             if (process == false) {
-                alert("Invalid range of number of days.");
+                toastr.error("Invalid range of number of days.");
             } else {
                 // if (confirm("Compute variable scanner?") == true) {
                 var highestUp = 0;

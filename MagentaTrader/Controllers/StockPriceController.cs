@@ -18,12 +18,17 @@ namespace MagentaTrader.Controllers
             List<Models.StockPrice> prices = new List<Models.StockPrice>();
 
             string SymbolDescription = "";
+            string Exchange = "";
+
+            symbol = symbol.Replace(",", ".");
 
             try
             {
                 var Symbols = from d in db.MstSymbols where d.Symbol == symbol select d;
 
                 SymbolDescription = Symbols.FirstOrDefault().Description;
+                Exchange = Symbols.FirstOrDefault().Exchange;
+
                 DateTime date2 = Symbols.FirstOrDefault().LatestQuoteDate.Value;
                 DateTime date1 = ((date2.AddDays(1)).AddYears(-10)).AddMonths(-5);
 
@@ -66,6 +71,7 @@ namespace MagentaTrader.Controllers
 
             StockPriceWrapper.Symbol = symbol.ToUpper();
             StockPriceWrapper.SymbolDescription = SymbolDescription;
+            StockPriceWrapper.Exchange = Exchange;
             StockPriceWrapper.StockPrices = prices.ToList();
 
             return StockPriceWrapper;

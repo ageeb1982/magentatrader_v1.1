@@ -185,16 +185,33 @@ namespace MagentaTrader.Controllers
                                 db.MstUsers.InsertOnSubmit(NewUser);
                                 db.SubmitChanges();
 
-                                Data.AspNetUserRole NewRole = new Data.AspNetUserRole();
+                                Data.AspNetUserRole NewRole1 = new Data.AspNetUserRole();
 
-                                NewRole.AspNetUser = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault();
-                                NewRole.AspNetRole = db.AspNetRoles.Where(d => d.Name == "Broker").FirstOrDefault();
+                                NewRole1.AspNetUser = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault();
+                                NewRole1.AspNetRole = db.AspNetRoles.Where(d => d.Name == "Quest").FirstOrDefault();
 
-                                db.AspNetUserRoles.InsertOnSubmit(NewRole);
+                                db.AspNetUserRoles.InsertOnSubmit(NewRole1);
                                 db.SubmitChanges();
-                            }
 
-                            return RedirectToAction("Index", "Home");
+                                Data.AspNetUserRole NewRole2 = new Data.AspNetUserRole();
+
+                                NewRole2.AspNetUser = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault();
+                                NewRole2.AspNetRole = db.AspNetRoles.Where(d => d.Name == "Chart").FirstOrDefault();
+
+                                db.AspNetUserRoles.InsertOnSubmit(NewRole2);
+                                db.SubmitChanges();
+
+                                Data.AspNetUserRole NewRole3 = new Data.AspNetUserRole();
+
+                                NewRole3.AspNetUser = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault();
+                                NewRole3.AspNetRole = db.AspNetRoles.Where(d => d.Name == "Web99").FirstOrDefault();
+
+                                db.AspNetUserRoles.InsertOnSubmit(NewRole3);
+                                db.SubmitChanges();
+
+                            }
+                            return RedirectToAction("Index", "Purchase");
+                            //return RedirectToAction("Index", "Home");
                         }
                         catch(Exception e)
                         {

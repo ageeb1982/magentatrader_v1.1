@@ -336,7 +336,6 @@
             }
         //}
     }
-    
 
     function GetEvents() {
         var events = new wijmo.collections.ObservableArray();
@@ -354,6 +353,7 @@
                         events.push({
                             EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditEvent' onclick='CmdEventEdit_OnClick()'>Edit</button>",
                             DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteEvent' onclick='CmdEventDelete_OnClick()'>Delete</button>",
+                            ViewId: "<a href='/Campaign/ViewVideo?id=" + Results[i]["Id"] + "'>" + Results[i]["Id"] + "</a>",
                             Id: Results[i]["Id"],
                             EventDate: Results[i]["EventDate"],
                             EventDescription: Results[i]["EventDescription"],
@@ -491,6 +491,13 @@
                         {
                             "header": "Delete",
                             "binding": "DeleteId",
+                            "width": 60,
+                            "allowSorting": false,
+                            "isContentHtml": true
+                        },
+                        {
+                            "header": "View",
+                            "binding": "ViewId",
                             "width": 60,
                             "allowSorting": false,
                             "isContentHtml": true

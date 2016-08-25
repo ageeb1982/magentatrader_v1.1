@@ -187,6 +187,7 @@
     <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\FreeWebinarsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MemberController.cs" />
     <Compile Include="Controllers\NewsController.cs" />
     <Compile Include="Controllers\PremiumWebinarsController.cs" />
     <Compile Include="Controllers\ProductController.cs" />
@@ -1538,6 +1539,9 @@
     <Content Include="Views\Campaign\Referral.cshtml" />
     <Content Include="Views\Campaign\IW20160619.cshtml" />
     <Content Include="Views\UserFavorite\Index.cshtml" />
+    <Content Include="Views\Member\Index.cshtml" />
+    <Content Include="Views\Campaign\Web99.cshtml" />
+    <Content Include="Views\Campaign\ViewVideo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

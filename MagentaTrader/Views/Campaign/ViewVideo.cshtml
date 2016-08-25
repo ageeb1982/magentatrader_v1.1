@@ -1,0 +1,86 @@
+﻿@{
+    ViewBag.Title = "View Video";
+    var VideoId = Request.QueryString["Id"];
+}
+
+<link href="/css/bootstrap-toggle.min.css" rel="stylesheet">
+<link href="~/css/toastr.css" rel="stylesheet" />
+
+<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/js/bootstrap-toggle.min.js"></script>
+<script src="~/js/toastr.js"></script>
+
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"> - View Video</span></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <hr class="section-heading-spacer">
+        <div class="clearfix"></div>
+    </div>
+    <br />
+    <br />
+    <div class="col-lg-12">
+        <div class="col-lg-9">
+            <video id="video" width="750" height="500" poster="~/img/magenta-screen.png" onclick="this.paused?this.play():this.pause();">
+            </video>
+        </div>
+        <div class="col-lg-3 panel panel-default">
+            <div class="panel-body"><img class="img-responsive center-block" src="/img/derekportrait-1.png" alt="" /></div>
+            <div class="panel-footer" style="text-align:center">
+                Derek Pilger, Founder - Magenta Trader
+            </div>
+            <div class="panel-body" style="text-align:center">
+                "We did not invent cycle, trend, and range trading. The practice has been around for
+                decades. Take a few minutes and you will see that by using current technology, we made
+                the charts and information more clear."
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function addSourceToVideo(element, src) {
+        var source = document.createElement('source');
+        source.src = src;
+        source.type = "video/mp4";
+
+        element.appendChild(source);
+        element.load();
+        element.play();
+    }
+
+    $(document).ready(function () {
+        var videoId = "@VideoId";
+
+        if (parseInt(videoId) > 0) {
+            $.ajax({
+                url: '/api/GetEvent/' + videoId,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (data) {
+                    var videoElement = document.getElementById("video");
+                    addSourceToVideo(videoElement, data.VideoURL);
+                }
+            }).fail(
+            function (xhr, textStatus, err) {
+                toastr.error(err);
+            });
+        } 
+    });
+</script>

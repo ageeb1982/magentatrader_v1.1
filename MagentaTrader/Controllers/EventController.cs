@@ -62,6 +62,56 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
+        // GET api/Event/Id
+        [Route("api/GetEvent/{Id}")]
+        public Models.Event GetEvent(int Id)
+        {
+            int retryCounter = 0;
+            Models.Event value = new Models.Event();
+
+            while (true)
+            {
+                try
+                {
+                    var Event = from d in db.MstEvents
+                                where d.Id == Id
+                                select new Models.Event
+                                {
+                                     Id = d.Id,
+                                     EventDate = Convert.ToString(d.EventDate.Year) + "-" + Convert.ToString(d.EventDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EventDate.Day + 100).Substring(1, 2),
+                                     EventDescription = d.EventDescription,
+                                     Particulars = d.Particulars,
+                                     URL = d.URL,
+                                     VideoURL = d.VideoURL,
+                                     EventType = d.EventType,
+                                     IsRestricted = d.IsRestricted,
+                                     IsArchived = d.IsArchived,
+                                };
+                    if (Event.Count() > 0)
+                    {
+                        value = Event.FirstOrDefault();
+                    }
+                    else
+                    {
+                        value = new Models.Event();
+                    }
+                    break;
+                }
+                catch
+                {
+                    if (retryCounter == 3)
+                    {
+                        value = new Models.Event();
+                        break;
+                    }
+
+                    System.Threading.Thread.Sleep(1000);
+                    retryCounter++;
+                }
+            }
+            return value;
+        }
+
         // GET api/FreeWebinars
         //[Authorize]
         [Route("api/FreeWebinars")]

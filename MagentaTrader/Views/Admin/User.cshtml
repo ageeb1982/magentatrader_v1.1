@@ -302,6 +302,7 @@
                             EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditUser' onclick='CmdUserEdit_OnClick()'>Edit</button>",
                             LedgerId: "<button class='btn btn-success btn-xs' data-toggle='modal' id=" + Results[i]["UserName"] + " onclick='CmdLedgerView_OnClick(this.id)'>Ledger</button>",
                             DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='CmdDeleteUser' onclick='CmdUserDelete_OnClick()'>Delete</button>",
+                            UserNameLink: "<a href='/Admin/UserLedger?user=" + Results[i]["UserName"] + "'>" + Results[i]["UserName"] + "</a>",
                             Id: Results[i]["Id"],
                             UserName: Results[i]["UserName"],
                             FirstName: Results[i]["FirstName"],
@@ -502,9 +503,10 @@
                         },
                         {
                             "header": "User Name",
-                            "binding": "UserName",
+                            "binding": "UserNameLink",
                             "allowSorting": true,
-                            "width": "4*"
+                            "width": "4*",
+                            "isContentHtml": true
                         },
                         {
                             "header": "First Name",

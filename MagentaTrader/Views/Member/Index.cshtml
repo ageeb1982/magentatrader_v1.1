@@ -1,0 +1,311 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/styles.css" rel="stylesheet" />
+<link href="/css/toastr.css" rel="stylesheet" />
+
+<script src="/js/jquery.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.js"></script>
+
+<script src="/js/toastr.js"></script>
+<script src="/js/date.js"></script>
+
+<script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.input.min.js"></script>
+<script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.chart.min.js"></script>
+
+<link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
+
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"></span></a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#">
+                        <div>
+                            @using (Html.BeginForm("LogOff", "Account"))
+                            {
+                                @Html.AntiForgeryToken()
+                                <input class="btn btn-sm btn-danger" title="Logout" value="Logout" type="submit" />
+                            }
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<br />
+<br />
+<br />
+
+<div class="container">
+    <div class="col-lg-8">
+        <div class="form-group" style="padding-top:30px;">
+            <button id="btnSave" class="btn btn-primary pull-right marginButton" onclick="btnSave_OnClick()" style="margin-right: 15px;" disabled>Save</button>
+            <button id="btnEdit" class="btn btn-primary pull-right marginButton" onclick="btnEdit_OnClick()" style="margin-right: 10px;">Edit</button>
+        </div>
+        <div class="form-group" style="padding-top:30px;">
+            <!-- Username -->
+            <label class="control-label col-sm-2" for="Username">Username</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="UserID" disabled type="hidden" />
+                <input class="form-control" id="Username" disabled />
+            </div>
+        </div>
+        <div class="form-group" style="padding-top: 30px;">
+            <!-- FirstName -->
+            <label class="control-label col-sm-2" for="FirstName">First Name</label>
+            <div class="col-sm-10"><input class="form-control" id="FirstName" disabled /></div>
+        </div>
+        <div class="form-group" style="padding-top: 30px;">
+            <!-- LastName -->
+            <label class="control-label col-sm-2" for="LastName">Last Name</label>
+            <div class="col-sm-10"><input class="form-control" id="LastName" disabled /></div>
+        </div>
+        <div class="form-group" style="padding-top: 30px;">
+            <!-- EmailAdd -->
+            <label class="control-label col-sm-2" for="EmailAdd">Email</label>
+            <div class="col-sm-10"><input class="form-control" id="EmailAdd" disabled /></div>
+        </div>
+        <div class="form-group" style="padding-top: 30px;">
+            <!-- PhoneNum -->
+            <label class="control-label col-sm-2" for="PhoneNum">Phone</label>
+            <div class="col-sm-10"><input class="form-control" id="PhoneNum" disabled /></div>
+        </div>
+        <div class="form-group" style="padding-top: 30px;">
+            <!-- Address -->
+            <label class="control-label col-sm-2" for="Address">Address</label>
+            <div class="col-sm-10"><textarea class="form-control" id="Address" disabled></textarea></div>
+        </div>
+        <div class="form-group" style="padding-top: 30px;">
+            <hr />
+        </div>
+        <div class="form-group">
+            <!-- WithSMS -->
+            <label class="control-label col-sm-2" for="WithSMS">Send Text Message</label>
+            <div class="col-sm-10"><input type="checkbox" class="form-control" id="WithSMS" disabled></div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <br />
+        <a href="/Software">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-line-chart fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div>Magenta Chart</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer panel-green-footer">
+                    <span class="pull-left">Go</span>
+                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </a>
+        <a href="/Web99">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-youtube-play fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div>Magenta Web99 Archived Videos</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer panel-green-footer">
+                    <span class="pull-left">Go</span>
+                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </a>
+        <a href="/Screener">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-search fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div>Magenta Screener</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer panel-green-footer">
+                    <span class="pull-left">Go</span>
+                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </a>
+        <a href="/Purchase">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-credit-card fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div>Purchase Magenta Services</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-footer panel-red-footer">
+                    <span class="pull-left">Go</span>
+                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+
+@*
+    =====================
+    Module - v 2016.07.30
+    =====================
+*@
+<script type="text/javascript">
+    var currentUser;
+    var btnSave;
+    var btnEdit;
+
+    var firstName;
+    var lastName;
+    var emailAdd;
+    var phoneNum;
+    var address;
+    var withSMS;
+
+    function lockedFields(locked) {
+        if (locked == true) {
+            firstName.setAttribute('disabled', 'disabled');
+            lastName.setAttribute('disabled', 'disabled');
+            emailAdd.setAttribute('disabled', 'disabled');
+            phoneNum.setAttribute('disabled', 'disabled');
+            address.setAttribute('disabled', 'disabled');
+            withSMS.setAttribute('disabled', 'disabled');
+        } else {
+            firstName.removeAttribute('disabled');
+            lastName.removeAttribute('disabled');
+            emailAdd.removeAttribute('disabled');
+            phoneNum.removeAttribute('disabled');
+            address.removeAttribute('disabled');
+            withSMS.removeAttribute('disabled');
+        }
+    }
+
+    function btnEdit_OnClick() {
+        btnSave.removeAttribute('disabled');
+        btnEdit.setAttribute('disabled', 'disabled');
+
+        lockedFields(false);
+    }
+    function btnSave_OnClick() {
+        var User = new Object();
+
+        User.Id = document.getElementById('UserID').value;
+        User.UserName = document.getElementById('Username').value;
+        User.FirstName = document.getElementById('FirstName').value;
+        User.LastName = document.getElementById('LastName').value;
+        User.EmailAddress = document.getElementById('EmailAdd').value;
+        User.Address = document.getElementById('Address').value;
+        User.PhoneNumber = document.getElementById('PhoneNum').value;
+        User.WithSMS = document.getElementById('WithSMS').checked;
+
+        var data = JSON.stringify(User);
+
+        $.ajax({
+            type: "PUT",
+            url: "/api/UpdateUser/" + User.Id,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: data,
+            statusCode: {
+                200: function () {
+                    toastr.success('Successfully updated!');
+
+                    btnEdit.removeAttribute('disabled');
+                    btnSave.setAttribute('disabled', 'disabled');
+
+                    lockedFields(true);
+                },
+                404: function () {
+                    toastr.error("Not found!");
+                },
+                400: function () {
+                    toastr.error("Bad Request!");
+                }
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        currentUser = '@User.Identity.Name';
+
+        btnSave = document.getElementById('btnSave');
+        btnEdit = document.getElementById('btnEdit');
+
+        firstName = document.getElementById('FirstName');
+        lastName = document.getElementById('LastName');
+        emailAdd = document.getElementById('EmailAdd');
+        phoneNum = document.getElementById('PhoneNum');
+        address = document.getElementById('Address');
+        withSMS = document.getElementById('WithSMS');
+
+        btnEdit.removeAttribute('disabled');
+        btnSave.setAttribute('disabled', 'disabled');
+
+        lockedFields(true);
+
+        $.ajax({
+            url: '/api/GetUser/' + currentUser,
+            type: 'GET',
+            data: {},
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (Results) {
+                if (Results.length > 0) {
+                    document.getElementById('UserID').value = Results[0].Id;
+                    document.getElementById('Username').value = Results[0].UserName;
+                    document.getElementById('FirstName').value = Results[0].FirstName;
+                    document.getElementById('LastName').value = Results[0].LastName;
+                    document.getElementById('EmailAdd').value = Results[0].EmailAddress;
+                    document.getElementById('Address').value = Results[0].Address;
+                    document.getElementById('PhoneNum').value = Results[0].PhoneNumber;
+                    document.getElementById('WithSMS').checked = Results[0].WithSMS;
+                } else {
+                    $('#Username, #FirstName, #LastName, #EmailAdd, #Address, #PhoneNum').text("");
+                }
+            }
+        }).fail(
+            function (xhr, textStatus, err) {
+                toastr.error("Error getting user.");
+            }
+        );
+    });
+</script>

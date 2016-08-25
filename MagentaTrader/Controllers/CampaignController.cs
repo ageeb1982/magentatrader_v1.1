@@ -78,5 +78,18 @@ namespace MagentaTrader.Controllers
         {
             return View();
         }
+
+        //
+        // GET: /Campaign/Web99
+        public ActionResult Web99()
+        {
+            return View();
+        }
+        //
+        // GET: /Campaign/ViewVideo
+        public ActionResult ViewVideo()
+        {
+            return View();
+        }
 	}
 }

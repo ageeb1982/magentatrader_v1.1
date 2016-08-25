@@ -70,6 +70,8 @@
                     <option value="Workshop">Workshop</option>
                     <option value="Broker">Broker</option>
                     <option value="Tester">Tester</option>
+                    <option value="Quest">Quest</option>
+                    <option value="SMS">SMS</option>
                 </select>
             </div>
             <div class="col-lg-2">
@@ -254,6 +256,7 @@
                     for (i = 0; i < Results.length; i++) {
                         users.push({
                             LedgerId: "<button class='btn btn-success btn-xs' data-toggle='modal' id=" + Results[i]["UserName"] + " onclick='cmdLedgerView_OnClick(this.id)'>Ledger</button>",
+                            UserNameLink: "<a href='/Admin/UserLedger?user=" + Results[i]["UserName"] + "'>" + Results[i]["UserName"] + "</a>",
                             Id: Results[i]["Id"],
                             UserName: Results[i]["UserName"],
                             FirstName: Results[i]["FirstName"],
@@ -318,8 +321,9 @@
                         },
                         {
                             "header": "User Name",
-                            "binding": "UserName",
+                            "binding": "UserNameLink",
                             "allowSorting": true,
+                            "isContentHtml": true,
                             "width": "*"
                         },
                         {
@@ -355,7 +359,7 @@
             autoGenerateColumns: false,
             itemsSource: UsersCollection,
             isReadOnly: true,
-            selectionMode: wijmo.grid.SelectionMode.Row
+            selectionMode: wijmo.grid.SelectionMode.None
         });
 
         UsersGrid.trackChanges = true;
@@ -401,6 +405,7 @@
             updateNavigateButtonsUser();
         });
 
+        makeUserGrid();
     });
 </script>
 

@@ -35,6 +35,7 @@ namespace MagentaTrader.Models
         public string ProductPackage { get; set; }
         public string ProductPackageURL { get; set; }
         public string Status { get; set; }
+        public bool WithSMS { get; set; }
 
         // Variables for Roles
         public string Roles { get; set; }

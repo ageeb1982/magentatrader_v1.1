@@ -34,7 +34,8 @@ namespace MagentaTrader.Controllers
                                      LastName = u.LastName,
                                      EmailAddress = u.EmailAddress,
                                      PhoneNumber = u.PhoneNumber,
-                                     Address = u.Address
+                                     Address = u.Address,
+                                     WithSMS = u.WithSMS == null ? false : u.WithSMS.Value
                                  }).ToList();
 
                     var MaxLastPurchase = (from u in db.MstUsers.Where(x => x.AspNetUserId != null)
@@ -96,6 +97,7 @@ namespace MagentaTrader.Controllers
                 NewUser.EmailAddress = value.EmailAddress;
                 NewUser.PhoneNumber = value.PhoneNumber;
                 NewUser.Address = value.Address;
+                NewUser.WithSMS = false;
 
                 db.MstUsers.InsertOnSubmit(NewUser);
                 db.SubmitChanges();
@@ -116,6 +118,9 @@ namespace MagentaTrader.Controllers
             Id = Id.Replace(",", "");
             int id = Convert.ToInt32(Id);
 
+            bool withSMS = false;
+            String aspNetUserId = "";
+
             try
             {
                 var Users = from d in db.MstUsers where d.Id == id select d;
@@ -124,14 +129,47 @@ namespace MagentaTrader.Controllers
                 {
                     var UpdatedUser = Users.FirstOrDefault();
 
+                    withSMS = value.WithSMS == null ? false : value.WithSMS; 
+
                     UpdatedUser.UserName = value.UserName;
                     UpdatedUser.FirstName = value.FirstName;
                     UpdatedUser.LastName = value.LastName;
                     UpdatedUser.EmailAddress = value.EmailAddress;
                     UpdatedUser.PhoneNumber = value.PhoneNumber;
                     UpdatedUser.Address = value.Address;
+                    UpdatedUser.WithSMS = withSMS;
 
                     db.SubmitChanges();
+                    
+                    aspNetUserId = UpdatedUser.AspNetUserId;
+
+                    var roles = from d in db.AspNetUserRoles
+                                where d.UserId == aspNetUserId &&
+                                      d.RoleId == db.AspNetRoles.Where(r => r.Name == "SMS").FirstOrDefault().Id
+                                select d;
+
+                    if (withSMS == true)
+                    {
+                        if (!roles.Any())
+                        {
+                            Data.AspNetUserRole NewRole = new Data.AspNetUserRole();
+
+                            NewRole.UserId = aspNetUserId;
+                            NewRole.AspNetRole = db.AspNetRoles.Where(d => d.Name == "SMS").FirstOrDefault();
+
+                            db.AspNetUserRoles.InsertOnSubmit(NewRole);
+                            db.SubmitChanges();
+                        }
+                    }
+                    else
+                    {
+                        if (roles.Any())
+                        {
+                            Data.AspNetUserRole DeleteRole = roles.First();
+                            db.AspNetUserRoles.DeleteOnSubmit(DeleteRole);
+                            db.SubmitChanges();
+                        }
+                    }
                 }
                 else
                 {
@@ -222,7 +260,8 @@ namespace MagentaTrader.Controllers
                                    LastName = m.LastName,
                                    EmailAddress = m.EmailAddress,
                                    PhoneNumber = m.PhoneNumber,
-                                   Address = m.Address
+                                   Address = m.Address,
+                                   WithSMS = m.WithSMS == null ? false : m.WithSMS.Value
                                };
                     if (Info.Count() > 0)
                     {

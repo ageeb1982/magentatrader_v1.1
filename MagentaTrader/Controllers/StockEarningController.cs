@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -52,6 +54,148 @@ namespace MagentaTrader.Controllers
             }
 
             return earnings.ToList();
+        }
+
+        // GET api/StockEarningHistory/FB/2015-01-01
+        [Authorize]
+        [Route("api/GetZacksEarningHistory/{Symbol}")]
+        public HttpResponseMessage GetZacksEarnings(string symbol)
+        {
+            try
+            {
+                WebRequest req = HttpWebRequest.Create("https://www.zacks.com/stock/research/" + symbol + "/earnings-announcements");
+                req.Method = "GET";
+
+                string source = "";
+                string parseSource = "";
+                string earningString = "";
+                bool continueEarningString = false;
+                long i = 1;
+
+                using (StreamReader reader = new StreamReader(req.GetResponse().GetResponseStream())) { source = reader.ReadToEnd(); }
+
+                foreach (char c in source)
+                {
+                    if (i > 4)
+                    {
+                        if (parseSource == "[  [")
+                        {
+                            earningString = parseSource;
+                            continueEarningString = true;
+                        }
+                        else if (parseSource == "]  ]")
+                        {
+                            var array = JArray.Parse(earningString);
+                            List<Models.StockEarning> earnings = new List<Models.StockEarning>();
+                            var symbols = from d in db.MstSymbols where d.Symbol == symbol select d;
+                            DateTime maxDate = DateTime.MinValue;
+                            DateTime minDate = DateTime.MinValue;
+                            if (symbols.Any()) {
+                                foreach (var a in array)
+                                {
+                                    DateTime earningDate = Convert.ToDateTime(a[0].ToString());
+                                    string periodEnding = a[1].ToString();
+                                    Decimal estimatedValue = a[2].ToString() == "--" ? Decimal.Parse("0") : Decimal.Parse(a[2].ToString().Replace("$", ""));
+                                    Decimal reportedValue = a[3].ToString() == "--" ? Decimal.Parse("0") : Decimal.Parse(a[3].ToString().Replace("$", ""));
+                                    string earningTime = a[5].ToString() == "--" ? "Before Open" : a[5].ToString();
+                                    if (earningTime == "Before Open")
+                                    {
+                                        earningTime = "Before Market Open";
+                                    }
+                                    else
+                                    {
+                                        earningTime = "After Market Close";
+                                    }
+
+                                    Models.StockEarning e = new Models.StockEarning();
+                                    e.SymbolId = symbols.FirstOrDefault().Id;
+                                    e.Symbol = symbols.FirstOrDefault().Symbol;
+                                    e.EarningDate = a[0].ToString();
+                                    e.EarningTime = earningTime;
+                                    e.PeriodEnding = periodEnding;
+                                    e.EstimatedValue = estimatedValue;
+                                    e.ReportedValue = reportedValue;
+                                    earnings.Add(e);
+
+                                    if (maxDate == DateTime.MinValue) maxDate = earningDate;
+                                    else if (earningDate > maxDate) maxDate = earningDate;
+
+                                    if (minDate == DateTime.MinValue) minDate = earningDate;
+                                    else if (earningDate < minDate) minDate = earningDate;
+                                }
+
+                                if (earnings.Any())
+                                {
+                                    // Clean existing stock earning schedule records
+                                    var stockEarnings = from d in db.TrnStockEarnings 
+                                                        where d.Symbol == symbols.FirstOrDefault().Symbol && 
+                                                              (d.EarningDate >= minDate && d.EarningDate <= maxDate) 
+                                                        select d;
+                                    if (stockEarnings.Any())
+                                    {
+                                        foreach (var se in stockEarnings)
+                                        {
+                                            se.Symbol = "XXX-" + se.Symbol;
+                                            db.SubmitChanges();
+                                        }
+                                    }
+                                    // Add new stock earning schedule records from Zacks
+                                    foreach (Models.StockEarning e in earnings)
+                                    {
+                                        Data.TrnStockEarning newEarnings = new Data.TrnStockEarning();
+
+                                        DateTime dt = Convert.ToDateTime(e.EarningDate);
+                                        SqlDateTime earningDate = new SqlDateTime(new DateTime(dt.Year, dt.Month, dt.Day));
+
+                                        newEarnings.Symbol = e.Symbol;
+                                        newEarnings.SymbolId = e.SymbolId;
+                                        newEarnings.EarningDate = earningDate.Value;
+                                        newEarnings.EarningTime = e.EarningTime;
+                                        newEarnings.PeriodEnding = e.PeriodEnding;
+                                        newEarnings.EstimatedValue = e.EstimatedValue;
+                                        newEarnings.ReportedValue = e.ReportedValue;
+
+                                        db.TrnStockEarnings.InsertOnSubmit(newEarnings);
+                                        db.SubmitChanges();
+                                    }
+                                }
+
+                                return Request.CreateResponse(HttpStatusCode.OK);
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound);
+                            }
+                        }
+                        else
+                        {
+                            if (continueEarningString == true)
+                            {
+                                earningString = earningString + c;
+                            }
+                        }
+                        parseSource = parseSource.Substring(1, 3) + c;
+                    }
+                    else
+                    {
+                        if (parseSource.Length == 4)
+                        {
+                            parseSource = parseSource.Substring(1, 3) + c;
+                        }
+                        else
+                        {
+                            parseSource = parseSource + c;
+                        }
+                    }
+                    i++;
+                }
+
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            catch
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
         }
 
         // GET api/StockEarningHistory/FB/2015-01-01
