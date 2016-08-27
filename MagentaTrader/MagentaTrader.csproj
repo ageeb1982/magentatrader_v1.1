@@ -862,6 +862,7 @@
     <Content Include="img\banner-bg.jpg" />
     <Content Include="img\campaign\20150626.png" />
     <Content Include="img\campaign\IW20160619.png" />
+    <Content Include="img\campaign\MagentaTour2017.png" />
     <Content Include="img\campaign\referral-magenta.png" />
     <Content Include="img\contact.jpg" />
     <Content Include="img\contact.png" />
@@ -1542,6 +1543,7 @@
     <Content Include="Views\Member\Index.cshtml" />
     <Content Include="Views\Campaign\Web99.cshtml" />
     <Content Include="Views\Campaign\ViewVideo.cshtml" />
+    <Content Include="Views\Campaign\MagentaTour2017.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

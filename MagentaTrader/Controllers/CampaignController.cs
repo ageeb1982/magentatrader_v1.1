@@ -91,5 +91,12 @@ namespace MagentaTrader.Controllers
         {
             return View();
         }
+
+        //
+        // GET: /Campaign/MagentaTour2017
+        public ActionResult MagentaTour2017()
+        {
+            return View();
+        }
 	}
 }
