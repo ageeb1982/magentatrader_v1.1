@@ -101,6 +101,13 @@
                             <div>Graph sector and associated symbol</div>
                         </a>
                     </li>
+                    <li>
+                        <hr style="margin: 10px 0 10px 0;" />
+                        <a href="/UserAlert">
+                            <div><strong>Alert</strong></div>
+                            <div>Set alert notification settings</div>
+                        </a>
+                    </li>
                 </ul>
                 <!-- /.dropdown-messages -->
             </li>
@@ -202,6 +209,7 @@
                                 <option value="US">ALL US EQUITIES</option>
                                 <option value="PSE">PSE</option>
                                 <option value="TSX">TSX</option>
+                                <option value="FOREX">FOREX</option>
                             </select>
                         </div>
                     </li>
@@ -3525,11 +3533,11 @@
             // Modify the plot data
             for (i = 0; i < 252; i++) {
                 if (i <= 125) {
-                    plotData[i].ma1 = AmCharts.roundTo(chartData[125 - i]["ma1"], 2);
-                    plotData[i].ma2 = AmCharts.roundTo(chartData[125 - i]["ma2"], 2);
-                    plotData[i].ma3 = AmCharts.roundTo(chartData[125 - i]["ma3"], 2);
-                    plotData[i].ma4 = AmCharts.roundTo(chartData[125 - i]["ma4"], 2);
-                    plotData[i].ma5 = AmCharts.roundTo(chartData[125 - i]["ma5"], 2);
+                    plotData[i].ma1 = AmCharts.roundTo(chartData[125 - i]["ma1"], 6);
+                    plotData[i].ma2 = AmCharts.roundTo(chartData[125 - i]["ma2"], 6);
+                    plotData[i].ma3 = AmCharts.roundTo(chartData[125 - i]["ma3"], 6);
+                    plotData[i].ma4 = AmCharts.roundTo(chartData[125 - i]["ma4"], 6);
+                    plotData[i].ma5 = AmCharts.roundTo(chartData[125 - i]["ma5"], 6);
                 }
             }
         }
@@ -4202,6 +4210,9 @@
         if (document.getElementById("Exchange").value == "TSX") {
             document.getElementById("searchSymbol").value = symbol;
             symbol = "TSX-" + symbol;
+        } else if (document.getElementById("Exchange").value == "FOREX") {
+            document.getElementById("searchSymbol").value = symbol;
+            symbol = "FX-" + symbol;
         } else if (document.getElementById("Exchange").value == "PSE") {
             document.getElementById("searchSymbol").value = symbol;
             symbol = "PSE-" + symbol;
@@ -4531,8 +4542,8 @@
                     earnings: earning == 0 ? 'NaN' : earning,
                     volume: chartData[125 - i]["volume"],
                     volumeDescription: AmCharts.roundTo(chartData[125 - i]["volume"]/1000000,2).toString() + "M",
-                    macd: AmCharts.roundTo(chartData[125 - i]["macd"], 2),
-                    macdSignal: AmCharts.roundTo(chartData[125 - i]["macdSignal"], 2),
+                    macd: AmCharts.roundTo(chartData[125 - i]["macd"], 6),
+                    macdSignal: AmCharts.roundTo(chartData[125 - i]["macdSignal"], 6),
                     ma1: 0,
                     ma2: 0,
                     ma3: 0,
@@ -5461,8 +5472,8 @@
             if (i < noOfYears) {
                 var Year = currentYear - (noOfYears - i);
 
-                var startValue = AmCharts.roundTo(closeYearData[noOfYears - i - 1][xValue], 2);
-                var endValue = AmCharts.roundTo(closeYearData[noOfYears - i - 1][xValue + scannerRange - 1], 2);
+                var startValue = AmCharts.roundTo(closeYearData[noOfYears - i - 1][xValue], 6);
+                var endValue = AmCharts.roundTo(closeYearData[noOfYears - i - 1][xValue + scannerRange - 1], 6);
 
                 var checked = plottedYearGraphs.indexOf(Year) >= 0 ? "checked" : "";
                 var status = "<span><input id='checked" + Year + "' type='checkbox' value='' " + checked + " onclick='checkYear(" + Year + "," + i + ")'></span><span> " + Year + ":</span><span class='pull-right'>No change.</span>";

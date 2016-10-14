@@ -647,11 +647,16 @@ Module - v 2016.06.21
             success: function (result) {
                 if (result.length > 0) {
                     // Data
+                    var owner = document.getElementById('UserFavorite_User').value;
+                    var disabled = "disabled";
+                    if (currentUser == owner) {
+                        disabled = "";
+                    }
                     while (favoriteSymbolsData.length > 0) favoriteSymbolsData.pop();
                     for (var i = 0; i < result.length; i++) {
                         favoriteSymbolsData.push({
-                            EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='cmdEditUserFavoriteSymbol' onclick='cmdEditUserFavoriteSymbol_OnClick()'>Edit</button>",
-                            DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='cmdDeleteUserFavoriteSymbol' onclick='cmdDeleteUserFavoriteSymbol_OnClick()'>Del</button>",
+                            EditId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='cmdEditUserFavoriteSymbol' onclick='cmdEditUserFavoriteSymbol_OnClick()' " + disabled  + ">Edit</button>",
+                            DeleteId: "<button class='btn btn-danger btn-xs' data-toggle='modal' id='cmdDeleteUserFavoriteSymbol' onclick='cmdDeleteUserFavoriteSymbol_OnClick()' " + disabled + ">Del</button>",
                             Id: result[i].Id,
                             UserFavoritesId: result[i].UserFavoritesId,
                             SymbolId: result[i].SymbolId,
@@ -726,6 +731,7 @@ Module - v 2016.06.21
                     });
                     favoriteSymbols.trackChanges = true;
                     updateNavSymbols();
+                    enableDisableSymbolButtons();
                 }
             }
         });
@@ -773,6 +779,20 @@ Module - v 2016.06.21
             favoriteSymbolsCollection.moveToLastPage();
             updateNavSymbols();
         });
+    }
+    function enableDisableSymbolButtons() {
+        var owner = document.getElementById('UserFavorite_User').value;
+        if (currentUser == owner) {
+            //document.getElementById('cmdEditUserFavoriteSymbol').disabled = false;
+            //document.getElementById('cmdDeleteUserFavoriteSymbol').disabled = false;
+            document.getElementById('cmdAddUserFavoriteSymbol').disabled = false;
+            document.getElementById('cmdUploadUserFavoriteSymbol').disabled = false;
+        } else {
+            //document.getElementById('cmdEditUserFavoriteSymbol').disabled = true;
+            //document.getElementById('cmdDeleteUserFavoriteSymbol').disabled = true;
+            document.getElementById('cmdAddUserFavoriteSymbol').disabled = true;
+            document.getElementById('cmdUploadUserFavoriteSymbol').disabled = true;
+        }
     }
 
     function cmdAddUserFavorite_OnClick() {

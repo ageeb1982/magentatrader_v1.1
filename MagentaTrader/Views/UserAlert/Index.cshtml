@@ -1,0 +1,311 @@
+﻿@{
+    //ViewBag.Title = "Index";
+
+    var Version = "v.Beta.1.20161012";
+}
+
+<link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
+<link href="/css/toastr.css" rel="stylesheet" />
+
+<script src="/js/jquery-1.10.2.min.js"></script>
+<script src="/js/knockout-3.2.0.js"></script>
+<script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+<script src="/js/date.js"></script>
+<script src="/js/toastr.js"></script>
+
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"> - Alerts @Version</span></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <h2 class="section-heading">Alert</h2>
+
+        @*Id*@
+        <input type="hidden" class="form-control" id="Id">
+
+        @*Description*@
+        <input type="hidden" class="form-control" id="Description">
+
+        @*Strategy*@
+        <div class="col-lg-6">
+            <p>Strategy</p>
+            <select id="Strategy" class="form-control" onchange="Strategy_OnChange()">
+                <option value="CUS" selected="selected">Customize</option>
+                <option value="MEU">Magenta Early Up</option>
+                <option value="MED">Magenta Early Down</option>
+            </select>
+        </div>
+        <div class="col-lg-6">
+            <p></p>
+            <div class="input-group">
+                <span class="input-group-btn">
+                    <button id="CmdDownloadResult" type="submit" class="btn btn-info pull-right" onclick="CmdDownloadResult_OnClick()">
+                        <span>Download Alert Results</span>
+                    </button>
+                    <button id="CmdGetResult" type="submit" class="btn btn-info pull-right" onclick="CmdGetResult_OnClick()">
+                        <span>Get Alert Results</span>
+                    </button>
+                    <button id="CmdSaveAlert" type="submit" class="btn btn-primary pull-right" onclick="CmdSaveAlert_OnClick()">
+                        <span>Save Alert Settings</span>
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>  
+    <br />
+    <div class="row">
+        @*Exchange*@
+        <div class="col-lg-2">
+            <p>Exchange</p>
+            <select id="Exchange" class="form-control">
+                <option value="All">All</option>
+                <option value="AMEX">AMEX</option>
+                <option value="NASDAQ">NASDAQ</option>
+                <option value="NYSE">NYSE</option>
+                <option value="PSE">PSE</option>
+                <option value="TSX">TSX</option>
+                <option value="FOREX">FOREX</option>
+            </select>
+        </div>
+        @*Price*@
+        <div class="col-lg-2">
+            <p>Price</p>
+            <input type="text" class="form-control" id="Price" placeholder="Price - [US $10]">
+        </div>
+        @*Volume*@
+        <div class="col-lg-2">
+            <p>Volume</p>
+            <input type="text" class="form-control" id="Volume" placeholder="Volume - [1M]">
+        </div>
+        @*GrowthDecayRate*@
+        <div class="col-lg-2">
+            <p>Growth(Decay) Rate</p>
+            <input type="text" class="form-control" id="GrowthDecayRate" placeholder="Growth(Decay) - [100]">
+        </div>
+        @*GrowthDecayTime*@
+        <div class="col-lg-2">
+            <p>Growth(Decay) Time</p>
+            <select id="GrowthDecayTime" class="form-control">
+                <option value="C0">Current Trend</option>
+                <option value="W1">One Week</option>
+                <option value="W2">Two Weeks</option>
+                <option value="W3">Three Weeks</option>
+                <option value="M1">One Month</option>
+                <option value="M2">Two Months</option>
+                <option value="M3">Three Months</option>
+            </select>
+        </div>
+        @*NoOfYears*@
+        <div class="col-lg-2">
+            <p>No. of Years</p>
+            <select id="NoOfYears" class="form-control">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8" selected="selected">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        @*Correlation30*@
+        <div class="col-lg-2">
+            <p>30 Days Linear</p>
+            <select id="Correlation30" class="form-control">
+                <option value="10" selected="selected">0.10</option>
+                <option value="20">0.20</option>
+                <option value="30">0.30</option>
+                <option value="40">0.40</option>
+                <option value="50">0.50</option>
+                <option value="60">0.60</option>
+                <option value="70">0.70</option>
+                <option value="80">0.80</option>
+                <option value="90">0.90</option>
+                <option value="100">1.00</option>
+            </select>
+        </div>
+        @*MACDOccurrence*@
+        <div class="col-lg-4">
+            <p>MACD Occurrence</p>
+            <select id="MACDOccurrence" class="form-control">
+                <option value="NA">Not Applicable</option>
+                <option value="Before10">10 Days before EMA Crossover</option>
+                <option value="Before">Before the EMA Crossover</option>
+                <option value="At">At the EMA Crossover</option>
+                <option value="After">After the EMA Crossover</option>
+            </select>
+        </div>
+        @*AlertVia*@
+        <div class="col-lg-4">
+            <p>Alert Via</p>
+            <select id="AlertVia" class="form-control">
+                <option value="Email">Email</option>
+            </select>
+        </div>
+        @*IsActive*@
+        <div class="col-lg-2">
+            <p>Active</p>
+            <input class="form-control" id="IsActive" type="checkbox" />
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-lg-12">
+            <p>Alert Results</p>
+            <div id="AlertGrid" class="grid"></div>
+            <div class="row">
+                <div class="btn-group col-md-7" id="NavPage">
+                    <button type="button" class="btn btn-default" id="NavFirstPage">
+                        <span class="glyphicon glyphicon-fast-backward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" id="NavPreviousPage">
+                        <span class="glyphicon glyphicon-step-backward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" disabled style="width:100px" id="NavCurrentPage"></button>
+                    <button type="button" class="btn btn-default" id="NavNextPage">
+                        <span class="glyphicon glyphicon-step-forward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" id="NavLastPage">
+                        <span class="glyphicon glyphicon-fast-forward"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var currentUser;
+
+    // Events
+    function Strategy_OnChange() {
+
+    }
+    function CmdDownloadResult_OnClick() {
+
+    }
+    function CmdGetResult_OnClick() {
+
+    }
+    function CmdSaveAlert_OnClick() {
+        SaveUserAlert();
+    }
+
+    // Data
+    function GetUserAlert() {
+        $.ajax({
+            url: '/api/GetUserAlert/' + currentUser,
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            success: function (result) {
+                if (result.Id > 0) {
+                    document.getElementById('Id').value = result.Id;
+                    document.getElementById('Description').value = result.Description;
+                    document.getElementById('Strategy').value = result.Strategy;
+                    document.getElementById('Exchange').value = result.Exchange;
+                    document.getElementById('Price').value = result.Price;
+                    document.getElementById('Volume').value = result.Volume;
+                    document.getElementById('GrowthDecayRate').value = result.GrowthDecayRate;
+                    document.getElementById('GrowthDecayTime').value = result.GrowthDecayTime;
+                    document.getElementById('NoOfYears').value = result.NoOfYears;
+                    document.getElementById('Correlation30').value = result.Correlation30;
+                    document.getElementById('MACDOccurrence').value = result.MACDOccurrence;
+                    document.getElementById('AlertVia').value = result.AlertVia;
+                    document.getElementById('IsActive').checked = result.IsActive;
+                } else {
+                    document.getElementById('Id').value = 0;
+                    document.getElementById('Description').value = "User Alert";
+                }
+            }
+        });
+    }
+    function SaveUserAlert() {
+        var userAlert = new Object();
+
+        userAlert.Id = parseFloat(document.getElementById('Id').value);
+        userAlert.UserId = 0;
+        userAlert.User = currentUser;
+        userAlert.Description = document.getElementById('Description').value;
+        userAlert.Strategy = document.getElementById('Strategy').value;
+        userAlert.Exchange = document.getElementById('Exchange').value;
+        var $price = parseFloat(document.getElementById('Price').value);
+        userAlert.Price = !$price ? 10 : $price;
+        var $volume = parseFloat(document.getElementById('Volume').value);
+        userAlert.Volume = !$volume ? 1000000 : $volume;;
+        var $growthDecayRate = document.getElementById('GrowthDecayRate').value;
+        userAlert.GrowthDecayRate = !$growthDecayRate ? 100 : $growthDecayRate;;
+        userAlert.GrowthDecayTime = document.getElementById('GrowthDecayTime').value;
+        var $noOfYears = parseInt(document.getElementById('NoOfYears').value);
+        userAlert.NoOfYears = !$noOfYears ? 8 : $noOfYears;
+        userAlert.Correlation30 = document.getElementById('Correlation30').value;
+        userAlert.MACDOccurrence = document.getElementById('MACDOccurrence').value;
+        userAlert.IsActive = document.getElementById('IsActive').checked;
+        userAlert.EncodedDate = new Date();
+        userAlert.AlertVia = document.getElementById('AlertVia').value;
+
+        var data = JSON.stringify(userAlert);
+
+        if (userAlert.Id == 0) {
+            $.ajax({
+                type: "POST",
+                url: "/api/AddUserAlert",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: data,
+                success: function (id) {
+                    if (id > 0) {
+                        toastr.success("Success!");
+                        GetUserAlert();
+                    } else {
+                        toastr.error("Server Error");
+                    }
+                }
+            });
+        } else {
+            $.ajax({
+                type: "PUT",
+                url: "/api/UpdateUserAlert/" + userAlert.Id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: data,
+                statusCode: {
+                    200: function () {
+                        toastr.success("Success!");
+                    },
+                    404: function () {
+                        toastr.error("Not found");
+                    },
+                    400: function () {
+                        toastr.error("Bad request");
+                    }
+                }
+            });
+        }
+    }
+
+    // Page Load
+    $(document).ready(function () {
+        currentUser = '@User.Identity.Name';
+
+        GetUserAlert();
+    });
+</script>

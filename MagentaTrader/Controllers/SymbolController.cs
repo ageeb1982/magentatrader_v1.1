@@ -348,7 +348,7 @@ namespace MagentaTrader.Controllers
                         var Symbols2 = from d in db.MstSymbols
                                        where (Exchange == "All" ? true : d.Exchange == Exchange) &&
                                              (d.ClosePrice >= Price) &&
-                                             (d.Volume >= Volume) &&
+                                             (d.Exchange == "FOREX" ? true : d.Volume >= Volume) &&
                                              (d.NoOfYears >= NoOfYears) &&
                                              (d.MACDGrowthDecayRate < 0) &&
                                              (d.EMAGrowthDecayRate < 0)
@@ -410,7 +410,7 @@ namespace MagentaTrader.Controllers
                         var Symbols1 = from d in db.MstSymbols
                                        where (Exchange == "All" ? true : d.Exchange == Exchange) &&
                                              (d.ClosePrice >= Price) &&
-                                             (d.Volume >= Volume) &&
+                                             (d.Exchange == "FOREX" ? true : d.Volume >= Volume) &&
                                              (d.NoOfYears >= NoOfYears) &&
                                              (d.MACDGrowthDecayRate >= 0) &&
                                              (d.EMAGrowthDecayRate >= 0)
@@ -472,7 +472,7 @@ namespace MagentaTrader.Controllers
                         var Symbols = from d in db.MstSymbols
                                       where (Exchange == "All" ? true : d.Exchange == Exchange) &&
                                             (d.ClosePrice >= Price) &&
-                                            (d.Volume >= Volume) &&
+                                            (d.Exchange == "FOREX" ? true : d.Volume >= Volume) &&
                                             (d.NoOfYears >= NoOfYears) &&
                                             (d.CorrelationCoefficient30 >= (Correlation30 / 100)) &&
                                             (GrowthDecayTime == "C0" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value) >= GrowthDecayRate ? true : false) : true) == true &&

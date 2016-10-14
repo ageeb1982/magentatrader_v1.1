@@ -20,6 +20,8 @@ namespace MagentaTrader.Controllers
             string SymbolDescription = "";
             string Exchange = "";
 
+            int dataCounter = 1;
+
             symbol = symbol.Replace(",", ".");
 
             try
@@ -48,18 +50,39 @@ namespace MagentaTrader.Controllers
 
                 foreach (var StockPrice in StockPrices)
                 {
-                    if (StockPrice.ClosePrice > 0 && StockPrice.Volume > 0)
+                    if (Exchange == "FOREX")
                     {
-                        Models.StockPrice price = new Models.StockPrice();
-                        price.QuoteDate = StockPrice.QuoteDate;
-                        price.OpenPrice = StockPrice.OpenPrice;
-                        price.HighPrice = StockPrice.HighPrice;
-                        price.LowPrice = StockPrice.LowPrice;
-                        price.ClosePrice = StockPrice.ClosePrice;
-                        price.Volume = StockPrice.Volume;
+                        if (StockPrice.ClosePrice > 0)
+                        {
+                            Models.StockPrice price = new Models.StockPrice();
+                            price.QuoteDate = StockPrice.QuoteDate;
+                            price.OpenPrice = StockPrice.OpenPrice;
+                            price.HighPrice = StockPrice.HighPrice;
+                            price.LowPrice = StockPrice.LowPrice;
+                            price.ClosePrice = StockPrice.ClosePrice;
+                            price.Volume = StockPrice.Volume;
 
-                        prices.Add(price);
+                            prices.Add(price);
+
+                            if (dataCounter > 2623) break;  // There are more data in FOREX than in Equities
+                        }
                     }
+                    else
+                    {
+                        if (StockPrice.ClosePrice > 0 && StockPrice.Volume > 0)
+                        {
+                            Models.StockPrice price = new Models.StockPrice();
+                            price.QuoteDate = StockPrice.QuoteDate;
+                            price.OpenPrice = StockPrice.OpenPrice;
+                            price.HighPrice = StockPrice.HighPrice;
+                            price.LowPrice = StockPrice.LowPrice;
+                            price.ClosePrice = StockPrice.ClosePrice;
+                            price.Volume = StockPrice.Volume;
+
+                            prices.Add(price);
+                        }
+                    }
+                    dataCounter++;
                 }
             }
             catch

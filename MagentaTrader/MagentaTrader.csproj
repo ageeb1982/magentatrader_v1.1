@@ -205,6 +205,8 @@
     <Compile Include="Controllers\StockPriceController.cs" />
     <Compile Include="Controllers\SymbolController.cs" />
     <Compile Include="Controllers\TradierController.cs" />
+    <Compile Include="Controllers\UserAlertAPIController.cs" />
+    <Compile Include="Controllers\UserAlertController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\UserFavoriteAPIController.cs" />
     <Compile Include="Controllers\UserFavoriteController.cs" />
@@ -279,6 +281,8 @@
     <Compile Include="Models\TradierUserAccount.cs" />
     <Compile Include="Models\TradierUserProfile.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Models\UserAlert.cs" />
+    <Compile Include="Models\UserAlertSymbol.cs" />
     <Compile Include="Models\UserFavorite.cs" />
     <Compile Include="Models\UserFavoriteSymbol.cs" />
     <Compile Include="Models\VariableScanner.cs" />
@@ -1544,6 +1548,7 @@
     <Content Include="Views\Campaign\Web99.cshtml" />
     <Content Include="Views\Campaign\ViewVideo.cshtml" />
     <Content Include="Views\Campaign\MagentaTour2017.cshtml" />
+    <Content Include="Views\UserAlert\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

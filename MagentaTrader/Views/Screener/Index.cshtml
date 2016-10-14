@@ -53,6 +53,7 @@
                 <option value="NYSE">NYSE</option>
                 <option value="PSE">PSE</option>
                 <option value="TSX">TSX</option>
+                <option value="FOREX">FOREX</option>
             </select>
         </div>
         <div class="col-lg-2">
@@ -284,6 +285,20 @@
     var SharedFavoritesCollection;
     var SharedFavoritesGrid;
 
+    function replaceSymbol(exchange, symbol) {
+        var returnSymbol;
+        if(exchange=="TSX") {
+            returnSymbol = symbol.replace("TSX-", "");
+        } else if(exchange=="FOREX") {
+            returnSymbol = symbol.replace("FX-", "");
+        } else if(exchange=="PSE") {
+            returnSymbol = symbol.replace("PSE-", "");
+        } else {
+            returnSymbol = symbol;
+        }
+        return returnSymbol;
+    }
+
     function GetRateColor(Rate) {
         var GreenColor = "#0FB203";
         var RedColor = "#A80008";
@@ -344,7 +359,7 @@
             success: function (result) {
                 for (i = 0; i < result.length; i++) {
                     d.push({
-                        Symbol: "<a href='/Software?symbol=" + result[i].SymbolDescription + "' target='_blank'><font color='black'>" + result[i].SymbolDescription + "</font></a>",
+                        Symbol: "<a href='/Software?symbol=" + result[i].SymbolDescription + "' target='_blank'><font color='black'>" + replaceSymbol(result[i].Exchange,result[i].SymbolDescription) + "</font></a>",
                         SymbolRaw: result[i].SymbolDescription,
                         Description: result[i].Description,
                         Exchange: result[i].Exchange,
