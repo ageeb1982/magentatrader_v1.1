@@ -368,7 +368,13 @@
             $("#CouponLink2").empty();
 
             $("#CouponLink").append("$85 per Month Web99 Coupon <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='4a8411f8-4996-45cf-8b45-caabbc05f499' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
-        } else {
+        } else if(CouponCode.toUpperCase() == "BOOK") {
+            $("#CouponLink").empty();
+            $("#CouponLink1").empty();
+            $("#CouponLink2").empty();
+
+            $("#CouponLink").append("Magenta Book/Annual Charts <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='dbabb9ac-66c3-4d05-804f-e8074043b247' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
+         } else {
             $("#CouponLink").empty();
             $("#CouponLink1").empty();
             $("#CouponLink2").empty();

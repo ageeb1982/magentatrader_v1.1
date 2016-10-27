@@ -48,6 +48,7 @@
         </div>
 
         <ul class="nav navbar-top-links navbar-right">
+            <li id="alertButton"></li>
             <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <i class="fa fa-globe fa-fw"></i>  <i class="fa fa-caret-down"></i>
@@ -5775,7 +5776,41 @@
         });
     }
 
+    function addAlertButton() {
+        var username = '@User.Identity.Name';
+        $.ajax({
+            url: '/api/GetUserAlert/' + username,
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            success: function (result) {
+                if (result.Id > 0) {
+                    $.ajax({
+                        url: '/api/GetUserAlertSymbols/' + result.Id,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (result) {
+                            if (result.length > 0) {
+                                var element = document.createElement("button");
+                                element.setAttribute("type", "button");
+                                element.setAttribute("class", "btn-danger");
+                                element.innerHTML = "Alert - " + result.length + " symbol(s)"
+                                element.onclick = function () {
+                                    window.location.href = "/UserAlert";
+                                };
+
+                                document.getElementById("alertButton").appendChild(element);
+                            }
+                        }
+                    });
+                } 
+            }
+        });
+    }
+
     $(document).ready(function () {
+
+        addAlertButton();
 
         // Scanner day range drop down list
 

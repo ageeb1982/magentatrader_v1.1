@@ -54,9 +54,6 @@
                     <button id="CmdDownloadResult" type="submit" class="btn btn-info pull-right" onclick="CmdDownloadResult_OnClick()">
                         <span>Download Alert Results</span>
                     </button>
-                    <button id="CmdGetResult" type="submit" class="btn btn-info pull-right" onclick="CmdGetResult_OnClick()">
-                        <span>Get Alert Results</span>
-                    </button>
                     <button id="CmdSaveAlert" type="submit" class="btn btn-primary pull-right" onclick="CmdSaveAlert_OnClick()">
                         <span>Save Alert Settings</span>
                     </button>
@@ -170,7 +167,7 @@
     <div class="row">
         <div class="col-lg-12">
             <p>Alert Results</p>
-            <div id="AlertGrid" class="grid"></div>
+            <div id="UserAlertGrid" class="grid"></div>
             <div class="row">
                 <div class="btn-group col-md-7" id="NavPage">
                     <button type="button" class="btn btn-default" id="NavFirstPage">
@@ -195,18 +192,168 @@
 <script type="text/javascript">
     var currentUser;
 
+    var UserAlertData;
+    var UserAlertCollection;
+    var UserAlertGrid;
+
+    var NavFirstPage;
+    var NavPreviousPage;
+    var NavNextPage;
+    var NavLastPage;
+    var NavCurrentPage;
+
     // Events
     function Strategy_OnChange() {
-
+        var Strategy = document.getElementById('Strategy').value;
+        switch (Strategy) {
+            case "CUS":
+                document.getElementById('GrowthDecayRate').disabled = false;
+                document.getElementById('GrowthDecayTime').disabled = false;
+                break;
+            case "MEU":
+            case "MED":
+                document.getElementById('GrowthDecayRate').disabled = true;
+                document.getElementById('GrowthDecayTime').disabled = true;
+                break;
+        }
     }
     function CmdDownloadResult_OnClick() {
+        var CSV = '';
+        var alertSymbols = [];
 
-    }
-    function CmdGetResult_OnClick() {
+        for (i = 0; i < UserAlertData.length; i++) {
+            alertSymbols.push({
+                Symbol: UserAlertData[i].SymbolRaw,
+                Description: UserAlertData[i].Description,
+                Exchange: UserAlertData[i].Exchange,
+                ClosePrice: UserAlertData[i].ClosePrice,
+                Volume: UserAlertData[i].Volume,
+                NoOfYears: UserAlertData[i].NoOfYears,
+                TrendNoOfDays: UserAlertData[i].TrendNoOfDays,
+                GrowthDecayRate: UserAlertData[i].GrowthDecayRate,
+                GrowthDecayRateW1: UserAlertData[i].GrowthDecayRateW1,
+                GrowthDecayRateW2: UserAlertData[i].GrowthDecayRateW2,
+                GrowthDecayRateW3: UserAlertData[i].GrowthDecayRateW3,
+                GrowthDecayRateM1: UserAlertData[i].GrowthDecayRateM1,
+                GrowthDecayRateM2: UserAlertData[i].GrowthDecayRateM2,
+                GrowthDecayRateM3: UserAlertData[i].GrowthDecayRateM3,
+                WinLossCurrent30: UserAlertData[i].WinLossCurrent30,
+                WinLossAverageCurrent30: UserAlertData[i].WinLossAverageCurrent30,
+                WinLoss20: UserAlertData[i].WinLoss20Raw,
+                WinLossAverage20: UserAlertData[i].WinLossAverage20,
+                WinLoss40: UserAlertData[i].WinLoss40Raw,
+                WinLossAverage40: UserAlertData[i].WinLossAverage40,
+                WinLoss60: UserAlertData[i].WinLoss60Raw,
+                WinLossAverage60: UserAlertData[i].WinLossAverage60,
+                CorrelationCoefficient30: UserAlertData[i].CorrelationCoefficient30,
+                SeasonalityCorrelation: UserAlertData[i].SeasonalityCorrelation,
+                MACDTrendNoOfDays: UserAlertData[i].MACDTrendNoOfDays,
+                MACDGrowthDecayRate: UserAlertData[i].MACDGrowthDecayRate,
+                EMATrendNoOfDays: UserAlertData[i].EMATrendNoOfDays,
+                EMAGrowthDecayRate: UserAlertData[i].EMAGrowthDecayRate,
+                EMAStartDate: UserAlertData[i].EMAStartDate,
+                EMALinear: UserAlertData[i].EMALinear
+            });
+        }
+
+        CSV += 'Alert Symbol Results Data' + '\r\n\n';
+
+        var alertSymbolsLabelRow = '';
+        for (var s in alertSymbols[0]) {
+            alertSymbolsLabelRow += s + ',';
+        }
+        alertSymbolsLabelRow = alertSymbolsLabelRow.slice(0, -1);
+        CSV += alertSymbolsLabelRow + '\r\n';
+
+        for (var i = 0; i < alertSymbols.length; i++) {
+            var alertSymbolsRow = '';
+            for (var s in alertSymbols[i]) {
+                alertSymbolsRow += '"' + alertSymbols[i][s] + '",';
+            }
+            alertSymbolsRow.slice(0, alertSymbolsRow.length - 1);
+            CSV += alertSymbolsRow + '\r\n';
+        }
+
+        if (CSV == '') {
+            toastr.error("No data");
+            return;
+        }
+
+        // Create filename
+        var fileName = 'alert_symbols.CSV';
+
+        // Download via <a> link
+
+        var link = document.createElement("a");
+
+        if (link.download !== undefined) {
+            var blob = new Blob([CSV], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style = "visibility:hidden";
+        }
+
+        if (navigator.msSaveBlob) {
+            link.addEventListener("click", function (event) {
+                var blob = new Blob([CSV], {
+                    "type": "text/csv;charset=utf-8;"
+                });
+                navigator.msSaveBlob(blob, fileName);
+            }, false);
+        }
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
 
     }
     function CmdSaveAlert_OnClick() {
         SaveUserAlert();
+    }
+    function UpdateNavPage() {
+        if (UserAlertCollection.pageSize <= 0) {
+            document.getElementById('NavPage').style.display = 'none';
+            return;
+        }
+        document.getElementById('NavPage').style.display = 'block';
+        if (UserAlertCollection.pageIndex === 0) {
+            NavFirstPage.setAttribute('disabled', 'disabled');
+            NavPreviousPage.setAttribute('disabled', 'disabled');
+            NavNextPage.removeAttribute('disabled');
+            NavLastPage.removeAttribute('disabled');
+        }
+        else if (UserAlertCollection.pageIndex === (UserAlertCollection.pageCount - 1)) {
+            NavFirstPage.removeAttribute('disabled');
+            NavPreviousPage.removeAttribute('disabled');
+            NavNextPage.setAttribute('disabled', 'disabled');
+            NavLastPage.setAttribute('disabled', 'disabled');
+        }
+        else {
+            NavFirstPage.removeAttribute('disabled');
+            NavPreviousPage.removeAttribute('disabled');
+            NavNextPage.removeAttribute('disabled');
+            NavLastPage.removeAttribute('disabled');
+        }
+        NavCurrentPage.innerHTML = (UserAlertCollection.pageIndex + 1) + ' / ' + UserAlertCollection.pageCount;
+    }
+    function AddListenerNavPage() {
+        NavFirstPage.addEventListener('click', function () {
+            UserAlertCollection.moveToFirstPage();
+            UpdateNavPage();
+        });
+        NavPreviousPage.addEventListener('click', function () {
+            UserAlertCollection.moveToPreviousPage();
+            UpdateNavPage();
+        });
+        NavNextPage.addEventListener('click', function () {
+            UserAlertCollection.moveToNextPage();
+            UpdateNavPage();
+        });
+        NavLastPage.addEventListener('click', function () {
+            UserAlertCollection.moveToLastPage();
+            UpdateNavPage();
+        });
     }
 
     // Data
@@ -231,6 +378,9 @@
                     document.getElementById('MACDOccurrence').value = result.MACDOccurrence;
                     document.getElementById('AlertVia').value = result.AlertVia;
                     document.getElementById('IsActive').checked = result.IsActive;
+
+                    GetUserAlertSymbols(result.Id, result.Strategy);
+                    Strategy_OnChange();
                 } else {
                     document.getElementById('Id').value = 0;
                     document.getElementById('Description').value = "User Alert";
@@ -290,6 +440,7 @@
                 statusCode: {
                     200: function () {
                         toastr.success("Success!");
+                        GetUserAlert();
                     },
                     404: function () {
                         toastr.error("Not found");
@@ -300,11 +451,471 @@
                 }
             });
         }
+    } 
+    function GetUserAlertSymbols(Id,Strategy) {
+        if (Id > 0) {
+            $.ajax({
+                url: '/api/GetUserAlertSymbols/' + Id,
+                type: 'GET',
+                dataType: 'json',
+                success: function (result) {
+                    // Data
+                    UserAlertData = new wijmo.collections.ObservableArray();
+                    for (var i = 0; i < result.length; i++) {
+                        UserAlertData.push({
+                            Symbol: "<a href='/Software?symbol=" + result[i].SymbolDescription + "' target='_blank'><font color='black'>" + ReplaceSymbol(result[i].Exchange, result[i].SymbolDescription) + "</font></a>",
+                            SymbolRaw: result[i].SymbolDescription,
+                            Description: result[i].Description,
+                            Exchange: result[i].Exchange,
+                            ClosePrice: result[i].ClosePrice,
+                            Volume: Math.round(result[i].Volume / 10000) / 100,
+                            Rate: GetRate(GrowthDecayTime, result[i]),
+                            GrowthDecayRate: Math.round(result[i].GrowthDecayRate),
+                            GrowthDecayRateW1: Math.round(result[i].GrowthDecayRateW1),
+                            GrowthDecayRateW2: Math.round(result[i].GrowthDecayRateW2),
+                            GrowthDecayRateW3: Math.round(result[i].GrowthDecayRateW3),
+                            GrowthDecayRateM1: Math.round(result[i].GrowthDecayRateM1),
+                            GrowthDecayRateM2: Math.round(result[i].GrowthDecayRateM2),
+                            GrowthDecayRateM3: Math.round(result[i].GrowthDecayRateM3),
+                            NoOfYears: result[i].NoOfYears,
+                            TrendNoOfDays: result[i].TrendNoOfDays,
+                            WinLossCurrent30: result[i].WinLossCurrent30,
+                            WinLossAverageCurrent30: result[i].WinLossAverageCurrent30,
+                            WinLoss20: "<a href='javascript:;' onclick='OpenYearlyWinLoss(20);'><font color='black'>" + result[i].WinLoss20 + "</font></a>",
+                            WinLossAverage20: result[i].WinLossAverage20,
+                            WinLoss40: "<a href='javascript:;' onclick='OpenYearlyWinLoss(40);'><font color='black'>" + result[i].WinLoss40 + "</font></a>",
+                            WinLossAverage40: result[i].WinLossAverage40,
+                            WinLoss60: "<a href='javascript:;' onclick='OpenYearlyWinLoss(60);'><font color='black'>" + result[i].WinLoss60 + "</font></a>",
+                            WinLoss20Raw: result[i].WinLoss20,
+                            WinLoss40Raw: result[i].WinLoss40,
+                            WinLoss60Raw: result[i].WinLoss60,
+                            WinLossAverage60: result[i].WinLossAverage60,
+                            CorrelationCoefficient30: result[i].CorrelationCoefficient30,
+                            SeasonalityCorrelation: result[i].SeasonalityCorrelation,
+                            MACDTrendNoOfDays: result[i].MACDGrowthDecayRate < 0 ? (result[i].MACDTrendNoOfDays * -1) : result[i].MACDTrendNoOfDays,
+                            MACDGrowthDecayRate: result[i].MACDGrowthDecayRate,
+                            EMATrendNoOfDays: result[i].EMAGrowthDecayRate < 0 ? (result[i].EMATrendNoOfDays * -1) : result[i].EMATrendNoOfDays,
+                            EMAGrowthDecayRate: result[i].EMAGrowthDecayRate,
+                            EMAStartDate: result[i].EMAStartDate,
+                            EMALinear: result[i].EMALinear
+                        });
+                    }
+                    // Collection
+                    UserAlertCollection = new wijmo.collections.CollectionView(UserAlertData);
+                    UserAlertCollection.pageSize = 10;
+                    UserAlertCollection.collectionChanged.addHandler(function (sender, args) {
+                        UpdateNavPage();
+                    });
+                    // Grid
+                    UserAlertGrid.dispose();
+                    UserAlertGrid = new wijmo.grid.FlexGrid('#UserAlertGrid');
+                    UserAlertGrid.initialize({
+                        columns: MakeUserAlertGridColumns(Strategy),
+                        autoGenerateColumns: false,
+                        itemsSource: UserAlertCollection,
+                        isReadOnly: true,
+                        selectionMode: wijmo.grid.SelectionMode.Row,
+                        itemFormatter: function (panel, r, c, cell) {
+                            if (wijmo.grid.CellType.Cell == panel.cellType &&
+                                (panel.columns[c].binding == 'GrowthDecayRate' ||
+                                panel.columns[c].binding == 'GrowthDecayRateW1' ||
+                                panel.columns[c].binding == 'GrowthDecayRateW2' ||
+                                panel.columns[c].binding == 'GrowthDecayRateW3' ||
+                                panel.columns[c].binding == 'GrowthDecayRateM1' ||
+                                panel.columns[c].binding == 'GrowthDecayRateM2' ||
+                                panel.columns[c].binding == 'GrowthDecayRateM3' ||
+                                panel.columns[c].binding == 'WinLossAverage20' ||
+                                panel.columns[c].binding == 'WinLossAverage40' ||
+                                panel.columns[c].binding == 'WinLossAverage60')) {
+                                var cellData = panel.getCellData(r, c);
+                                cell.style.color = GetRateColor(cellData);
+                                cell.style.fontSize = "75%";
+                            } else if (wijmo.grid.CellType.Cell == panel.cellType &&
+                                        (panel.columns[c].binding == 'MACDTrendNoOfDays' ||
+                                        panel.columns[c].binding == 'EMATrendNoOfDays' ||
+                                        panel.columns[c].binding == 'EMAGrowthDecayRate')) {
+                                var redColor = "#A80008";
+                                var blueColor = "#070BB0";
+
+                                var cellData = panel.getCellData(r, c);
+
+                                if (cellData >= 0) {
+                                    cell.style.color = blueColor;
+                                } else {
+                                    cell.style.color = redColor;
+                                }
+
+                                cell.style.fontSize = "75%";
+                            } else if (wijmo.grid.CellType.ColumnHeader == panel.cellType) {
+                                var cellData = panel.getCellData(r, c);
+                                cell.style.fontSize = "70%";
+                            } else {
+                                var cellData = panel.getCellData(r, c);
+                                cell.style.fontSize = "75%";
+                            }
+                        }
+                    });
+                    UserAlertGrid.trackChanges = true;
+                    UpdateNavPage();
+                }
+            });
+        }
+    }
+    function MakeUserAlertGridColumns(Strategy) {
+        var gridColumns = [];
+        switch (Strategy) {
+            case "MEU":
+            case "MED":
+                gridColumns = [{
+                    "header": "Symbol",
+                    "binding": "Symbol",
+                    "width": 70,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Price",
+                    "binding": "ClosePrice",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Vol (M)",
+                    "binding": "Volume",
+                    "width": 50,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Years",
+                    "binding": "NoOfYears",
+                    "width": 35,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Correlation",
+                    "binding": "SeasonalityCorrelation",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Trend",
+                    "binding": "TrendNoOfDays",
+                    "width": 35,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Linear",
+                    "binding": "CorrelationCoefficient30",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Rate-T",
+                    "binding": "GrowthDecayRate",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "MACD",
+                    "binding": "MACDTrendNoOfDays",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "EMA",
+                    "binding": "EMATrendNoOfDays",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "EMA Rate",
+                    "binding": "EMAGrowthDecayRate",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "EMA Start",
+                    "binding": "EMAStartDate",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "EMA Linear",
+                    "binding": "EMALinear",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "20 W/L %",
+                    "binding": "WinLossAverage20",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "20 W/L",
+                    "binding": "WinLoss20",
+                    "width": 55,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "40 W/L %",
+                    "binding": "WinLossAverage40",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "40 W/L",
+                    "binding": "WinLoss40",
+                    "width": 55,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "60 W/L %",
+                    "binding": "WinLossAverage60",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "60 W/L",
+                    "binding": "WinLoss60",
+                    "width": 55,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }];
+                break;
+            default:
+                gridColumns = [{
+                    "header": "Symbol",
+                    "binding": "Symbol",
+                    "width": 70,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Price",
+                    "binding": "ClosePrice",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Vol (M)",
+                    "binding": "Volume",
+                    "width": 50,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Years",
+                    "binding": "NoOfYears",
+                    "width": 35,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Correlation",
+                    "binding": "SeasonalityCorrelation",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Trend",
+                    "binding": "TrendNoOfDays",
+                    "width": 35,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Linear",
+                    "binding": "CorrelationCoefficient30",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Rate-T",
+                    "binding": "GrowthDecayRate",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Rate-W1",
+                    "binding": "GrowthDecayRateW1",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Rate-W2",
+                    "binding": "GrowthDecayRateW2",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Rate-W3",
+                    "binding": "GrowthDecayRateW3",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Rate-M1",
+                    "binding": "GrowthDecayRateM1",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Rate-M2",
+                    "binding": "GrowthDecayRateM2",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "Rate-M3",
+                    "binding": "GrowthDecayRateM3",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "20 W/L %",
+                    "binding": "WinLossAverage20",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "20 W/L",
+                    "binding": "WinLoss20",
+                    "width": 55,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "40 W/L %",
+                    "binding": "WinLossAverage40",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "40 W/L",
+                    "binding": "WinLoss40",
+                    "width": 55,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "60 W/L %",
+                    "binding": "WinLossAverage60",
+                    "width": "*",
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }, {
+                    "header": "60 W/L",
+                    "binding": "WinLoss60",
+                    "width": 55,
+                    "allowSorting": true,
+                    "isContentHtml": true,
+                    "wordWrap": true
+                }];
+                break;
+        }
+        return gridColumns;
+    }
+
+    // Utilities
+    function ReplaceSymbol(exchange, symbol) {
+        var returnSymbol;
+        if (exchange == "TSX") {
+            returnSymbol = symbol.replace("TSX-", "");
+        } else if (exchange == "FOREX") {
+            returnSymbol = symbol.replace("FX-", "");
+        } else if (exchange == "PSE") {
+            returnSymbol = symbol.replace("PSE-", "");
+        } else {
+            returnSymbol = symbol;
+        }
+        return returnSymbol;
+    }
+    function GetRateColor(Rate) {
+        var GreenColor = "#0FB203";
+        var RedColor = "#A80008";
+        return Rate >= 0 ? GreenColor : RedColor;
+    }
+    function GetRate(GrowthDecayTime, Result) {
+        var returnResult = 0;
+        switch (GrowthDecayTime) {
+            case "C0":
+                returnResult = Result.GrowthDecayRate;
+                break;
+            case "W1":
+                returnResult = Result.GrowthDecayRateW1;
+                break;
+            case "W2":
+                returnResult = Result.GrowthDecayRateW2;
+                break;
+            case "W3":
+                returnResult = Result.GrowthDecayRateW3;
+                break;
+            case "M1":
+                returnResult = Result.GrowthDecayRateM1;
+                break;
+            case "M2":
+                returnResult = Result.GrowthDecayRateM2;
+                break;
+            case "M3":
+                returnResult = Result.GrowthDecayRateM3;
+                break;
+            default:
+                returnResult = 0;
+                break;
+        }
+        return Math.round(returnResult);
     }
 
     // Page Load
     $(document).ready(function () {
         currentUser = '@User.Identity.Name';
+
+        NavFirstPage = document.getElementById('NavFirstPage');
+        NavPreviousPage = document.getElementById('NavPreviousPage');
+        NavNextPage = document.getElementById('NavNextPage');
+        NavLastPage = document.getElementById('NavLastPage');
+        NavCurrentPage = document.getElementById('NavCurrentPage');
+
+        UserAlertData = new wijmo.collections.ObservableArray();
+        UserAlertCollection = new wijmo.collections.CollectionView();
+        UserAlertCollection.collectionChanged.addHandler(function (sender, args) {
+            UpdateNavPage();
+        });
+        UserAlertGrid = new wijmo.grid.FlexGrid('#UserAlertGrid');
+
+        AddListenerNavPage();
 
         GetUserAlert();
     });
