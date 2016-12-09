@@ -178,6 +178,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AffiliateController.cs" />
+    <Compile Include="Controllers\BookClubController.cs" />
     <Compile Include="Controllers\BrokerLoginController.cs" />
     <Compile Include="Controllers\CalendarController.cs" />
     <Compile Include="Controllers\CampaignController.cs" />
@@ -1549,6 +1550,7 @@
     <Content Include="Views\Campaign\ViewVideo.cshtml" />
     <Content Include="Views\Campaign\MagentaTour2017.cshtml" />
     <Content Include="Views\UserAlert\Index.cshtml" />
+    <Content Include="Views\BookClub\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1029,21 +1029,12 @@ Module - v 2016.06.21
         var data = [];
         var CSV = '';
 
-        for (var i = 0; i < favoriteSymbolsCollection.items.length; i++) {
-            data.push(favoriteSymbolsCollection.items[i].Symbol);
-        }
-
-        var filteredData = [];
-        for (i = 0; i < 100; i++) {
-            filteredData.push(data[i]);
-        }
-
+        var id = document.getElementById('UserFavorite_Id').value;
         $.ajax({
             type: "GET",
-            url: "/api/VariableScanner",
+            url: "/api/VariableScannerOnFavorites/" + id,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
-            data: { Symbols: filteredData },
             success: function (result) {
                 data = [];
                 for (i = 0; i < result.length; i++) {
@@ -1052,7 +1043,8 @@ Module - v 2016.06.21
                         UpDate: result[i].UpDate,
                         UpNoOfDays: result[i].UpNoOfDays,
                         UpRate: result[i].UpRate,
-                        UpPercentage: result[i].UpPercentage,
+                        UpPercent: result[i].UpPercentage,
+                        DailyUpPercent: result[i].UpNoOfDays == 0 ? 0 : (result[i].UpPercentage / result[i].UpNoOfDays).toFixed(4),
                         UpYear0: result[i].UpYearPercentage.length > 0 ? result[i].UpYearPercentage[0].Percentage : 0,
                         UpYear1: result[i].UpYearPercentage.length > 1 ? result[i].UpYearPercentage[1].Percentage : 0,
                         UpYear2: result[i].UpYearPercentage.length > 2 ? result[i].UpYearPercentage[2].Percentage : 0,
@@ -1066,7 +1058,8 @@ Module - v 2016.06.21
                         DownDate: result[i].DownDate,
                         DownNoOfDays: result[i].DownNoOfDays,
                         DownRate: result[i].DownRate,
-                        DownPercentage: result[i].DownPercentage,
+                        DownPercent: result[i].DownPercentage,
+                        DailyDownPercent: result[i].DownNoOfDays == 0 ? 0 : (result[i].DownPercentage / result[i].DownNoOfDays).toFixed(4),
                         DownYear0: result[i].DownYearPercentage.length > 0 ? result[i].DownYearPercentage[0].Percentage : 0,
                         DownYear1: result[i].DownYearPercentage.length > 1 ? result[i].DownYearPercentage[1].Percentage : 0,
                         DownYear2: result[i].DownYearPercentage.length > 2 ? result[i].DownYearPercentage[2].Percentage : 0,

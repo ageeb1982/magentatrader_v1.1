@@ -168,6 +168,12 @@
             Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='9a179f39-241d-4f13-b122-df91712a1bbe' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
         });
 
+        purchases.push({
+            Product: "Book Club Webinars",
+            Price: "US$ 295",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='2a90c234-b3e1-44b7-8d8b-85288866d613' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        });
+
         //purchases.push({
         //    Product: "Annual Realtime",
         //    Price: "US$ 700",
@@ -264,17 +270,17 @@
         //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='53c868a4-ee26-4e2f-9531-f07498757d96' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
         //});
 
-        purchases.push({
-            Product: "Magenta Las Vegas Workshop - Nov 13-16, 2016",
-            Price: "US$ 995",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='16c583e4-ba7e-4c09-8f53-698490f80d47' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
-        });
+        //purchases.push({
+        //    Product: "Magenta Las Vegas Workshop - Nov 13-16, 2016",
+        //    Price: "US$ 995",
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='16c583e4-ba7e-4c09-8f53-698490f80d47' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //});
 
-        purchases.push({
-            Product: "Magenta Las Vegas Workshop - Nov 13-16, 2016 (If Couple)",
-            Price: "US$ 1,494",
-            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='7915f54f-4c28-411d-8c90-2745e3725f20' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
-        });
+        //purchases.push({
+        //    Product: "Magenta Las Vegas Workshop - Nov 13-16, 2016 (If Couple)",
+        //    Price: "US$ 1,494",
+        //    Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='7915f54f-4c28-411d-8c90-2745e3725f20' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        //});
 
         purchases.push({
             Product: "Magenta Trader 2017 Tour (January 28 - February 26, 2017)",
@@ -369,11 +375,11 @@
 
             $("#CouponLink").append("$85 per Month Web99 Coupon <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='4a8411f8-4996-45cf-8b45-caabbc05f499' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
         } else if(CouponCode.toUpperCase() == "BOOK") {
-            $("#CouponLink").empty();
-            $("#CouponLink1").empty();
-            $("#CouponLink2").empty();
+            //$("#CouponLink").empty();
+            //$("#CouponLink1").empty();
+            //$("#CouponLink2").empty();
 
-            $("#CouponLink").append("Magenta Book/Annual Charts <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='dbabb9ac-66c3-4d05-804f-e8074043b247' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
+            //$("#CouponLink").append("Magenta Book/Annual Charts <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='dbabb9ac-66c3-4d05-804f-e8074043b247' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
          } else {
             $("#CouponLink").empty();
             $("#CouponLink1").empty();

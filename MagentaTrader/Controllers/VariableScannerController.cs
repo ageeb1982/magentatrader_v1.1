@@ -118,10 +118,8 @@ namespace MagentaTrader.Controllers
             return result;
         }
 
-        // GET api/VariableScanner
-        [Authorize]
-        [Route("api/VariableScanner")]
-        public List<Models.VariableScanner> GetVariableScanner([FromUri] List<String> Symbols)
+
+        private List<Models.VariableScanner> ComputeVariableScannerResult(List<String> Symbols)
         {
             List<Models.VariableScanner> data = new List<Models.VariableScanner>();
             try
@@ -285,19 +283,25 @@ namespace MagentaTrader.Controllers
                     List<Models.YearPercentage> upYearPercentage = new List<Models.YearPercentage>();
                     List<Models.YearPercentage> downYearPercentage = new List<Models.YearPercentage>();
 
-                    for (d = startNoOfDay; d <= endNoOfDay; d++) {
-                        for (r = 125 ; r < 252 - d ; r++) {
+                    for (d = startNoOfDay; d <= endNoOfDay; d++)
+                    {
+                        for (r = 125; r < 252 - d; r++)
+                        {
                             decimal seasonTenYear = plotData[r].Season;
                             decimal seasonTenYearPlusVarDays = plotData[r + d - 1].Season;
                             ScanResult result = new ScanResult();
 
-                            if (seasonTenYearPlusVarDays > seasonTenYear) {
-                                result = getScanResult("up",closeYearData, r, d, noOfYears);
-                            } else {
+                            if (seasonTenYearPlusVarDays > seasonTenYear)
+                            {
+                                result = getScanResult("up", closeYearData, r, d, noOfYears);
+                            }
+                            else
+                            {
                                 result = getScanResult("down", closeYearData, r, d, noOfYears);
                             }
 
-                            if (result.Up > 0) {
+                            if (result.Up > 0)
+                            {
                                 if (result.Up > highestUp || (result.Up == highestUp && result.UpAverage > highestUpAverage))
                                 {
                                     highestUp = result.Up;
@@ -313,7 +317,7 @@ namespace MagentaTrader.Controllers
                                     }
                                 }
                             }
-                            else if (result.Down> 0)
+                            else if (result.Down > 0)
                             {
                                 if (result.Down > highestDown || (result.Down == highestDown && result.DownAverage > highestDownAverage))
                                 {
@@ -343,15 +347,17 @@ namespace MagentaTrader.Controllers
                     newData.Symbol = Symbols[s];
                     if (highestUp > 0)
                     {
-                        newData.UpDate = Convert.ToString(plotData[highestUpIndex].QuoteDate.Year) + "-" + Convert.ToString(plotData[highestUpIndex].QuoteDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(plotData[highestUpIndex].QuoteDate.Day + 100).Substring(1, 2);
-                        newData.UpNoOfDays = highestDownDaySpan;
+                        // newData.UpDate = Convert.ToString(plotData[highestUpIndex].QuoteDate.Year) + "-" + Convert.ToString(plotData[highestUpIndex].QuoteDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(plotData[highestUpIndex].QuoteDate.Day + 100).Substring(1, 2);
+                        newData.UpDate = Convert.ToString(plotData[highestUpIndex].QuoteDate.Year) + Convert.ToString(plotData[highestUpIndex].QuoteDate.Month + 100).Substring(1, 2) + Convert.ToString(plotData[highestUpIndex].QuoteDate.Day + 100).Substring(1, 2);
+                        newData.UpNoOfDays = highestUpDaySpan;
                         newData.UpRate = "Up: " + highestUp + "/" + (noOfYears - highestUp);
                         newData.UpPercentage = Math.Round(highestUpAverage, 2);
                         newData.UpYearPercentage = upYearPercentage;
                     }
                     if (highestDown > 0)
                     {
-                        newData.DownDate = Convert.ToString(plotData[highestDownIndex].QuoteDate.Year) + "-" + Convert.ToString(plotData[highestDownIndex].QuoteDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(plotData[highestDownIndex].QuoteDate.Day + 100).Substring(1, 2);
+                        // newData.DownDate = Convert.ToString(plotData[highestDownIndex].QuoteDate.Year) + "-" + Convert.ToString(plotData[highestDownIndex].QuoteDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(plotData[highestDownIndex].QuoteDate.Day + 100).Substring(1, 2);
+                        newData.DownDate = Convert.ToString(plotData[highestDownIndex].QuoteDate.Year) +  Convert.ToString(plotData[highestDownIndex].QuoteDate.Month + 100).Substring(1, 2) + Convert.ToString(plotData[highestDownIndex].QuoteDate.Day + 100).Substring(1, 2);
                         newData.DownNoOfDays = highestDownDaySpan;
                         newData.DownRate = "Down: " + highestDown + "/" + (noOfYears - highestDown);
                         newData.DownPercentage = Math.Round(highestDownAverage, 2);
@@ -360,10 +366,54 @@ namespace MagentaTrader.Controllers
 
                     data.Add(newData);
                 }
-            } catch {
-                data = new List<Models.VariableScanner>();
+            }
+            catch
+            {
+                return data.ToList();
             }
             return data.ToList();
+        }
+        
+        // GET api/VariableScanner
+        [Authorize]
+        [Route("api/VariableScanner")]
+        public List<Models.VariableScanner> GetVariableScanner([FromUri] List<String> Symbols)
+        {
+            return ComputeVariableScannerResult(Symbols);
+        }
+
+        // GET api/VariableScannerOnFavorites
+        [Authorize]
+        [Route("api/VariableScannerOnFavorites/{Id}")]
+        public List<Models.VariableScanner> GetVariableScannerOnFavorites(String Id)
+        {
+            Id = Id.Replace(",", "");
+            int id = Convert.ToInt32(Id);
+            bool insertToSymbol;
+
+            var userFavoriteSymbols = from d in db.TrnUserFavoritesSymbols where d.UserFavoritesId == id select d;
+            if (userFavoriteSymbols.Any())
+            {
+                List<String> symbols = new List<String>();
+                foreach (var s in userFavoriteSymbols)
+                {
+                    insertToSymbol = true;
+                    foreach (var symbol in symbols)
+                    {
+                        if (symbol == s.MstSymbol.Symbol)
+                        {
+                            insertToSymbol = false;
+                            break;
+                        }
+                    }
+                    if(insertToSymbol == true) symbols.Add(s.MstSymbol.Symbol);
+                }
+                return ComputeVariableScannerResult(symbols);
+            }
+            else
+            {
+                return new List<Models.VariableScanner>();
+            }
         }
     }
 

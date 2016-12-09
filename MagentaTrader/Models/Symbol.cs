@@ -48,5 +48,8 @@ namespace MagentaTrader.Models
         public decimal EMAGrowthDecayRate { get; set; }
         public string EMAStartDate { get; set; }
         public decimal EMALinear { get; set; }
+        public decimal Nov7ClosePrice { get; set; }
+        public int Nov7NumberOfDays { get; set; }
+        public decimal Nov7CorrelationCoefficient { get; set; }
     }
 }

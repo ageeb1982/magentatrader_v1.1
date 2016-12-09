@@ -333,11 +333,19 @@ namespace MagentaTrader.Controllers
             decimal Correlation30 = Convert.ToDecimal(Parameters[6]);  
             string Strategy = Parameters[7]; 
             int FavoriteUserId  = Convert.ToInt16(Parameters[8]);  
-            string FavoriteRemarks = Parameters[9]; 
+            string FavoriteRemarks = Parameters[9];
+            int Nov7AGR = Convert.ToInt16(Parameters[10]);
+            decimal Nov7Correlation = Convert.ToDecimal(Parameters[11]); 
             
             var retryCounter = 0;
 
             List<Models.Symbol> Values;
+
+            DateTime nov7Date = new DateTime(2016, 11, 7);
+            DateTime currentDate = DateTime.Now;
+
+            int dateDifference = (currentDate.Date - nov7Date.Date).Days;
+            decimal annualizedFactor = 252 / dateDifference;
 
             while (true)
             {
@@ -351,7 +359,9 @@ namespace MagentaTrader.Controllers
                                              (d.Exchange == "FOREX" ? true : d.Volume >= Volume) &&
                                              (d.NoOfYears >= NoOfYears) &&
                                              (d.MACDGrowthDecayRate < 0) &&
-                                             (d.EMAGrowthDecayRate < 0)
+                                             (d.EMAGrowthDecayRate < 0) &&
+                                             (Nov7AGR == 0 ? true : d.Nov7ClosePrice == 0 ? false : (int)(((d.ClosePrice - d.Nov7ClosePrice) / d.Nov7ClosePrice) * 100 * annualizedFactor) >= Nov7AGR) &&
+                                             (Nov7AGR == 0 ? true : d.Nov7CorrelationCoefficient >= (Nov7Correlation / 100))
                                        select new Models.Symbol
                                        {
                                            SymbolDescription = d.Symbol,
@@ -383,7 +393,10 @@ namespace MagentaTrader.Controllers
                                            EMATrendNoOfDays = d.EMATrendNoOfDays.Value == null ? 0 : d.EMATrendNoOfDays.Value,
                                            EMAGrowthDecayRate = d.EMAGrowthDecayRate.Value == null ? 0 : d.EMAGrowthDecayRate.Value,
                                            EMAStartDate = d.EMAStartDate == null ? "NA" : Convert.ToString(d.EMAStartDate.Value.Year).Substring(2, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Day + 100).Substring(1, 2),
-                                           EMALinear = d.EMALinear.Value == null ? 0 : d.EMALinear.Value
+                                           EMALinear = d.EMALinear.Value == null ? 0 : d.EMALinear.Value,
+                                           Nov7ClosePrice = d.Nov7ClosePrice == null ? 0 : d.Nov7ClosePrice.Value,
+                                           Nov7NumberOfDays = d.Nov7NumberOfDays == null ? 0 : d.Nov7NumberOfDays.Value,
+                                           Nov7CorrelationCoefficient = d.Nov7CorrelationCoefficient == null ? 0 : d.Nov7CorrelationCoefficient.Value
                                        };
                         if (Symbols2.Count() > 0)
                         {
@@ -413,7 +426,9 @@ namespace MagentaTrader.Controllers
                                              (d.Exchange == "FOREX" ? true : d.Volume >= Volume) &&
                                              (d.NoOfYears >= NoOfYears) &&
                                              (d.MACDGrowthDecayRate >= 0) &&
-                                             (d.EMAGrowthDecayRate >= 0)
+                                             (d.EMAGrowthDecayRate >= 0) &&
+                                             (Nov7AGR == 0 ? true : d.Nov7ClosePrice == 0 ? false : (int)(((d.ClosePrice - d.Nov7ClosePrice) / d.Nov7ClosePrice) * 100 * annualizedFactor) >= Nov7AGR) &&
+                                             (Nov7AGR == 0 ? true : d.Nov7CorrelationCoefficient >= (Nov7Correlation / 100))
                                        select new Models.Symbol
                                        {
                                            SymbolDescription = d.Symbol,
@@ -445,7 +460,10 @@ namespace MagentaTrader.Controllers
                                            EMATrendNoOfDays = d.EMATrendNoOfDays.Value == null ? 0 : d.EMATrendNoOfDays.Value,
                                            EMAGrowthDecayRate = d.EMAGrowthDecayRate.Value == null ? 0 : d.EMAGrowthDecayRate.Value,
                                            EMAStartDate = d.EMAStartDate == null ? "NA" : Convert.ToString(d.EMAStartDate.Value.Year).Substring(2, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Day + 100).Substring(1, 2),
-                                           EMALinear = d.EMALinear.Value == null ? 0 : d.EMALinear.Value
+                                           EMALinear = d.EMALinear.Value == null ? 0 : d.EMALinear.Value,
+                                           Nov7ClosePrice = d.Nov7ClosePrice == null ? 0 : d.Nov7ClosePrice.Value,
+                                           Nov7NumberOfDays = d.Nov7NumberOfDays == null ? 0 : d.Nov7NumberOfDays.Value,
+                                           Nov7CorrelationCoefficient = d.Nov7CorrelationCoefficient == null ? 0 : d.Nov7CorrelationCoefficient.Value
                                        };
                         if (Symbols1.Count() > 0)
                         {
@@ -488,7 +506,9 @@ namespace MagentaTrader.Controllers
                                             (GrowthDecayTime == "M2" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRateM2.Value == null ? 0 : d.GrowthDecayRateM2.Value) >= GrowthDecayRate ? true : false) : true) == true &&
                                             (GrowthDecayTime == "M2" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRateM2.Value == null ? 0 : d.GrowthDecayRateM2.Value) ? true : false) : true) == true &&
                                             (GrowthDecayTime == "M3" && GrowthDecayRate >= 0 ? ((d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value) >= GrowthDecayRate ? true : false) : true) == true &&
-                                            (GrowthDecayTime == "M3" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value) ? true : false) : true) == true
+                                            (GrowthDecayTime == "M3" && GrowthDecayRate < 0 ? (GrowthDecayRate >= (d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value) ? true : false) : true) == true &&
+                                            (Nov7AGR == 0 ? true : d.Nov7ClosePrice == 0 ? false : (int)(((d.ClosePrice - d.Nov7ClosePrice) / d.Nov7ClosePrice) * 100 * annualizedFactor) >= Nov7AGR) &&
+                                            (Nov7AGR == 0 ? true : d.Nov7CorrelationCoefficient >= (Nov7Correlation / 100))
                                       select new Models.Symbol
                                       {
                                           SymbolDescription = d.Symbol,
@@ -520,7 +540,10 @@ namespace MagentaTrader.Controllers
                                           EMATrendNoOfDays = d.EMATrendNoOfDays.Value == null ? 0 : d.EMATrendNoOfDays.Value,
                                           EMAGrowthDecayRate = d.EMAGrowthDecayRate.Value == null ? 0 : d.EMAGrowthDecayRate.Value,
                                           EMAStartDate = d.EMAStartDate == null ? "NA" : Convert.ToString(d.EMAStartDate.Value.Year).Substring(2, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EMAStartDate.Value.Day + 100).Substring(1, 2),
-                                          EMALinear = d.EMALinear.Value == null ? 0 : d.EMALinear.Value
+                                          EMALinear = d.EMALinear.Value == null ? 0 : d.EMALinear.Value,
+                                          Nov7ClosePrice = d.Nov7ClosePrice == null ? 0 : d.Nov7ClosePrice.Value,
+                                          Nov7NumberOfDays = d.Nov7NumberOfDays == null ? 0 : d.Nov7NumberOfDays.Value,
+                                          Nov7CorrelationCoefficient = d.Nov7CorrelationCoefficient == null ? 0 : d.Nov7CorrelationCoefficient.Value
                                       };
                         if (Symbols.Count() > 0)
                         {

@@ -119,6 +119,28 @@
             <input type="hidden" class="form-control" id="Favorite_Remarks" placeholder="None" >
             <input type="text" class="form-control" id="FavoriteCode" placeholder="None" disabled="disabled">
         </div>
+        <div class="col-lg-2">
+            <p>Nov 7 AGR</p>
+            <select id="Nov7AGR" class="form-control">
+                <option value="0" selected="selected">Not Included</option>
+                <option value="80">Min 80</option>
+            </select>
+        </div>
+        <div class="col-lg-2">
+            <p>Nov 7 Linear</p>
+            <select id="Nov7Correlation" class="form-control">
+                <option value="10" selected="selected">0.10</option>
+                <option value="20">0.20</option>
+                <option value="30">0.30</option>
+                <option value="40">0.40</option>
+                <option value="50">0.50</option>
+                <option value="60">0.60</option>
+                <option value="70">0.70</option>
+                <option value="80">0.80</option>
+                <option value="90">0.90</option>
+                <option value="100">1.00</option>
+            </select>
+        </div>
     </div>
     <br />
     <div class="row">
@@ -285,6 +307,23 @@
     var SharedFavoritesCollection;
     var SharedFavoritesGrid;
 
+    function dateDiffInDays(a, b) {
+        var _MS_PER_DAY = 1000 * 60 * 60 * 24;
+        // Discard the time and time-zone information.
+        var utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+        var utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+        return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+    }
+
+    function countSatSun(start, end) {
+        if (end < start) return; //avoid infinite loop;
+        for (var count = { sun: 0, sat: 0 }; start < end; start.setDate(start.getDate() + 1)) {
+            if (start.getDay() == 0) count.sun++;
+            else if (start.getDay() == 6) count.sat++;
+        }
+        return count;
+    }
+
     function replaceSymbol(exchange, symbol) {
         var returnSymbol;
         if(exchange=="TSX") {
@@ -334,7 +373,7 @@
         }
         return Math.round(returnResult);
     }
-    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears, Correlation30, Strategy, FavoriteUserId, FavoriteRemarks) {
+    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears, Correlation30, Strategy, FavoriteUserId, FavoriteRemarks, Nov7AGR, Nov7Correlation) {
         $('#loading').modal('show');
         var d = new wijmo.collections.ObservableArray();
 
@@ -350,6 +389,8 @@
         p.push(Strategy);
         p.push(FavoriteUserId);
         p.push(FavoriteRemarks);
+        p.push(Nov7AGR);
+        p.push(Nov7Correlation);
 
         $.ajax({
             url: '/api/SymbolScreenerV2',
@@ -357,6 +398,12 @@
             data: { Parameters: p },
             dataType: 'json',
             success: function (result) {
+                var nov7Date = new Date("Nov 7, 2016 11:13:00");
+                var currentDate = Date.now();
+                var datediff = dateDiffInDays(nov7Date, currentDate);
+                var satSun = countSatSun(nov7Date, currentDate);
+                datediff = datediff - satSun.sat - satSun.sun;
+                
                 for (i = 0; i < result.length; i++) {
                     d.push({
                         Symbol: "<a href='/Software?symbol=" + result[i].SymbolDescription + "' target='_blank'><font color='black'>" + replaceSymbol(result[i].Exchange,result[i].SymbolDescription) + "</font></a>",
@@ -393,8 +440,13 @@
                         EMATrendNoOfDays: result[i].EMAGrowthDecayRate < 0 ? (result[i].EMATrendNoOfDays * -1) : result[i].EMATrendNoOfDays,
                         EMAGrowthDecayRate: result[i].EMAGrowthDecayRate,
                         EMAStartDate: result[i].EMAStartDate,
-                        EMALinear: result[i].EMALinear
+                        EMALinear: result[i].EMALinear,
+                        Nov7ClosePrice: result[i].Nov7ClosePrice,
+                        Nov7NumberOfDays: result[i].Nov7NumberOfDays,
+                        Nov7CorrelationCoefficient: result[i].Nov7CorrelationCoefficient,
+                        Nov7AGR: result[i].ClosePrice == 0 || result[i].Nov7ClosePrice == 0 || result[i].Nov7NumberOfDays == 0 ? 0 : (((result[i].ClosePrice - result[i].Nov7ClosePrice) / result[i].Nov7ClosePrice) * 100) / result[i].Nov7NumberOfDays * 252,
                     });
+                    //Nov7ClosePrice: result[i].ClosePrice == 0 || result[i].Nov7ClosePrice == 0 ? 0 : (((result[i].ClosePrice - result[i].Nov7ClosePrice) / result[i].Nov7ClosePrice) * 100) / datediff * 252,
                 }
 
                 while (ScreenerSaveData.length > 0) ScreenerSaveData.pop();
@@ -576,6 +628,20 @@
                                 "allowSorting": true,
                                 "isContentHtml": true,
                                 "wordWrap": true
+                            }, {
+                                "header": "Nov7%",
+                                "binding": "Nov7AGR",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Nov7 Linear",
+                                "binding": "Nov7CorrelationCoefficient",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
                             }];
                 break;
             default:
@@ -718,6 +784,20 @@
                                 "allowSorting": true,
                                 "isContentHtml": true,
                                 "wordWrap": true
+                            }, {
+                                "header": "Nov7%",
+                                "binding": "Nov7AGR",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
+                                "header": "Nov7 Linear",
+                                "binding": "Nov7CorrelationCoefficient",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
                             }];
                 break;
         }
@@ -801,7 +881,9 @@
         var $strategy = document.getElementById('Strategy').value;
         var $favoriteUserId = document.getElementById('Favorite_UserId').value;
         var $favoriteRemarks = document.getElementById('Favorite_Remarks').value;
-
+        var $nov7AGR = document.getElementById('Nov7AGR').value;
+        var $nov7Correlation = parseFloat(document.getElementById('Nov7Correlation').value);
+        
         $closePrice = !$closePrice ? 10 : $closePrice;
         $volume = !$volume ? 1000000 : $volume;
         $growthDecayRate = !$growthDecayRate ? 100 : $growthDecayRate;
@@ -810,8 +892,9 @@
         $correlation30 = !$correlation30 ? 10 : $correlation30;
         $favoriteUserId = !$favoriteUserId ? 0 : $favoriteUserId;
         $favoriteRemarks = !$favoriteRemarks ? "NA" : $favoriteRemarks;
+        $nov7Correlation = !$nov7Correlation ? 10 : $nov7Correlation;
 
-        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears, $correlation30, $strategy, $favoriteUserId, $favoriteRemarks);
+        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears, $correlation30, $strategy, $favoriteUserId, $favoriteRemarks, $nov7AGR, $nov7Correlation);
     }
     function CmdSaveXLS_OnClick() {
         var CSV = '';

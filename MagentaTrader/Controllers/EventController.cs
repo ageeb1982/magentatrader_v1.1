@@ -329,6 +329,60 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
+        [Authorize]
+        [Route("api/BookClub")]
+        public List<Models.Event> GetBookClub()
+        {
+            var retryCounter = 0;
+            List<Models.Event> values;
+
+            while (true)
+            {
+                try
+                {
+                    var Events = from d in db.MstEvents
+                                 orderby d.Id descending
+                                 where d.EventType == "BOOKCLUB" &&
+                                       d.VideoURL != null &&
+                                       d.IsRestricted == true &&
+                                       d.IsArchived == true
+                                 select new Models.Event
+                                 {
+                                     Id = d.Id,
+                                     EventDate = Convert.ToString(d.EventDate.Year) + "-" + Convert.ToString(d.EventDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EventDate.Day + 100).Substring(1, 2),
+                                     EventDescription = d.EventDescription,
+                                     Particulars = d.Particulars,
+                                     URL = d.URL,
+                                     VideoURL = d.VideoURL,
+                                     EventType = d.EventType,
+                                     IsRestricted = d.IsRestricted,
+                                     IsArchived = d.IsArchived,
+                                 };
+                    if (Events.Count() > 0)
+                    {
+                        values = Events.ToList();
+                    }
+                    else
+                    {
+                        values = new List<Models.Event>();
+                    }
+                    break;
+                }
+                catch
+                {
+                    if (retryCounter == 3)
+                    {
+                        values = new List<Models.Event>();
+                        break;
+                    }
+
+                    System.Threading.Thread.Sleep(1000);
+                    retryCounter++;
+                }
+            }
+            return values;
+        }
+
         [Route("api/LatestEvent")]
         public List<Models.Event> GetLatest()
         {

@@ -12,81 +12,279 @@ namespace MagentaTrader.Controllers
     {
         private Data.MagentaTradersDBDataContext db = new Data.MagentaTradersDBDataContext();
 
+
+        private List<Data.MstSymbol> GetResultLevelSymbol(long userAlertId)
+        {
+            List<Data.MstSymbol> symbols = new List<Data.MstSymbol>();
+            string exchange;
+
+            if (userAlertId > 0)
+            {
+                var userAlerts = from d in db.TrnUserAlerts where d.Id == userAlertId select d;
+                exchange = userAlerts.First().SymbolExchange;
+                if (userAlerts.Any()) {
+                    var filterSymbols = from d in db.MstSymbols select d;
+                    if (exchange == "US")
+                    {
+                        filterSymbols = from d in db.MstSymbols
+                                        where d.Exchange == "AMEX" || d.Exchange == "NYSE" || d.Exchange == "NASDAQ"
+                                        select d;
+                    }
+                    else
+                    {
+                        filterSymbols = from d in db.MstSymbols
+                                        where d.Exchange == exchange
+                                        select d;
+                    }
+                    foreach (Data.MstSymbol s in filterSymbols)
+                    {
+                        symbols.Add(s);
+                    }
+                }
+            }
+            return symbols.ToList();
+        }
+        private List<Data.MstSymbol> GetResultLevelStrategy(long userAlertId, List<Data.MstSymbol> filteredSymbols)
+        {
+            List<Data.MstSymbol> symbols = new List<Data.MstSymbol>();
+            string strategy;
+            if (filteredSymbols.Any())
+            {
+                if (userAlertId > 0)
+                {
+                    var userAlerts = from d in db.TrnUserAlerts where d.Id == userAlertId select d;
+                    if (userAlerts.Any())
+                    {
+                        strategy = userAlerts.First().Strategy;
+                        var strategySymbols = from d in filteredSymbols select d;
+                        if (strategy == "MED")
+                        {
+                            strategySymbols = from d in filteredSymbols 
+                                              where d.MACDGrowthDecayRate < 0 &&  d.EMAGrowthDecayRate < 0
+                                              select d;
+                        }
+                        else if (strategy == "MEU")
+                        {
+                            strategySymbols = from d in filteredSymbols
+                                              where d.MACDGrowthDecayRate >= 0 && d.EMAGrowthDecayRate >= 0
+                                              select d;
+                        }
+                        foreach (Data.MstSymbol s in strategySymbols)
+                        {
+                            symbols.Add(s);
+                        }
+                    }
+                }
+            }
+            return symbols.ToList();
+        }
+        private List<Data.MstSymbol> GetResultLevelMACD(long userAlertId, List<Data.MstSymbol> filteredSymbols)
+        {
+            List<Data.MstSymbol> symbols = new List<Data.MstSymbol>();
+            string macdCrossover;
+            string macdEMA;
+            if (filteredSymbols.Any())
+            {
+                if (userAlertId > 0)
+                {
+                    var userAlerts = from d in db.TrnUserAlerts where d.Id == userAlertId select d;
+                    if (userAlerts.Any())
+                    {
+                        macdCrossover = userAlerts.First().MACDCrossover;
+                        macdEMA = userAlerts.First().MACDEMA;
+                        var macdSymbols = from d in filteredSymbols select d;
+                        if (macdEMA == "BEFORE")
+                        {
+                            macdSymbols = from d in filteredSymbols
+                                          where macdCrossover == "ALL" ? true : d.MACDPosition == macdCrossover &&
+                                                d.MACDLastCrossoverNoOfDays > d.EMALastCrossoverNoOfDays
+                                          select d;
+                        }
+                        else if (macdEMA == "AFTER")
+                        {
+                            macdSymbols = from d in filteredSymbols
+                                          where macdCrossover == "ALL" ? true : d.MACDPosition == macdCrossover &&
+                                                d.MACDLastCrossoverNoOfDays <= d.EMALastCrossoverNoOfDays
+                                          select d;
+                        }
+                        else
+                        {
+                            macdSymbols = from d in filteredSymbols
+                                          where macdCrossover == "ALL" ? true : d.MACDPosition == macdCrossover
+                                          select d;
+                        }
+                        foreach (Data.MstSymbol s in macdSymbols)
+                        {
+                            symbols.Add(s);
+                        }
+                    }
+                }
+            }
+            return symbols.ToList();
+        }
+        private List<Data.MstSymbol> GetResultLevelMagentaChannel(long userAlertId, List<Data.MstSymbol> filteredSymbols)
+        {
+            List<Data.MstSymbol> symbols = new List<Data.MstSymbol>();
+            string magentaChannelBegins;
+            int magentaChannelCorrelation30;
+            int magentaChannelDays;
+            decimal magentaChannelAGRADR;
+            if (filteredSymbols.Any())
+            {
+                if (userAlertId > 0)
+                {
+                    var userAlerts = from d in db.TrnUserAlerts where d.Id == userAlertId select d;
+                    if (userAlerts.Any())
+                    {
+                        magentaChannelBegins = userAlerts.First().MagentaChannelBegins;
+                        magentaChannelCorrelation30 = userAlerts.First().MagentaChannelCorrelation30;
+                        magentaChannelDays = userAlerts.First().MagentaChannelDays;
+                        magentaChannelAGRADR = userAlerts.First().MagentaChannelAGRADR;
+                        
+                        var magentaChannelSymbols = from d in filteredSymbols select d;
+
+                        if (magentaChannelBegins == "ALL")
+                        {
+                            magentaChannelSymbols = from d in filteredSymbols
+                                                    where d.CorrelationCoefficient30 >= magentaChannelCorrelation30 &&
+                                                          d.TrendNoOfDays >= magentaChannelDays &&
+                                                          magentaChannelAGRADR >= 0 ? d.GrowthDecayRate >= magentaChannelAGRADR : d.GrowthDecayRate <= magentaChannelAGRADR
+                                                    select d;
+                        }
+                        else if (magentaChannelBegins == "MACD")
+                        {
+                            magentaChannelSymbols = from d in filteredSymbols
+                                                    where d.TrendNoOfDays >= d.MACDLastCrossoverNoOfDays &&
+                                                          d.CorrelationCoefficient30 >= magentaChannelCorrelation30 &&
+                                                          d.TrendNoOfDays >= d.MACDLastCrossoverNoOfDays &&
+                                                          magentaChannelAGRADR >= 0 ? d.GrowthDecayRate >= magentaChannelAGRADR : d.GrowthDecayRate <= magentaChannelAGRADR
+                                                    select d;
+                        }
+                        else if (magentaChannelBegins == "EMA")
+                        {
+                            magentaChannelSymbols = from d in filteredSymbols
+                                                    where d.TrendNoOfDays >= d.EMALastCrossoverNoOfDays &&
+                                                          d.CorrelationCoefficient30 >= magentaChannelCorrelation30 &&
+                                                          d.TrendNoOfDays >= d.EMALastCrossoverNoOfDays &&
+                                                          magentaChannelAGRADR >= 0 ? d.GrowthDecayRate >= magentaChannelAGRADR : d.GrowthDecayRate <= magentaChannelAGRADR
+                                                    select d;
+                        }
+                        foreach (Data.MstSymbol s in magentaChannelSymbols)
+                        {
+                            symbols.Add(s);
+                        }
+                    }
+                }
+            }
+            return symbols.ToList();
+        }
+        private List<Data.MstSymbol> GetResultLevelSeasonality(long userAlertId, List<Data.MstSymbol> filteredSymbols)
+        {
+            List<Data.MstSymbol> symbols = new List<Data.MstSymbol>();
+            decimal seasonalityWinLossPercent;
+            decimal seasonalityGainLossPercent;
+            if (filteredSymbols.Any())
+            {
+                if (userAlertId > 0)
+                {
+                    var userAlerts = from d in db.TrnUserAlerts where d.Id == userAlertId select d;
+                    if (userAlerts.Any())
+                    {
+                        seasonalityWinLossPercent = userAlerts.First().SeasonalityWinLossPercent;
+                        seasonalityGainLossPercent = userAlerts.First().SeasonalityGainLossPercent;
+
+                        var seasonalitySymbols = from d in filteredSymbols
+                                                 where d.WinLossAverageCurrent30 >= seasonalityGainLossPercent
+                                                 select d;
+
+                        foreach (Data.MstSymbol s in seasonalitySymbols)
+                        {
+                            symbols.Add(s);
+                        }
+                    }
+                }
+            }
+            return symbols.ToList();
+        }
+        private List<Data.MstSymbol> GetResultLevelAdditionalFilter(long userAlertId, List<Data.MstSymbol> filteredSymbols)
+        {
+            List<Data.MstSymbol> symbols = new List<Data.MstSymbol>();
+            decimal additionalFilterPrice;
+            decimal additionalFilterVolume;
+            int additionalFilterNoOfYears;
+            if (filteredSymbols.Any())
+            {
+                if (userAlertId > 0)
+                {
+                    var userAlerts = from d in db.TrnUserAlerts where d.Id == userAlertId select d;
+                    if (userAlerts.Any())
+                    {
+                        additionalFilterPrice = userAlerts.First().AdditionalFilterPrice;
+                        additionalFilterVolume = userAlerts.First().AdditionalFilterVolume;
+                        additionalFilterNoOfYears = userAlerts.First().AdditionalFilterNoOfYears;
+
+                        var additionalFilterSymbols = from d in filteredSymbols
+                                                      where d.ClosePrice >= additionalFilterPrice &&
+                                                            d.Volume >= additionalFilterVolume &&
+                                                            d.NoOfYears >= additionalFilterNoOfYears
+                                                      select d;
+
+                        foreach (Data.MstSymbol s in additionalFilterSymbols)
+                        {
+                            symbols.Add(s);
+                        }
+                    }
+                }
+            }
+            return symbols.ToList();
+        }
         // Add User Alert Symbols in the Database
         private void GetResultSymbols(long userAlertId)
         {
-            string strategy;
-            string exchange;
-            decimal price;
-            decimal volume;
-            decimal growthDecayRate;
-            string growthDecayTime;
-            int noOfYears;
-            decimal correlation30;
+            bool symbolFilter;
+            bool strategyFilter;
+            bool macdFilter;
+            bool magentaChannelFilter;
+            bool seasonalityFilter;
+            bool additionalFilter;
 
             if (userAlertId > 0)
             {
                 var userAlerts = from d in db.TrnUserAlerts where d.Id == userAlertId select d;
                 if (userAlerts.Any())
                 {
-                    strategy = userAlerts.First().Strategy;
-                    exchange = userAlerts.First().Exchange;
-                    price = userAlerts.First().Price;
-                    volume = userAlerts.First().Volume;
-                    growthDecayRate = userAlerts.First().GrowthDecayRate;
-                    growthDecayTime = userAlerts.First().GrowthDecayTime;
-                    noOfYears = userAlerts.First().NoOfYears;
-                    correlation30 = userAlerts.First().Correlation30;
+                    // Filter symbols
+                    List<Data.MstSymbol> symbolResults = new List<Data.MstSymbol>();
+                    symbolFilter = userAlerts.First().SymbolFilter;
+                    strategyFilter = userAlerts.First().StrategyFilter;
+                    macdFilter = userAlerts.First().MACDFilter;
+                    magentaChannelFilter =userAlerts.First().MagentaChannelFilter;
+                    seasonalityFilter = userAlerts.First().SeasonalityFilter;
+                    additionalFilter = userAlerts.First().AdditionalFilter;
 
-                    var symbols = from d in db.MstSymbols where d.Exchange == "NA" select d;
-                    if (strategy == "MED")
+                    if (symbolFilter == true)
                     {
-                        // Magenta Early Down
-                        symbols = from d in db.MstSymbols
-                                  where (exchange == "All" ? true : d.Exchange == exchange) &&
-                                            (d.ClosePrice >= price) &&
-                                            (d.Exchange == "FOREX" ? true : d.Volume >= volume) &&
-                                            (d.NoOfYears >= noOfYears) &&
-                                            (d.MACDGrowthDecayRate < 0) &&
-                                            (d.EMAGrowthDecayRate < 0)
-                                  select d;
-                    }
-                    else if (strategy == "MEU")
-                    {
-                        // Magenta Early Up
-                        symbols = from d in db.MstSymbols
-                                  where (exchange == "All" ? true : d.Exchange == exchange) &&
-                                                (d.ClosePrice >= price) &&
-                                                (d.Exchange == "FOREX" ? true : d.Volume >= volume) &&
-                                                (d.NoOfYears >= noOfYears) &&
-                                                (d.MACDGrowthDecayRate >= 0) &&
-                                                (d.EMAGrowthDecayRate >= 0)
-                                  select d;
-                    }
-                    else
-                    {
-                        // Customized
-                        symbols = from d in db.MstSymbols
-                                  where (exchange == "All" ? true : d.Exchange == exchange) &&
-                                            (d.ClosePrice >= price) &&
-                                            (d.Exchange == "FOREX" ? true : d.Volume >= volume) &&
-                                            (d.NoOfYears >= noOfYears) &&
-                                            (d.CorrelationCoefficient30 >= (correlation30 / 100)) &&
-                                            (growthDecayTime == "C0" && growthDecayRate >= 0 ? ((d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value) >= growthDecayRate ? true : false) : true) == true &&
-                                            (growthDecayTime == "C0" && growthDecayRate < 0 ? (growthDecayRate >= (d.GrowthDecayRate.Value == null ? 0 : d.GrowthDecayRate.Value) ? true : false) : true) == true &&
-                                            (growthDecayTime == "W1" && growthDecayRate >= 0 ? ((d.GrowthDecayRateW1.Value == null ? 0 : d.GrowthDecayRateW1.Value) >= growthDecayRate ? true : false) : true) == true &&
-                                            (growthDecayTime == "W1" && growthDecayRate < 0 ? (growthDecayRate >= (d.GrowthDecayRateW1.Value == null ? 0 : d.GrowthDecayRateW1.Value) ? true : false) : true) == true &&
-                                            (growthDecayTime == "W2" && growthDecayRate >= 0 ? ((d.GrowthDecayRateW2.Value == null ? 0 : d.GrowthDecayRateW2.Value) >= growthDecayRate ? true : false) : true) == true &&
-                                            (growthDecayTime == "W2" && growthDecayRate < 0 ? (growthDecayRate >= (d.GrowthDecayRateW2.Value == null ? 0 : d.GrowthDecayRateW2.Value) ? true : false) : true) == true &&
-                                            (growthDecayTime == "W3" && growthDecayRate >= 0 ? ((d.GrowthDecayRateW3.Value == null ? 0 : d.GrowthDecayRateW3.Value) >= growthDecayRate ? true : false) : true) == true &&
-                                            (growthDecayTime == "W3" && growthDecayRate < 0 ? (growthDecayRate >= (d.GrowthDecayRateW3.Value == null ? 0 : d.GrowthDecayRateW3.Value) ? true : false) : true) == true &&
-                                            (growthDecayTime == "M1" && growthDecayRate >= 0 ? ((d.GrowthDecayRateM1.Value == null ? 0 : d.GrowthDecayRateM1.Value) >= growthDecayRate ? true : false) : true) == true &&
-                                            (growthDecayTime == "M1" && growthDecayRate < 0 ? (growthDecayRate >= (d.GrowthDecayRateM1.Value == null ? 0 : d.GrowthDecayRateM1.Value) ? true : false) : true) == true &&
-                                            (growthDecayTime == "M2" && growthDecayRate >= 0 ? ((d.GrowthDecayRateM2.Value == null ? 0 : d.GrowthDecayRateM2.Value) >= growthDecayRate ? true : false) : true) == true &&
-                                            (growthDecayTime == "M2" && growthDecayRate < 0 ? (growthDecayRate >= (d.GrowthDecayRateM2.Value == null ? 0 : d.GrowthDecayRateM2.Value) ? true : false) : true) == true &&
-                                            (growthDecayTime == "M3" && growthDecayRate >= 0 ? ((d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value) >= growthDecayRate ? true : false) : true) == true &&
-                                            (growthDecayTime == "M3" && growthDecayRate < 0 ? (growthDecayRate >= (d.GrowthDecayRateM3.Value == null ? 0 : d.GrowthDecayRateM3.Value) ? true : false) : true) == true
-                                  select d;
+                        symbolResults = GetResultLevelSymbol(userAlertId);
+                        if (strategyFilter == true)
+                        {
+                            symbolResults = GetResultLevelStrategy(userAlertId, symbolResults);
+                        }
+                        if (macdFilter == true)
+                        {
+                            symbolResults = GetResultLevelMACD(userAlertId, symbolResults);
+                        }
+                        if (magentaChannelFilter == true)
+                        {
+                            symbolResults = GetResultLevelMagentaChannel(userAlertId, symbolResults);
+                        }
+                        if (seasonalityFilter == true)
+                        {
+                            symbolResults = GetResultLevelSeasonality(userAlertId, symbolResults);
+                        }
+                        if (additionalFilter == true)
+                        {
+                            symbolResults = GetResultLevelAdditionalFilter(userAlertId, symbolResults);
+                        }
                     }
 
                     // Delete existing data
@@ -100,10 +298,10 @@ namespace MagentaTrader.Controllers
                         }
                     }
 
-                    if (symbols.Any())
+                    // Add symbols
+                    if (symbolResults.Any())
                     {
-                        // Add symbols
-                        foreach (var s in symbols)
+                        foreach (var s in symbolResults)
                         {
                             Data.TrnUserAlertSymbol newUserAlertSymbol = new Data.TrnUserAlertSymbol();
 
@@ -135,18 +333,32 @@ namespace MagentaTrader.Controllers
                                 UserId = d.UserId,
                                 User = d.MstUser.UserName,
                                 Description = d.Description,
-                                Strategy = d.Strategy,
-                                Exchange = d.Exchange,
-                                Price = d.Price,
-                                Volume = d.Volume,
-                                GrowthDecayRate = d.GrowthDecayRate,
-                                GrowthDecayTime = d.GrowthDecayTime,
-                                NoOfYears = d.NoOfYears,
-                                Correlation30 = d.Correlation30,
-                                MACDOccurrence = d.MACDOccurrence,
                                 IsActive = d.IsActive,
                                 EncodedDate = Convert.ToString(d.EncodedDate.Year) + "-" + Convert.ToString(d.EncodedDate.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EncodedDate.Day + 100).Substring(1, 2),
-                                AlertVia = d.AlertVia
+                                AlertVia = d.AlertVia,
+                                SymbolFilter = d.SymbolFilter,
+                                SymbolExchange = d.SymbolExchange,
+                                SymbolUserFavoritesId = d.SymbolUserFavoritesId == null ? 0 : d.SymbolUserFavoritesId.Value,
+                                SymbolUserFavorites = d.SymbolUserFavoritesId == null ? "NA" : db.TrnUserFavorites.Where(f=>f.Id==d.SymbolUserFavoritesId).First().Description,
+                                StrategyFilter = d.StrategyFilter,
+                                Strategy = d.Strategy,
+                                StrategyGrowthDecayRate = d.StrategyGrowthDecayRate,
+                                StrategyGrowthDecayTime = d.StrategyGrowthDecayTime,
+                                MACDFilter = d.MACDFilter,
+                                MACDCrossover = d.MACDCrossover,
+                                MACDEMA = d.MACDEMA,
+                                MagentaChannelFilter = d.MagentaChannelFilter,
+                                MagentaChannelBegins = d.MagentaChannelBegins,
+                                MagentaChannelCorrelation30 = d.MagentaChannelCorrelation30,
+                                MagentaChannelDays = d.MagentaChannelDays,
+                                MagentaChannelAGRADR = d.MagentaChannelAGRADR,
+                                SeasonalityFilter = d.SeasonalityFilter,
+                                SeasonalityWinLossPercent = d.SeasonalityWinLossPercent,
+                                SeasonalityGainLossPercent = d.SeasonalityGainLossPercent,
+                                AdditionalFilter = d.AdditionalFilter,
+                                AdditionalFilterPrice = d.AdditionalFilterPrice,
+                                AdditionalFilterVolume = d.AdditionalFilterVolume,
+                                AdditionalFilterNoOfYears = d.AdditionalFilterNoOfYears
                             };
 
             if (userAlert.Any())
@@ -220,18 +432,37 @@ namespace MagentaTrader.Controllers
 
                 newUserAlert.UserId = userId;
                 newUserAlert.Description = value.Description;
-                newUserAlert.Strategy = value.Strategy;
-                newUserAlert.Exchange = value.Exchange;
-                newUserAlert.Price = value.Price;
-                newUserAlert.Volume = value.Volume;
-                newUserAlert.GrowthDecayRate = value.GrowthDecayRate;
-                newUserAlert.GrowthDecayTime = value.GrowthDecayTime;
-                newUserAlert.NoOfYears = value.NoOfYears;
-                newUserAlert.Correlation30 = value.Correlation30;
-                newUserAlert.MACDOccurrence = value.MACDOccurrence;
                 newUserAlert.IsActive = value.IsActive;
                 newUserAlert.EncodedDate = EncodedDate.Value;
                 newUserAlert.AlertVia = value.AlertVia;
+
+                newUserAlert.SymbolFilter = value.SymbolFilter;
+                newUserAlert.SymbolExchange = value.SymbolExchange;
+                newUserAlert.SymbolUserFavoritesId = value.SymbolUserFavoritesId;
+
+                newUserAlert.StrategyFilter = value.StrategyFilter;
+                newUserAlert.Strategy = value.Strategy;
+                newUserAlert.StrategyGrowthDecayRate = value.StrategyGrowthDecayRate;
+                newUserAlert.StrategyGrowthDecayTime = value.StrategyGrowthDecayTime;
+
+                newUserAlert.MACDFilter = value.MACDFilter;
+                newUserAlert.MACDCrossover = value.MACDCrossover;
+                newUserAlert.MACDEMA = value.MACDEMA;
+
+                newUserAlert.MagentaChannelFilter = value.MagentaChannelFilter;
+                newUserAlert.MagentaChannelBegins = value.MagentaChannelBegins;
+                newUserAlert.MagentaChannelCorrelation30 = value.MagentaChannelCorrelation30;
+                newUserAlert.MagentaChannelDays = value.MagentaChannelDays;
+                newUserAlert.MagentaChannelAGRADR = value.MagentaChannelAGRADR;
+
+                newUserAlert.SeasonalityFilter = value.SeasonalityFilter;
+                newUserAlert.SeasonalityWinLossPercent = value.SeasonalityWinLossPercent;
+                newUserAlert.SeasonalityGainLossPercent = value.SeasonalityGainLossPercent;
+
+                newUserAlert.AdditionalFilter = value.AdditionalFilter;
+                newUserAlert.AdditionalFilterPrice = value.AdditionalFilterPrice;
+                newUserAlert.AdditionalFilterVolume = value.AdditionalFilterVolume;
+                newUserAlert.AdditionalFilterNoOfYears = value.AdditionalFilterNoOfYears;
 
                 db.TrnUserAlerts.InsertOnSubmit(newUserAlert);
                 db.SubmitChanges();
@@ -267,17 +498,37 @@ namespace MagentaTrader.Controllers
 
                     updateUserAlert.Description = value.Description;
                     updateUserAlert.Strategy = value.Strategy;
-                    updateUserAlert.Exchange = value.Exchange;
-                    updateUserAlert.Price = value.Price;
-                    updateUserAlert.Volume = value.Volume;
-                    updateUserAlert.GrowthDecayRate = value.GrowthDecayRate;
-                    updateUserAlert.GrowthDecayTime = value.GrowthDecayTime;
-                    updateUserAlert.NoOfYears = value.NoOfYears;
-                    updateUserAlert.Correlation30 = value.Correlation30;
-                    updateUserAlert.MACDOccurrence = value.MACDOccurrence;
                     updateUserAlert.IsActive = value.IsActive;
                     updateUserAlert.EncodedDate = EncodedDate.Value;
                     updateUserAlert.AlertVia = value.AlertVia;
+
+                    updateUserAlert.SymbolFilter = value.SymbolFilter;
+                    updateUserAlert.SymbolExchange = value.SymbolExchange;
+                    updateUserAlert.SymbolUserFavoritesId = value.SymbolUserFavoritesId;
+
+                    updateUserAlert.StrategyFilter = value.StrategyFilter;
+                    updateUserAlert.Strategy = value.Strategy;
+                    updateUserAlert.StrategyGrowthDecayRate = value.StrategyGrowthDecayRate;
+                    updateUserAlert.StrategyGrowthDecayTime = value.StrategyGrowthDecayTime;
+
+                    updateUserAlert.MACDFilter = value.MACDFilter;
+                    updateUserAlert.MACDCrossover = value.MACDCrossover;
+                    updateUserAlert.MACDEMA = value.MACDEMA;
+
+                    updateUserAlert.MagentaChannelFilter = value.MagentaChannelFilter;
+                    updateUserAlert.MagentaChannelBegins = value.MagentaChannelBegins;
+                    updateUserAlert.MagentaChannelCorrelation30 = value.MagentaChannelCorrelation30;
+                    updateUserAlert.MagentaChannelDays = value.MagentaChannelDays;
+                    updateUserAlert.MagentaChannelAGRADR = value.MagentaChannelAGRADR;
+
+                    updateUserAlert.SeasonalityFilter = value.SeasonalityFilter;
+                    updateUserAlert.SeasonalityWinLossPercent = value.SeasonalityWinLossPercent;
+                    updateUserAlert.SeasonalityGainLossPercent = value.SeasonalityGainLossPercent;
+
+                    updateUserAlert.AdditionalFilter = value.AdditionalFilter;
+                    updateUserAlert.AdditionalFilterPrice = value.AdditionalFilterPrice;
+                    updateUserAlert.AdditionalFilterVolume = value.AdditionalFilterVolume;
+                    updateUserAlert.AdditionalFilterNoOfYears = value.AdditionalFilterNoOfYears;
 
                     db.SubmitChanges();
 

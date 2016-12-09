@@ -1,7 +1,7 @@
 ﻿@{
     //ViewBag.Title = "Index";
 
-    var Version = "v.Beta.1.20161012";
+    var Version = "v.Beta.1.20161112";
 }
 
 <link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
@@ -29,23 +29,21 @@
 </nav>
 
 <div class="container">
+
+    <!-- Heading: Id, Description, AlertVia, IsActive-->
     <div class="row">
         <h2 class="section-heading">Alert</h2>
-
-        @*Id*@
         <input type="hidden" class="form-control" id="Id">
-
-        @*Description*@
         <input type="hidden" class="form-control" id="Description">
-
-        @*Strategy*@
-        <div class="col-lg-6">
-            <p>Strategy</p>
-            <select id="Strategy" class="form-control" onchange="Strategy_OnChange()">
-                <option value="CUS" selected="selected">Customize</option>
-                <option value="MEU">Magenta Early Up</option>
-                <option value="MED">Magenta Early Down</option>
+        <div class="col-lg-4">
+            <p>Alert Via</p>
+            <select id="AlertVia" class="form-control">
+                <option value="Email">Email</option>
             </select>
+        </div>
+        <div class="col-lg-2">
+            <p>Active</p>
+            <input class="form-control" id="IsActive" type="checkbox" />
         </div>
         <div class="col-lg-6">
             <p></p>
@@ -60,14 +58,19 @@
                 </span>
             </div>
         </div>
-    </div>  
+    </div>
+
     <br />
-    <div class="row">
-        @*Exchange*@
-        <div class="col-lg-2">
-            <p>Exchange</p>
-            <select id="Exchange" class="form-control">
-                <option value="All">All</option>
+
+    <!-- SymbolFilter: SymbolExchange, SymbolFavorites -->
+    <h4><input type="checkbox" id="SymbolFilter" /> - Symbols</h4>
+    <div class="row" id="SymbolFilterDiv">
+        <div class="col-lg-4">
+            <p>Exchanges</p>
+            <select id="SymbolExchange" class="form-control" onchange="SymbolExchange_OnChange()">
+                <option value="ALL">All</option>
+                <option value="US">All US Securities</option>
+                <option value="FAV">Favorites</option>
                 <option value="AMEX">AMEX</option>
                 <option value="NASDAQ">NASDAQ</option>
                 <option value="NYSE">NYSE</option>
@@ -76,25 +79,37 @@
                 <option value="FOREX">FOREX</option>
             </select>
         </div>
-        @*Price*@
-        <div class="col-lg-2">
-            <p>Price</p>
-            <input type="text" class="form-control" id="Price" placeholder="Price - [US $10]">
+        <div class="col-lg-4">
+            <p>&nbsp;</p>
+            <input type="hidden" class="form-control" id="SymbolUserFavoritesId">
+            <select id="SymbolUserFavorites" class="form-control"></select>
         </div>
-        @*Volume*@
-        <div class="col-lg-2">
-            <p>Volume</p>
-            <input type="text" class="form-control" id="Volume" placeholder="Volume - [1M]">
+        @*<div class="col-lg-4">
+            <p>Symbols Results</p>
+            <input type="text" class="form-control" id="Result1" disabled>
+        </div>*@
+    </div>
+
+    <br />
+
+    <!-- StrategyFilter: Strategy, StrategyGrowthDecayRate, StrategyGrowthDecayTime -->
+    <h4><input type="checkbox" id="StrategyFilter" /> - Strategy</h4>
+    <div class="row" id="StrategyFilterDiv">
+        <div class="col-lg-4">
+            <p>Strategy</p>
+            <select id="Strategy" class="form-control" onchange="Strategy_OnChange()">
+                @*<option value="CUS" selected="selected">Customize</option>*@
+                <option value="MEU" selected="selected">Magenta Early Up</option>
+                <option value="MED">Magenta Early Down</option>
+            </select>
         </div>
-        @*GrowthDecayRate*@
         <div class="col-lg-2">
             <p>Growth(Decay) Rate</p>
-            <input type="text" class="form-control" id="GrowthDecayRate" placeholder="Growth(Decay) - [100]">
+            <input type="text" class="form-control" id="StrategyGrowthDecayRate" placeholder="Growth(Decay) - [100]">
         </div>
-        @*GrowthDecayTime*@
         <div class="col-lg-2">
             <p>Growth(Decay) Time</p>
-            <select id="GrowthDecayTime" class="form-control">
+            <select id="StrategyGrowthDecayTime" class="form-control">
                 <option value="C0">Current Trend</option>
                 <option value="W1">One Week</option>
                 <option value="W2">Two Weeks</option>
@@ -104,29 +119,55 @@
                 <option value="M3">Three Months</option>
             </select>
         </div>
-        @*NoOfYears*@
-        <div class="col-lg-2">
-            <p>No. of Years</p>
-            <select id="NoOfYears" class="form-control">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8" selected="selected">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
+        @*<div class="col-lg-4">
+            <p>Strategy Results</p>
+            <input type="text" class="form-control" id="Result2" disabled>
+        </div>*@
+    </div>  
+
+    <br />
+
+    <!-- MACDFilter: MACDCrossover, MACDEMA -->
+    <h4><input type="checkbox" id="MACDFilter" /> - MACD</h4>
+    <div class="row" id="MACDFilterDiv">
+        <div class="col-lg-4">
+            <p>MACD Crossover</p>
+            <select id="MACDCrossover" class="form-control">
+                <option value="ALL">All</option>
+                <option value="UP">Up</option>
+                <option value="DOWN">Down</option>
             </select>
         </div>
+        <div class="col-lg-4">
+            <p>MACD Crossover Occurs EMA</p>
+            <select id="MACDEMA" class="form-control">
+                <option value="EITHER">Either</option>
+                <option value="BEFORE">Before EMA</option>
+                <option value="AFTER">After EMA</option>
+            </select>
+        </div>
+        @*<div class="col-lg-4">
+            <p>MACD Results</p>
+            <input type="text" class="form-control" id="Result3" disabled>
+        </div>*@
     </div>
+
     <br />
-    <div class="row">
-        @*Correlation30*@
+    
+    <!-- MagentaChannelFilter: MagentaChannelBegins, MagentaChannelCorrelation30, MagentaChannelDays, MagentaChannelAGRADR -->
+    <h4><input type="checkbox" id="MagentaChannelFilter" /> - Magenta Channel</h4>
+    <div class="row" id="MagentaChannelFilterDiv">
         <div class="col-lg-2">
-            <p>30 Days Linear</p>
-            <select id="Correlation30" class="form-control">
+            <p>Begins</p>
+            <select id="MagentaChannelBegins" class="form-control">
+                <option value="ALL">Anywhere</option>
+                <option value="MACD">MACD Crossover</option>
+                <option value="EMA">EMA Crossover</option>
+            </select>
+        </div>
+        <div class="col-lg-2">
+            <p>Greater Linear</p>
+            <select id="MagentaChannelCorrelation30" class="form-control">
                 <option value="10" selected="selected">0.10</option>
                 <option value="20">0.20</option>
                 <option value="30">0.30</option>
@@ -139,34 +180,86 @@
                 <option value="100">1.00</option>
             </select>
         </div>
-        @*MACDOccurrence*@
-        <div class="col-lg-4">
-            <p>MACD Occurrence</p>
-            <select id="MACDOccurrence" class="form-control">
-                <option value="NA">Not Applicable</option>
-                <option value="Before10">10 Days before EMA Crossover</option>
-                <option value="Before">Before the EMA Crossover</option>
-                <option value="At">At the EMA Crossover</option>
-                <option value="After">After the EMA Crossover</option>
-            </select>
-        </div>
-        @*AlertVia*@
-        <div class="col-lg-4">
-            <p>Alert Via</p>
-            <select id="AlertVia" class="form-control">
-                <option value="Email">Email</option>
-            </select>
-        </div>
-        @*IsActive*@
         <div class="col-lg-2">
-            <p>Active</p>
-            <input class="form-control" id="IsActive" type="checkbox" />
+            <p>Min No of Days</p>
+            <select id="MagentaChannelDays" class="form-control">
+                <option value="0" selected="selected">NA</option>
+                <option value="5">5 Days</option>
+                <option value="10">10 Days</option>
+                <option value="15">10 Days</option>
+                <option value="20">20 Days</option>
+                <option value="25">25 Days</option>
+                <option value="30">30 Days</option>
+            </select>
         </div>
+        <div class="col-lg-2">
+            <p>AGR/ADR</p>
+            <input type="text" class="form-control" id="MagentaChannelAGRADR" placeholder="1-100% (ADR Negative)">
+        </div>
+        @*<div class="col-lg-4">
+            <p>Magenta Channel Results</p>
+            <input type="text" class="form-control" id="Result4" disabled>
+        </div>*@
     </div>
+
     <br />
+    
+    <!-- SeasonalityFilter: SeasonalityWinLossPercent, SeasonalityGainLossPercent -->
+    <h4><input type="checkbox" id="SeasonalityFilter" /> - Seasonality</h4>
+    <div class="row" id="SeasonalityFilterDiv">
+        <div class="col-lg-4">
+            <p>Win/Loss %</p>
+            <input type="text" class="form-control" id="SeasonalityWinLossPercent" placeholder="Win/Loss%(-)">
+        </div>
+        <div class="col-lg-4">
+            <p>Gains(Losses) %</p>
+            <input type="text" class="form-control" id="SeasonalityGainLossPercent" placeholder="Gain/Loss%(-)">
+        </div>
+        @*<div class="col-lg-4">
+            <p>Seasonality Results</p>
+            <input type="text" class="form-control" id="Result5" disabled>
+        </div>*@
+    </div>
+
+    <br />
+
+    <!-- AdditionalFilter: AdditionalFilterPrice, AdditionalFilterVolume, AdditionalFilterNoOfYears -->
+    <h4><input type="checkbox" id="AdditionalFilter" /> - Additional Filters</h4>
+    <div class="row" id="AdditionalFilterDiv">
+        <div class="col-lg-4">
+            <p>Min Price</p>
+            <input type="text" class="form-control" id="AdditionalFilterPrice" placeholder="Price - [US $10]">
+        </div>
+        <div class="col-lg-2">
+            <p>Min Volume</p>
+            <input type="text" class="form-control" id="AdditionalFilterVolume" placeholder="Volume - [1M]">
+        </div>
+        <div class="col-lg-2">
+            <p>No. of Years</p>
+            <select id="AdditionalFilterNoOfYears" class="form-control">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8" selected="selected">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+        @*<div class="col-lg-4">
+            <p>Additional Filter Results</p>
+            <input type="text" class="form-control" id="Result6" disabled>
+        </div>*@
+    </div>
+
+    <br />
+
+    <h4>Results</h4>
     <div class="row">
         <div class="col-lg-12">
-            <p>Alert Results</p>
             <div id="UserAlertGrid" class="grid"></div>
             <div class="row">
                 <div class="btn-group col-md-7" id="NavPage">
@@ -187,6 +280,7 @@
             </div>
         </div>
     </div>
+
 </div>
 
 <script type="text/javascript">
@@ -203,17 +297,25 @@
     var NavCurrentPage;
 
     // Events
+    function SymbolExchange_OnChange() {
+        var $symbolExchange = document.getElementById('SymbolExchange').value;
+        if ($symbolExchange=="FAV") {
+            document.getElementById('SymbolUserFavorites').style.visibility = 'visible';
+        } else {
+            document.getElementById('SymbolUserFavorites').style.visibility = 'hidden';
+        }
+    }
     function Strategy_OnChange() {
         var Strategy = document.getElementById('Strategy').value;
         switch (Strategy) {
             case "CUS":
-                document.getElementById('GrowthDecayRate').disabled = false;
-                document.getElementById('GrowthDecayTime').disabled = false;
+                document.getElementById('StrategyGrowthDecayRate').disabled = false;
+                document.getElementById('StrategyGrowthDecayTime').disabled = false;
                 break;
             case "MEU":
             case "MED":
-                document.getElementById('GrowthDecayRate').disabled = true;
-                document.getElementById('GrowthDecayTime').disabled = true;
+                document.getElementById('StrategyGrowthDecayRate').disabled = true;
+                document.getElementById('StrategyGrowthDecayTime').disabled = true;
                 break;
         }
     }
@@ -367,19 +469,41 @@
                 if (result.Id > 0) {
                     document.getElementById('Id').value = result.Id;
                     document.getElementById('Description').value = result.Description;
-                    document.getElementById('Strategy').value = result.Strategy;
-                    document.getElementById('Exchange').value = result.Exchange;
-                    document.getElementById('Price').value = result.Price;
-                    document.getElementById('Volume').value = result.Volume;
-                    document.getElementById('GrowthDecayRate').value = result.GrowthDecayRate;
-                    document.getElementById('GrowthDecayTime').value = result.GrowthDecayTime;
-                    document.getElementById('NoOfYears').value = result.NoOfYears;
-                    document.getElementById('Correlation30').value = result.Correlation30;
-                    document.getElementById('MACDOccurrence').value = result.MACDOccurrence;
                     document.getElementById('AlertVia').value = result.AlertVia;
                     document.getElementById('IsActive').checked = result.IsActive;
 
+                    document.getElementById('SymbolFilter').checked = result.SymbolFilter;
+                    document.getElementById('SymbolExchange').value = result.SymbolExchange;
+                    document.getElementById('SymbolUserFavoritesId').value = result.SymbolUserFavoritesId;
+                    document.getElementById('SymbolUserFavorites').value = result.SymbolUserFavorites;
+
+                    document.getElementById('StrategyFilter').checked = result.StrategyFilter;
+                    document.getElementById('Strategy').value = result.Strategy;
+                    document.getElementById('StrategyGrowthDecayRate').value = result.StrategyGrowthDecayRate;
+                    document.getElementById('StrategyGrowthDecayTime').value = result.StrategyGrowthDecayTime;
+
+                    document.getElementById('MACDFilter').checked = result.MACDFilter;
+                    document.getElementById('MACDCrossover').value = result.MACDCrossover;
+                    document.getElementById('MACDEMA').value = result.MACDEMA;
+
+                    document.getElementById('MagentaChannelFilter').checked = result.MagentaChannelFilter;
+                    document.getElementById('MagentaChannelBegins').value = result.MagentaChannelBegins;
+                    document.getElementById('MagentaChannelCorrelation30').value = result.MagentaChannelCorrelation30;
+                    document.getElementById('MagentaChannelDays').value = result.MagentaChannelDays;
+                    document.getElementById('MagentaChannelAGRADR').value = result.MagentaChannelAGRADR;
+
+                    document.getElementById('SeasonalityFilter').checked = result.SeasonalityFilter;
+                    document.getElementById('SeasonalityWinLossPercent').value = result.SeasonalityWinLossPercent;
+                    document.getElementById('SeasonalityGainLossPercent').value = result.SeasonalityGainLossPercent;
+
+                    document.getElementById('AdditionalFilter').checked = result.AdditionalFilter;
+                    document.getElementById('AdditionalFilterPrice').value = result.AdditionalFilterPrice;
+                    document.getElementById('AdditionalFilterVolume').value = result.AdditionalFilterVolume;
+                    document.getElementById('AdditionalFilterNoOfYears').value = result.AdditionalFilterNoOfYears;
+
                     GetUserAlertSymbols(result.Id, result.Strategy);
+                    ExpandCollapseFilters();
+                    SymbolExchange_OnChange();
                     Strategy_OnChange();
                 } else {
                     document.getElementById('Id').value = 0;
@@ -395,22 +519,47 @@
         userAlert.UserId = 0;
         userAlert.User = currentUser;
         userAlert.Description = document.getElementById('Description').value;
-        userAlert.Strategy = document.getElementById('Strategy').value;
-        userAlert.Exchange = document.getElementById('Exchange').value;
-        var $price = parseFloat(document.getElementById('Price').value);
-        userAlert.Price = !$price ? 10 : $price;
-        var $volume = parseFloat(document.getElementById('Volume').value);
-        userAlert.Volume = !$volume ? 1000000 : $volume;;
-        var $growthDecayRate = document.getElementById('GrowthDecayRate').value;
-        userAlert.GrowthDecayRate = !$growthDecayRate ? 100 : $growthDecayRate;;
-        userAlert.GrowthDecayTime = document.getElementById('GrowthDecayTime').value;
-        var $noOfYears = parseInt(document.getElementById('NoOfYears').value);
-        userAlert.NoOfYears = !$noOfYears ? 8 : $noOfYears;
-        userAlert.Correlation30 = document.getElementById('Correlation30').value;
-        userAlert.MACDOccurrence = document.getElementById('MACDOccurrence').value;
         userAlert.IsActive = document.getElementById('IsActive').checked;
         userAlert.EncodedDate = new Date();
         userAlert.AlertVia = document.getElementById('AlertVia').value;
+
+        userAlert.SymbolFilter = document.getElementById('SymbolFilter').checked;
+        userAlert.SymbolExchange = document.getElementById('SymbolExchange').value;
+        userAlert.SymbolUserFavoritesId = document.getElementById('SymbolUserFavoritesId').value;
+        userAlert.SymbolUserFavorites = document.getElementById('SymbolUserFavorites').value;
+
+        userAlert.StrategyFilter = document.getElementById('StrategyFilter').checked;
+        userAlert.Strategy = document.getElementById('Strategy').value;
+        var $strategyGrowthDecayRate = parseFloat(document.getElementById('StrategyGrowthDecayRate').value); 
+        userAlert.StrategyGrowthDecayRate = !$strategyGrowthDecayRate ? 0 : $strategyGrowthDecayRate;
+        userAlert.StrategyGrowthDecayTime = document.getElementById('StrategyGrowthDecayTime').value;
+
+        userAlert.MACDFilter = document.getElementById('MACDFilter').checked;
+        userAlert.MACDCrossover = document.getElementById('MACDCrossover').value;
+        userAlert.MACDEMA = document.getElementById('MACDEMA').value;
+
+        userAlert.MagentaChannelFilter = document.getElementById('MagentaChannelFilter').checked;
+        userAlert.MagentaChannelBegins = document.getElementById('MagentaChannelBegins').value;
+        var $magentaChannelCorrelation30 = parseInt(document.getElementById('MagentaChannelCorrelation30').value);
+        userAlert.MagentaChannelCorrelation30 = !$magentaChannelCorrelation30 ? 0 : $magentaChannelCorrelation30;
+        var $magentaChannelDays = parseInt(document.getElementById('MagentaChannelDays').value);
+        userAlert.MagentaChannelDays = !$magentaChannelDays ? 0 : $magentaChannelDays;
+        var $magentaChannelAGRADR = parseFloat(document.getElementById('MagentaChannelAGRADR').value); 
+        userAlert.MagentaChannelAGRADR = !$magentaChannelAGRADR ? 0 : $magentaChannelAGRADR;
+
+        userAlert.SeasonalityFilter = document.getElementById('SeasonalityFilter').checked;
+        var $seasonalityWinLossPercent = parseFloat(document.getElementById('SeasonalityWinLossPercent').value);
+        userAlert.SeasonalityWinLossPercent = !$seasonalityWinLossPercent ? 0 : $seasonalityWinLossPercent;
+        var $seasonalityGainLossPercent = parseFloat(document.getElementById('SeasonalityGainLossPercent').value);
+        userAlert.SeasonalityGainLossPercent = !$seasonalityGainLossPercent ? 0 : $seasonalityGainLossPercent;
+
+        userAlert.AdditionalFilter = document.getElementById('AdditionalFilter').checked;
+        var $additionalFilterPrice = parseFloat(document.getElementById('AdditionalFilterPrice').value);
+        userAlert.AdditionalFilterPrice = !$additionalFilterPrice ? 0 : $additionalFilterPrice;
+        var $additionalFilterVolume = parseFloat(document.getElementById('AdditionalFilterVolume').value);
+        userAlert.AdditionalFilterVolume = !$additionalFilterVolume ? 0 : $additionalFilterVolume;
+        var $additionalFilterNoOfYears = parseInt(document.getElementById('AdditionalFilterNoOfYears').value);
+        userAlert.AdditionalFilterNoOfYears = !$additionalFilterNoOfYears ? 0 : $additionalFilterNoOfYears;
 
         var data = JSON.stringify(userAlert);
 
@@ -469,7 +618,7 @@
                             Exchange: result[i].Exchange,
                             ClosePrice: result[i].ClosePrice,
                             Volume: Math.round(result[i].Volume / 10000) / 100,
-                            Rate: GetRate(GrowthDecayTime, result[i]),
+                            Rate: GetRate(StrategyGrowthDecayTime, result[i]),
                             GrowthDecayRate: Math.round(result[i].GrowthDecayRate),
                             GrowthDecayRateW1: Math.round(result[i].GrowthDecayRateW1),
                             GrowthDecayRateW2: Math.round(result[i].GrowthDecayRateW2),
@@ -867,9 +1016,9 @@
         var RedColor = "#A80008";
         return Rate >= 0 ? GreenColor : RedColor;
     }
-    function GetRate(GrowthDecayTime, Result) {
+    function GetRate(StrategyGrowthDecayTime, Result) {
         var returnResult = 0;
-        switch (GrowthDecayTime) {
+        switch (StrategyGrowthDecayTime) {
             case "C0":
                 returnResult = Result.GrowthDecayRate;
                 break;
@@ -898,6 +1047,23 @@
         return Math.round(returnResult);
     }
 
+    // User Interface
+    function ExpandCollapseFilters() {
+        $("#SymbolFilterDiv").hide();
+        $("#StrategyFilterDiv").hide();
+        $("#MACDFilterDiv").hide();
+        $("#MagentaChannelFilterDiv").hide();
+        $("#SeasonalityFilterDiv").hide();
+        $("#AdditionalFilterDiv").hide();
+
+        if (document.getElementById('SymbolFilter').checked) $("#SymbolFilterDiv").show();
+        if (document.getElementById('StrategyFilter').checked) $("#StrategyFilterDiv").show();
+        if (document.getElementById('MACDFilter').checked) $("#MACDFilterDiv").show();
+        if (document.getElementById('MagentaChannelFilter').checked) $("#MagentaChannelFilterDiv").show();
+        if (document.getElementById('SeasonalityFilter').checked) $("#SeasonalityFilterDiv").show();
+        if (document.getElementById('AdditionalFilter').checked) $("#AdditionalFilterDiv").show();
+    }
+
     // Page Load
     $(document).ready(function () {
         currentUser = '@User.Identity.Name';
@@ -918,5 +1084,24 @@
         AddListenerNavPage();
 
         GetUserAlert();
+
+        $('#SymbolFilter').on('change', function () { 
+            ExpandCollapseFilters();
+        })
+        $('#StrategyFilter').on('change', function () {
+            ExpandCollapseFilters();
+        })
+        $('#MACDFilter').on('change', function () {
+            ExpandCollapseFilters();
+        })
+        $('#MagentaChannelFilter').on('change', function () {
+            ExpandCollapseFilters();
+        })
+        $('#SeasonalityFilter').on('change', function () {
+            ExpandCollapseFilters();
+        })     
+        $('#AdditionalFilter').on('change', function () {
+            ExpandCollapseFilters();
+        })
     });
 </script>
