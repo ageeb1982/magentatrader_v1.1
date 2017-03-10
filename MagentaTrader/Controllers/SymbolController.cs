@@ -402,8 +402,8 @@ namespace MagentaTrader.Controllers
                         {
                             if (FavoriteUserId > 0)
                             {
-                                var FavoriteSymbols = (from d in db.TrnFavorites
-                                                       where d.UserId == FavoriteUserId && d.Remarks.Equals(FavoriteRemarks)
+                                var FavoriteSymbols = (from d in db.TrnUserFavoritesSymbols
+                                                       where d.UserFavoritesId == FavoriteUserId
                                                        select d.Symbol).ToArray();
                                 Values = Symbols2.Where(d => FavoriteSymbols.Contains(d.SymbolDescription) == true).ToList();
                             }
@@ -469,8 +469,8 @@ namespace MagentaTrader.Controllers
                         {
                             if (FavoriteUserId > 0)
                             {
-                                var FavoriteSymbols = (from d in db.TrnFavorites
-                                                       where d.UserId == FavoriteUserId && d.Remarks.Equals(FavoriteRemarks)
+                                var FavoriteSymbols = (from d in db.TrnUserFavoritesSymbols
+                                                       where d.UserFavoritesId == FavoriteUserId
                                                        select d.Symbol).ToArray();
                                 Values = Symbols1.Where(d => FavoriteSymbols.Contains(d.SymbolDescription) == true).ToList();
                             }
@@ -549,8 +549,8 @@ namespace MagentaTrader.Controllers
                         {
                             if (FavoriteUserId > 0)
                             {
-                                var FavoriteSymbols = (from d in db.TrnFavorites
-                                                       where d.UserId == FavoriteUserId && d.Remarks.Equals(FavoriteRemarks)
+                                var FavoriteSymbols = (from d in db.TrnUserFavoritesSymbols
+                                                       where d.UserFavoritesId == FavoriteUserId
                                                        select d.Symbol).ToArray();
                                 Values = Symbols.Where(d => FavoriteSymbols.Contains(d.SymbolDescription) == true).ToList();
                             }

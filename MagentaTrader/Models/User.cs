@@ -17,6 +17,7 @@ namespace MagentaTrader.Models
         public string Address { get; set; }
         public string ReferralUserName { get; set; }
         public string LastPurchase { get; set; }
+        public string DateCreated { get; set; }
         public DateTime dateLP { get; set; }
         
         // Variables for PackageLedger

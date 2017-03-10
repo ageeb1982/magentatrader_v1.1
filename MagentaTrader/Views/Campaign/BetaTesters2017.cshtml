@@ -1,0 +1,134 @@
+﻿
+@{
+    ViewBag.Title = "Beta Testers";
+}
+
+<link href="/css/bootstrap-toggle.min.css" rel="stylesheet">
+<link href="~/css/toastr.css" rel="stylesheet" />
+
+<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/js/bootstrap-toggle.min.js"></script>
+<script src="~/js/toastr.js"></script>
+
+<script src='https://www.google.com/recaptcha/api.js'></script>
+
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"></span></a>
+        </div>
+    </div>
+</nav>
+
+<div class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="intro-message" style="padding-bottom:1%">
+                    <h3>Why pay for Seasonality Software?</h3>
+                    <p>
+                        Become a Beta Tester for Magenta Trader. <br />
+                        No Credit Cards ever and receive the same software service and support that Magenta Trader has been supplying for all these years.<br />
+                        <video controls style="padding:0" id="video" width="400" height="300" poster="~/img/magentavideoloading1.gif" onclick="this.paused?this.play():this.pause();"></video>
+                    </p>
+                    
+                    @*<br />
+                    <br />
+                    <p style="color:yellow">@Html.ValidationSummary()</p>*@
+                </div>
+            </div>
+            <div class="col-lg-5">
+                @using (Html.BeginForm("BetaTesters2017", "Campaign", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                {
+                    @*@Html.AntiForgeryToken()*@
+                    <fieldset>
+                    <div class="intro-message" style="padding-bottom:10%">
+                        <h3>&nbsp;</h3>
+                        <div class="col-md-12" style="padding-bottom:1%">
+                            <input id="UserName" class="form-control" placeholder="Username" name="UserName" type="text" autofocus>
+                        </div>
+                        <div class="col-md-6" style="padding-bottom:1%">
+                            <input id="Password" class="form-control" placeholder="Password" name="Password" type="password" value="" autofocus>
+                        </div>
+                        <div class="col-md-6" style="padding-bottom:1%">
+                            <input id="ConfirmPassword" class="form-control" placeholder="Confirm Password" name="ConfirmPassword" type="password" value="" autofocus>
+                        </div>
+                        <div class="col-md-6" style="padding-bottom:1%">
+                            <input id="FirstName" class="form-control" placeholder="First Name" name="FirstName" type="text" autofocus>
+                        </div>
+                        <div class="col-md-6" style="padding-bottom:1%">
+                            <input id="LastName" class="form-control" placeholder="Last Name" name="LastName" type="text" autofocus>
+                        </div>
+                        <div class="col-md-12" style="padding-bottom:1%"><input id="EmailAddress" class="form-control" placeholder="Email Address" name="EmailAddress" type="text" autofocus></div>
+                        <div class="col-md-12" style="padding-bottom:1%"><input id="PhoneNumber" class="form-control" placeholder="Phone Number" name="PhoneNumber" type="text" autofocus></div>
+                        <div class="col-md-12" style="padding-bottom:1%">
+                            <select class="form-control custom-width" id="Address" name="Address">
+                                <option value="USA">USA</option>
+                                <option value="CANADA">CANADA</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" style="padding-bottom:10%">
+                            <div class="g-recaptcha" data-sitekey="6Lc5GBoTAAAAAAEQ98bJVGjZJOgt_WlfZOgkVAM9"></div>
+                        </div>
+                        <div class="col-md-6" style="padding-bottom:10%;padding-left:1%" align="right">
+                            <input type="submit" value="Register" class="btn btn-lg btn-success" />
+                        </div>
+                        <div>
+                            <input id="ReferralUserName" class="form-control" name="ReferralUserName" type="hidden" value="hgminerva">
+                        </div>
+                    </div>
+                    </fieldset>
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                @*<input class="form-control" id="IsPurchase" name="IsPurchase" type="checkbox" />*@
+                <h2><i class="fa fa-square-o"></i>&nbsp;1</h2>
+                <p>Purchase</p>
+                <p>When you purchase the software you receive Lifetime Upgrades.  $50/month for data.</p>
+                <h2>$3,495</h2>
+            </div>
+            <div class="col-lg-4">
+                @*<input class="form-control" id="IsLease" name="IsLease" type="checkbox" />*@
+                <h2><i class="fa fa-square-o"></i>&nbsp;2</h2>
+                <p>Lease</p>
+                <p>When you lease the software you receive Lifetime Upgrades.  No charge for data.</p>
+                <h2>$249/Month</h2>
+            </div>
+            <div class="col-lg-4" style="background-color:darkslategrey">
+                @*<input class="form-control" id="IsBetaTester" name="IsBetaTester" type="checkbox" checked/>*@
+                <h2><i class="fa fa-check-square-o"></i>&nbsp;3</h2>
+                <p>Beta Tester</p>
+                <p>Become a Beta Tester and the software you recieve Lifetime Upgrades.  No charge for data.</p>
+                <h2>FREE</h2>
+                <p>&nbsp;</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function addSourceToVideo(element, src) {
+        var source = document.createElement('source');
+        source.src = src;
+        source.type = "video/mp4";
+
+        element.appendChild(source);
+        element.load();
+        element.play();
+    }
+
+    $(document).ready(function () {
+        var videoElement = document.getElementById("video");
+        //addSourceToVideo(videoElement, "https://mediasvcmg26x4p1t4vmz.blob.core.windows.net/asset-061786bd-2f81-4add-8cae-23de657d6f1f/2016-09-05 19.20 Open Web99Derek 8pm ET.mp4?sv=2012-02-12&sr=c&si=90ec8196-9149-4a06-8431-87e4691ac589&sig=3ZGtzJrgiDARtRgBDETR%2B%2BQl%2FiL1Hyr7vosHTgKvi3M%3D&se=2017-09-06T13%3A43%3A07Z");
+        addSourceToVideo(videoElement, "https://mediasvcmg26x4p1t4vmz.blob.core.windows.net/asset-98914542-6efb-4a4f-bf6d-e2d493a8de3f/2016-12-09 16.24 Magenta Intro Webinar.mp4?sv=2012-02-12&sr=c&si=537e1e03-8dfb-4765-9284-ab2574e1c873&sig=5FxE%2FqYYR7eILVnUr3kpTS2wvTjLw9%2BxWyNP1mdshFo%3D&se=2017-12-09T21%3A50%3A01Z");
+    });
+</script>

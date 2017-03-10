@@ -156,8 +156,8 @@
       <Column Name="IsShared" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="EncodedDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
       <Column Name="Trend" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Association Name="MstUser_TrnFavorite" Member="MstUser" ThisKey="UserId" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
       <Association Name="MstSymbol_TrnFavorite" Member="MstSymbol" ThisKey="SymbolId" OtherKey="Id" Type="MstSymbol" IsForeignKey="true" />
+      <Association Name="MstUser_TrnFavorite" Member="MstUser" ThisKey="UserId" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.TrnSector" Member="TrnSectors">
@@ -201,27 +201,6 @@
       <Association Name="MstSymbol_TrnUserFavoritesSymbol" Member="MstSymbol" ThisKey="SymbolId" OtherKey="Id" Type="MstSymbol" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="dbo.MstUser" Member="MstUsers">
-    <Type Name="MstUser">
-      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="UserName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="FirstName" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="LastName" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="EmailAddress" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="PhoneNumber" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="AspNetUserId" Type="System.String" DbType="NVarChar(128)" CanBeNull="true" />
-      <Column Name="Address" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
-      <Column Name="ReferralUserName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="WithSMS" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
-      <Association Name="MstUser_TrnAffiliate" Member="TrnAffiliates" ThisKey="Id" OtherKey="UserId" Type="TrnAffiliate" />
-      <Association Name="MstUser_TrnSale" Member="TrnSales" ThisKey="Id" OtherKey="UserId" Type="TrnSale" />
-      <Association Name="MstUser_SysAcessLog" Member="SysAcessLogs" ThisKey="Id" OtherKey="UserId" Type="SysAcessLog" />
-      <Association Name="MstUser_TrnFavorite" Member="TrnFavorites" ThisKey="Id" OtherKey="UserId" Type="TrnFavorite" />
-      <Association Name="MstUser_TrnUserFavorite" Member="TrnUserFavorites" ThisKey="Id" OtherKey="UserId" Type="TrnUserFavorite" />
-      <Association Name="MstUser_TrnUserAlert" Member="TrnUserAlerts" ThisKey="Id" OtherKey="UserId" Type="TrnUserAlert" />
-      <Association Name="AspNetUser_MstUser" Member="AspNetUser" ThisKey="AspNetUserId" OtherKey="Id" Type="AspNetUser" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.TrnStockEarning" Member="TrnStockEarnings">
     <Type Name="TrnStockEarning">
       <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -243,42 +222,8 @@
       <Column Name="Symbol" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Column Name="Trend" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Column Name="EncodedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Association Name="TrnUserAlert_TrnUserAlertSymbol" Member="TrnUserAlert" ThisKey="UserAlertId" OtherKey="Id" Type="TrnUserAlert" IsForeignKey="true" />
       <Association Name="MstSymbol_TrnUserAlertSymbol" Member="MstSymbol" ThisKey="SymbolId" OtherKey="Id" Type="MstSymbol" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.TrnUserAlert" Member="TrnUserAlerts">
-    <Type Name="TrnUserAlert">
-      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="UserId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Description" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
-      <Column Name="Strategy" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="IsActive" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="EncodedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="AlertVia" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="SymbolFilter" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="SymbolExchange" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="SymbolUserFavoritesId" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="StrategyGrowthDecayRate" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
-      <Column Name="StrategyGrowthDecayTime" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="StrategyFilter" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="MACDFilter" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="MACDCrossover" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="MACDEMA" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="MagentaChannelFilter" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="MagentaChannelBegins" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="MagentaChannelAGRADR" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
-      <Column Name="SeasonalityFilter" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="SeasonalityWinLossPercent" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
-      <Column Name="SeasonalityGainLossPercent" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
-      <Column Name="AdditionalFilter" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="AdditionalFilterPrice" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
-      <Column Name="AdditionalFilterVolume" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
-      <Column Name="AdditionalFilterNoOfYears" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="MagentaChannelDays" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="MagentaChannelCorrelation30" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="TrnUserAlert_TrnUserAlertSymbol" Member="TrnUserAlertSymbols" ThisKey="Id" OtherKey="UserAlertId" Type="TrnUserAlertSymbol" />
-      <Association Name="MstUser_TrnUserAlert" Member="MstUser" ThisKey="UserId" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+      <Association Name="TrnUserAlert_TrnUserAlertSymbol" Member="TrnUserAlert" ThisKey="UserAlertId" OtherKey="Id" Type="TrnUserAlert" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.MstSymbol" Member="MstSymbols">
@@ -335,6 +280,63 @@
       <Association Name="MstSymbol_TrnUserFavoritesSymbol" Member="TrnUserFavoritesSymbols" ThisKey="Id" OtherKey="SymbolId" Type="TrnUserFavoritesSymbol" />
       <Association Name="MstSymbol_TrnStockEarning" Member="TrnStockEarnings" ThisKey="Id" OtherKey="SymbolId" Type="TrnStockEarning" />
       <Association Name="MstSymbol_TrnUserAlertSymbol" Member="TrnUserAlertSymbols" ThisKey="Id" OtherKey="SymbolId" Type="TrnUserAlertSymbol" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MstUser" Member="MstUsers">
+    <Type Name="MstUser">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UserName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="FirstName" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="LastName" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="EmailAddress" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="PhoneNumber" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="AspNetUserId" Type="System.String" DbType="NVarChar(128)" CanBeNull="true" />
+      <Column Name="Address" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="ReferralUserName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="WithSMS" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="DateCreated" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Association Name="MstUser_TrnAffiliate" Member="TrnAffiliates" ThisKey="Id" OtherKey="UserId" Type="TrnAffiliate" />
+      <Association Name="MstUser_TrnSale" Member="TrnSales" ThisKey="Id" OtherKey="UserId" Type="TrnSale" />
+      <Association Name="MstUser_SysAcessLog" Member="SysAcessLogs" ThisKey="Id" OtherKey="UserId" Type="SysAcessLog" />
+      <Association Name="MstUser_TrnFavorite" Member="TrnFavorites" ThisKey="Id" OtherKey="UserId" Type="TrnFavorite" />
+      <Association Name="MstUser_TrnUserFavorite" Member="TrnUserFavorites" ThisKey="Id" OtherKey="UserId" Type="TrnUserFavorite" />
+      <Association Name="MstUser_TrnUserAlert" Member="TrnUserAlerts" ThisKey="Id" OtherKey="UserId" Type="TrnUserAlert" />
+      <Association Name="AspNetUser_MstUser" Member="AspNetUser" ThisKey="AspNetUserId" OtherKey="Id" Type="AspNetUser" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TrnUserAlert" Member="TrnUserAlerts">
+    <Type Name="TrnUserAlert">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UserId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="Strategy" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="IsActive" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="EncodedDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="AlertVia" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="SymbolFilter" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="SymbolExchange" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="SymbolUserFavoritesId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="StrategyGrowthDecayRate" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="StrategyGrowthDecayTime" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="StrategyFilter" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="MACDFilter" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="MACDCrossover" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="MACDEMA" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="MagentaChannelFilter" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="MagentaChannelBegins" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="MagentaChannelAGRADR" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="SeasonalityFilter" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="SeasonalityWinLossPercent" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="SeasonalityGainLossPercent" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="AdditionalFilter" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="AdditionalFilterPrice" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="AdditionalFilterVolume" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="AdditionalFilterNoOfYears" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="MagentaChannelDays" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="MagentaChannelCorrelation30" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SeasonalityTrend" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Association Name="TrnUserAlert_TrnUserAlertSymbol" Member="TrnUserAlertSymbols" ThisKey="Id" OtherKey="UserAlertId" Type="TrnUserAlertSymbol" />
+      <Association Name="MstUser_TrnUserAlert" Member="MstUser" ThisKey="UserId" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

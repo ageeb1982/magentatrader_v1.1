@@ -36,6 +36,7 @@ namespace MagentaTrader.Models
         public decimal MagentaChannelAGRADR { get; set; }
 
         public bool SeasonalityFilter { get; set; }
+        public string SeasonalityTrend { get; set; }
         public decimal SeasonalityWinLossPercent { get; set; }
         public decimal SeasonalityGainLossPercent { get; set; }
 

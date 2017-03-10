@@ -45,6 +45,11 @@ h6 {
     padding-bottom: 20%;
 }
 
+.intro-message1 {
+    padding-top: 10%;
+    padding-bottom: 20%;
+}
+
 .intro-message > h1 {
     margin: 0;
     text-shadow: 2px 2px 3px rgba(0,0,0,0.6);

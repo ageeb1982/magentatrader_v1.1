@@ -187,6 +187,7 @@
     <Compile Include="Controllers\FavoritesAPIController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\FreeWebinarsController.cs" />
+    <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MemberController.cs" />
     <Compile Include="Controllers\NewsController.cs" />
@@ -284,6 +285,7 @@
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserAlert.cs" />
     <Compile Include="Models\UserAlertSymbol.cs" />
+    <Compile Include="Models\UserAlertSymbolResult.cs" />
     <Compile Include="Models\UserFavorite.cs" />
     <Compile Include="Models\UserFavoriteSymbol.cs" />
     <Compile Include="Models\VariableScanner.cs" />
@@ -853,6 +855,7 @@
     <Content Include="css\site.css" />
     <Content Include="css\styles.css" />
     <Content Include="css\toastr.css" />
+    <Content Include="css\ytLoad.jquery.css" />
     <Content Include="dist\css\sb-admin-2.css" />
     <Content Include="dist\css\timeline.css" />
     <Content Include="dist\js\sb-admin-2.js" />
@@ -865,7 +868,9 @@
     <Content Include="Content\Site.css" />
     <Content Include="img\alaska1.jpg" />
     <Content Include="img\banner-bg.jpg" />
-    <Content Include="img\campaign\20150626.png" />
+    <Content Include="img\campaign\IW20170305-1.png" />
+    <Content Include="img\campaign\IW20170305-2.png" />
+    <Content Include="img\campaign\xxx.png" />
     <Content Include="img\campaign\IW20160619.png" />
     <Content Include="img\campaign\MagentaTour2017.png" />
     <Content Include="img\campaign\referral-magenta.png" />
@@ -879,6 +884,7 @@
     <Content Include="img\intro-bg1.jpg" />
     <Content Include="img\intro-bg1.png" />
     <Content Include="img\ipad.png" />
+    <Content Include="img\loadingcity.gif" />
     <Content Include="img\logo-1.png" />
     <Content Include="img\logo-2.png" />
     <Content Include="img\logo.png" />
@@ -887,7 +893,11 @@
     <Content Include="img\magenta-questrade.png" />
     <Content Include="img\magenta-screen.png" />
     <Content Include="img\magenta-tradier.png" />
+    <Content Include="img\magentavideo.png" />
+    <Content Include="img\magentavideoloading.gif" />
+    <Content Include="img\magentavideoloading1.gif" />
     <Content Include="img\phones.png" />
+    <Content Include="img\placeholder.png" />
     <Content Include="img\progress_bar.gif" />
     <Content Include="img\questrade-logo-smaller.png" />
     <Content Include="img\software-1.png" />
@@ -916,6 +926,7 @@
     <Content Include="js\jquery-1.10.2.min.js" />
     <Content Include="js\jquery.js" />
     <Content Include="js\jquery.slimscroll.min.js" />
+    <Content Include="js\jquery.transit.js" />
     <Content Include="js\jquery.validate.js" />
     <Content Include="js\jquery.validate.min.js" />
     <Content Include="js\knockout-3.2.0.js" />
@@ -923,6 +934,7 @@
     <Content Include="js\require.js" />
     <Content Include="js\simple_statistics.js" />
     <Content Include="js\toastr.js" />
+    <Content Include="js\ytLoad.jquery.js" />
     <Content Include="lib\bootstrap\css\bootstrap-theme.css" />
     <Content Include="lib\bootstrap\css\bootstrap-theme.min.css" />
     <Content Include="lib\bootstrap\css\bootstrap.css" />
@@ -1551,6 +1563,10 @@
     <Content Include="Views\Campaign\MagentaTour2017.cshtml" />
     <Content Include="Views\UserAlert\Index.cshtml" />
     <Content Include="Views\BookClub\Index.cshtml" />
+    <Content Include="Views\Campaign\BetaTesters2017Video.cshtml" />
+    <Content Include="Views\Campaign\BetaTesters2017.cshtml" />
+    <Content Include="Views\Help\Index.cshtml" />
+    <Content Include="Views\Campaign\IW20170305.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

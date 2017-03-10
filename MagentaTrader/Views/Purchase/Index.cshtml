@@ -294,6 +294,12 @@
             Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='9abae95a-774e-4d51-967b-1a1457334df4' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
         });
 
+        purchases.push({
+            Product: "Magenta Trader Internet Workshop <button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdDetails' onclick='CmdDetails_OnClick()'>Details</button>",
+            Price: "US$ 299",
+            Purchase: "<form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='e23a61ca-1c86-4cab-ac3c-2e6a5abd641e' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>"
+        });
+
         //purchases.push({
         //    Product: "Magenta 5 Year Anniversary Festival <button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdEditEvent' onclick='CmdAnniversary5_OnClick()'>Details</button>",
         //    Price: "US$ 295",
@@ -324,6 +330,9 @@
     }
     function CmdAlaskaCruise2016_OnClick() {
         location.href = '/Campaign/AlaskaCruise2016';
+    }
+    function CmdDetails_OnClick() {
+        location.href = '/Campaign/IW20170305';
     }
     function CmdCoupon_OnClick() {
         $("#CouponsTitle").text("Coupons");
@@ -380,7 +389,13 @@
             //$("#CouponLink2").empty();
 
             //$("#CouponLink").append("Magenta Book/Annual Charts <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='dbabb9ac-66c3-4d05-804f-e8074043b247' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
-         } else {
+        } else if (CouponCode.toUpperCase() == "BEN") {
+            $("#CouponLink").empty();
+            $("#CouponLink1").empty();
+            $("#CouponLink2").empty();
+
+            $("#CouponLink").append("Magenta Trader Lifetime Chart and Web99 for $3,000 <form name='PrePage' method = 'post' action = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx'> <input type = 'hidden' name = 'LinkId' value ='e1212214-02bf-4dff-8fa7-c2f2b88f9846' /> <input type = 'image' src ='//content.authorize.net/images/buy-now-gold.gif' /> </form>");
+        } else {
             $("#CouponLink").empty();
             $("#CouponLink1").empty();
             $("#CouponLink2").empty();

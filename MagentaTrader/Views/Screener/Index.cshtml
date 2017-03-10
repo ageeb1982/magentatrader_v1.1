@@ -115,6 +115,7 @@
         </div>
         <div class="col-lg-4">
             <p><a href='javascript:;' onclick='Favorites_OnClick();'>Favorites</a></p>
+            <input type="hidden" class="form-control" id="Favorite_Id" placeholder="None">
             <input type="hidden" class="form-control" id="Favorite_UserId" placeholder="None" >
             <input type="hidden" class="form-control" id="Favorite_Remarks" placeholder="None" >
             <input type="text" class="form-control" id="FavoriteCode" placeholder="None" disabled="disabled">
@@ -373,7 +374,7 @@
         }
         return Math.round(returnResult);
     }
-    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears, Correlation30, Strategy, FavoriteUserId, FavoriteRemarks, Nov7AGR, Nov7Correlation) {
+    function GetData(Exchange, Price, Volume, GrowthDecayRate, GrowthDecayTime, NoOfYears, Correlation30, Strategy, FavoriteId, FavoriteRemarks, Nov7AGR, Nov7Correlation) {
         $('#loading').modal('show');
         var d = new wijmo.collections.ObservableArray();
 
@@ -387,7 +388,7 @@
         p.push(NoOfYears);
         p.push(Correlation30);
         p.push(Strategy);
-        p.push(FavoriteUserId);
+        p.push(FavoriteId);
         p.push(FavoriteRemarks);
         p.push(Nov7AGR);
         p.push(Nov7Correlation);
@@ -879,6 +880,7 @@
         var $noOfYears = parseInt(document.getElementById('NoOfYears').value);
         var $correlation30 = parseFloat(document.getElementById('Correlation30').value);
         var $strategy = document.getElementById('Strategy').value;
+        var $favoriteId = document.getElementById('Favorite_Id').value;
         var $favoriteUserId = document.getElementById('Favorite_UserId').value;
         var $favoriteRemarks = document.getElementById('Favorite_Remarks').value;
         var $nov7AGR = document.getElementById('Nov7AGR').value;
@@ -890,11 +892,12 @@
         $growthDecayTime = !$growthDecayTime ? "C0" : $growthDecayTime;
         $noOfYears = !$noOfYears ? 8 : $noOfYears;
         $correlation30 = !$correlation30 ? 10 : $correlation30;
+        $favoriteId = !$favoriteId ? 0 : $favoriteId;
         $favoriteUserId = !$favoriteUserId ? 0 : $favoriteUserId;
         $favoriteRemarks = !$favoriteRemarks ? "NA" : $favoriteRemarks;
         $nov7Correlation = !$nov7Correlation ? 10 : $nov7Correlation;
 
-        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears, $correlation30, $strategy, $favoriteUserId, $favoriteRemarks, $nov7AGR, $nov7Correlation);
+        GetData($exchange, $closePrice, $volume, $growthDecayRate, $growthDecayTime, $noOfYears, $correlation30, $strategy, $favoriteId, $favoriteRemarks, $nov7AGR, $nov7Correlation);
     }
     function CmdSaveXLS_OnClick() {
         var CSV = '';
@@ -931,7 +934,9 @@
                 EMATrendNoOfDays: ScreenerSaveData[i].EMATrendNoOfDays, 
                 EMAGrowthDecayRate: ScreenerSaveData[i].EMAGrowthDecayRate,
                 EMAStartDate: ScreenerSaveData[i].EMAStartDate,
-                EMALinear: ScreenerSaveData[i].EMALinear
+                EMALinear: ScreenerSaveData[i].EMALinear,
+                Nov7AGR: ScreenerSaveData[i].Nov7AGR,
+                Nov7CorrelationCoefficient: ScreenerSaveData[i].Nov7CorrelationCoefficient
             });
         }
 
@@ -1069,6 +1074,7 @@
         SharedFavoritesCollection.editItem(SharedFavoritesCollection.currentItem);
         var PickedFavorite = SharedFavoritesCollection.currentEditItem;
 
+        document.getElementById('Favorite_Id').value = PickedFavorite.Id;
         document.getElementById('Favorite_UserId').value = PickedFavorite.UserId;
         document.getElementById('Favorite_Remarks').value = PickedFavorite.Remarks;
         document.getElementById('FavoriteCode').value = PickedFavorite.Remarks;
@@ -1098,6 +1104,7 @@
                         SharedFavoritesData.push({
                             PickId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='CmdPickSharedFavorites' onclick='CmdPickSharedFavorites_OnClick()'>Pick</button>",
                             Remarks: result[i].Description,
+                            Id: result[i].Id,
                             User: result[i].User,
                             UserId: result[i].UserId,
                             NoOfSymbols: result[i].NoOfSymbols,

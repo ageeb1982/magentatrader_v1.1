@@ -6,6 +6,7 @@
 
 <link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
 <link href="/css/toastr.css" rel="stylesheet" />
+<link href="/css/ytLoad.jquery.css" rel="stylesheet" type="text/css">
 
 <script src="/js/jquery-1.10.2.min.js"></script>
 <script src="/js/knockout-3.2.0.js"></script>
@@ -13,6 +14,10 @@
 <script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
 <script src="/js/date.js"></script>
 <script src="/js/toastr.js"></script>
+<script src="/js/jquery.transit.js" type="text/javascript"></script>
+<script src="/js/ytLoad.jquery.js" type="text/javascript"></script>
+
+<div id="ajaxContent"></div>
 
 <nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
     <div class="container topnav">
@@ -84,10 +89,10 @@
             <input type="hidden" class="form-control" id="SymbolUserFavoritesId">
             <select id="SymbolUserFavorites" class="form-control"></select>
         </div>
-        @*<div class="col-lg-4">
+        <div class="col-lg-4">
             <p>Symbols Results</p>
-            <input type="text" class="form-control" id="Result1" disabled>
-        </div>*@
+            <input type="text" class="form-control" id="SymbolFilterResult" disabled>
+        </div>
     </div>
 
     <br />
@@ -119,10 +124,10 @@
                 <option value="M3">Three Months</option>
             </select>
         </div>
-        @*<div class="col-lg-4">
+        <div class="col-lg-4">
             <p>Strategy Results</p>
-            <input type="text" class="form-control" id="Result2" disabled>
-        </div>*@
+            <input type="text" class="form-control" id="StrategyFilterResult" disabled>
+        </div>
     </div>  
 
     <br />
@@ -146,10 +151,10 @@
                 <option value="AFTER">After EMA</option>
             </select>
         </div>
-        @*<div class="col-lg-4">
+        <div class="col-lg-4">
             <p>MACD Results</p>
-            <input type="text" class="form-control" id="Result3" disabled>
-        </div>*@
+            <input type="text" class="form-control" id="MACDFilterResult" disabled>
+        </div>
     </div>
 
     <br />
@@ -196,10 +201,10 @@
             <p>AGR/ADR</p>
             <input type="text" class="form-control" id="MagentaChannelAGRADR" placeholder="1-100% (ADR Negative)">
         </div>
-        @*<div class="col-lg-4">
+        <div class="col-lg-4">
             <p>Magenta Channel Results</p>
-            <input type="text" class="form-control" id="Result4" disabled>
-        </div>*@
+            <input type="text" class="form-control" id="MagentaChannelFilterResult" disabled>
+        </div>
     </div>
 
     <br />
@@ -208,17 +213,38 @@
     <h4><input type="checkbox" id="SeasonalityFilter" /> - Seasonality</h4>
     <div class="row" id="SeasonalityFilterDiv">
         <div class="col-lg-4">
-            <p>Win/Loss %</p>
-            <input type="text" class="form-control" id="SeasonalityWinLossPercent" placeholder="Win/Loss%(-)">
+            <p>Seasonality No of Days</p>
+            <select id="SeasonalityTrend" class="form-control">
+                <option value="30" selected="selected">Current Trend (30 Days)</option>
+                <option value="20">20 Days</option>
+                <option value="40">40 Days</option>
+                <option value="60">60 Days</option>
+            </select>
         </div>
-        <div class="col-lg-4">
+        <div class="col-lg-2">
+            <p>Win/Loss %</p>
+            <select id="SeasonalityWinLossPercent" class="form-control">
+                <option value=100>All Wins</option>
+                <option value=80 selected="selected">> 8W/2L</option>
+                <option value=60>> 6W/4L</option>
+                <option value=40>> 4W/6L</option>
+                <option value=20>> 2W/8L</option>
+                <option value=0>Zero Wins/Loss</option>
+                <option value=-20>> 2L/8W</option>
+                <option value=-40>> 4L/6W</option>
+                <option value=-60>> 6L/4W</option>
+                <option value=-80>> 8L/2W</option>
+                <option value=-100>All Losses</option>
+            </select>
+        </div>
+        <div class="col-lg-2">
             <p>Gains(Losses) %</p>
             <input type="text" class="form-control" id="SeasonalityGainLossPercent" placeholder="Gain/Loss%(-)">
         </div>
-        @*<div class="col-lg-4">
+        <div class="col-lg-4">
             <p>Seasonality Results</p>
-            <input type="text" class="form-control" id="Result5" disabled>
-        </div>*@
+            <input type="text" class="form-control" id="SeasonalityFilterResult" disabled>
+        </div>
     </div>
 
     <br />
@@ -249,10 +275,10 @@
                 <option value="10">10</option>
             </select>
         </div>
-        @*<div class="col-lg-4">
+        <div class="col-lg-4">
             <p>Additional Filter Results</p>
-            <input type="text" class="form-control" id="Result6" disabled>
-        </div>*@
+            <input type="text" class="form-control" id="AdditionalFilterResult" disabled>
+        </div>
     </div>
 
     <br />
@@ -493,6 +519,7 @@
                     document.getElementById('MagentaChannelAGRADR').value = result.MagentaChannelAGRADR;
 
                     document.getElementById('SeasonalityFilter').checked = result.SeasonalityFilter;
+                    document.getElementById('SeasonalityTrend').value = result.SeasonalityTrend;
                     document.getElementById('SeasonalityWinLossPercent').value = result.SeasonalityWinLossPercent;
                     document.getElementById('SeasonalityGainLossPercent').value = result.SeasonalityGainLossPercent;
 
@@ -501,6 +528,7 @@
                     document.getElementById('AdditionalFilterVolume').value = result.AdditionalFilterVolume;
                     document.getElementById('AdditionalFilterNoOfYears').value = result.AdditionalFilterNoOfYears;
 
+                    GetUserAlertSymbolResult(result.Id);
                     GetUserAlertSymbols(result.Id, result.Strategy);
                     ExpandCollapseFilters();
                     SymbolExchange_OnChange();
@@ -548,6 +576,7 @@
         userAlert.MagentaChannelAGRADR = !$magentaChannelAGRADR ? 0 : $magentaChannelAGRADR;
 
         userAlert.SeasonalityFilter = document.getElementById('SeasonalityFilter').checked;
+        userAlert.SeasonalityTrend = document.getElementById('SeasonalityTrend').value;
         var $seasonalityWinLossPercent = parseFloat(document.getElementById('SeasonalityWinLossPercent').value);
         userAlert.SeasonalityWinLossPercent = !$seasonalityWinLossPercent ? 0 : $seasonalityWinLossPercent;
         var $seasonalityGainLossPercent = parseFloat(document.getElementById('SeasonalityGainLossPercent').value);
@@ -600,7 +629,22 @@
                 }
             });
         }
-    } 
+    }
+    function GetUserAlertSymbolResult(Id) {
+        $.ajax({
+            url: '/api/GetUserAlertResult/' + Id,
+            type: 'GET',
+            dataType: 'json',
+            success: function (result) {
+                document.getElementById('SymbolFilterResult').value = result.SymbolFilterResult;
+                document.getElementById('StrategyFilterResult').value = result.StrategyFilterResult;
+                document.getElementById('MACDFilterResult').value = result.MACDFilterResult;
+                document.getElementById('MagentaChannelFilterResult').value = result.MagentaChannelFilterResult;
+                document.getElementById('SeasonalityFilterResult').value = result.SeasonalityFilterResult;
+                document.getElementById('AdditionalFilterResult').value = result.AdditionalFilterResult;
+            }
+        });
+    }
     function GetUserAlertSymbols(Id,Strategy) {
         if (Id > 0) {
             $.ajax({
@@ -1067,6 +1111,8 @@
     // Page Load
     $(document).ready(function () {
         currentUser = '@User.Identity.Name';
+
+        $.ytLoad();
 
         NavFirstPage = document.getElementById('NavFirstPage');
         NavPreviousPage = document.getElementById('NavPreviousPage');

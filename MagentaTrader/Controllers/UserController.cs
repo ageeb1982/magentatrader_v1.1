@@ -312,7 +312,8 @@ namespace MagentaTrader.Controllers
                                    EmailAddress = m.EmailAddress,
                                    PhoneNumber = m.PhoneNumber,
                                    Address = m.Address,
-                                   ReferralUserName = m.ReferralUserName
+                                   ReferralUserName = m.ReferralUserName,
+                                   DateCreated = m.DateCreated==null ? "" : Convert.ToString(m.DateCreated.Value.Year) + "-" + Convert.ToString(m.DateCreated.Value.Month + 100).Substring(1, 2) + "-" + Convert.ToString(m.DateCreated.Value.Day + 100).Substring(1, 2),
                                };
                     if (Info.Count() > 0)
                     {

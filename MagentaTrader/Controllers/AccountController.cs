@@ -13,6 +13,7 @@ using MagentaTrader.IdentityExtensions;
 using System.Web.Security;
 using Newtonsoft.Json;
 using System.Net.Http;
+using System.Data.SqlTypes;
 
 namespace MagentaTrader.Controllers
 {
@@ -133,12 +134,18 @@ namespace MagentaTrader.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+
+            if (model.UserName == null)
+            {
+                return View(model);
+            }
+
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser() { UserName = model.UserName };
                 var result = await UserManager.CreateAsync(user, model.Password);
 
-                var response = HttpContext.Request.Form["g-recaptcha-response"];
+                var response = HttpContext.Request.Form["g-recaptcha-response"] == null ? "" : HttpContext.Request.Form["g-recaptcha-response"];
                 string secretKey = "6Lc5GBoTAAAAAOQFNfUBzRtzN_I-vmyJzGugEx65";
                 var client = new System.Net.WebClient();
                 var verificationResultJson = client.DownloadString(string.Format("https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}", secretKey, response));
@@ -182,6 +189,12 @@ namespace MagentaTrader.Controllers
                                 NewUser.ReferralUserName = model.ReferralUserName == null || model.ReferralUserName.Length == 0 ? "" : model.ReferralUserName;
                                 NewUser.AspNetUserId = db.AspNetUsers.Where(d => d.UserName == model.UserName).FirstOrDefault().Id;
 
+                                DateTime dateCreated = DateTime.Now;
+                                SqlDateTime dateCreatedSQL = new SqlDateTime(new DateTime(dateCreated.Year, +
+                                                                                          dateCreated.Month, +
+                                                                                          dateCreated.Day));
+                                NewUser.DateCreated = dateCreatedSQL.Value;
+
                                 db.MstUsers.InsertOnSubmit(NewUser);
                                 db.SubmitChanges();
 
@@ -210,7 +223,7 @@ namespace MagentaTrader.Controllers
                                 db.SubmitChanges();
 
                             }
-                            return RedirectToAction("Index", "Purchase");
+                            return RedirectToAction("Index", "Help");
                             //return RedirectToAction("Index", "Home");
                         }
                         catch(Exception e)

@@ -125,7 +125,7 @@ namespace MagentaTrader.Controllers
                 try
                 {
                     var Events = from d in db.MstEvents
-                                 orderby d.Id descending
+                                 orderby d.EventDate descending
                                  where d.EventType == "WEBINAR" &&
                                        d.VideoURL != null &&
                                        d.IsRestricted == false &&
@@ -167,6 +167,7 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
+        // GET api/PremiumWebinars
         [Authorize]
         [Route("api/PremiumWebinars")]
         public List<Models.Event> GetPremiumWebinars()
@@ -179,7 +180,7 @@ namespace MagentaTrader.Controllers
                 try
                 {
                     var Events = from d in db.MstEvents
-                                 orderby d.Id descending
+                                 orderby d.EventDate descending
                                  where d.EventType == "WEBINAR" &&
                                        d.VideoURL != null &&
                                        d.IsRestricted == true &&
@@ -221,6 +222,7 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
+        // GET api/Web99
         [Authorize]
         [Route("api/Web99")]
         public List<Models.Event> GetWeb99()
@@ -233,7 +235,7 @@ namespace MagentaTrader.Controllers
                 try
                 {
                     var Events = from d in db.MstEvents
-                                 orderby d.Id descending
+                                 orderby d.EventDate descending
                                  where d.EventType == "WEB99" &&
                                        d.VideoURL != null &&
                                        d.IsRestricted == true &&
@@ -275,6 +277,7 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
+        // GET api/Workshop
         [Authorize]
         [Route("api/Workshop")]
         public List<Models.Event> GetWorkshop()
@@ -287,7 +290,7 @@ namespace MagentaTrader.Controllers
                 try
                 {
                     var Events = from d in db.MstEvents
-                                 orderby d.Id descending
+                                 orderby d.EventDate descending
                                  where d.EventType == "WORKSHOP" &&
                                        d.IsRestricted == true &&
                                        d.IsArchived == true &&
@@ -329,6 +332,7 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
+        // GET api/BookClub
         [Authorize]
         [Route("api/BookClub")]
         public List<Models.Event> GetBookClub()
@@ -341,7 +345,7 @@ namespace MagentaTrader.Controllers
                 try
                 {
                     var Events = from d in db.MstEvents
-                                 orderby d.Id descending
+                                 orderby d.EventDate descending
                                  where d.EventType == "BOOKCLUB" &&
                                        d.VideoURL != null &&
                                        d.IsRestricted == true &&
@@ -383,6 +387,7 @@ namespace MagentaTrader.Controllers
             return values;
         }
 
+        // GET api/LatestEvent
         [Route("api/LatestEvent")]
         public List<Models.Event> GetLatest()
         {

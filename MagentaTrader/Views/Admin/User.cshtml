@@ -37,6 +37,7 @@
                 <li role="presentation"><a href="~/Admin/Package">Packages</a></li>
                 <li role="presentation"><a href="~/Admin/Product">Products</a></li>
                 <li role="presentation"><a href="~/Admin/News">News</a></li>
+                <li role="presentation"><a href="~/Admin/Roles">Roles</a></li>
                 <li role="presentation"><a href="~/Admin/"><i class="fa fa-home"></i></a></li>
             </ul>
         </div>
@@ -542,7 +543,8 @@
             autoGenerateColumns: false,
             itemsSource: Users,
             isReadOnly: true,
-            selectionMode: wijmo.grid.SelectionMode.Row,
+            //selectionMode: wijmo.grid.SelectionMode.Row,
+            selectionMode: wijmo.grid.SelectionMode.None,
             allowSorting: true
         });
 

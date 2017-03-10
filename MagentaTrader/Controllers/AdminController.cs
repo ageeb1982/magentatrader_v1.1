@@ -26,7 +26,7 @@ namespace MagentaTrader.Controllers
 
         //
         // GET: /Admin/User
-        [Authorize]
+        [Authorize(Users = "dpilger")]
         public ActionResult User()
         {
             return View();
@@ -34,7 +34,7 @@ namespace MagentaTrader.Controllers
 
         //
         // GET: /Admin/UserLedger
-        [Authorize]
+        [Authorize(Users = "dpilger")]
         public ActionResult UserLedger()
         {
             return View();
@@ -42,7 +42,7 @@ namespace MagentaTrader.Controllers
 
         //
         // GET: /Admin/News
-        [Authorize]
+        [Authorize(Users = "dpilger")]
         public ActionResult News()
         {
             return View();
@@ -51,7 +51,7 @@ namespace MagentaTrader.Controllers
 
         //
         // GET: /Admin/Product
-        [Authorize]
+        [Authorize(Users = "dpilger")]
         public ActionResult Product()
         {
             return View();
@@ -59,7 +59,7 @@ namespace MagentaTrader.Controllers
 
         //
         // GET: /Admin/Package
-        [Authorize]
+        [Authorize(Users = "dpilger")]
         public ActionResult Package()
         {
             return View();
@@ -67,7 +67,7 @@ namespace MagentaTrader.Controllers
 
         //
         // GET: /Admin/PackageLedger
-        [Authorize]
+        [Authorize(Users = "dpilger")]
         public ActionResult PackageLedger()
         {
             return View();
@@ -75,7 +75,7 @@ namespace MagentaTrader.Controllers
 
         //
         // GET: /Admin/Sales
-        [Authorize]
+        [Authorize(Users = "dpilger")]
         public ActionResult Sales()
         {
             return View();
@@ -83,7 +83,7 @@ namespace MagentaTrader.Controllers
 
         //
         // GET: /Admin/Roles
-        [Authorize]
+        [Authorize(Users = "dpilger")]
         public ActionResult Roles()
         {
             return View();

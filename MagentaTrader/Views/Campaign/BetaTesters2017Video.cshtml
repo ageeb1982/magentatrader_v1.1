@@ -1,6 +1,6 @@
-﻿@{
-    ViewBag.Title = "View Video";
-    var VideoId = Request.QueryString["Id"];
+﻿
+@{
+    ViewBag.Title = "Beta Testers Video";
 }
 
 <link href="/css/bootstrap-toggle.min.css" rel="stylesheet">
@@ -20,7 +20,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand topnav" href="/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"> - View Video</span></a>
+            <a class="navbar-brand topnav" href="/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"> - Beta Testers Video</span></a>
         </div>
     </div>
 </nav>
@@ -51,7 +51,6 @@
 </div>
 
 <script type="text/javascript">
-
     function addSourceToVideo(element, src) {
         var source = document.createElement('source');
         source.src = src;
@@ -63,23 +62,8 @@
     }
 
     $(document).ready(function () {
-        var videoId = "@VideoId";
-
-        if (parseInt(videoId) > 0) {
-            $.ajax({
-                url: '/api/GetEvent/' + videoId,
-                cache: false,
-                type: 'GET',
-                contentType: 'application/json; charset=utf-8',
-                data: {},
-                success: function (data) {
-                    var videoElement = document.getElementById("video");
-                    addSourceToVideo(videoElement, data.VideoURL);
-                }
-            }).fail(
-            function (xhr, textStatus, err) {
-                toastr.error(err);
-            });
-        } 
+        var videoElement = document.getElementById("video");
+        addSourceToVideo(videoElement, "https://mediasvcmg26x4p1t4vmz.blob.core.windows.net/asset-061786bd-2f81-4add-8cae-23de657d6f1f/2016-09-05 19.20 Open Web99Derek 8pm ET.mp4?sv=2012-02-12&sr=c&si=90ec8196-9149-4a06-8431-87e4691ac589&sig=3ZGtzJrgiDARtRgBDETR%2B%2BQl%2FiL1Hyr7vosHTgKvi3M%3D&se=2017-09-06T13%3A43%3A07Z");
     });
 </script>
+

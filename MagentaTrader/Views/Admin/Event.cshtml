@@ -40,6 +40,7 @@
                 <li role="presentation"><a href="~/Admin/Package">Packages</a></li>
                 <li role="presentation"><a href="~/Admin/Product">Products</a></li>
                 <li role="presentation"><a href="~/Admin/News">News</a></li>
+                <li role="presentation"><a href="~/Admin/Roles">Roles</a></li>
                 <li role="presentation"><a href="~/Admin/"><i class="fa fa-home"></i></a></li>
             </ul>
         </div>
@@ -199,7 +200,6 @@
 
         var Event = Events.currentEditItem;
         document.getElementById('EventEdit_Id').value = Event.Id !== null && typeof (Event.Id) != 'undefined' ? wijmo.Globalize.format(Event.Id) : '';
-        debugger;
         document.getElementById('EventEdit_EventDate').value = Event.EventDate ? Event.EventDate : '';
         document.getElementById('EventEdit_EventDate_Data').value = Event.EventDate ? Event.EventDate : '';
         document.getElementById('EventEdit_EventDescription').value = Event.EventDescription ? Event.EventDescription : '';

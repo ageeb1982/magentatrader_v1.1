@@ -84,21 +84,21 @@ namespace MagentaTrader.Data
     partial void InsertTrnUserFavoritesSymbol(TrnUserFavoritesSymbol instance);
     partial void UpdateTrnUserFavoritesSymbol(TrnUserFavoritesSymbol instance);
     partial void DeleteTrnUserFavoritesSymbol(TrnUserFavoritesSymbol instance);
-    partial void InsertMstUser(MstUser instance);
-    partial void UpdateMstUser(MstUser instance);
-    partial void DeleteMstUser(MstUser instance);
     partial void InsertTrnStockEarning(TrnStockEarning instance);
     partial void UpdateTrnStockEarning(TrnStockEarning instance);
     partial void DeleteTrnStockEarning(TrnStockEarning instance);
     partial void InsertTrnUserAlertSymbol(TrnUserAlertSymbol instance);
     partial void UpdateTrnUserAlertSymbol(TrnUserAlertSymbol instance);
     partial void DeleteTrnUserAlertSymbol(TrnUserAlertSymbol instance);
-    partial void InsertTrnUserAlert(TrnUserAlert instance);
-    partial void UpdateTrnUserAlert(TrnUserAlert instance);
-    partial void DeleteTrnUserAlert(TrnUserAlert instance);
     partial void InsertMstSymbol(MstSymbol instance);
     partial void UpdateMstSymbol(MstSymbol instance);
     partial void DeleteMstSymbol(MstSymbol instance);
+    partial void InsertMstUser(MstUser instance);
+    partial void UpdateMstUser(MstUser instance);
+    partial void DeleteMstUser(MstUser instance);
+    partial void InsertTrnUserAlert(TrnUserAlert instance);
+    partial void UpdateTrnUserAlert(TrnUserAlert instance);
+    partial void DeleteTrnUserAlert(TrnUserAlert instance);
     #endregion
 		
 		public MagentaTradersDBDataContext() : 
@@ -275,14 +275,6 @@ namespace MagentaTrader.Data
 			}
 		}
 		
-		public System.Data.Linq.Table<MstUser> MstUsers
-		{
-			get
-			{
-				return this.GetTable<MstUser>();
-			}
-		}
-		
 		public System.Data.Linq.Table<TrnStockEarning> TrnStockEarnings
 		{
 			get
@@ -299,19 +291,27 @@ namespace MagentaTrader.Data
 			}
 		}
 		
-		public System.Data.Linq.Table<TrnUserAlert> TrnUserAlerts
-		{
-			get
-			{
-				return this.GetTable<TrnUserAlert>();
-			}
-		}
-		
 		public System.Data.Linq.Table<MstSymbol> MstSymbols
 		{
 			get
 			{
 				return this.GetTable<MstSymbol>();
+			}
+		}
+		
+		public System.Data.Linq.Table<MstUser> MstUsers
+		{
+			get
+			{
+				return this.GetTable<MstUser>();
+			}
+		}
+		
+		public System.Data.Linq.Table<TrnUserAlert> TrnUserAlerts
+		{
+			get
+			{
+				return this.GetTable<TrnUserAlert>();
 			}
 		}
 	}
@@ -3307,9 +3307,9 @@ namespace MagentaTrader.Data
 		
 		private string _Trend;
 		
-		private EntityRef<MstUser> _MstUser;
-		
 		private EntityRef<MstSymbol> _MstSymbol;
+		
+		private EntityRef<MstUser> _MstUser;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -3335,8 +3335,8 @@ namespace MagentaTrader.Data
 		
 		public TrnFavorite()
 		{
-			this._MstUser = default(EntityRef<MstUser>);
 			this._MstSymbol = default(EntityRef<MstSymbol>);
+			this._MstUser = default(EntityRef<MstUser>);
 			OnCreated();
 		}
 		
@@ -3508,40 +3508,6 @@ namespace MagentaTrader.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnFavorite", Storage="_MstUser", ThisKey="UserId", OtherKey="Id", IsForeignKey=true)]
-		public MstUser MstUser
-		{
-			get
-			{
-				return this._MstUser.Entity;
-			}
-			set
-			{
-				MstUser previousValue = this._MstUser.Entity;
-				if (((previousValue != value) 
-							|| (this._MstUser.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._MstUser.Entity = null;
-						previousValue.TrnFavorites.Remove(this);
-					}
-					this._MstUser.Entity = value;
-					if ((value != null))
-					{
-						value.TrnFavorites.Add(this);
-						this._UserId = value.Id;
-					}
-					else
-					{
-						this._UserId = default(int);
-					}
-					this.SendPropertyChanged("MstUser");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnFavorite", Storage="_MstSymbol", ThisKey="SymbolId", OtherKey="Id", IsForeignKey=true)]
 		public MstSymbol MstSymbol
 		{
@@ -3572,6 +3538,40 @@ namespace MagentaTrader.Data
 						this._SymbolId = default(int);
 					}
 					this.SendPropertyChanged("MstSymbol");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnFavorite", Storage="_MstUser", ThisKey="UserId", OtherKey="Id", IsForeignKey=true)]
+		public MstUser MstUser
+		{
+			get
+			{
+				return this._MstUser.Entity;
+			}
+			set
+			{
+				MstUser previousValue = this._MstUser.Entity;
+				if (((previousValue != value) 
+							|| (this._MstUser.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._MstUser.Entity = null;
+						previousValue.TrnFavorites.Remove(this);
+					}
+					this._MstUser.Entity = value;
+					if ((value != null))
+					{
+						value.TrnFavorites.Add(this);
+						this._UserId = value.Id;
+					}
+					else
+					{
+						this._UserId = default(int);
+					}
+					this.SendPropertyChanged("MstUser");
 				}
 			}
 		}
@@ -4442,493 +4442,6 @@ namespace MagentaTrader.Data
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.MstUser")]
-	public partial class MstUser : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _Id;
-		
-		private string _UserName;
-		
-		private string _FirstName;
-		
-		private string _LastName;
-		
-		private string _EmailAddress;
-		
-		private string _PhoneNumber;
-		
-		private string _AspNetUserId;
-		
-		private string _Address;
-		
-		private string _ReferralUserName;
-		
-		private System.Nullable<bool> _WithSMS;
-		
-		private EntitySet<TrnAffiliate> _TrnAffiliates;
-		
-		private EntitySet<TrnSale> _TrnSales;
-		
-		private EntitySet<SysAcessLog> _SysAcessLogs;
-		
-		private EntitySet<TrnFavorite> _TrnFavorites;
-		
-		private EntitySet<TrnUserFavorite> _TrnUserFavorites;
-		
-		private EntitySet<TrnUserAlert> _TrnUserAlerts;
-		
-		private EntityRef<AspNetUser> _AspNetUser;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnIdChanging(int value);
-    partial void OnIdChanged();
-    partial void OnUserNameChanging(string value);
-    partial void OnUserNameChanged();
-    partial void OnFirstNameChanging(string value);
-    partial void OnFirstNameChanged();
-    partial void OnLastNameChanging(string value);
-    partial void OnLastNameChanged();
-    partial void OnEmailAddressChanging(string value);
-    partial void OnEmailAddressChanged();
-    partial void OnPhoneNumberChanging(string value);
-    partial void OnPhoneNumberChanged();
-    partial void OnAspNetUserIdChanging(string value);
-    partial void OnAspNetUserIdChanged();
-    partial void OnAddressChanging(string value);
-    partial void OnAddressChanged();
-    partial void OnReferralUserNameChanging(string value);
-    partial void OnReferralUserNameChanged();
-    partial void OnWithSMSChanging(System.Nullable<bool> value);
-    partial void OnWithSMSChanged();
-    #endregion
-		
-		public MstUser()
-		{
-			this._TrnAffiliates = new EntitySet<TrnAffiliate>(new Action<TrnAffiliate>(this.attach_TrnAffiliates), new Action<TrnAffiliate>(this.detach_TrnAffiliates));
-			this._TrnSales = new EntitySet<TrnSale>(new Action<TrnSale>(this.attach_TrnSales), new Action<TrnSale>(this.detach_TrnSales));
-			this._SysAcessLogs = new EntitySet<SysAcessLog>(new Action<SysAcessLog>(this.attach_SysAcessLogs), new Action<SysAcessLog>(this.detach_SysAcessLogs));
-			this._TrnFavorites = new EntitySet<TrnFavorite>(new Action<TrnFavorite>(this.attach_TrnFavorites), new Action<TrnFavorite>(this.detach_TrnFavorites));
-			this._TrnUserFavorites = new EntitySet<TrnUserFavorite>(new Action<TrnUserFavorite>(this.attach_TrnUserFavorites), new Action<TrnUserFavorite>(this.detach_TrnUserFavorites));
-			this._TrnUserAlerts = new EntitySet<TrnUserAlert>(new Action<TrnUserAlert>(this.attach_TrnUserAlerts), new Action<TrnUserAlert>(this.detach_TrnUserAlerts));
-			this._AspNetUser = default(EntityRef<AspNetUser>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int Id
-		{
-			get
-			{
-				return this._Id;
-			}
-			set
-			{
-				if ((this._Id != value))
-				{
-					this.OnIdChanging(value);
-					this.SendPropertyChanging();
-					this._Id = value;
-					this.SendPropertyChanged("Id");
-					this.OnIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserName", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
-		public string UserName
-		{
-			get
-			{
-				return this._UserName;
-			}
-			set
-			{
-				if ((this._UserName != value))
-				{
-					this.OnUserNameChanging(value);
-					this.SendPropertyChanging();
-					this._UserName = value;
-					this.SendPropertyChanged("UserName");
-					this.OnUserNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FirstName", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
-		public string FirstName
-		{
-			get
-			{
-				return this._FirstName;
-			}
-			set
-			{
-				if ((this._FirstName != value))
-				{
-					this.OnFirstNameChanging(value);
-					this.SendPropertyChanging();
-					this._FirstName = value;
-					this.SendPropertyChanged("FirstName");
-					this.OnFirstNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LastName", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
-		public string LastName
-		{
-			get
-			{
-				return this._LastName;
-			}
-			set
-			{
-				if ((this._LastName != value))
-				{
-					this.OnLastNameChanging(value);
-					this.SendPropertyChanging();
-					this._LastName = value;
-					this.SendPropertyChanged("LastName");
-					this.OnLastNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EmailAddress", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
-		public string EmailAddress
-		{
-			get
-			{
-				return this._EmailAddress;
-			}
-			set
-			{
-				if ((this._EmailAddress != value))
-				{
-					this.OnEmailAddressChanging(value);
-					this.SendPropertyChanging();
-					this._EmailAddress = value;
-					this.SendPropertyChanged("EmailAddress");
-					this.OnEmailAddressChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PhoneNumber", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
-		public string PhoneNumber
-		{
-			get
-			{
-				return this._PhoneNumber;
-			}
-			set
-			{
-				if ((this._PhoneNumber != value))
-				{
-					this.OnPhoneNumberChanging(value);
-					this.SendPropertyChanging();
-					this._PhoneNumber = value;
-					this.SendPropertyChanged("PhoneNumber");
-					this.OnPhoneNumberChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AspNetUserId", DbType="NVarChar(128)")]
-		public string AspNetUserId
-		{
-			get
-			{
-				return this._AspNetUserId;
-			}
-			set
-			{
-				if ((this._AspNetUserId != value))
-				{
-					if (this._AspNetUser.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnAspNetUserIdChanging(value);
-					this.SendPropertyChanging();
-					this._AspNetUserId = value;
-					this.SendPropertyChanged("AspNetUserId");
-					this.OnAspNetUserIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Address", DbType="NVarChar(255)")]
-		public string Address
-		{
-			get
-			{
-				return this._Address;
-			}
-			set
-			{
-				if ((this._Address != value))
-				{
-					this.OnAddressChanging(value);
-					this.SendPropertyChanging();
-					this._Address = value;
-					this.SendPropertyChanged("Address");
-					this.OnAddressChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ReferralUserName", DbType="NVarChar(50)")]
-		public string ReferralUserName
-		{
-			get
-			{
-				return this._ReferralUserName;
-			}
-			set
-			{
-				if ((this._ReferralUserName != value))
-				{
-					this.OnReferralUserNameChanging(value);
-					this.SendPropertyChanging();
-					this._ReferralUserName = value;
-					this.SendPropertyChanged("ReferralUserName");
-					this.OnReferralUserNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WithSMS", DbType="Bit")]
-		public System.Nullable<bool> WithSMS
-		{
-			get
-			{
-				return this._WithSMS;
-			}
-			set
-			{
-				if ((this._WithSMS != value))
-				{
-					this.OnWithSMSChanging(value);
-					this.SendPropertyChanging();
-					this._WithSMS = value;
-					this.SendPropertyChanged("WithSMS");
-					this.OnWithSMSChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnAffiliate", Storage="_TrnAffiliates", ThisKey="Id", OtherKey="UserId")]
-		public EntitySet<TrnAffiliate> TrnAffiliates
-		{
-			get
-			{
-				return this._TrnAffiliates;
-			}
-			set
-			{
-				this._TrnAffiliates.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnSale", Storage="_TrnSales", ThisKey="Id", OtherKey="UserId")]
-		public EntitySet<TrnSale> TrnSales
-		{
-			get
-			{
-				return this._TrnSales;
-			}
-			set
-			{
-				this._TrnSales.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_SysAcessLog", Storage="_SysAcessLogs", ThisKey="Id", OtherKey="UserId")]
-		public EntitySet<SysAcessLog> SysAcessLogs
-		{
-			get
-			{
-				return this._SysAcessLogs;
-			}
-			set
-			{
-				this._SysAcessLogs.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnFavorite", Storage="_TrnFavorites", ThisKey="Id", OtherKey="UserId")]
-		public EntitySet<TrnFavorite> TrnFavorites
-		{
-			get
-			{
-				return this._TrnFavorites;
-			}
-			set
-			{
-				this._TrnFavorites.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnUserFavorite", Storage="_TrnUserFavorites", ThisKey="Id", OtherKey="UserId")]
-		public EntitySet<TrnUserFavorite> TrnUserFavorites
-		{
-			get
-			{
-				return this._TrnUserFavorites;
-			}
-			set
-			{
-				this._TrnUserFavorites.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnUserAlert", Storage="_TrnUserAlerts", ThisKey="Id", OtherKey="UserId")]
-		public EntitySet<TrnUserAlert> TrnUserAlerts
-		{
-			get
-			{
-				return this._TrnUserAlerts;
-			}
-			set
-			{
-				this._TrnUserAlerts.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="AspNetUser_MstUser", Storage="_AspNetUser", ThisKey="AspNetUserId", OtherKey="Id", IsForeignKey=true)]
-		public AspNetUser AspNetUser
-		{
-			get
-			{
-				return this._AspNetUser.Entity;
-			}
-			set
-			{
-				AspNetUser previousValue = this._AspNetUser.Entity;
-				if (((previousValue != value) 
-							|| (this._AspNetUser.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._AspNetUser.Entity = null;
-						previousValue.MstUsers.Remove(this);
-					}
-					this._AspNetUser.Entity = value;
-					if ((value != null))
-					{
-						value.MstUsers.Add(this);
-						this._AspNetUserId = value.Id;
-					}
-					else
-					{
-						this._AspNetUserId = default(string);
-					}
-					this.SendPropertyChanged("AspNetUser");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_TrnAffiliates(TrnAffiliate entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstUser = this;
-		}
-		
-		private void detach_TrnAffiliates(TrnAffiliate entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstUser = null;
-		}
-		
-		private void attach_TrnSales(TrnSale entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstUser = this;
-		}
-		
-		private void detach_TrnSales(TrnSale entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstUser = null;
-		}
-		
-		private void attach_SysAcessLogs(SysAcessLog entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstUser = this;
-		}
-		
-		private void detach_SysAcessLogs(SysAcessLog entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstUser = null;
-		}
-		
-		private void attach_TrnFavorites(TrnFavorite entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstUser = this;
-		}
-		
-		private void detach_TrnFavorites(TrnFavorite entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstUser = null;
-		}
-		
-		private void attach_TrnUserFavorites(TrnUserFavorite entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstUser = this;
-		}
-		
-		private void detach_TrnUserFavorites(TrnUserFavorite entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstUser = null;
-		}
-		
-		private void attach_TrnUserAlerts(TrnUserAlert entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstUser = this;
-		}
-		
-		private void detach_TrnUserAlerts(TrnUserAlert entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstUser = null;
-		}
-	}
-	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.TrnStockEarning")]
 	public partial class TrnStockEarning : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -5218,9 +4731,9 @@ namespace MagentaTrader.Data
 		
 		private System.DateTime _EncodedDate;
 		
-		private EntityRef<TrnUserAlert> _TrnUserAlert;
-		
 		private EntityRef<MstSymbol> _MstSymbol;
+		
+		private EntityRef<TrnUserAlert> _TrnUserAlert;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -5242,8 +4755,8 @@ namespace MagentaTrader.Data
 		
 		public TrnUserAlertSymbol()
 		{
-			this._TrnUserAlert = default(EntityRef<TrnUserAlert>);
 			this._MstSymbol = default(EntityRef<MstSymbol>);
+			this._TrnUserAlert = default(EntityRef<TrnUserAlert>);
 			OnCreated();
 		}
 		
@@ -5375,40 +4888,6 @@ namespace MagentaTrader.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnUserAlert_TrnUserAlertSymbol", Storage="_TrnUserAlert", ThisKey="UserAlertId", OtherKey="Id", IsForeignKey=true)]
-		public TrnUserAlert TrnUserAlert
-		{
-			get
-			{
-				return this._TrnUserAlert.Entity;
-			}
-			set
-			{
-				TrnUserAlert previousValue = this._TrnUserAlert.Entity;
-				if (((previousValue != value) 
-							|| (this._TrnUserAlert.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._TrnUserAlert.Entity = null;
-						previousValue.TrnUserAlertSymbols.Remove(this);
-					}
-					this._TrnUserAlert.Entity = value;
-					if ((value != null))
-					{
-						value.TrnUserAlertSymbols.Add(this);
-						this._UserAlertId = value.Id;
-					}
-					else
-					{
-						this._UserAlertId = default(int);
-					}
-					this.SendPropertyChanged("TrnUserAlert");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnUserAlertSymbol", Storage="_MstSymbol", ThisKey="SymbolId", OtherKey="Id", IsForeignKey=true)]
 		public MstSymbol MstSymbol
 		{
@@ -5443,769 +4922,36 @@ namespace MagentaTrader.Data
 			}
 		}
 		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.TrnUserAlert")]
-	public partial class TrnUserAlert : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _Id;
-		
-		private int _UserId;
-		
-		private string _Description;
-		
-		private string _Strategy;
-		
-		private bool _IsActive;
-		
-		private System.DateTime _EncodedDate;
-		
-		private string _AlertVia;
-		
-		private bool _SymbolFilter;
-		
-		private string _SymbolExchange;
-		
-		private System.Nullable<int> _SymbolUserFavoritesId;
-		
-		private decimal _StrategyGrowthDecayRate;
-		
-		private string _StrategyGrowthDecayTime;
-		
-		private bool _StrategyFilter;
-		
-		private bool _MACDFilter;
-		
-		private string _MACDCrossover;
-		
-		private string _MACDEMA;
-		
-		private bool _MagentaChannelFilter;
-		
-		private string _MagentaChannelBegins;
-		
-		private decimal _MagentaChannelAGRADR;
-		
-		private bool _SeasonalityFilter;
-		
-		private decimal _SeasonalityWinLossPercent;
-		
-		private decimal _SeasonalityGainLossPercent;
-		
-		private bool _AdditionalFilter;
-		
-		private decimal _AdditionalFilterPrice;
-		
-		private decimal _AdditionalFilterVolume;
-		
-		private int _AdditionalFilterNoOfYears;
-		
-		private int _MagentaChannelDays;
-		
-		private int _MagentaChannelCorrelation30;
-		
-		private EntitySet<TrnUserAlertSymbol> _TrnUserAlertSymbols;
-		
-		private EntityRef<MstUser> _MstUser;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnIdChanging(int value);
-    partial void OnIdChanged();
-    partial void OnUserIdChanging(int value);
-    partial void OnUserIdChanged();
-    partial void OnDescriptionChanging(string value);
-    partial void OnDescriptionChanged();
-    partial void OnStrategyChanging(string value);
-    partial void OnStrategyChanged();
-    partial void OnIsActiveChanging(bool value);
-    partial void OnIsActiveChanged();
-    partial void OnEncodedDateChanging(System.DateTime value);
-    partial void OnEncodedDateChanged();
-    partial void OnAlertViaChanging(string value);
-    partial void OnAlertViaChanged();
-    partial void OnSymbolFilterChanging(bool value);
-    partial void OnSymbolFilterChanged();
-    partial void OnSymbolExchangeChanging(string value);
-    partial void OnSymbolExchangeChanged();
-    partial void OnSymbolUserFavoritesIdChanging(System.Nullable<int> value);
-    partial void OnSymbolUserFavoritesIdChanged();
-    partial void OnStrategyGrowthDecayRateChanging(decimal value);
-    partial void OnStrategyGrowthDecayRateChanged();
-    partial void OnStrategyGrowthDecayTimeChanging(string value);
-    partial void OnStrategyGrowthDecayTimeChanged();
-    partial void OnStrategyFilterChanging(bool value);
-    partial void OnStrategyFilterChanged();
-    partial void OnMACDFilterChanging(bool value);
-    partial void OnMACDFilterChanged();
-    partial void OnMACDCrossoverChanging(string value);
-    partial void OnMACDCrossoverChanged();
-    partial void OnMACDEMAChanging(string value);
-    partial void OnMACDEMAChanged();
-    partial void OnMagentaChannelFilterChanging(bool value);
-    partial void OnMagentaChannelFilterChanged();
-    partial void OnMagentaChannelBeginsChanging(string value);
-    partial void OnMagentaChannelBeginsChanged();
-    partial void OnMagentaChannelAGRADRChanging(decimal value);
-    partial void OnMagentaChannelAGRADRChanged();
-    partial void OnSeasonalityFilterChanging(bool value);
-    partial void OnSeasonalityFilterChanged();
-    partial void OnSeasonalityWinLossPercentChanging(decimal value);
-    partial void OnSeasonalityWinLossPercentChanged();
-    partial void OnSeasonalityGainLossPercentChanging(decimal value);
-    partial void OnSeasonalityGainLossPercentChanged();
-    partial void OnAdditionalFilterChanging(bool value);
-    partial void OnAdditionalFilterChanged();
-    partial void OnAdditionalFilterPriceChanging(decimal value);
-    partial void OnAdditionalFilterPriceChanged();
-    partial void OnAdditionalFilterVolumeChanging(decimal value);
-    partial void OnAdditionalFilterVolumeChanged();
-    partial void OnAdditionalFilterNoOfYearsChanging(int value);
-    partial void OnAdditionalFilterNoOfYearsChanged();
-    partial void OnMagentaChannelDaysChanging(int value);
-    partial void OnMagentaChannelDaysChanged();
-    partial void OnMagentaChannelCorrelation30Changing(int value);
-    partial void OnMagentaChannelCorrelation30Changed();
-    #endregion
-		
-		public TrnUserAlert()
-		{
-			this._TrnUserAlertSymbols = new EntitySet<TrnUserAlertSymbol>(new Action<TrnUserAlertSymbol>(this.attach_TrnUserAlertSymbols), new Action<TrnUserAlertSymbol>(this.detach_TrnUserAlertSymbols));
-			this._MstUser = default(EntityRef<MstUser>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int Id
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnUserAlert_TrnUserAlertSymbol", Storage="_TrnUserAlert", ThisKey="UserAlertId", OtherKey="Id", IsForeignKey=true)]
+		public TrnUserAlert TrnUserAlert
 		{
 			get
 			{
-				return this._Id;
+				return this._TrnUserAlert.Entity;
 			}
 			set
 			{
-				if ((this._Id != value))
-				{
-					this.OnIdChanging(value);
-					this.SendPropertyChanging();
-					this._Id = value;
-					this.SendPropertyChanged("Id");
-					this.OnIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserId", DbType="Int NOT NULL")]
-		public int UserId
-		{
-			get
-			{
-				return this._UserId;
-			}
-			set
-			{
-				if ((this._UserId != value))
-				{
-					if (this._MstUser.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnUserIdChanging(value);
-					this.SendPropertyChanging();
-					this._UserId = value;
-					this.SendPropertyChanged("UserId");
-					this.OnUserIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Description", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
-		public string Description
-		{
-			get
-			{
-				return this._Description;
-			}
-			set
-			{
-				if ((this._Description != value))
-				{
-					this.OnDescriptionChanging(value);
-					this.SendPropertyChanging();
-					this._Description = value;
-					this.SendPropertyChanged("Description");
-					this.OnDescriptionChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Strategy", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
-		public string Strategy
-		{
-			get
-			{
-				return this._Strategy;
-			}
-			set
-			{
-				if ((this._Strategy != value))
-				{
-					this.OnStrategyChanging(value);
-					this.SendPropertyChanging();
-					this._Strategy = value;
-					this.SendPropertyChanged("Strategy");
-					this.OnStrategyChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsActive", DbType="Bit NOT NULL")]
-		public bool IsActive
-		{
-			get
-			{
-				return this._IsActive;
-			}
-			set
-			{
-				if ((this._IsActive != value))
-				{
-					this.OnIsActiveChanging(value);
-					this.SendPropertyChanging();
-					this._IsActive = value;
-					this.SendPropertyChanged("IsActive");
-					this.OnIsActiveChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EncodedDate", DbType="DateTime NOT NULL")]
-		public System.DateTime EncodedDate
-		{
-			get
-			{
-				return this._EncodedDate;
-			}
-			set
-			{
-				if ((this._EncodedDate != value))
-				{
-					this.OnEncodedDateChanging(value);
-					this.SendPropertyChanging();
-					this._EncodedDate = value;
-					this.SendPropertyChanged("EncodedDate");
-					this.OnEncodedDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AlertVia", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
-		public string AlertVia
-		{
-			get
-			{
-				return this._AlertVia;
-			}
-			set
-			{
-				if ((this._AlertVia != value))
-				{
-					this.OnAlertViaChanging(value);
-					this.SendPropertyChanging();
-					this._AlertVia = value;
-					this.SendPropertyChanged("AlertVia");
-					this.OnAlertViaChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SymbolFilter", DbType="Bit NOT NULL")]
-		public bool SymbolFilter
-		{
-			get
-			{
-				return this._SymbolFilter;
-			}
-			set
-			{
-				if ((this._SymbolFilter != value))
-				{
-					this.OnSymbolFilterChanging(value);
-					this.SendPropertyChanging();
-					this._SymbolFilter = value;
-					this.SendPropertyChanged("SymbolFilter");
-					this.OnSymbolFilterChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SymbolExchange", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
-		public string SymbolExchange
-		{
-			get
-			{
-				return this._SymbolExchange;
-			}
-			set
-			{
-				if ((this._SymbolExchange != value))
-				{
-					this.OnSymbolExchangeChanging(value);
-					this.SendPropertyChanging();
-					this._SymbolExchange = value;
-					this.SendPropertyChanged("SymbolExchange");
-					this.OnSymbolExchangeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SymbolUserFavoritesId", DbType="Int")]
-		public System.Nullable<int> SymbolUserFavoritesId
-		{
-			get
-			{
-				return this._SymbolUserFavoritesId;
-			}
-			set
-			{
-				if ((this._SymbolUserFavoritesId != value))
-				{
-					this.OnSymbolUserFavoritesIdChanging(value);
-					this.SendPropertyChanging();
-					this._SymbolUserFavoritesId = value;
-					this.SendPropertyChanged("SymbolUserFavoritesId");
-					this.OnSymbolUserFavoritesIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StrategyGrowthDecayRate", DbType="Decimal(18,5) NOT NULL")]
-		public decimal StrategyGrowthDecayRate
-		{
-			get
-			{
-				return this._StrategyGrowthDecayRate;
-			}
-			set
-			{
-				if ((this._StrategyGrowthDecayRate != value))
-				{
-					this.OnStrategyGrowthDecayRateChanging(value);
-					this.SendPropertyChanging();
-					this._StrategyGrowthDecayRate = value;
-					this.SendPropertyChanged("StrategyGrowthDecayRate");
-					this.OnStrategyGrowthDecayRateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StrategyGrowthDecayTime", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
-		public string StrategyGrowthDecayTime
-		{
-			get
-			{
-				return this._StrategyGrowthDecayTime;
-			}
-			set
-			{
-				if ((this._StrategyGrowthDecayTime != value))
-				{
-					this.OnStrategyGrowthDecayTimeChanging(value);
-					this.SendPropertyChanging();
-					this._StrategyGrowthDecayTime = value;
-					this.SendPropertyChanged("StrategyGrowthDecayTime");
-					this.OnStrategyGrowthDecayTimeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StrategyFilter", DbType="Bit NOT NULL")]
-		public bool StrategyFilter
-		{
-			get
-			{
-				return this._StrategyFilter;
-			}
-			set
-			{
-				if ((this._StrategyFilter != value))
-				{
-					this.OnStrategyFilterChanging(value);
-					this.SendPropertyChanging();
-					this._StrategyFilter = value;
-					this.SendPropertyChanged("StrategyFilter");
-					this.OnStrategyFilterChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDFilter", DbType="Bit NOT NULL")]
-		public bool MACDFilter
-		{
-			get
-			{
-				return this._MACDFilter;
-			}
-			set
-			{
-				if ((this._MACDFilter != value))
-				{
-					this.OnMACDFilterChanging(value);
-					this.SendPropertyChanging();
-					this._MACDFilter = value;
-					this.SendPropertyChanged("MACDFilter");
-					this.OnMACDFilterChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDCrossover", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
-		public string MACDCrossover
-		{
-			get
-			{
-				return this._MACDCrossover;
-			}
-			set
-			{
-				if ((this._MACDCrossover != value))
-				{
-					this.OnMACDCrossoverChanging(value);
-					this.SendPropertyChanging();
-					this._MACDCrossover = value;
-					this.SendPropertyChanged("MACDCrossover");
-					this.OnMACDCrossoverChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDEMA", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
-		public string MACDEMA
-		{
-			get
-			{
-				return this._MACDEMA;
-			}
-			set
-			{
-				if ((this._MACDEMA != value))
-				{
-					this.OnMACDEMAChanging(value);
-					this.SendPropertyChanging();
-					this._MACDEMA = value;
-					this.SendPropertyChanged("MACDEMA");
-					this.OnMACDEMAChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MagentaChannelFilter", DbType="Bit NOT NULL")]
-		public bool MagentaChannelFilter
-		{
-			get
-			{
-				return this._MagentaChannelFilter;
-			}
-			set
-			{
-				if ((this._MagentaChannelFilter != value))
-				{
-					this.OnMagentaChannelFilterChanging(value);
-					this.SendPropertyChanging();
-					this._MagentaChannelFilter = value;
-					this.SendPropertyChanged("MagentaChannelFilter");
-					this.OnMagentaChannelFilterChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MagentaChannelBegins", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
-		public string MagentaChannelBegins
-		{
-			get
-			{
-				return this._MagentaChannelBegins;
-			}
-			set
-			{
-				if ((this._MagentaChannelBegins != value))
-				{
-					this.OnMagentaChannelBeginsChanging(value);
-					this.SendPropertyChanging();
-					this._MagentaChannelBegins = value;
-					this.SendPropertyChanged("MagentaChannelBegins");
-					this.OnMagentaChannelBeginsChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MagentaChannelAGRADR", DbType="Decimal(18,5) NOT NULL")]
-		public decimal MagentaChannelAGRADR
-		{
-			get
-			{
-				return this._MagentaChannelAGRADR;
-			}
-			set
-			{
-				if ((this._MagentaChannelAGRADR != value))
-				{
-					this.OnMagentaChannelAGRADRChanging(value);
-					this.SendPropertyChanging();
-					this._MagentaChannelAGRADR = value;
-					this.SendPropertyChanged("MagentaChannelAGRADR");
-					this.OnMagentaChannelAGRADRChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SeasonalityFilter", DbType="Bit NOT NULL")]
-		public bool SeasonalityFilter
-		{
-			get
-			{
-				return this._SeasonalityFilter;
-			}
-			set
-			{
-				if ((this._SeasonalityFilter != value))
-				{
-					this.OnSeasonalityFilterChanging(value);
-					this.SendPropertyChanging();
-					this._SeasonalityFilter = value;
-					this.SendPropertyChanged("SeasonalityFilter");
-					this.OnSeasonalityFilterChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SeasonalityWinLossPercent", DbType="Decimal(18,5) NOT NULL")]
-		public decimal SeasonalityWinLossPercent
-		{
-			get
-			{
-				return this._SeasonalityWinLossPercent;
-			}
-			set
-			{
-				if ((this._SeasonalityWinLossPercent != value))
-				{
-					this.OnSeasonalityWinLossPercentChanging(value);
-					this.SendPropertyChanging();
-					this._SeasonalityWinLossPercent = value;
-					this.SendPropertyChanged("SeasonalityWinLossPercent");
-					this.OnSeasonalityWinLossPercentChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SeasonalityGainLossPercent", DbType="Decimal(18,5) NOT NULL")]
-		public decimal SeasonalityGainLossPercent
-		{
-			get
-			{
-				return this._SeasonalityGainLossPercent;
-			}
-			set
-			{
-				if ((this._SeasonalityGainLossPercent != value))
-				{
-					this.OnSeasonalityGainLossPercentChanging(value);
-					this.SendPropertyChanging();
-					this._SeasonalityGainLossPercent = value;
-					this.SendPropertyChanged("SeasonalityGainLossPercent");
-					this.OnSeasonalityGainLossPercentChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AdditionalFilter", DbType="Bit NOT NULL")]
-		public bool AdditionalFilter
-		{
-			get
-			{
-				return this._AdditionalFilter;
-			}
-			set
-			{
-				if ((this._AdditionalFilter != value))
-				{
-					this.OnAdditionalFilterChanging(value);
-					this.SendPropertyChanging();
-					this._AdditionalFilter = value;
-					this.SendPropertyChanged("AdditionalFilter");
-					this.OnAdditionalFilterChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AdditionalFilterPrice", DbType="Decimal(18,5) NOT NULL")]
-		public decimal AdditionalFilterPrice
-		{
-			get
-			{
-				return this._AdditionalFilterPrice;
-			}
-			set
-			{
-				if ((this._AdditionalFilterPrice != value))
-				{
-					this.OnAdditionalFilterPriceChanging(value);
-					this.SendPropertyChanging();
-					this._AdditionalFilterPrice = value;
-					this.SendPropertyChanged("AdditionalFilterPrice");
-					this.OnAdditionalFilterPriceChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AdditionalFilterVolume", DbType="Decimal(18,5) NOT NULL")]
-		public decimal AdditionalFilterVolume
-		{
-			get
-			{
-				return this._AdditionalFilterVolume;
-			}
-			set
-			{
-				if ((this._AdditionalFilterVolume != value))
-				{
-					this.OnAdditionalFilterVolumeChanging(value);
-					this.SendPropertyChanging();
-					this._AdditionalFilterVolume = value;
-					this.SendPropertyChanged("AdditionalFilterVolume");
-					this.OnAdditionalFilterVolumeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AdditionalFilterNoOfYears", DbType="Int NOT NULL")]
-		public int AdditionalFilterNoOfYears
-		{
-			get
-			{
-				return this._AdditionalFilterNoOfYears;
-			}
-			set
-			{
-				if ((this._AdditionalFilterNoOfYears != value))
-				{
-					this.OnAdditionalFilterNoOfYearsChanging(value);
-					this.SendPropertyChanging();
-					this._AdditionalFilterNoOfYears = value;
-					this.SendPropertyChanged("AdditionalFilterNoOfYears");
-					this.OnAdditionalFilterNoOfYearsChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MagentaChannelDays", DbType="Int NOT NULL")]
-		public int MagentaChannelDays
-		{
-			get
-			{
-				return this._MagentaChannelDays;
-			}
-			set
-			{
-				if ((this._MagentaChannelDays != value))
-				{
-					this.OnMagentaChannelDaysChanging(value);
-					this.SendPropertyChanging();
-					this._MagentaChannelDays = value;
-					this.SendPropertyChanged("MagentaChannelDays");
-					this.OnMagentaChannelDaysChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MagentaChannelCorrelation30", DbType="Int NOT NULL")]
-		public int MagentaChannelCorrelation30
-		{
-			get
-			{
-				return this._MagentaChannelCorrelation30;
-			}
-			set
-			{
-				if ((this._MagentaChannelCorrelation30 != value))
-				{
-					this.OnMagentaChannelCorrelation30Changing(value);
-					this.SendPropertyChanging();
-					this._MagentaChannelCorrelation30 = value;
-					this.SendPropertyChanged("MagentaChannelCorrelation30");
-					this.OnMagentaChannelCorrelation30Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnUserAlert_TrnUserAlertSymbol", Storage="_TrnUserAlertSymbols", ThisKey="Id", OtherKey="UserAlertId")]
-		public EntitySet<TrnUserAlertSymbol> TrnUserAlertSymbols
-		{
-			get
-			{
-				return this._TrnUserAlertSymbols;
-			}
-			set
-			{
-				this._TrnUserAlertSymbols.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnUserAlert", Storage="_MstUser", ThisKey="UserId", OtherKey="Id", IsForeignKey=true)]
-		public MstUser MstUser
-		{
-			get
-			{
-				return this._MstUser.Entity;
-			}
-			set
-			{
-				MstUser previousValue = this._MstUser.Entity;
+				TrnUserAlert previousValue = this._TrnUserAlert.Entity;
 				if (((previousValue != value) 
-							|| (this._MstUser.HasLoadedOrAssignedValue == false)))
+							|| (this._TrnUserAlert.HasLoadedOrAssignedValue == false)))
 				{
 					this.SendPropertyChanging();
 					if ((previousValue != null))
 					{
-						this._MstUser.Entity = null;
-						previousValue.TrnUserAlerts.Remove(this);
+						this._TrnUserAlert.Entity = null;
+						previousValue.TrnUserAlertSymbols.Remove(this);
 					}
-					this._MstUser.Entity = value;
+					this._TrnUserAlert.Entity = value;
 					if ((value != null))
 					{
-						value.TrnUserAlerts.Add(this);
-						this._UserId = value.Id;
+						value.TrnUserAlertSymbols.Add(this);
+						this._UserAlertId = value.Id;
 					}
 					else
 					{
-						this._UserId = default(int);
+						this._UserAlertId = default(int);
 					}
-					this.SendPropertyChanged("MstUser");
+					this.SendPropertyChanged("TrnUserAlert");
 				}
 			}
 		}
@@ -6228,18 +4974,6 @@ namespace MagentaTrader.Data
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
-		}
-		
-		private void attach_TrnUserAlertSymbols(TrnUserAlertSymbol entity)
-		{
-			this.SendPropertyChanging();
-			entity.TrnUserAlert = this;
-		}
-		
-		private void detach_TrnUserAlertSymbols(TrnUserAlertSymbol entity)
-		{
-			this.SendPropertyChanging();
-			entity.TrnUserAlert = null;
 		}
 	}
 	
@@ -7550,6 +6284,1320 @@ namespace MagentaTrader.Data
 		{
 			this.SendPropertyChanging();
 			entity.MstSymbol = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.MstUser")]
+	public partial class MstUser : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private string _UserName;
+		
+		private string _FirstName;
+		
+		private string _LastName;
+		
+		private string _EmailAddress;
+		
+		private string _PhoneNumber;
+		
+		private string _AspNetUserId;
+		
+		private string _Address;
+		
+		private string _ReferralUserName;
+		
+		private System.Nullable<bool> _WithSMS;
+		
+		private System.Nullable<System.DateTime> _DateCreated;
+		
+		private EntitySet<TrnAffiliate> _TrnAffiliates;
+		
+		private EntitySet<TrnSale> _TrnSales;
+		
+		private EntitySet<SysAcessLog> _SysAcessLogs;
+		
+		private EntitySet<TrnFavorite> _TrnFavorites;
+		
+		private EntitySet<TrnUserFavorite> _TrnUserFavorites;
+		
+		private EntitySet<TrnUserAlert> _TrnUserAlerts;
+		
+		private EntityRef<AspNetUser> _AspNetUser;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnUserNameChanging(string value);
+    partial void OnUserNameChanged();
+    partial void OnFirstNameChanging(string value);
+    partial void OnFirstNameChanged();
+    partial void OnLastNameChanging(string value);
+    partial void OnLastNameChanged();
+    partial void OnEmailAddressChanging(string value);
+    partial void OnEmailAddressChanged();
+    partial void OnPhoneNumberChanging(string value);
+    partial void OnPhoneNumberChanged();
+    partial void OnAspNetUserIdChanging(string value);
+    partial void OnAspNetUserIdChanged();
+    partial void OnAddressChanging(string value);
+    partial void OnAddressChanged();
+    partial void OnReferralUserNameChanging(string value);
+    partial void OnReferralUserNameChanged();
+    partial void OnWithSMSChanging(System.Nullable<bool> value);
+    partial void OnWithSMSChanged();
+    partial void OnDateCreatedChanging(System.Nullable<System.DateTime> value);
+    partial void OnDateCreatedChanged();
+    #endregion
+		
+		public MstUser()
+		{
+			this._TrnAffiliates = new EntitySet<TrnAffiliate>(new Action<TrnAffiliate>(this.attach_TrnAffiliates), new Action<TrnAffiliate>(this.detach_TrnAffiliates));
+			this._TrnSales = new EntitySet<TrnSale>(new Action<TrnSale>(this.attach_TrnSales), new Action<TrnSale>(this.detach_TrnSales));
+			this._SysAcessLogs = new EntitySet<SysAcessLog>(new Action<SysAcessLog>(this.attach_SysAcessLogs), new Action<SysAcessLog>(this.detach_SysAcessLogs));
+			this._TrnFavorites = new EntitySet<TrnFavorite>(new Action<TrnFavorite>(this.attach_TrnFavorites), new Action<TrnFavorite>(this.detach_TrnFavorites));
+			this._TrnUserFavorites = new EntitySet<TrnUserFavorite>(new Action<TrnUserFavorite>(this.attach_TrnUserFavorites), new Action<TrnUserFavorite>(this.detach_TrnUserFavorites));
+			this._TrnUserAlerts = new EntitySet<TrnUserAlert>(new Action<TrnUserAlert>(this.attach_TrnUserAlerts), new Action<TrnUserAlert>(this.detach_TrnUserAlerts));
+			this._AspNetUser = default(EntityRef<AspNetUser>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserName", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string UserName
+		{
+			get
+			{
+				return this._UserName;
+			}
+			set
+			{
+				if ((this._UserName != value))
+				{
+					this.OnUserNameChanging(value);
+					this.SendPropertyChanging();
+					this._UserName = value;
+					this.SendPropertyChanged("UserName");
+					this.OnUserNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FirstName", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
+		public string FirstName
+		{
+			get
+			{
+				return this._FirstName;
+			}
+			set
+			{
+				if ((this._FirstName != value))
+				{
+					this.OnFirstNameChanging(value);
+					this.SendPropertyChanging();
+					this._FirstName = value;
+					this.SendPropertyChanged("FirstName");
+					this.OnFirstNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LastName", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
+		public string LastName
+		{
+			get
+			{
+				return this._LastName;
+			}
+			set
+			{
+				if ((this._LastName != value))
+				{
+					this.OnLastNameChanging(value);
+					this.SendPropertyChanging();
+					this._LastName = value;
+					this.SendPropertyChanged("LastName");
+					this.OnLastNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EmailAddress", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
+		public string EmailAddress
+		{
+			get
+			{
+				return this._EmailAddress;
+			}
+			set
+			{
+				if ((this._EmailAddress != value))
+				{
+					this.OnEmailAddressChanging(value);
+					this.SendPropertyChanging();
+					this._EmailAddress = value;
+					this.SendPropertyChanged("EmailAddress");
+					this.OnEmailAddressChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PhoneNumber", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string PhoneNumber
+		{
+			get
+			{
+				return this._PhoneNumber;
+			}
+			set
+			{
+				if ((this._PhoneNumber != value))
+				{
+					this.OnPhoneNumberChanging(value);
+					this.SendPropertyChanging();
+					this._PhoneNumber = value;
+					this.SendPropertyChanged("PhoneNumber");
+					this.OnPhoneNumberChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AspNetUserId", DbType="NVarChar(128)")]
+		public string AspNetUserId
+		{
+			get
+			{
+				return this._AspNetUserId;
+			}
+			set
+			{
+				if ((this._AspNetUserId != value))
+				{
+					if (this._AspNetUser.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnAspNetUserIdChanging(value);
+					this.SendPropertyChanging();
+					this._AspNetUserId = value;
+					this.SendPropertyChanged("AspNetUserId");
+					this.OnAspNetUserIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Address", DbType="NVarChar(255)")]
+		public string Address
+		{
+			get
+			{
+				return this._Address;
+			}
+			set
+			{
+				if ((this._Address != value))
+				{
+					this.OnAddressChanging(value);
+					this.SendPropertyChanging();
+					this._Address = value;
+					this.SendPropertyChanged("Address");
+					this.OnAddressChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ReferralUserName", DbType="NVarChar(50)")]
+		public string ReferralUserName
+		{
+			get
+			{
+				return this._ReferralUserName;
+			}
+			set
+			{
+				if ((this._ReferralUserName != value))
+				{
+					this.OnReferralUserNameChanging(value);
+					this.SendPropertyChanging();
+					this._ReferralUserName = value;
+					this.SendPropertyChanged("ReferralUserName");
+					this.OnReferralUserNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WithSMS", DbType="Bit")]
+		public System.Nullable<bool> WithSMS
+		{
+			get
+			{
+				return this._WithSMS;
+			}
+			set
+			{
+				if ((this._WithSMS != value))
+				{
+					this.OnWithSMSChanging(value);
+					this.SendPropertyChanging();
+					this._WithSMS = value;
+					this.SendPropertyChanged("WithSMS");
+					this.OnWithSMSChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DateCreated", DbType="DateTime")]
+		public System.Nullable<System.DateTime> DateCreated
+		{
+			get
+			{
+				return this._DateCreated;
+			}
+			set
+			{
+				if ((this._DateCreated != value))
+				{
+					this.OnDateCreatedChanging(value);
+					this.SendPropertyChanging();
+					this._DateCreated = value;
+					this.SendPropertyChanged("DateCreated");
+					this.OnDateCreatedChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnAffiliate", Storage="_TrnAffiliates", ThisKey="Id", OtherKey="UserId")]
+		public EntitySet<TrnAffiliate> TrnAffiliates
+		{
+			get
+			{
+				return this._TrnAffiliates;
+			}
+			set
+			{
+				this._TrnAffiliates.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnSale", Storage="_TrnSales", ThisKey="Id", OtherKey="UserId")]
+		public EntitySet<TrnSale> TrnSales
+		{
+			get
+			{
+				return this._TrnSales;
+			}
+			set
+			{
+				this._TrnSales.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_SysAcessLog", Storage="_SysAcessLogs", ThisKey="Id", OtherKey="UserId")]
+		public EntitySet<SysAcessLog> SysAcessLogs
+		{
+			get
+			{
+				return this._SysAcessLogs;
+			}
+			set
+			{
+				this._SysAcessLogs.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnFavorite", Storage="_TrnFavorites", ThisKey="Id", OtherKey="UserId")]
+		public EntitySet<TrnFavorite> TrnFavorites
+		{
+			get
+			{
+				return this._TrnFavorites;
+			}
+			set
+			{
+				this._TrnFavorites.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnUserFavorite", Storage="_TrnUserFavorites", ThisKey="Id", OtherKey="UserId")]
+		public EntitySet<TrnUserFavorite> TrnUserFavorites
+		{
+			get
+			{
+				return this._TrnUserFavorites;
+			}
+			set
+			{
+				this._TrnUserFavorites.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnUserAlert", Storage="_TrnUserAlerts", ThisKey="Id", OtherKey="UserId")]
+		public EntitySet<TrnUserAlert> TrnUserAlerts
+		{
+			get
+			{
+				return this._TrnUserAlerts;
+			}
+			set
+			{
+				this._TrnUserAlerts.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="AspNetUser_MstUser", Storage="_AspNetUser", ThisKey="AspNetUserId", OtherKey="Id", IsForeignKey=true)]
+		public AspNetUser AspNetUser
+		{
+			get
+			{
+				return this._AspNetUser.Entity;
+			}
+			set
+			{
+				AspNetUser previousValue = this._AspNetUser.Entity;
+				if (((previousValue != value) 
+							|| (this._AspNetUser.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._AspNetUser.Entity = null;
+						previousValue.MstUsers.Remove(this);
+					}
+					this._AspNetUser.Entity = value;
+					if ((value != null))
+					{
+						value.MstUsers.Add(this);
+						this._AspNetUserId = value.Id;
+					}
+					else
+					{
+						this._AspNetUserId = default(string);
+					}
+					this.SendPropertyChanged("AspNetUser");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_TrnAffiliates(TrnAffiliate entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = this;
+		}
+		
+		private void detach_TrnAffiliates(TrnAffiliate entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = null;
+		}
+		
+		private void attach_TrnSales(TrnSale entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = this;
+		}
+		
+		private void detach_TrnSales(TrnSale entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = null;
+		}
+		
+		private void attach_SysAcessLogs(SysAcessLog entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = this;
+		}
+		
+		private void detach_SysAcessLogs(SysAcessLog entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = null;
+		}
+		
+		private void attach_TrnFavorites(TrnFavorite entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = this;
+		}
+		
+		private void detach_TrnFavorites(TrnFavorite entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = null;
+		}
+		
+		private void attach_TrnUserFavorites(TrnUserFavorite entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = this;
+		}
+		
+		private void detach_TrnUserFavorites(TrnUserFavorite entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = null;
+		}
+		
+		private void attach_TrnUserAlerts(TrnUserAlert entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = this;
+		}
+		
+		private void detach_TrnUserAlerts(TrnUserAlert entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.TrnUserAlert")]
+	public partial class TrnUserAlert : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private int _UserId;
+		
+		private string _Description;
+		
+		private string _Strategy;
+		
+		private bool _IsActive;
+		
+		private System.DateTime _EncodedDate;
+		
+		private string _AlertVia;
+		
+		private bool _SymbolFilter;
+		
+		private string _SymbolExchange;
+		
+		private System.Nullable<int> _SymbolUserFavoritesId;
+		
+		private decimal _StrategyGrowthDecayRate;
+		
+		private string _StrategyGrowthDecayTime;
+		
+		private bool _StrategyFilter;
+		
+		private bool _MACDFilter;
+		
+		private string _MACDCrossover;
+		
+		private string _MACDEMA;
+		
+		private bool _MagentaChannelFilter;
+		
+		private string _MagentaChannelBegins;
+		
+		private decimal _MagentaChannelAGRADR;
+		
+		private bool _SeasonalityFilter;
+		
+		private decimal _SeasonalityWinLossPercent;
+		
+		private decimal _SeasonalityGainLossPercent;
+		
+		private bool _AdditionalFilter;
+		
+		private decimal _AdditionalFilterPrice;
+		
+		private decimal _AdditionalFilterVolume;
+		
+		private int _AdditionalFilterNoOfYears;
+		
+		private int _MagentaChannelDays;
+		
+		private int _MagentaChannelCorrelation30;
+		
+		private string _SeasonalityTrend;
+		
+		private EntitySet<TrnUserAlertSymbol> _TrnUserAlertSymbols;
+		
+		private EntityRef<MstUser> _MstUser;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnUserIdChanging(int value);
+    partial void OnUserIdChanged();
+    partial void OnDescriptionChanging(string value);
+    partial void OnDescriptionChanged();
+    partial void OnStrategyChanging(string value);
+    partial void OnStrategyChanged();
+    partial void OnIsActiveChanging(bool value);
+    partial void OnIsActiveChanged();
+    partial void OnEncodedDateChanging(System.DateTime value);
+    partial void OnEncodedDateChanged();
+    partial void OnAlertViaChanging(string value);
+    partial void OnAlertViaChanged();
+    partial void OnSymbolFilterChanging(bool value);
+    partial void OnSymbolFilterChanged();
+    partial void OnSymbolExchangeChanging(string value);
+    partial void OnSymbolExchangeChanged();
+    partial void OnSymbolUserFavoritesIdChanging(System.Nullable<int> value);
+    partial void OnSymbolUserFavoritesIdChanged();
+    partial void OnStrategyGrowthDecayRateChanging(decimal value);
+    partial void OnStrategyGrowthDecayRateChanged();
+    partial void OnStrategyGrowthDecayTimeChanging(string value);
+    partial void OnStrategyGrowthDecayTimeChanged();
+    partial void OnStrategyFilterChanging(bool value);
+    partial void OnStrategyFilterChanged();
+    partial void OnMACDFilterChanging(bool value);
+    partial void OnMACDFilterChanged();
+    partial void OnMACDCrossoverChanging(string value);
+    partial void OnMACDCrossoverChanged();
+    partial void OnMACDEMAChanging(string value);
+    partial void OnMACDEMAChanged();
+    partial void OnMagentaChannelFilterChanging(bool value);
+    partial void OnMagentaChannelFilterChanged();
+    partial void OnMagentaChannelBeginsChanging(string value);
+    partial void OnMagentaChannelBeginsChanged();
+    partial void OnMagentaChannelAGRADRChanging(decimal value);
+    partial void OnMagentaChannelAGRADRChanged();
+    partial void OnSeasonalityFilterChanging(bool value);
+    partial void OnSeasonalityFilterChanged();
+    partial void OnSeasonalityWinLossPercentChanging(decimal value);
+    partial void OnSeasonalityWinLossPercentChanged();
+    partial void OnSeasonalityGainLossPercentChanging(decimal value);
+    partial void OnSeasonalityGainLossPercentChanged();
+    partial void OnAdditionalFilterChanging(bool value);
+    partial void OnAdditionalFilterChanged();
+    partial void OnAdditionalFilterPriceChanging(decimal value);
+    partial void OnAdditionalFilterPriceChanged();
+    partial void OnAdditionalFilterVolumeChanging(decimal value);
+    partial void OnAdditionalFilterVolumeChanged();
+    partial void OnAdditionalFilterNoOfYearsChanging(int value);
+    partial void OnAdditionalFilterNoOfYearsChanged();
+    partial void OnMagentaChannelDaysChanging(int value);
+    partial void OnMagentaChannelDaysChanged();
+    partial void OnMagentaChannelCorrelation30Changing(int value);
+    partial void OnMagentaChannelCorrelation30Changed();
+    partial void OnSeasonalityTrendChanging(string value);
+    partial void OnSeasonalityTrendChanged();
+    #endregion
+		
+		public TrnUserAlert()
+		{
+			this._TrnUserAlertSymbols = new EntitySet<TrnUserAlertSymbol>(new Action<TrnUserAlertSymbol>(this.attach_TrnUserAlertSymbols), new Action<TrnUserAlertSymbol>(this.detach_TrnUserAlertSymbols));
+			this._MstUser = default(EntityRef<MstUser>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserId", DbType="Int NOT NULL")]
+		public int UserId
+		{
+			get
+			{
+				return this._UserId;
+			}
+			set
+			{
+				if ((this._UserId != value))
+				{
+					if (this._MstUser.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnUserIdChanging(value);
+					this.SendPropertyChanging();
+					this._UserId = value;
+					this.SendPropertyChanged("UserId");
+					this.OnUserIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Description", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		public string Description
+		{
+			get
+			{
+				return this._Description;
+			}
+			set
+			{
+				if ((this._Description != value))
+				{
+					this.OnDescriptionChanging(value);
+					this.SendPropertyChanging();
+					this._Description = value;
+					this.SendPropertyChanged("Description");
+					this.OnDescriptionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Strategy", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string Strategy
+		{
+			get
+			{
+				return this._Strategy;
+			}
+			set
+			{
+				if ((this._Strategy != value))
+				{
+					this.OnStrategyChanging(value);
+					this.SendPropertyChanging();
+					this._Strategy = value;
+					this.SendPropertyChanged("Strategy");
+					this.OnStrategyChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsActive", DbType="Bit NOT NULL")]
+		public bool IsActive
+		{
+			get
+			{
+				return this._IsActive;
+			}
+			set
+			{
+				if ((this._IsActive != value))
+				{
+					this.OnIsActiveChanging(value);
+					this.SendPropertyChanging();
+					this._IsActive = value;
+					this.SendPropertyChanged("IsActive");
+					this.OnIsActiveChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EncodedDate", DbType="DateTime NOT NULL")]
+		public System.DateTime EncodedDate
+		{
+			get
+			{
+				return this._EncodedDate;
+			}
+			set
+			{
+				if ((this._EncodedDate != value))
+				{
+					this.OnEncodedDateChanging(value);
+					this.SendPropertyChanging();
+					this._EncodedDate = value;
+					this.SendPropertyChanged("EncodedDate");
+					this.OnEncodedDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AlertVia", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string AlertVia
+		{
+			get
+			{
+				return this._AlertVia;
+			}
+			set
+			{
+				if ((this._AlertVia != value))
+				{
+					this.OnAlertViaChanging(value);
+					this.SendPropertyChanging();
+					this._AlertVia = value;
+					this.SendPropertyChanged("AlertVia");
+					this.OnAlertViaChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SymbolFilter", DbType="Bit NOT NULL")]
+		public bool SymbolFilter
+		{
+			get
+			{
+				return this._SymbolFilter;
+			}
+			set
+			{
+				if ((this._SymbolFilter != value))
+				{
+					this.OnSymbolFilterChanging(value);
+					this.SendPropertyChanging();
+					this._SymbolFilter = value;
+					this.SendPropertyChanged("SymbolFilter");
+					this.OnSymbolFilterChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SymbolExchange", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string SymbolExchange
+		{
+			get
+			{
+				return this._SymbolExchange;
+			}
+			set
+			{
+				if ((this._SymbolExchange != value))
+				{
+					this.OnSymbolExchangeChanging(value);
+					this.SendPropertyChanging();
+					this._SymbolExchange = value;
+					this.SendPropertyChanged("SymbolExchange");
+					this.OnSymbolExchangeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SymbolUserFavoritesId", DbType="Int")]
+		public System.Nullable<int> SymbolUserFavoritesId
+		{
+			get
+			{
+				return this._SymbolUserFavoritesId;
+			}
+			set
+			{
+				if ((this._SymbolUserFavoritesId != value))
+				{
+					this.OnSymbolUserFavoritesIdChanging(value);
+					this.SendPropertyChanging();
+					this._SymbolUserFavoritesId = value;
+					this.SendPropertyChanged("SymbolUserFavoritesId");
+					this.OnSymbolUserFavoritesIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StrategyGrowthDecayRate", DbType="Decimal(18,5) NOT NULL")]
+		public decimal StrategyGrowthDecayRate
+		{
+			get
+			{
+				return this._StrategyGrowthDecayRate;
+			}
+			set
+			{
+				if ((this._StrategyGrowthDecayRate != value))
+				{
+					this.OnStrategyGrowthDecayRateChanging(value);
+					this.SendPropertyChanging();
+					this._StrategyGrowthDecayRate = value;
+					this.SendPropertyChanged("StrategyGrowthDecayRate");
+					this.OnStrategyGrowthDecayRateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StrategyGrowthDecayTime", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string StrategyGrowthDecayTime
+		{
+			get
+			{
+				return this._StrategyGrowthDecayTime;
+			}
+			set
+			{
+				if ((this._StrategyGrowthDecayTime != value))
+				{
+					this.OnStrategyGrowthDecayTimeChanging(value);
+					this.SendPropertyChanging();
+					this._StrategyGrowthDecayTime = value;
+					this.SendPropertyChanged("StrategyGrowthDecayTime");
+					this.OnStrategyGrowthDecayTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StrategyFilter", DbType="Bit NOT NULL")]
+		public bool StrategyFilter
+		{
+			get
+			{
+				return this._StrategyFilter;
+			}
+			set
+			{
+				if ((this._StrategyFilter != value))
+				{
+					this.OnStrategyFilterChanging(value);
+					this.SendPropertyChanging();
+					this._StrategyFilter = value;
+					this.SendPropertyChanged("StrategyFilter");
+					this.OnStrategyFilterChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDFilter", DbType="Bit NOT NULL")]
+		public bool MACDFilter
+		{
+			get
+			{
+				return this._MACDFilter;
+			}
+			set
+			{
+				if ((this._MACDFilter != value))
+				{
+					this.OnMACDFilterChanging(value);
+					this.SendPropertyChanging();
+					this._MACDFilter = value;
+					this.SendPropertyChanged("MACDFilter");
+					this.OnMACDFilterChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDCrossover", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string MACDCrossover
+		{
+			get
+			{
+				return this._MACDCrossover;
+			}
+			set
+			{
+				if ((this._MACDCrossover != value))
+				{
+					this.OnMACDCrossoverChanging(value);
+					this.SendPropertyChanging();
+					this._MACDCrossover = value;
+					this.SendPropertyChanged("MACDCrossover");
+					this.OnMACDCrossoverChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDEMA", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string MACDEMA
+		{
+			get
+			{
+				return this._MACDEMA;
+			}
+			set
+			{
+				if ((this._MACDEMA != value))
+				{
+					this.OnMACDEMAChanging(value);
+					this.SendPropertyChanging();
+					this._MACDEMA = value;
+					this.SendPropertyChanged("MACDEMA");
+					this.OnMACDEMAChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MagentaChannelFilter", DbType="Bit NOT NULL")]
+		public bool MagentaChannelFilter
+		{
+			get
+			{
+				return this._MagentaChannelFilter;
+			}
+			set
+			{
+				if ((this._MagentaChannelFilter != value))
+				{
+					this.OnMagentaChannelFilterChanging(value);
+					this.SendPropertyChanging();
+					this._MagentaChannelFilter = value;
+					this.SendPropertyChanged("MagentaChannelFilter");
+					this.OnMagentaChannelFilterChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MagentaChannelBegins", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string MagentaChannelBegins
+		{
+			get
+			{
+				return this._MagentaChannelBegins;
+			}
+			set
+			{
+				if ((this._MagentaChannelBegins != value))
+				{
+					this.OnMagentaChannelBeginsChanging(value);
+					this.SendPropertyChanging();
+					this._MagentaChannelBegins = value;
+					this.SendPropertyChanged("MagentaChannelBegins");
+					this.OnMagentaChannelBeginsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MagentaChannelAGRADR", DbType="Decimal(18,5) NOT NULL")]
+		public decimal MagentaChannelAGRADR
+		{
+			get
+			{
+				return this._MagentaChannelAGRADR;
+			}
+			set
+			{
+				if ((this._MagentaChannelAGRADR != value))
+				{
+					this.OnMagentaChannelAGRADRChanging(value);
+					this.SendPropertyChanging();
+					this._MagentaChannelAGRADR = value;
+					this.SendPropertyChanged("MagentaChannelAGRADR");
+					this.OnMagentaChannelAGRADRChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SeasonalityFilter", DbType="Bit NOT NULL")]
+		public bool SeasonalityFilter
+		{
+			get
+			{
+				return this._SeasonalityFilter;
+			}
+			set
+			{
+				if ((this._SeasonalityFilter != value))
+				{
+					this.OnSeasonalityFilterChanging(value);
+					this.SendPropertyChanging();
+					this._SeasonalityFilter = value;
+					this.SendPropertyChanged("SeasonalityFilter");
+					this.OnSeasonalityFilterChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SeasonalityWinLossPercent", DbType="Decimal(18,5) NOT NULL")]
+		public decimal SeasonalityWinLossPercent
+		{
+			get
+			{
+				return this._SeasonalityWinLossPercent;
+			}
+			set
+			{
+				if ((this._SeasonalityWinLossPercent != value))
+				{
+					this.OnSeasonalityWinLossPercentChanging(value);
+					this.SendPropertyChanging();
+					this._SeasonalityWinLossPercent = value;
+					this.SendPropertyChanged("SeasonalityWinLossPercent");
+					this.OnSeasonalityWinLossPercentChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SeasonalityGainLossPercent", DbType="Decimal(18,5) NOT NULL")]
+		public decimal SeasonalityGainLossPercent
+		{
+			get
+			{
+				return this._SeasonalityGainLossPercent;
+			}
+			set
+			{
+				if ((this._SeasonalityGainLossPercent != value))
+				{
+					this.OnSeasonalityGainLossPercentChanging(value);
+					this.SendPropertyChanging();
+					this._SeasonalityGainLossPercent = value;
+					this.SendPropertyChanged("SeasonalityGainLossPercent");
+					this.OnSeasonalityGainLossPercentChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AdditionalFilter", DbType="Bit NOT NULL")]
+		public bool AdditionalFilter
+		{
+			get
+			{
+				return this._AdditionalFilter;
+			}
+			set
+			{
+				if ((this._AdditionalFilter != value))
+				{
+					this.OnAdditionalFilterChanging(value);
+					this.SendPropertyChanging();
+					this._AdditionalFilter = value;
+					this.SendPropertyChanged("AdditionalFilter");
+					this.OnAdditionalFilterChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AdditionalFilterPrice", DbType="Decimal(18,5) NOT NULL")]
+		public decimal AdditionalFilterPrice
+		{
+			get
+			{
+				return this._AdditionalFilterPrice;
+			}
+			set
+			{
+				if ((this._AdditionalFilterPrice != value))
+				{
+					this.OnAdditionalFilterPriceChanging(value);
+					this.SendPropertyChanging();
+					this._AdditionalFilterPrice = value;
+					this.SendPropertyChanged("AdditionalFilterPrice");
+					this.OnAdditionalFilterPriceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AdditionalFilterVolume", DbType="Decimal(18,5) NOT NULL")]
+		public decimal AdditionalFilterVolume
+		{
+			get
+			{
+				return this._AdditionalFilterVolume;
+			}
+			set
+			{
+				if ((this._AdditionalFilterVolume != value))
+				{
+					this.OnAdditionalFilterVolumeChanging(value);
+					this.SendPropertyChanging();
+					this._AdditionalFilterVolume = value;
+					this.SendPropertyChanged("AdditionalFilterVolume");
+					this.OnAdditionalFilterVolumeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AdditionalFilterNoOfYears", DbType="Int NOT NULL")]
+		public int AdditionalFilterNoOfYears
+		{
+			get
+			{
+				return this._AdditionalFilterNoOfYears;
+			}
+			set
+			{
+				if ((this._AdditionalFilterNoOfYears != value))
+				{
+					this.OnAdditionalFilterNoOfYearsChanging(value);
+					this.SendPropertyChanging();
+					this._AdditionalFilterNoOfYears = value;
+					this.SendPropertyChanged("AdditionalFilterNoOfYears");
+					this.OnAdditionalFilterNoOfYearsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MagentaChannelDays", DbType="Int NOT NULL")]
+		public int MagentaChannelDays
+		{
+			get
+			{
+				return this._MagentaChannelDays;
+			}
+			set
+			{
+				if ((this._MagentaChannelDays != value))
+				{
+					this.OnMagentaChannelDaysChanging(value);
+					this.SendPropertyChanging();
+					this._MagentaChannelDays = value;
+					this.SendPropertyChanged("MagentaChannelDays");
+					this.OnMagentaChannelDaysChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MagentaChannelCorrelation30", DbType="Int NOT NULL")]
+		public int MagentaChannelCorrelation30
+		{
+			get
+			{
+				return this._MagentaChannelCorrelation30;
+			}
+			set
+			{
+				if ((this._MagentaChannelCorrelation30 != value))
+				{
+					this.OnMagentaChannelCorrelation30Changing(value);
+					this.SendPropertyChanging();
+					this._MagentaChannelCorrelation30 = value;
+					this.SendPropertyChanged("MagentaChannelCorrelation30");
+					this.OnMagentaChannelCorrelation30Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SeasonalityTrend", DbType="NVarChar(50)")]
+		public string SeasonalityTrend
+		{
+			get
+			{
+				return this._SeasonalityTrend;
+			}
+			set
+			{
+				if ((this._SeasonalityTrend != value))
+				{
+					this.OnSeasonalityTrendChanging(value);
+					this.SendPropertyChanging();
+					this._SeasonalityTrend = value;
+					this.SendPropertyChanged("SeasonalityTrend");
+					this.OnSeasonalityTrendChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnUserAlert_TrnUserAlertSymbol", Storage="_TrnUserAlertSymbols", ThisKey="Id", OtherKey="UserAlertId")]
+		public EntitySet<TrnUserAlertSymbol> TrnUserAlertSymbols
+		{
+			get
+			{
+				return this._TrnUserAlertSymbols;
+			}
+			set
+			{
+				this._TrnUserAlertSymbols.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnUserAlert", Storage="_MstUser", ThisKey="UserId", OtherKey="Id", IsForeignKey=true)]
+		public MstUser MstUser
+		{
+			get
+			{
+				return this._MstUser.Entity;
+			}
+			set
+			{
+				MstUser previousValue = this._MstUser.Entity;
+				if (((previousValue != value) 
+							|| (this._MstUser.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._MstUser.Entity = null;
+						previousValue.TrnUserAlerts.Remove(this);
+					}
+					this._MstUser.Entity = value;
+					if ((value != null))
+					{
+						value.TrnUserAlerts.Add(this);
+						this._UserId = value.Id;
+					}
+					else
+					{
+						this._UserId = default(int);
+					}
+					this.SendPropertyChanged("MstUser");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_TrnUserAlertSymbols(TrnUserAlertSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.TrnUserAlert = this;
+		}
+		
+		private void detach_TrnUserAlertSymbols(TrnUserAlertSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.TrnUserAlert = null;
 		}
 	}
 }

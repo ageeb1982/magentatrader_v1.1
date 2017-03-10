@@ -12,7 +12,43 @@ namespace MagentaTrader.Controllers
     {
         private Data.MagentaTradersDBDataContext db = new Data.MagentaTradersDBDataContext();
 
+        private Boolean convertWinLossToPercent(string WinLoss, decimal limit)
+        {
+            int separatorLocation  = WinLoss.IndexOf("/");
+            if (separatorLocation > 0)
+            {
+                string numerator = WinLoss.Substring(0, separatorLocation - 1);
+                string denumerator = WinLoss.Substring(separatorLocation + 1);
 
+                string direction = numerator.Substring(numerator.Length - 1);
+
+                numerator = new String(numerator.Where(Char.IsDigit).ToArray());
+                denumerator = new String(denumerator.Where(Char.IsDigit).ToArray());
+
+                int n = Int32.Parse(numerator);
+                int d = Int32.Parse(denumerator);
+
+                int m = 1;
+                if (direction == "L") m = -1;
+
+                int wl = 0;
+                if (n + d > 0) wl = (n / (n + d)) * 100 * m;
+                else wl =  100 * m;
+
+                if (direction == "L")
+                {
+                    return wl <= limit;
+                }
+                else
+                {
+                    return wl >= limit;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
         private List<Data.MstSymbol> GetResultLevelSymbol(long userAlertId)
         {
             List<Data.MstSymbol> symbols = new List<Data.MstSymbol>();
@@ -181,6 +217,7 @@ namespace MagentaTrader.Controllers
         private List<Data.MstSymbol> GetResultLevelSeasonality(long userAlertId, List<Data.MstSymbol> filteredSymbols)
         {
             List<Data.MstSymbol> symbols = new List<Data.MstSymbol>();
+            string seasonalityTrend;
             decimal seasonalityWinLossPercent;
             decimal seasonalityGainLossPercent;
             if (filteredSymbols.Any())
@@ -190,12 +227,36 @@ namespace MagentaTrader.Controllers
                     var userAlerts = from d in db.TrnUserAlerts where d.Id == userAlertId select d;
                     if (userAlerts.Any())
                     {
+                        seasonalityTrend = userAlerts.First().SeasonalityTrend == null ? "30" : userAlerts.First().SeasonalityTrend;
                         seasonalityWinLossPercent = userAlerts.First().SeasonalityWinLossPercent;
                         seasonalityGainLossPercent = userAlerts.First().SeasonalityGainLossPercent;
 
                         var seasonalitySymbols = from d in filteredSymbols
-                                                 where d.WinLossAverageCurrent30 >= seasonalityGainLossPercent
+                                                 where convertWinLossToPercent(d.WinLossCurrent30, seasonalityWinLossPercent) && 
+                                                       d.WinLossAverageCurrent30 >= seasonalityGainLossPercent
                                                  select d;
+
+                        if (seasonalityTrend == "20")
+                        {
+                            seasonalitySymbols = from d in filteredSymbols
+                                                 where convertWinLossToPercent(d.WinLoss20, seasonalityWinLossPercent) && 
+                                                       d.WinLossAverage20 >= seasonalityGainLossPercent
+                                                 select d;
+                        }
+                        else if (seasonalityTrend == "40")
+                        {
+                            seasonalitySymbols = from d in filteredSymbols
+                                                 where convertWinLossToPercent(d.WinLoss40, seasonalityWinLossPercent) && 
+                                                       d.WinLossAverage40 >= seasonalityGainLossPercent
+                                                 select d;
+                        }
+                        else if (seasonalityTrend == "60")
+                        {
+                            seasonalitySymbols = from d in filteredSymbols
+                                                 where convertWinLossToPercent(d.WinLoss60, seasonalityWinLossPercent) && 
+                                                       d.WinLossAverage60 >= seasonalityGainLossPercent
+                                                 select d;
+                        }
 
                         foreach (Data.MstSymbol s in seasonalitySymbols)
                         {
@@ -238,6 +299,7 @@ namespace MagentaTrader.Controllers
             }
             return symbols.ToList();
         }
+        
         // Add User Alert Symbols in the Database
         private void GetResultSymbols(long userAlertId)
         {
@@ -320,6 +382,80 @@ namespace MagentaTrader.Controllers
             }
         }
 
+        // Get the number of results per filter
+        [Authorize]
+        [Route("api/GetUserAlertResult/{Id}")]
+        public Models.UserAlertSymbolResult GetUserAlertResult(String Id)
+        {
+            bool symbolFilter;
+            bool strategyFilter;
+            bool macdFilter;
+            bool magentaChannelFilter;
+            bool seasonalityFilter;
+            bool additionalFilter;
+
+            Id = Id.Replace(",", "");
+            int userAlertId = Convert.ToInt32(Id);
+
+            Models.UserAlertSymbolResult result = new Models.UserAlertSymbolResult();
+
+            if (userAlertId > 0)
+            {
+                var userAlerts = from d in db.TrnUserAlerts where d.Id == userAlertId select d;
+                if (userAlerts.Any())
+                {
+                    // Filter symbols
+                    List<Data.MstSymbol> symbolResults = new List<Data.MstSymbol>();
+                    symbolFilter = userAlerts.First().SymbolFilter;
+                    strategyFilter = userAlerts.First().StrategyFilter;
+                    macdFilter = userAlerts.First().MACDFilter;
+                    magentaChannelFilter = userAlerts.First().MagentaChannelFilter;
+                    seasonalityFilter = userAlerts.First().SeasonalityFilter;
+                    additionalFilter = userAlerts.First().AdditionalFilter;
+
+                    result.SymbolFilterResult = 0;
+                    result.StrategyFilterResult = 0;
+                    result.MACDFilterResult = 0;
+                    result.MagentaChannelFilterResult = 0;
+                    result.SeasonalityFilterResult = 0;
+                    result.AdditionalFilterResult = 0;
+
+                    if (symbolFilter == true)
+                    {
+                        symbolResults = GetResultLevelSymbol(userAlertId);
+                        result.SymbolFilterResult = symbolResults.Count();
+                        if (strategyFilter == true)
+                        {
+                            symbolResults = GetResultLevelStrategy(userAlertId, symbolResults);
+                            result.StrategyFilterResult = symbolResults.Count();
+                        }
+                        if (macdFilter == true)
+                        {
+                            symbolResults = GetResultLevelMACD(userAlertId, symbolResults);
+                            result.MACDFilterResult = symbolResults.Count();
+                        }
+                        if (magentaChannelFilter == true)
+                        {
+                            symbolResults = GetResultLevelMagentaChannel(userAlertId, symbolResults);
+                            result.MagentaChannelFilterResult = symbolResults.Count();
+                        }
+                        if (seasonalityFilter == true)
+                        {
+                            symbolResults = GetResultLevelSeasonality(userAlertId, symbolResults);
+                            result.SeasonalityFilterResult = symbolResults.Count();
+                        }
+                        if (additionalFilter == true)
+                        {
+                            symbolResults = GetResultLevelAdditionalFilter(userAlertId, symbolResults);
+                            result.AdditionalFilterResult = symbolResults.Count();
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
         // GET api/GetUserAlert/Username
         [Authorize]
         [Route("api/GetUserAlert/{UserName}")]
@@ -353,6 +489,7 @@ namespace MagentaTrader.Controllers
                                 MagentaChannelDays = d.MagentaChannelDays,
                                 MagentaChannelAGRADR = d.MagentaChannelAGRADR,
                                 SeasonalityFilter = d.SeasonalityFilter,
+                                SeasonalityTrend = d.SeasonalityTrend == null ? "30" : d.SeasonalityTrend,
                                 SeasonalityWinLossPercent = d.SeasonalityWinLossPercent,
                                 SeasonalityGainLossPercent = d.SeasonalityGainLossPercent,
                                 AdditionalFilter = d.AdditionalFilter,
@@ -456,6 +593,7 @@ namespace MagentaTrader.Controllers
                 newUserAlert.MagentaChannelAGRADR = value.MagentaChannelAGRADR;
 
                 newUserAlert.SeasonalityFilter = value.SeasonalityFilter;
+                newUserAlert.SeasonalityTrend = value.SeasonalityTrend == null ? "30" : value.SeasonalityTrend;
                 newUserAlert.SeasonalityWinLossPercent = value.SeasonalityWinLossPercent;
                 newUserAlert.SeasonalityGainLossPercent = value.SeasonalityGainLossPercent;
 
@@ -522,6 +660,7 @@ namespace MagentaTrader.Controllers
                     updateUserAlert.MagentaChannelAGRADR = value.MagentaChannelAGRADR;
 
                     updateUserAlert.SeasonalityFilter = value.SeasonalityFilter;
+                    updateUserAlert.SeasonalityTrend = value.SeasonalityTrend == null ? "30" : value.SeasonalityTrend;
                     updateUserAlert.SeasonalityWinLossPercent = value.SeasonalityWinLossPercent;
                     updateUserAlert.SeasonalityGainLossPercent = value.SeasonalityGainLossPercent;
 
