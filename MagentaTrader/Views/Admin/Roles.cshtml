@@ -81,11 +81,19 @@
                     <option value="SMS">SMS</option>
                 </select>
             </div>
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" readonly><span class="fa fa-search"></span></button>
+                    </span>
+                    <input type="text" class="form-control" id="SearchFilter" placeholder="Search">
+                </div>
+            </div>
             <div class="col-lg-2">
                 <button id="CmdDownloadUser" type="submit" class="btn btn-primary btn-block" onclick="cmdDownloadUser_OnClick()">Save Users</button>
             </div>
             <div class="col-lg-2">
-                <button id="CmdDownloadUserToPral" type="submit" class="btn btn-primary btn-block" onclick="cmdDownloadUserToPral_OnClick()">Save Users To Prayl</button>
+                <button id="CmdDownloadUserToPral" type="submit" class="btn btn-primary btn-block" onclick="cmdDownloadUserPrayl_OnClick()">Save Users To Prayl</button>
             </div>
         </div>
         <br />
@@ -279,6 +287,60 @@
         // Create filename
 
         var fileName = 'users_' + role + '.CSV';
+
+        // Download via <a> link
+
+        var link = document.createElement("a");
+
+        if (link.download !== undefined) {
+            var blob = new Blob([CSV], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style = "visibility:hidden";
+        }
+
+        if (navigator.msSaveBlob) {
+            link.addEventListener("click", function (event) {
+                var blob = new Blob([CSV], {
+                    "type": "text/csv;charset=utf-8;"
+                });
+                navigator.msSaveBlob(blob, fileName);
+            }, false);
+        }
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    function cmdDownloadUserPrayl_OnClick() {
+        var CSV = '';
+        var data = [];
+
+        for (i = 0; i < UsersCollection.items.length; i++) {
+            data.push({
+                FullName: UsersCollection.items[i].FirstName + ' ' + UsersCollection.items[i].LastName,
+                EmailAddress: UsersCollection.items[i].EmailAddress
+            });
+        }
+
+        for (var i = 0; i < data.length; i++) {
+            var DataRow = '';
+            for (var d in data[i]) {
+                DataRow += '"' + data[i][d] + '",';
+            }
+            DataRow.slice(0, DataRow.length - 1);
+            CSV += DataRow + '\r\n';
+        }
+
+        if (CSV == '') {
+            alert("No data");
+            return;
+        }
+
+        // Create filename
+
+        var fileName = 'usersForPrayl.CSV';
 
         // Download via <a> link
 
@@ -644,6 +706,22 @@
 
         makeUserGrid();
 
+        // Filter on User Grid
+        var filterText = '';
+        $('#SearchFilter').keyup(function () {
+            filterText = this.value.toLowerCase();
+            UsersCollection.refresh();
+        });
+        UsersCollection.filter = function (data) {
+            return !filterText || (data.UserName.toLowerCase().indexOf(filterText) > -1) ||
+                                  (data.FirstName.toLowerCase().indexOf(filterText) > -1) ||
+                                  (data.LastName.toLowerCase().indexOf(filterText) > -1) ||
+                                  (data.EmailAddress.toLowerCase().indexOf(filterText) > -1) ||
+                                  (data.PhoneNumber.toLowerCase().indexOf(filterText) > -1) || 
+                                  (data.DateCreated.toLowerCase().indexOf(filterText) > -1);
+        }
+
+        // User Role Grid
         UserRolesGrid = new wijmo.grid.FlexGrid('#UserRolesGrid');
 
         var roleSelect = document.getElementById("Roles");

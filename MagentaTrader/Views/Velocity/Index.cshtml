@@ -1,0 +1,490 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+
+    var Version = "v.Beta.1.20170402";
+
+    var Tradier_scope = Request.QueryString["scope"];
+    var Tradier_state = Request.QueryString["state"];
+    var Tradier_code = Request.QueryString["code"];
+}
+
+<div id="ajaxContent"></div>
+
+<div>
+
+    @*Header*@
+    <nav id="menu-wrapper" class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/Home" style="font-size:smaller"><span><img src="/img/logo-velocity.png" /></span><span class="hidden-xs"> - @Version</span></a>
+        </div>
+        <ul class="nav navbar-top-links navbar-right">
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-plug fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-messages">
+                    <li>
+                        <a href="#" onclick="connectTradier();">
+                            <div><img src="/img/tradier-brokerage-logo-smaller.png" /></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="connectQuestrade();">
+                            <div><img src="/img/questrade-logo-smaller.png" /></div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    @*Body - Header*@
+    <div class="row">
+        <div class="col-lg-2">
+            <div class="input-group">
+                <span class="input-group-addon velocity-form velocity-form-label">Exchange:</span>
+                <select id="Exchange" class="form-control velocity-form">
+                    <option value="AMEX">AMEX</option>
+                    <option value="NASDAQ">NASDAQ</option>
+                    <option value="NYSE">NYSE</option>
+                    <option value="US">ALL US EQUITIES</option>
+                    <option value="PSE">PSE</option>
+                    <option value="TSX">TSX</option>
+                    <option value="FOREX">FOREX</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-2">
+            <div class="input-group">
+                <span class="input-group-addon velocity-form velocity-form-label">Symbol:</span>
+                <input type="text" class="form-control velocity-form" id="Symbol" placeholder="________">
+            </div>
+        </div>
+    </div>
+    @*Body - Chart*@
+    <div class="row">
+        <div class="col-lg-4">
+            <div>
+                <div class="input-group">
+                    <span class="input-group-addon velocity-form velocity-form-label">Chart 1 Data:</span>
+                    <select id="DataType1" class="form-control velocity-form">
+                        <option value="EOD" selected>EOD</option>
+                        <option value="IntraDay">IntraDay</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <div id="ChartDiv1" style="height: 80.5vh;"></div>
+            </div>
+        </div>
+        <div class="col-lg-4" id=" chartdata2">
+            <div>
+                <div class="input-group">
+                    <span class="input-group-addon velocity-form velocity-form-label">Chart 2 Data:</span>
+                    <select id="DataType2" class="form-control velocity-form">
+                        <option value="EOD" selected>EOD</option>
+                        <option value="IntraDay">IntraDay</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <div id="ChartDiv2" style="height: 80.5vh;"></div>
+            </div>
+        </div>
+        <div class="col-lg-4" id=" chartdata3">
+            <div>
+                <div class="input-group">
+                    <span class="input-group-addon velocity-form velocity-form-label">Chart 3 Data:</span>
+                    <select id="DataType3" class="form-control velocity-form">
+                        <option value="EOD" selected>EOD</option>
+                        <option value="IntraDay">IntraDay</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <div id="ChartDiv3" style="height: 80.5vh;"></div>
+            </div>
+        </div>
+    </div>
+
+    @*Footer*@
+    <div>
+        <nav id="menu-wrapper" class="navbar navbar-default navbar-fixed-bottom" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <a id="status" class="navbar-brand" href="#" style="font-size:smaller"></a>
+            </div>
+        </nav>
+    </div>
+
+</div>
+
+@*Bootstrap*@
+<link href="/css/bootstrap-toggle.min.css" rel="stylesheet">
+<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+@*Toaster*@
+<link href="~/css/toastr.css" rel="stylesheet" />
+<script src="~/js/toastr.js"></script>
+@*Page Look and Feel*@
+<link href="/dist/css/sb-admin-2.css" rel="stylesheet">
+<link href="~/css/velocity.css" rel="stylesheet" />
+@*Status loader*@
+<link href="/css/ytLoad.jquery.css" rel="stylesheet" type="text/css">
+<script src="/js/jquery.transit.js" type="text/javascript"></script>
+<script src="/js/ytLoad.jquery.js" type="text/javascript"></script>
+@*AmCharts*@
+<link rel="stylesheet" href="/amcharts/amcharts/style.css" type="text/css">
+<script src="/amcharts/amcharts/amcharts.js" type="text/javascript"></script>
+<script src="/amcharts/amcharts/serial.js" type="text/javascript"></script>
+<script src="/amcharts/amcharts/amstock.js" type="text/javascript"></script>
+@*Date manipulation*@
+<script src="/js/date.js"></script>
+
+<script type="text/javascript">
+    // symbol data repository
+    var _symbol = "";
+    var _symbolDescription = "";
+    var _symbolEOD;
+
+    var _chartDataProvider1 = [];
+
+    var _goldColor = "#FFA200";
+    var _grayColor = "#858583";
+    var _yellowColor = "#FFFF00";
+    var _greenColor = "#00FF00";
+    var _blueColor = "#0000FF";
+    var _redColor = "#FF0000";
+    var _darkGreenColor = "#65BF04";
+    var _magentaColor = "#9C0063";
+
+    // broker connection functions
+    function connectQuestrade() {
+        toastr.error("Not yet applicable.");
+    }
+    function connectTradier() {
+        setCookie("cookie_broker", "Tradier", 1);
+        location.href = "https://api.tradier.com/v1/oauth/authorize?client_id=38Ng8OopHazxYkvkHcYwA718F30U0MH7&scope=read,write,market,trade&state=magenta";
+    }
+    // cookie functions
+    function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        var expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + "; " + expires;
+    }
+    function getCookie(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1);
+            if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+        }
+        return "";
+    }
+    // status bar
+    function setStatus() {
+        var broker = getCookie("cookie_broker");
+        document.getElementById("status").innerHTML = "<span class='hidden-xs not_connected'>Status: <i class='fa fa-cricle'></i> Not connected.</span>";
+        if (broker == "Tradier") {
+            if (getCookie("cookie_tradier_access_token") != "") {
+                document.getElementById("status").innerHTML = "<span class='hidden-xs connected'>Status: <i class='fa fa-cricle-o'></i> Connected to Tradier</span>";
+            }
+        }
+    }
+    // get symbol data
+    function getSymbolData() {
+        var symbol = $('#Symbol').val().toUpperCase();
+
+        symbol = symbol.replace(".", ",");
+
+        if (document.getElementById("Exchange").value == "TSX") {
+            document.getElementById("Symbol").value = symbol;
+            symbol = "TSX-" + symbol;
+        } else if (document.getElementById("Exchange").value == "FOREX") {
+            document.getElementById("Symbol").value = symbol;
+            symbol = "FX-" + symbol;
+        } else if (document.getElementById("Exchange").value == "PSE") {
+            document.getElementById("Symbol").value = symbol;
+            symbol = "PSE-" + symbol;
+        } else {
+            document.getElementById("Symbol").value = symbol;
+        }
+
+        if (symbol != "") {
+            $.ajax({
+                url: '/api/StockPrice/' + symbol,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (data) {
+                    if (data.StockPrices.length > 0) {
+                        _symbol = data.Symbol;
+                        _symbolDescription = data.SymbolDescription;
+                        _symbolEOD = data.StockPrices;
+
+                        document.getElementById("Exchange").value = data.Exchange;
+
+                        $('#ChartDiv1').empty();
+                        $('#ChartDiv2').empty();
+                        $('#ChartDiv3').empty();
+
+                        makeChart("ChartDiv1");
+                        makeChart("ChartDiv2");
+                        makeChart("ChartDiv3");
+
+                        toastr.success("Symbol data loaded.");
+                    } else {
+                        toastr.error("Symbol not found.");
+                    }
+                }
+            }).fail(
+                function (xhr, textStatus, err) {
+                    toastr.error(err);
+                }
+            );
+        }
+    }
+    // chart data provider
+    function provideData(dataType) {
+        var data = [];
+        if (dataType == "EOD") {
+            if (_symbolEOD.length > 0) {
+                // get data
+                for (var i = _symbolEOD.length - 1; i >= 0; i--) {
+                    data.push({
+                        date: parseChartDate(_symbolEOD[i].QuoteDate),
+                        open: _symbolEOD[i].OpenPrice,
+                        high: _symbolEOD[i].HighPrice,
+                        low: _symbolEOD[i].LowPrice,
+                        close: _symbolEOD[i].ClosePrice,
+                        volume: AmCharts.roundTo(_symbolEOD[i].Volume / 1000000, 2)
+                    });
+                }
+                // add 5 days for chart cursor problem
+                var futureDate = new Date((new Date(_symbolEOD[0].QuoteDate)).add(1).days());
+                for (var i = 0; i < 5; i++) {
+                    data.push({
+                        date: new Date(futureDate)
+                    });
+                    futureDate = futureDate.add(1).day();
+                }
+            }
+        } else if (dataType == "IntraDay") {
+
+
+        }
+        return data;
+    }
+    // parse date
+    function parseChartDate(quoteDate) {
+        var parts = quoteDate.split('-');
+        return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+    // make chart
+    function makeChart(dom) {
+        // chart data provider
+        var chartDataProvider = [];
+        if (dom == "ChartDiv1") {
+            chartDataProvider = provideData(document.getElementById("DataType1").value);
+        } else if (dom == "ChartDiv2") {
+            chartDataProvider = provideData(document.getElementById("DataType2").value);
+        } else if (dom == "ChartDiv3") {
+            chartDataProvider = provideData(document.getElementById("DataType3").value);
+        }
+
+        //chart data set
+        var chartDataSet = new AmCharts.DataSet();
+        chartDataSet.title = _symbol;
+        chartDataSet.color = "#7f8da9";
+        chartDataSet.fieldMappings = [{
+                fromField: "open",
+                toField: "open"
+            }, {
+                fromField: "high",
+                toField: "high"
+            }, {
+                fromField: "low",
+                toField: "low"
+            }, {
+                fromField: "close",
+                toField: "close"
+            }, {
+                fromField: "volume",
+                toField: "volume"
+            }];
+        chartDataSet.dataProvider = chartDataProvider;
+        chartDataSet.categoryField = "date";
+
+        // chart value Axes (X-Axis)
+        var chartAxis1 = new AmCharts.ValueAxis();
+        chartAxis1.id = "PriceAxis";
+        chartAxis1.color = _blueColor;
+
+        var chartAxis2 = new AmCharts.ValueAxis();
+        chartAxis2.id = "VolumeAxis"
+        chartAxis2.labelsEnabled = false;
+        chartAxis2.position = "right";
+        chartAxis2.gridThickness = 0;
+        chartAxis2.axisThickness = 0;
+
+        // chart category axis settings (Y-Axis)
+        var categoryAxesSettings = new AmCharts.CategoryAxesSettings()
+        categoryAxesSettings.maxSeries = 150;
+        categoryAxesSettings.groupToPeriods = ["15mm", "hh", "DD", "WW", "MM", "YYYY"];
+        categoryAxesSettings.minPeriod = "15mm";
+        categoryAxesSettings.equalSpacing = true;
+        categoryAxesSettings.color = _blueColor;
+        categoryAxesSettings.inside = true;
+
+        // chart cursor settings
+        var chartCursorSettings = new AmCharts.ChartCursorSettings();
+        chartCursorSettings.valueLineEnabled = true;
+        chartCursorSettings.valueBalloonsEnabled = true;
+
+        // chart graphs
+        var chartGraph1 = new AmCharts.StockGraph();
+        chartGraph1.id = "Price";
+        chartGraph1.title = "Price";
+        chartGraph1.type = "candlestick";
+        chartGraph1.openField = "open";
+        chartGraph1.closeField = "close";
+        chartGraph1.highField = "high";
+        chartGraph1.lowField = "low";
+        chartGraph1.valueField = "close";
+        chartGraph1.lineColor = "#0FB203";
+        chartGraph1.fillColors = "#0FB203";
+        chartGraph1.negativeLineColor = "#A80008";
+        chartGraph1.negativeFillColors = "#A80008";
+        chartGraph1.fillAlphas = 1;
+        chartGraph1.useDataSetColors = false;
+        chartGraph1.showBalloon = true;
+        chartGraph1.proCandlesticks = false;
+        chartGraph1.periodValue = "Close";
+        chartGraph1.valueAxis = chartAxis1;
+
+        var chartGraph2 = new AmCharts.StockGraph();
+        chartGraph2.id = "Volume";
+        chartGraph2.title = "Volume (M)";
+        chartGraph2.valueField = "volume";
+        chartGraph2.type = "column";
+        chartGraph2.useDataSetColors = false;
+        chartGraph2.color = _grayColor;
+        chartGraph2.lineColor = _grayColor;
+        chartGraph2.showBalloon = false;
+        chartGraph2.lineAlpha = 0;
+        chartGraph2.fillAlphas = 0.3;
+        chartGraph2.valueAxis = chartAxis2;
+
+        // chart panels
+        var chartPanel1 = new AmCharts.StockPanel();
+        chartPanel1.showCategoryAxis = false;
+        chartPanel1.title = _symbolDescription;
+        chartPanel1.percentHeight = 80;
+        chartPanel1.recalculateToPercents = "never";
+        chartPanel1.addValueAxis(chartAxis1);
+        chartPanel1.addStockGraph(chartGraph1);
+
+        var chartPanel2 = new AmCharts.StockPanel();
+        chartPanel2.allowTurningOff = true;
+        chartPanel2.percentHeight = 20;
+        chartPanel2.addValueAxis(chartAxis2);
+        chartPanel2.addStockGraph(chartGraph2);
+
+        // period selector
+        var periodSelector = new AmCharts.PeriodSelector();
+        periodSelector.position = "top";
+        periodSelector.inputFieldsEnabled = false;
+        periodSelector.color = _blueColor;
+        periodSelector.periods = [
+        {
+            period: "YYYY",
+            count: 1,
+            selected: false,
+            label: "1 Year"
+        }, {
+            period: "MM",
+            count: 6,
+            selected: dom == "ChartDiv2" ? true : false,
+            label: "6 Months"
+        }, {
+            period: "DD",
+            count: 30,
+            selected: dom == "ChartDiv3" ? true : false,
+            label: "30 Days"
+        }, {
+            period: "MAX",
+            selected: dom == "ChartDiv1" ? true : false,
+            label: "Max"
+        }];
+
+        // chart
+        var chart = new AmCharts.AmStockChart();
+        chart.pathToImages = "/amcharts/amcharts/images/";
+        chart.addClassNames = true;
+        chart.hideStockEvents();
+        chart.dataSets = [chartDataSet];
+        chart.panels = [chartPanel1, chartPanel2];
+        chart.chartScrollbarSettings.enabled = false;
+        chart.categoryAxesSettings = categoryAxesSettings;
+        chart.chartCursorSettings = chartCursorSettings;
+        chart.periodSelector = periodSelector;
+        chart.write(dom);
+    }
+
+    // main
+    $(document).ready(function () {
+        $.ytLoad();
+
+        var broker = getCookie("cookie_broker");
+        if (broker == "Tradier") {
+            if (getCookie("cookie_tradier_access_token") == "") {
+                var tradier_scope = "@Tradier_scope";
+                var tradier_state = "@Tradier_state";
+                var tradier_code = "@Tradier_code";
+                if (tradier_code != "") {
+                    $.ajax({
+                        type: 'GET',
+                        url: '/api/GetTradierAccessToken/velocity/' + tradier_code,
+                        success: function (result) {
+                            var tradier_access_token = result.access_token == null ? "" : result.access_token;
+                            if (tradier_access_token != "") {
+                                setCookie("cookie_tradier_access_token", tradier_access_token, 1);
+                                toastr.success("Connected to Tradier.");
+                            } else {
+                                toastr.error("Error connecting to Tradier.")
+                            }
+                            setStatus();
+                        }
+                    });
+                }
+            }
+        } else if (broker == "Questrade") {
+            toastr.error("Not yet applicable.");
+        }
+
+        setStatus();
+
+        //var serverSentEvents = new window.EventSource('/api/GetTradierStream');
+        //serverSentEvents.onmessage = function (e) {
+        //    $('#chartdata1').val($('#chartdata1').val() + "\n" + e.data);
+        //};
+
+        //serverSentEvents.addEventListener("testEvent", function (e) {
+        //    $('#chartdata1').val($('#chartdata1').val() + "\n" + e.data);
+        //});
+
+        //serverSentEvents.onerror = function (e) {
+        //    toastr.error("Error accessing data.");
+        //};
+
+        document.getElementById("Symbol").addEventListener("change", getSymbolData);
+    });
+</script>

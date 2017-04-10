@@ -19,5 +19,16 @@ namespace MagentaTrader
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
+
+        protected void Application_BeginRequest()
+        {
+            if (!Context.Request.IsSecureConnection
+                && !Context.Request.Url.ToString().StartsWith("http://localhost:") // to avoid switching to https when local testing
+                )
+            {
+                // Only insert an "s" to the "http:", and avoid modifying http: in the url parameters
+                Response.Redirect(Context.Request.Url.ToString().Insert(4, "s"));
+            }
+        }
     }
 }

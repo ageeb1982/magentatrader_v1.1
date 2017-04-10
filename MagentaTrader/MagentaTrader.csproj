@@ -207,6 +207,7 @@
     <Compile Include="Controllers\StockPriceController.cs" />
     <Compile Include="Controllers\SymbolController.cs" />
     <Compile Include="Controllers\TradierController.cs" />
+    <Compile Include="Controllers\TradierStreamingController.cs" />
     <Compile Include="Controllers\UserAlertAPIController.cs" />
     <Compile Include="Controllers\UserAlertController.cs" />
     <Compile Include="Controllers\UserController.cs" />
@@ -214,6 +215,7 @@
     <Compile Include="Controllers\UserFavoriteController.cs" />
     <Compile Include="Controllers\UserFavoriteSymbolAPIController.cs" />
     <Compile Include="Controllers\VariableScannerController.cs" />
+    <Compile Include="Controllers\VelocityController.cs" />
     <Compile Include="Controllers\VideoController.cs" />
     <Compile Include="Controllers\Web99Controller.cs" />
     <Compile Include="Controllers\WorkshopController.cs" />
@@ -855,6 +857,7 @@
     <Content Include="css\site.css" />
     <Content Include="css\styles.css" />
     <Content Include="css\toastr.css" />
+    <Content Include="css\velocity.css" />
     <Content Include="css\ytLoad.jquery.css" />
     <Content Include="dist\css\sb-admin-2.css" />
     <Content Include="dist\css\timeline.css" />
@@ -887,6 +890,7 @@
     <Content Include="img\loadingcity.gif" />
     <Content Include="img\logo-1.png" />
     <Content Include="img\logo-2.png" />
+    <Content Include="img\logo-velocity.png" />
     <Content Include="img\logo.png" />
     <Content Include="img\lv-nov13-16-seatingplan.png" />
     <Content Include="img\lvnov132016.jpg" />
@@ -1433,6 +1437,7 @@
     <Content Include="wijmo\styles\wijmo.min.css" />
     <Content Include="js\bootstrap-toggle.min.js.map" />
     <Content Include="js\bootstrap2-toggle.min.js.map" />
+    <Content Include="img\logo-velocity.psd" />
     <None Include="Properties\PublishProfiles\magentatrader - FTP %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\magentatrader - FTP %283%29.pubxml" />
     <None Include="Properties\PublishProfiles\magentatrader - FTP %284%29.pubxml" />
@@ -1567,6 +1572,7 @@
     <Content Include="Views\Campaign\BetaTesters2017.cshtml" />
     <Content Include="Views\Help\Index.cshtml" />
     <Content Include="Views\Campaign\IW20170305.cshtml" />
+    <Content Include="Views\Velocity\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -75,6 +75,45 @@ namespace MagentaTrader.Controllers
             }
         }
 
+        // GET api/GetTradierAccessToken/velocity/pjytfG9a
+        [Authorize]
+        [Route("api/GetTradierAccessToken/velocity/{code}")]
+        public Models.TradierAccessToken GetTradierAccessTokenVelocity(string code)
+        {
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.tradier.com/v1/oauth/accesstoken");
+            byte[] bytedata = Encoding.UTF8.GetBytes("grant_type=authorization_code&code=" + code);
+            string authInfo = Convert.ToBase64String(Encoding.Default.GetBytes("38Ng8OopHazxYkvkHcYwA718F30U0MH7:HFWAobtl6YYYnuG2"));
+
+            httpWebRequest.Method = "POST";
+            httpWebRequest.Accept = "*/*";
+            httpWebRequest.Headers.Add("Authorization", "Basic " + authInfo);
+            httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+            httpWebRequest.ContentLength = bytedata.Length;
+
+            Stream requestStream = httpWebRequest.GetRequestStream();
+            requestStream.Write(bytedata, 0, bytedata.Length);
+            requestStream.Close();
+
+            try
+            {
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    var result = streamReader.ReadToEnd();
+                    JavaScriptSerializer js = new JavaScriptSerializer();
+                    Models.TradierAccessToken t = (Models.TradierAccessToken)js.Deserialize(result, typeof(Models.TradierAccessToken));
+
+                    AccessLog("Tradier Access Token");
+
+                    return t;
+                }
+            }
+            catch
+            {
+                return new Models.TradierAccessToken();
+            }
+        }
+
         // GET api/GetTradierUserProfile/098f6bcd4621d373cade4e832627b4f6
         [Authorize]
         [Route("api/GetTradierUserProfile/{token}")]
