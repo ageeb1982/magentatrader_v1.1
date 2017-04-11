@@ -265,9 +265,70 @@
                         high: _symbolEOD[i].HighPrice,
                         low: _symbolEOD[i].LowPrice,
                         close: _symbolEOD[i].ClosePrice,
-                        volume: AmCharts.roundTo(_symbolEOD[i].Volume / 1000000, 2)
+                        volume: AmCharts.roundTo(_symbolEOD[i].Volume / 1000000, 2),
+                        ema1: 0,
+                        ema2: 0,
+                        macd: 0,
+                        macdSignal: 0
                     });
                 }
+
+                // compute for macd
+                var macd_index = 0;
+                var ema1_closePrices = 0;
+                var ema1_previous = 0;
+                var ema1 = 0;
+                var ema2_closePrices = 0;
+                var ema2_previous = 0;
+                var ema2 = 0;
+                var macd_values = 0;
+                var macd_sginal = 0;
+                var macd_sginal_previous = 0;
+                var fast_length = 12;
+                var slow_length = 26;
+                var macd_length = 9
+                for (var i = data.length - 1; i >= 0; i--) {
+                    // fast ema
+                    if (macd_index < (fast_length - 1)) {
+                        ema1_closePrices = ema1_closePrices + data[i].close;
+                    } else if (macd_index == (fast_length - 1)) {
+                        ema1 = ema1_closePrices / fast_length;
+                        ema1_previous = ema1;
+                        data[i].ema1 = ema1;
+                    } else if (macd_index > (fast_length - 1)) {
+                        ema1 = (data[i].close * (2 / (fast_length + 1)) + ema1_previous * (1 - (2 / (fast_length + 1))));
+                        ema1_previous = ema1;
+                        data[i].ema1 = ema1;
+                    }
+                    // slow ema
+                    if (macd_index < (slow_length-1)) {
+                        ema2_closePrices = ema2_closePrices + data[i].close;
+                    } else if (macd_index == (slow_length-1)) {
+                        ema2 = ema2_closePrices / slow_length;
+                        ema2_previous = ema2;
+                        data[i].ema2 = ema2;
+                        data[i].macd = data[i].ema1 - ema2;
+                    } else if (macd_index > (slow_length-1)) {
+                        ema2 = (data[i].close * (2 / (slow_length + 1)) + ema2_previous * (1 - (2 / (slow_length + 1))));
+                        ema2_previous = ema2;
+                        data[i].ema2 = ema2;
+                        data[i].macd = data[i].ema1 - ema2;
+                    }
+                    // signal
+                    if (macd_index < (slow_length+macd_length-1)) {
+                        macd_values = macd_values + data[i].macd;
+                    } else if (macd_index == (slow_length + macd_length - 1)) {
+                        macd_sginal = macd_values / macd_length;
+                        macd_sginal_previous = macd_sginal;
+                        data[i].macdSignal = macd_sginal;
+                    } else if (macd_index > (slow_length + macd_length - 1)) {
+                        macd_sginal = (data[i].macd * (2 / (macd_length + 1)) + macd_sginal * (1 - (2 / (macd_length + 1))));
+                        macd_sginal_previous = macd_sginal;
+                        data[i].macdSignal = macd_sginal;
+                    }
+                    macd_index++;
+                }
+
                 // add 5 days for chart cursor problem
                 var futureDate = new Date((new Date(_symbolEOD[0].QuoteDate)).add(1).days());
                 for (var i = 0; i < 5; i++) {
@@ -319,6 +380,12 @@
             }, {
                 fromField: "volume",
                 toField: "volume"
+            }, {
+                fromField: "macd",
+                toField: "macd"
+            }, {
+                fromField: "macdSignal",
+                toField: "macdSignal"
             }];
         chartDataSet.dataProvider = chartDataProvider;
         chartDataSet.categoryField = "date";
@@ -334,6 +401,13 @@
         chartAxis2.position = "right";
         chartAxis2.gridThickness = 0;
         chartAxis2.axisThickness = 0;
+
+        var chartAxis3 = new AmCharts.ValueAxis();
+        chartAxis3.id = "MACDAxis"
+        chartAxis3.labelsEnabled = false;
+        chartAxis3.position = "right";
+        chartAxis3.gridThickness = 0;
+        chartAxis3.axisThickness = 0;
 
         // chart category axis settings (Y-Axis)
         var categoryAxesSettings = new AmCharts.CategoryAxesSettings()
@@ -383,20 +457,47 @@
         chartGraph2.fillAlphas = 0.3;
         chartGraph2.valueAxis = chartAxis2;
 
+        var chartGraph3 = new AmCharts.StockGraph();
+        chartGraph3.id = "MACD";
+        chartGraph3.title = "MACD";
+        chartGraph3.valueField = "macd";
+        chartGraph3.useDataSetColors = false;
+        chartGraph3.color = _blueColor;
+        chartGraph3.lineColor = _blueColor;
+        chartGraph3.type = "line";
+        chartGraph3.lineThickness = 1;
+        chartGraph3.showBalloon = false;
+        chartGraph3.valueAxis = chartAxis3;
+
+        var chartGraph4 = new AmCharts.StockGraph();
+        chartGraph4.id = "MACDSignal";
+        chartGraph4.title = "Signal";
+        chartGraph4.valueField = "macdSignal";
+        chartGraph4.useDataSetColors = false;
+        chartGraph4.color = _redColor;
+        chartGraph4.lineColor = _redColor;
+        chartGraph4.type = "line";
+        chartGraph4.lineThickness = 1;
+        chartGraph4.showBalloon = false;
+        chartGraph4.valueAxis = chartAxis3;
+
         // chart panels
         var chartPanel1 = new AmCharts.StockPanel();
         chartPanel1.showCategoryAxis = false;
         chartPanel1.title = _symbolDescription;
-        chartPanel1.percentHeight = 80;
+        chartPanel1.percentHeight = 70;
         chartPanel1.recalculateToPercents = "never";
         chartPanel1.addValueAxis(chartAxis1);
+        chartPanel1.addValueAxis(chartAxis2);
         chartPanel1.addStockGraph(chartGraph1);
+        chartPanel1.addStockGraph(chartGraph2);
 
         var chartPanel2 = new AmCharts.StockPanel();
         chartPanel2.allowTurningOff = true;
-        chartPanel2.percentHeight = 20;
-        chartPanel2.addValueAxis(chartAxis2);
-        chartPanel2.addStockGraph(chartGraph2);
+        chartPanel2.percentHeight = 30;
+        chartPanel2.addValueAxis(chartAxis3);
+        chartPanel2.addStockGraph(chartGraph3);
+        chartPanel2.addStockGraph(chartGraph4);
 
         // period selector
         var periodSelector = new AmCharts.PeriodSelector();
