@@ -3457,7 +3457,8 @@
         $('#MovingAverage').modal('hide');
     }
     function computeMovingAverage() {
-        if (chartData.length > 252) {
+        var maxData = chartData.length - 1;
+        if (chartData.length > maxData) {
             for (var m = 0; m < 5; m++) {
                 if (MovingAverageData[m].isActive == true) {
                     if (MovingAverageData[m].type == "e") {
@@ -3467,7 +3468,7 @@
                         var ma_close = 0;
                         var ma = 0;
                         var ma_previous = 0;
-                        for (var i = 252; i >= 0; i--) {
+                        for (var i = maxData; i >= 0; i--) {
                             if (day < noOfDays) {
                                 ma_close = ma_close + chartData[i].close;
                             } else if (day == noOfDays) {
@@ -3502,7 +3503,7 @@
                         var ma_close = 0;
                         var ma = 0;
                         var ma_previous = 0;
-                        for (var i = 252; i >= 0; i--) {
+                        for (var i = maxData; i >= 0; i--) {
                             if (day < noOfDays) {
                                 ma_close = ma_close + chartData[i].close;
                             } else if (day == noOfDays) {
@@ -3532,7 +3533,7 @@
                 }
             }
             // Modify the plot data
-            for (i = 0; i < 252; i++) {
+            for (i = 0; i < maxData; i++) {
                 if (i <= 125) {
                     plotData[i].ma1 = AmCharts.roundTo(chartData[125 - i]["ma1"], 6);
                     plotData[i].ma2 = AmCharts.roundTo(chartData[125 - i]["ma2"], 6);

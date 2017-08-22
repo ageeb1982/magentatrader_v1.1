@@ -69,42 +69,54 @@
     </div>
     @*Body - Chart*@
     <div class="row">
-        <div class="col-lg-4">
+        <div class="col-lg-4" id="ChartData1">
             <div>
                 <div class="input-group">
-                    <span class="input-group-addon velocity-form velocity-form-label">Chart 1 Data:</span>
+                    <span class="input-group-addon velocity-form velocity-form-label">Timeframe:</span>
                     <select id="DataType1" class="form-control velocity-form">
-                        <option value="EOD" selected>EOD</option>
-                        <option value="IntraDay">IntraDay</option>
+                        <option value="Daily" selected>Daily Price - Weekly MACD</option>
+                        <option value="Weekly">Weekly Price - Monthly MACD</option>
+                        <option value="Hourly">Hourly Price - Daily MACD</option>
+                        <option value="15Min">15Min Price - Hourly MACD</option>
                     </select>
+                    <span class="input-group-addon velocity-form velocity-form-label"><a href="javascript:;" onclick="maximizeChart('1');"><i class="fa fa-square-o"></i> Full</a></span>
+                    <span class="input-group-addon velocity-form velocity-form-label"><a href="javascript:;" onclick="minimizeChart('1');"><i class="fa fa-table"></i> Tile</a></span>
                 </div>
             </div>
             <div>
                 <div id="ChartDiv1" style="height: 80.5vh;"></div>
             </div>
         </div>
-        <div class="col-lg-4" id=" chartdata2">
+        <div class="col-lg-4" id="ChartData2">
             <div>
                 <div class="input-group">
-                    <span class="input-group-addon velocity-form velocity-form-label">Chart 2 Data:</span>
+                    <span class="input-group-addon velocity-form velocity-form-label">Timeframe:</span>
                     <select id="DataType2" class="form-control velocity-form">
-                        <option value="EOD" selected>EOD</option>
-                        <option value="IntraDay">IntraDay</option>
+                        <option value="Daily" selected>Daily Price - Weekly MACD</option>
+                        <option value="Weekly">Weekly Price - Monthly MACD</option>
+                        <option value="Hourly">Hourly Price - Daily MACD</option>
+                        <option value="15Min">15Min Price - Hourly MACD</option>
                     </select>
+                    <span class="input-group-addon velocity-form velocity-form-label"><a href="javascript:;" onclick="maximizeChart('2');"><i class="fa fa-square-o"></i> Full</a></span>
+                    <span class="input-group-addon velocity-form velocity-form-label"><a href="javascript:;" onclick="minimizeChart('2');"><i class="fa fa-table"></i> Tile</a></span>
                 </div>
             </div>
             <div>
                 <div id="ChartDiv2" style="height: 80.5vh;"></div>
             </div>
         </div>
-        <div class="col-lg-4" id=" chartdata3">
+        <div class="col-lg-4" id="ChartData3">
             <div>
                 <div class="input-group">
-                    <span class="input-group-addon velocity-form velocity-form-label">Chart 3 Data:</span>
+                    <span class="input-group-addon velocity-form velocity-form-label">Timeframe:</span>
                     <select id="DataType3" class="form-control velocity-form">
-                        <option value="EOD" selected>EOD</option>
-                        <option value="IntraDay">IntraDay</option>
+                        <option value="Daily" selected>Daily Price - Weekly MACD</option>
+                        <option value="Weekly">Weekly Price - Monthly MACD</option>
+                        <option value="Hourly">Hourly Price - Daily MACD</option>
+                        <option value="15Min">15Min Price - Hourly MACD</option>
                     </select>
+                    <span class="input-group-addon velocity-form velocity-form-label"><a href="javascript:;" onclick="maximizeChart('3');"><i class="fa fa-square-o"></i> Full</a></span>
+                    <span class="input-group-addon velocity-form velocity-form-label"><a href="javascript:;" onclick="minimizeChart('3');"><i class="fa fa-table"></i> Tile</a></span>
                 </div>
             </div>
             <div>
@@ -151,17 +163,27 @@
     var _symbol = "";
     var _symbolDescription = "";
     var _symbolEOD;
+    var _symbolIntraday;
 
     var _chartDataProvider1 = [];
+
+    var _chart1;
+    var _chart2;
+    var _chart3;
 
     var _goldColor = "#FFA200";
     var _grayColor = "#858583";
     var _yellowColor = "#FFFF00";
     var _greenColor = "#00FF00";
     var _blueColor = "#0000FF";
+
     var _redColor = "#FF0000";
     var _darkGreenColor = "#65BF04";
     var _magentaColor = "#9C0063";
+
+    var _seaGreenColor = "#2DD493";
+    var _violetColor = "#8342E5";
+    var _pinkColor = "#EE4FEC";
 
     // broker connection functions
     function connectQuestrade() {
@@ -170,6 +192,23 @@
     function connectTradier() {
         setCookie("cookie_broker", "Tradier", 1);
         location.href = "https://api.tradier.com/v1/oauth/authorize?client_id=38Ng8OopHazxYkvkHcYwA718F30U0MH7&scope=read,write,market,trade&state=magenta";
+    }
+    function getTradierTimeSales(symbol) {
+        var token = getCookie("cookie_tradier_access_token");
+        if (token != "") {
+            $.ajax({
+                type: 'GET',
+                url: '/api/GetTradierTimeSales/velocity/' + symbol + '/' + token,
+                success: function (result) {
+                    if (result.series.data.length > 0) {
+                        _symbolIntraday = result.series.data;
+                    }
+                    toastr.success("Symbol intraday data loaded.");
+                }
+            });
+        } else {
+            toastr.error("No broker connection.");
+        }
     }
     // cookie functions
     function setCookie(cname, cvalue, exdays) {
@@ -218,6 +257,7 @@
         }
 
         if (symbol != "") {
+            // EOD Historical data
             $.ajax({
                 url: '/api/StockPrice/' + symbol,
                 cache: false,
@@ -232,13 +272,25 @@
 
                         document.getElementById("Exchange").value = data.Exchange;
 
+                        $("#ChartData1").show();
+                        $("#ChartData1").removeClass("col-lg-12");
+                        $("#ChartData1").addClass("col-lg-4");
+
+                        $("#ChartData2").show();
+                        $("#ChartData1").removeClass("col-lg-12");
+                        $("#ChartData2").addClass("col-lg-4");
+
+                        $("#ChartData3").show();
+                        $("#ChartData1").removeClass("col-lg-12");
+                        $("#ChartData3").addClass("col-lg-4");
+
                         $('#ChartDiv1').empty();
                         $('#ChartDiv2').empty();
                         $('#ChartDiv3').empty();
 
-                        makeChart("ChartDiv1");
-                        makeChart("ChartDiv2");
-                        makeChart("ChartDiv3");
+                        _chart1 = makeChart("ChartDiv1");
+                        _chart2 = makeChart("ChartDiv2");
+                        _chart3 = makeChart("ChartDiv3");
 
                         toastr.success("Symbol data loaded.");
                     } else {
@@ -250,97 +302,613 @@
                     toastr.error(err);
                 }
             );
+
+            // Intra day historical data (need broker connection)
+            getTradierTimeSales(symbol);
+        }
+    }
+    // compute for MACD data
+    function computeMACD(data, dataType) {
+        var macd_index = 0;
+        var ema1_closePrices = 0;
+        var ema1_previous = 0;
+        var ema1 = 0;
+        var ema2_closePrices = 0;
+        var ema2_previous = 0;
+        var ema2 = 0;
+        var macd_values = 0;
+        var macd_values_previous = 0;
+        var macd_signal = 0;
+        var macd_signal_previous = 0;
+
+        var fast_length = 12;
+        var slow_length = 26;
+        var macd_length = 9
+
+        var macd_color = _blueColor;
+        var closePrice = 0;
+
+        for (var i = 0; i < data.length; i++) {
+            
+            if (dataType == "15Min") {
+                closePrice = data[i].close;
+            } else if (dataType == "Hourly") {
+                closePrice = data[i].hourly_close;
+            } else if (dataType == "Daily") {
+                closePrice = data[i].daily_close;
+            } else if (dataType == "Weekly") {
+                closePrice = data[i].weekly_close;
+            } else if (dataType == "Monthly") {
+                closePrice = data[i].monthly_close;
+            }
+
+            if (closePrice != 'NaN') {
+                // fast ema
+                if (macd_index < (fast_length - 1)) {
+                    ema1_closePrices = ema1_closePrices + closePrice;
+                } else if (macd_index == (fast_length - 1)) {
+                    ema1 = ema1_closePrices / fast_length;
+                    ema1_previous = ema1;
+                    if (dataType == "15Min") {
+                        data[i].ema1 = ema1;
+                    } else if (dataType == "Hourly") {
+                        data[i].hourly_ema1 = ema1;
+                    } else if (dataType == "Daily") {
+                        data[i].daily_ema1 = ema1;
+                    } else if (dataType == "Weekly") {
+                        data[i].weekly_ema1 = ema1;
+                    } else if (dataType == "Monthly") {
+                        data[i].monthly_ema1 = ema1;
+                    }
+                } else if (macd_index > (fast_length - 1)) {
+                    ema1 = (closePrice * (2 / (fast_length + 1)) + ema1_previous * (1 - (2 / (fast_length + 1))));
+                    ema1_previous = ema1;
+                    if (dataType == "15Min") {
+                        data[i].ema1 = ema1;
+                    } else if (dataType == "Hourly") {
+                        data[i].hourly_ema1 = ema1;
+                    } else if (dataType == "Daily") {
+                        data[i].daily_ema1 = ema1;
+                    } else if (dataType == "Weekly") {
+                        data[i].weekly_ema1 = ema1;
+                    } else if (dataType == "Monthly") {
+                        data[i].monthly_ema1 = ema1;
+                    }
+                }
+                // slow ema
+                if (macd_index < (slow_length - 1)) {
+                    ema2_closePrices = ema2_closePrices + closePrice;
+                } else if (macd_index == (slow_length - 1)) {
+                    ema2 = ema2_closePrices / slow_length;
+                    ema2_previous = ema2;
+                    if (dataType == "15Min") {
+                        data[i].ema2 = ema2;
+                        data[i].macd = data[i].ema1 - ema2;
+                        data[i].macdColor = _blueColor;
+                        if (i > 0 && (macd_values_previous > data[i].macd)) {
+                            data[i].macdColor = _redColor;
+                        }
+                        macd_values_previous = data[i].macd;
+                    } else if (dataType == "Hourly") {
+                        data[i].hourly_ema2 = ema2;
+                        data[i].hourly_macd = data[i].hourly_ema1 - ema2;
+                        data[i].hourly_macdColor = _blueColor;
+                        if (i > 0 && (macd_values_previous > data[i].hourly_macd)) {
+                            data[i].hourly_macdColor = _redColor;
+                        }
+                        macd_values_previous = data[i].hourly_macd;
+                    } else if (dataType == "Daily") {
+                        data[i].daily_ema2 = ema2;
+                        data[i].daily_macd = data[i].daily_ema1 - ema2;
+                        data[i].daily_macdColor = _blueColor;
+                        if (i > 0 && (macd_values_previous > data[i].daily_macd)) {
+                            data[i].daily_macdColor = _redColor;
+                        }
+                        macd_values_previous = data[i].daily_macd;
+                    } else if (dataType == "Weekly") {
+                        data[i].weekly_ema2 = ema2;
+                        data[i].weekly_macd = data[i].weekly_ema1 - ema2;
+                        data[i].weekly_macdColor = _blueColor;
+                        if (i > 0 && (macd_values_previous > data[i].weekly_macd)) {
+                            data[i].weekly_macdColor = _redColor;
+                        }
+                        macd_values_previous = data[i].weekly_macd;
+                    } else if (dataType == "Monthly") {
+                        data[i].monthly_ema2 = ema2;
+                        data[i].monthly_macd = data[i].monthly_ema1 - ema2;
+                        data[i].monthly_macdColor = _blueColor;
+                        if (i > 0 && (macd_values_previous > data[i].monthly_macd)) {
+                            data[i].monthly_macdColor = _redColor;
+                        }
+                        macd_values_previous = data[i].monthly_macd;
+                    }
+                } else if (macd_index > (slow_length - 1)) {
+                    ema2 = (closePrice * (2 / (slow_length + 1)) + ema2_previous * (1 - (2 / (slow_length + 1))));
+                    ema2_previous = ema2;
+                    if (dataType == "15Min") {
+                        data[i].ema2 = ema2;
+                        data[i].macd = data[i].ema1 - ema2;
+                        data[i].macdColor = _blueColor;
+                        if (i > 0 && (data[i - 1].macd > data[i].macd)) {
+                            data[i].macdColor = _redColor;
+                        }
+                        macd_values_previous = data[i].macd;
+                    } else if (dataType == "Hourly") {
+                        data[i].hourly_ema2 = ema2;
+                        data[i].hourly_macd = data[i].hourly_ema1 - ema2;
+                        data[i].hourly_macdColor = _blueColor;
+                        if (i > 0 && (macd_values_previous > data[i].hourly_macd)) {
+                            data[i].hourly_macdColor = _redColor;
+                        }
+                        macd_values_previous = data[i].hourly_macd;
+                    } else if (dataType == "Daily") {
+                        data[i].daily_ema2 = ema2;
+                        data[i].daily_macd = data[i].daily_ema1 - ema2;
+                        data[i].daily_macdColor = _blueColor;
+                        if (i > 0 && (macd_values_previous > data[i].daily_macd)) {
+                            data[i].daily_macdColor = _redColor;
+                        }
+                        macd_values_previous = data[i].daily_macd;
+                    } else if (dataType == "Weekly") {
+                        data[i].weekly_ema2 = ema2;
+                        data[i].weekly_macd = data[i].weekly_ema1 - ema2;
+                        data[i].weekly_macdColor = _blueColor;
+                        if (i > 0 && (macd_values_previous > data[i].weekly_macd)) {
+                            data[i].weekly_macdColor = _redColor;
+                        }
+                        macd_values_previous = data[i].weekly_macd;
+                    } else if (dataType == "Monthly") {
+                        data[i].monthly_ema2 = ema2;
+                        data[i].monthly_macd = data[i].monthly_ema1 - ema2;
+                        data[i].monthly_macdColor = _blueColor;
+                        if (i > 0 && (macd_values_previous > data[i].monthly_macd)) {
+                            data[i].monthly_macdColor = _redColor;
+                        }
+                        macd_values_previous = data[i].monthly_macd;
+                    }
+                }
+                // signal
+                if (dataType == "15Min") {
+                    if (macd_index < (slow_length + macd_length - 1)) {
+                        macd_values = macd_values + data[i].macd;
+                    } else if (macd_index == (slow_length + macd_length - 1)) {
+                        macd_signal = macd_values / macd_length;
+                        macd_signal_previous = macd_signal;
+                        data[i].macdSignal = macd_signal;
+                    } else if (macd_index > (slow_length + macd_length - 1)) {
+                        macd_signal = (data[i].macd * (2 / (macd_length + 1)) + macd_signal * (1 - (2 / (macd_length + 1))));
+                        macd_signal_previous = macd_signal; weekly
+                        data[i].macdSignal = macd_signal;
+                    }
+                } else if (dataType == "Hourly") {
+                    if (macd_index < (slow_length + macd_length - 1)) {
+                        macd_values = macd_values + data[i].hourly_macd;
+                    } else if (macd_index == (slow_length + macd_length - 1)) {
+                        macd_signal = macd_values / macd_length;
+                        macd_signal_previous = macd_signal;
+                        data[i].hourly_macdSignal = macd_signal;
+                    } else if (macd_index > (slow_length + macd_length - 1)) {
+                        macd_signal = (data[i].hourly_macd * (2 / (macd_length + 1)) + macd_signal * (1 - (2 / (macd_length + 1))));
+                        macd_signal_previous = macd_signal;
+                        data[i].hourly_macdSignal = macd_signal;
+                    }
+                } else if (dataType == "Daily") {
+                    if (macd_index < (slow_length + macd_length - 1)) {
+                        macd_values = macd_values + data[i].daily_macd;
+                    } else if (macd_index == (slow_length + macd_length - 1)) {
+                        macd_signal = macd_values / macd_length;
+                        macd_signal_previous = macd_signal;
+                        data[i].daily_macdSignal = macd_signal;
+                    } else if (macd_index > (slow_length + macd_length - 1)) {
+                        macd_signal = (data[i].daily_macd * (2 / (macd_length + 1)) + macd_signal * (1 - (2 / (macd_length + 1))));
+                        macd_signal_previous = macd_signal;
+                        data[i].daily_macdSignal = macd_signal;
+                    }
+                } else if (dataType == "Weekly") {
+                    if (macd_index < (slow_length + macd_length - 1)) {
+                        macd_values = macd_values + data[i].weekly_macd;
+                    } else if (macd_index == (slow_length + macd_length - 1)) {
+                        macd_signal = macd_values / macd_length;
+                        macd_signal_previous = macd_signal;
+                        data[i].weekly_macdSignal = macd_signal;
+                    } else if (macd_index > (slow_length + macd_length - 1)) {
+                        macd_signal = (data[i].weekly_macd * (2 / (macd_length + 1)) + macd_signal * (1 - (2 / (macd_length + 1))));
+                        macd_signal_previous = macd_signal;
+                        data[i].weekly_macdSignal = macd_signal;
+                    }
+                } else if (dataType == "Monthly") {
+                    if (macd_index < (slow_length + macd_length - 1)) {
+                        macd_values = macd_values + data[i].monthly_macd;
+                    } else if (macd_index == (slow_length + macd_length - 1)) {
+                        macd_signal = macd_values / macd_length;
+                        macd_signal_previous = macd_signal;
+                        data[i].monthly_macdSignal = macd_signal;
+                    } else if (macd_index > (slow_length + macd_length - 1)) {
+                        macd_signal = (data[i].monthly_macd * (2 / (macd_length + 1)) + macd_signal * (1 - (2 / (macd_length + 1))));
+                        macd_signal_previous = macd_signal;
+                        data[i].monthly_macdSignal = macd_signal;
+                    }
+                }
+
+                macd_index++;
+            }
+        }
+    }
+    // compute for Moving Average data
+    function computeMovingAverage(data, dataType) {
+        var day = 1;
+
+        var ma1NoOfDays = 50;
+        var ma2NoOfDays = 21;
+        var ma3NoOfDays = 200;
+
+        var ma1_close = 0;
+        var ma1_previous = 0;
+        var ma1 = 0;
+        var ma2_close = 0;
+        var ma2_previous = 0;
+        var ma2 = 0;
+        var ma3_close = 0;
+        var ma3_previous = 0;
+        var ma3 = 0;
+        var closePrice = 0;
+
+        for (var i = 0; i < data.length; i++) {
+
+            //if (dataType == "Daily") {
+                closePrice = data[i].close;
+            //} else if (dataType == "Weekly") {
+            //    closePrice = data[i].weekly_close;
+            //} else if (dataType == "Monthly") {
+            //    closePrice = data[i].monthly_close;
+            //}
+
+            //if (closePrice != 'NaN') {
+                //ema1
+                if (day < ma1NoOfDays) {
+                    ma1_close = ma1_close + closePrice;
+                } else if (day == ma1NoOfDays) {
+                    ma1_close = ma1_close + closePrice;
+                    ma1 = ma1_close / ma1NoOfDays;
+                    ma1_previous = ma1;
+                    if (dataType == "Daily" || dataType == "15Min") {
+                        data[i].ema1 = ma1;
+                    } else if (dataType == "Hourly") {
+                        data[i].hourly_ema1 = ma1;
+                    } else if (dataType == "Weekly") {
+                        data[i].weekly_ema1 = ma1;
+                    } else if (dataType == "Monthly") {
+                        data[i].monthly_ema1 = ma1;
+                    }
+                } else if (day > ma1NoOfDays) {
+                    ma1 = (closePrice * (2 / (ma1NoOfDays + 1)) + ma1_previous * (1 - (2 / (ma1NoOfDays + 1))));
+                    ma1_previous = ma1;
+                    if (dataType == "Daily" || dataType == "15Min") {
+                        data[i].ema1 = ma1;
+                    } else if (dataType == "Hourly") {
+                        data[i].hourly_ema1 = ma1;
+                    } else if (dataType == "Weekly") {
+                        data[i].weekly_ema1 = ma1;
+                    } else if (dataType == "Monthly") {
+                        data[i].monthly_ema1 = ma1;
+                    }
+                }
+                //ema2
+                if (day < ma2NoOfDays) {
+                    ma2_close = ma2_close + closePrice;
+                } else if (day == ma2NoOfDays) {
+                    ma2_close = ma2_close + closePrice;
+                    ma2 = ma2_close / ma2NoOfDays;
+                    ma2_previous = ma2;
+                    if (dataType == "Daily" || dataType == "15Min") {
+                        data[i].ema2 = ma2;
+                    } else if (dataType == "Hourly") {
+                        data[i].hourly_ema2 = ma2;
+                    } else if (dataType == "Weekly") {
+                        data[i].weekly_ema2 = ma2;
+                    } else if (dataType == "Monthly") {
+                        data[i].monthly_ema2 = ma2;
+                    }
+                } else if (day > ma2NoOfDays) {
+                    ma2 = (closePrice * (2 / (ma2NoOfDays + 1)) + ma2_previous * (1 - (2 / (ma2NoOfDays + 1))));
+                    ma2_previous = ma2;
+                    if (dataType == "Daily" || dataType == "15Min") {
+                        data[i].ema2 = ma2;
+                    } else if (dataType == "Hourly") {
+                        data[i].hourly_ema2 = ma2;
+                    } else if (dataType == "Weekly") {
+                        data[i].weekly_ema2 = ma2;
+                    } else if (dataType == "Monthly") {
+                        data[i].monthly_ema2 = ma2;
+                    }
+                }
+                //sma1
+                if (day < ma3NoOfDays) {
+                    ma3_close = ma3_close + closePrice;
+                } else if (day == ma3NoOfDays) {
+                    ma3_close = ma3_close + closePrice;
+                    ma3 = ma3_close / ma3NoOfDays;
+                    if (dataType == "Daily" || dataType == "15Min") {
+                        data[i].sma1 = ma3;
+                    } else if (dataType == "Hourly") {
+                        data[i].hourly_sma1 = ma3;
+                    } else if (dataType == "Weekly") {
+                        data[i].weekly_sma1 = ma3;
+                    } else if (dataType == "Monthly") {
+                        data[i].monthly_sma1 = ma3;
+                    }
+                } else if (day > ma3NoOfDays) {
+                    //if (dataType == "Daily") {
+                        ma3_close = ma3_close + closePrice - data[i - ma3NoOfDays].close;
+                    //} else if (dataType == "Weekly") {
+                        //for (var r = ma3NoOfDays; r < i; r++) {
+                        //    if (data[i - r].weekly_close != 'NaN') {
+                        //        ma3_close = ma3_close + closePrice - data[i - ma3NoOfDays].weekly_close;
+                        //        break;
+                        //    }
+                        //}
+                    //} else if (dataType == "Monthly") {
+                        //for (var r = ma3NoOfDays; r < i; r++) {
+                        //    if (data[i - r].monthly_close != 'NaN') {
+                        //       ma3_close = ma3_close + closePrice - data[i - ma3NoOfDays].monthly_close;
+                        //        break;
+                        //    }
+                        //}  
+                    //}
+                    ma3 = ma3_close / ma3NoOfDays;
+                    if (dataType == "Daily" || dataType == "15Min") {
+                        data[i].sma1 = ma3;
+                    } else if (dataType == "Hourly") {
+                        data[i].hourly_sma1 = ma3;
+                    } else if (dataType == "Weekly") {
+                        data[i].weekly_sma1 = ma3;
+                    } else if (dataType == "Monthly") {
+                        data[i].monthly_sma1 = ma3;
+                    }
+                }
+
+                day++;
+            //}
         }
     }
     // chart data provider
     function provideData(dataType) {
         var data = [];
-        if (dataType == "EOD") {
+
+        if (dataType == "Daily" || dataType == "Weekly" || dataType == "Monthly") {
+
             if (_symbolEOD.length > 0) {
                 // get data
+                var weekly_open = 0;
+                var weekly_high = 0;
+                var weekly_low = 0;
+                var weekly_close = 0;
+                var weekly_volume = 0;
+
+                var monthly_open = 0;
+                var monthly_high = 0;
+                var monthly_low = 0;
+                var monthly_close = 0;
+                var monthly_volume = 0;
+                var monthly_previousMonth = 0;
+
                 for (var i = _symbolEOD.length - 1; i >= 0; i--) {
+                    // prepare data
+                    var quoteDate = parseChartDate(_symbolEOD[i].QuoteDate);
+                    if (i == _symbolEOD.length) {
+                        weekly_open = _symbolEOD[i].OpenPrice;
+                        weekly_high = _symbolEOD[i].HighPrice;
+                        weekly_low = _symbolEOD[i].LowPrice;
+                        weekly_close = _symbolEOD[i].ClosePrice;
+                        weekly_volume = AmCharts.roundTo(_symbolEOD[i].Volume / 1000000, 2);
+
+                        monthly_open = _symbolEOD[i].OpenPrice;
+                        monthly_high = _symbolEOD[i].HighPrice;
+                        monthly_low = _symbolEOD[i].LowPrice;
+                        monthly_close = _symbolEOD[i].ClosePrice;
+                        monthly_volume = AmCharts.roundTo(_symbolEOD[i].Volume / 1000000, 2);
+                        monthly_previousMonth = quoteDate.getMonth();
+                    } else {
+                        // weekly
+                        if (quoteDate.getDay() == 5) {
+                            weekly_open = _symbolEOD[i].OpenPrice;
+                            weekly_high = _symbolEOD[i].HighPrice;
+                            weekly_low = _symbolEOD[i].LowPrice;
+                            weekly_close = _symbolEOD[i].ClosePrice;
+                            weekly_volume = AmCharts.roundTo(_symbolEOD[i].Volume / 1000000, 2);
+                        } else {
+                            weekly_open = 'NaN';
+                            weekly_high = 'NaN';
+                            weekly_low = 'NaN';
+                            weekly_close = 'NaN';
+                            weekly_volume = 'NaN';
+                        }
+                        // monthly
+                        if (monthly_previousMonth != quoteDate.getMonth()) {
+                            monthly_open = _symbolEOD[i].OpenPrice;
+                            monthly_high = _symbolEOD[i].HighPrice;
+                            monthly_low = _symbolEOD[i].LowPrice;
+                            monthly_close = _symbolEOD[i].ClosePrice;
+                            monthly_volume = AmCharts.roundTo(_symbolEOD[i].Volume / 1000000, 2);
+                            monthly_previousMonth = quoteDate.getMonth();
+                        } else {
+                            monthly_open = 'NaN';
+                            monthly_high = 'NaN';
+                            monthly_low = 'NaN';
+                            monthly_close = 'NaN';
+                            monthly_volume = 'NaN';
+                        }
+                    }
+
+                    // save data
                     data.push({
                         date: parseChartDate(_symbolEOD[i].QuoteDate),
+
                         open: _symbolEOD[i].OpenPrice,
                         high: _symbolEOD[i].HighPrice,
                         low: _symbolEOD[i].LowPrice,
                         close: _symbolEOD[i].ClosePrice,
                         volume: AmCharts.roundTo(_symbolEOD[i].Volume / 1000000, 2),
+
+                        weekly_open: weekly_open,
+                        weekly_high: weekly_high,
+                        weekly_low: weekly_low,
+                        weekly_close: weekly_close,
+                        weekly_volume: weekly_volume,
+
+                        monthly_open: monthly_open,
+                        monthly_high: monthly_high,
+                        monthly_low: monthly_low,
+                        monthly_close: monthly_close,
+                        monthly_volume: monthly_volume,
+
                         ema1: 0,
                         ema2: 0,
+                        sma1: 0,
                         macd: 0,
-                        macdSignal: 0
+                        macdSignal: 0,
+                        macdColor: _blueColor,
+
+                        weekly_ema1: 'NaN',
+                        weekly_ema2: 'NaN',
+                        weekly_sma1: 'NaN',
+                        weekly_macd: 'NaN',
+                        weekly_macdSignal: 'NaN',
+                        weekly_macdColor: _blueColor,
+
+                        monthly_ema1: 'NaN',
+                        monthly_ema2: 'NaN',
+                        monthly_sma1: 'NaN',
+                        monthly_macd: 'NaN',
+                        monthly_macdSignal: 'NaN',
+                        monthly_macdColor: _blueColor
                     });
                 }
 
-                // compute for macd
-                var macd_index = 0;
-                var ema1_closePrices = 0;
-                var ema1_previous = 0;
-                var ema1 = 0;
-                var ema2_closePrices = 0;
-                var ema2_previous = 0;
-                var ema2 = 0;
-                var macd_values = 0;
-                var macd_sginal = 0;
-                var macd_sginal_previous = 0;
-                var fast_length = 12;
-                var slow_length = 26;
-                var macd_length = 9
-                for (var i = data.length - 1; i >= 0; i--) {
-                    // fast ema
-                    if (macd_index < (fast_length - 1)) {
-                        ema1_closePrices = ema1_closePrices + data[i].close;
-                    } else if (macd_index == (fast_length - 1)) {
-                        ema1 = ema1_closePrices / fast_length;
-                        ema1_previous = ema1;
-                        data[i].ema1 = ema1;
-                    } else if (macd_index > (fast_length - 1)) {
-                        ema1 = (data[i].close * (2 / (fast_length + 1)) + ema1_previous * (1 - (2 / (fast_length + 1))));
-                        ema1_previous = ema1;
-                        data[i].ema1 = ema1;
-                    }
-                    // slow ema
-                    if (macd_index < (slow_length-1)) {
-                        ema2_closePrices = ema2_closePrices + data[i].close;
-                    } else if (macd_index == (slow_length-1)) {
-                        ema2 = ema2_closePrices / slow_length;
-                        ema2_previous = ema2;
-                        data[i].ema2 = ema2;
-                        data[i].macd = data[i].ema1 - ema2;
-                    } else if (macd_index > (slow_length-1)) {
-                        ema2 = (data[i].close * (2 / (slow_length + 1)) + ema2_previous * (1 - (2 / (slow_length + 1))));
-                        ema2_previous = ema2;
-                        data[i].ema2 = ema2;
-                        data[i].macd = data[i].ema1 - ema2;
-                    }
-                    // signal
-                    if (macd_index < (slow_length+macd_length-1)) {
-                        macd_values = macd_values + data[i].macd;
-                    } else if (macd_index == (slow_length + macd_length - 1)) {
-                        macd_sginal = macd_values / macd_length;
-                        macd_sginal_previous = macd_sginal;
-                        data[i].macdSignal = macd_sginal;
-                    } else if (macd_index > (slow_length + macd_length - 1)) {
-                        macd_sginal = (data[i].macd * (2 / (macd_length + 1)) + macd_sginal * (1 - (2 / (macd_length + 1))));
-                        macd_sginal_previous = macd_sginal;
-                        data[i].macdSignal = macd_sginal;
-                    }
-                    macd_index++;
+                // compute for MACD data
+                if (dataType == "Daily") {
+                    computeMACD(data, "Weekly");
+                }  else if (dataType == "Weekly") {
+                    computeMACD(data, "Monthly");
                 }
 
-                // add 5 days for chart cursor problem
+                // compute for ema/sma
+                computeMovingAverage(data, dataType);
+
+                // add 126 days for chart cursor problem (use to plot seasonality)
                 var futureDate = new Date((new Date(_symbolEOD[0].QuoteDate)).add(1).days());
-                for (var i = 0; i < 5; i++) {
+                for (var i = 0; i < 126; i++) {
                     data.push({
                         date: new Date(futureDate)
                     });
                     futureDate = futureDate.add(1).day();
                 }
             }
-        } else if (dataType == "IntraDay") {
 
+        } else if (dataType == "Hourly" || dataType == "15Min") {
+            if (_symbolIntraday.length > 0) {
+                for (var i = 0; i < _symbolIntraday.length; i++) {
 
+                    var d1 = _symbolIntraday[i].time.replace('T', '-');
+                    var d2 = d1.replace(/:/g, '-');
+                    var dp = d2.split('-');
+                    var quoteDate = new Date(dp[0], dp[1] - 1, dp[2], dp[3], dp[4], dp[5]);
+
+                    var hourly_open = 'NaN';
+                    var hourly_high = 'NaN';
+                    var hourly_low = 'NaN';
+                    var hourly_close = 'NaN';
+                    var hourly_volume = 'NaN';
+
+                    var daily_open = 'NaN';
+                    var daily_high = 'NaN';
+                    var daily_low = 'NaN';
+                    var daily_close = 'NaN';
+                    var daily_volume = 'NaN';
+
+                    if (quoteDate.getMinutes() == 0) {
+                        hourly_open = _symbolIntraday[i].open;
+                        hourly_high = _symbolIntraday[i].high;
+                        hourly_low =  _symbolIntraday[i].low;
+                        hourly_close = _symbolIntraday[i].close;
+                        hourly_volume = AmCharts.roundTo(_symbolIntraday[i].volume / 1000000, 2);
+                        if (quoteDate.getHours() == 16) {
+                            daily_open = _symbolIntraday[i].open;
+                            daily_high = _symbolIntraday[i].high;
+                            daily_low = _symbolIntraday[i].low;
+                            daily_close = _symbolIntraday[i].close;
+                            daily_volume = AmCharts.roundTo(_symbolIntraday[i].volume / 1000000, 2);
+                        }
+                    }
+
+                    data.push({
+                        date: quoteDate,
+
+                        open: _symbolIntraday[i].open,
+                        high: _symbolIntraday[i].high,
+                        low: _symbolIntraday[i].low,
+                        close: _symbolIntraday[i].close,
+                        volume: AmCharts.roundTo(_symbolIntraday[i].volume / 1000000, 2),
+
+                        hourly_open: hourly_open,
+                        hourly_high: hourly_high,
+                        hourly_low: hourly_low,
+                        hourly_close: hourly_close,
+                        hourly_volume: hourly_volume,
+
+                        daily_open: daily_open,
+                        daily_high: daily_high,
+                        daily_low: daily_low,
+                        daily_close: daily_close,
+                        daily_volume: daily_volume,
+
+                        ema1: 'NaN',
+                        ema2: 'NaN',
+                        sma1: 'NaN',
+                        macd: 0,
+                        macdSignal: 0,
+                        macdColor: _blueColor,
+
+                        weekly_ema1: 'NaN',
+                        weekly_ema2: 'NaN',
+                        weekly_sma1: 'NaN',
+                        weekly_macd: 'NaN',
+                        weekly_macdSignal: 'NaN',
+                        weekly_macdColor: _blueColor,
+
+                        monthly_ema1: 'NaN',
+                        monthly_ema2: 'NaN',
+                        monthly_sma1: 'NaN',
+                        monthly_macd: 'NaN',
+                        monthly_macdSignal: 'NaN',
+                        monthly_macdColor: _blueColor
+                    });
+                }
+
+                // compute for MACD data
+                if (dataType == "15Min") {
+                    computeMACD(data, "Hourly");
+                } else if (dataType == "Hourly") {
+                    computeMACD(data, "Daily");
+                }
+
+                // compute for ema/sma
+                computeMovingAverage(data, dataType);
+
+                // add 3 days for chart cursor problem (use to plot seasonality)
+                d1 = _symbolIntraday[_symbolIntraday.length - 1].time.replace('T', '-');
+                d2 = d1.replace(/:/g, '-');
+                dp = d2.split('-');
+                quoteDate = new Date(dp[0], dp[1] - 1, dp[2], dp[3], dp[4], dp[5]);
+
+                var futureDate = dateAdd(quoteDate, 'minute', 15);
+                for (var i = 0; i < 100; i++) {
+                    data.push({
+                        date: new Date(futureDate)
+                    });
+                    futureDate = dateAdd(futureDate, 'minute', 15);
+                }
+            }
         }
         return data;
     }
@@ -349,44 +917,105 @@
         var parts = quoteDate.split('-');
         return new Date(parts[0], parts[1] - 1, parts[2]);
     }
+    function dateAdd(date, interval, units) {
+        var ret = new Date(date); //don't change original date
+        var checkRollover = function () { if (ret.getDate() != date.getDate()) ret.setDate(0); };
+        switch (interval.toLowerCase()) {
+            case 'year': ret.setFullYear(ret.getFullYear() + units); checkRollover(); break;
+            case 'quarter': ret.setMonth(ret.getMonth() + 3 * units); checkRollover(); break;
+            case 'month': ret.setMonth(ret.getMonth() + units); checkRollover(); break;
+            case 'week': ret.setDate(ret.getDate() + 7 * units); break;
+            case 'day': ret.setDate(ret.getDate() + units); break;
+            case 'hour': ret.setTime(ret.getTime() + units * 3600000); break;
+            case 'minute': ret.setTime(ret.getTime() + units * 60000); break;
+            case 'second': ret.setTime(ret.getTime() + units * 1000); break;
+            default: ret = undefined; break;
+        }
+        return ret;
+    }
     // make chart
     function makeChart(dom) {
+
         // chart data provider
         var chartDataProvider = [];
+        var chartDataType = "Daily";
+
         if (dom == "ChartDiv1") {
             chartDataProvider = provideData(document.getElementById("DataType1").value);
+            chartDataType = document.getElementById("DataType1").value;
         } else if (dom == "ChartDiv2") {
             chartDataProvider = provideData(document.getElementById("DataType2").value);
+            chartDataType = document.getElementById("DataType2").value;
         } else if (dom == "ChartDiv3") {
             chartDataProvider = provideData(document.getElementById("DataType3").value);
+            chartDataType = document.getElementById("DataType3").value;
         }
 
         //chart data set
         var chartDataSet = new AmCharts.DataSet();
         chartDataSet.title = _symbol;
         chartDataSet.color = "#7f8da9";
-        chartDataSet.fieldMappings = [{
-                fromField: "open",
-                toField: "open"
-            }, {
-                fromField: "high",
-                toField: "high"
-            }, {
-                fromField: "low",
-                toField: "low"
-            }, {
-                fromField: "close",
-                toField: "close"
-            }, {
-                fromField: "volume",
-                toField: "volume"
-            }, {
-                fromField: "macd",
-                toField: "macd"
-            }, {
-                fromField: "macdSignal",
-                toField: "macdSignal"
-            }];
+        chartDataSet.fieldMappings = [
+            { fromField: "open", toField: "open" },
+            { fromField: "high", toField: "high" },
+            { fromField: "low", toField: "low" },
+            { fromField: "close", toField: "close" },
+            { fromField: "volume", toField: "volume" },
+            { fromField: "macd", toField: "macd" },
+            { fromField: "macdColor", toField: "macdColor" },
+            { fromField: "macdSignal", toField: "macdSignal" },
+            { fromField: "ema1", toField: "ema1" },
+            { fromField: "ema2", toField: "ema2" },
+            { fromField: "sma1", toField: "sma1" },
+
+            { fromField: "weekly_open", toField: "weekly_open" },
+            { fromField: "weekly_high", toField: "weekly_high" },
+            { fromField: "weekly_low", toField: "weekly_low" },
+            { fromField: "weekly_close", toField: "weekly_close" },
+            { fromField: "weekly_volume", toField: "weekly_volume" },
+            { fromField: "weekly_macd", toField: "weekly_macd" },
+            { fromField: "weekly_macdColor", toField: "weekly_macdColor" },
+            { fromField: "weekly_macdSignal", toField: "weekly_macdSignal" },
+            { fromField: "weekly_ema1", toField: "weekly_ema1" },
+            { fromField: "weekly_ema2", toField: "weekly_ema2" },
+            { fromField: "weekly_sma1", toField: "weekly_sma1" },
+
+            { fromField: "monthly_open", toField: "monthly_open" },
+            { fromField: "monthly_high", toField: "monthly_high" },
+            { fromField: "monthly_low", toField: "monthly_low" },
+            { fromField: "monthly_close", toField: "monthly_close" },
+            { fromField: "monthly_volume", toField: "monthly_volume" },
+            { fromField: "monthly_macd", toField: "monthly_macd" },
+            { fromField: "monthly_macdColor", toField: "monthly_macdColor" },
+            { fromField: "monthly_macdSignal", toField: "monthly_macdSignal" },
+            { fromField: "monthly_ema1", toField: "monthly_ema1" },
+            { fromField: "monthly_ema2", toField: "monthly_ema2" },
+            { fromField: "monthly_sma1", toField: "monthly_sma1" },
+
+            { fromField: "hourly_open", toField: "hourly_open" },
+            { fromField: "hourly_high", toField: "hourly_high" },
+            { fromField: "hourly_low", toField: "hourly_low" },
+            { fromField: "hourly_close", toField: "hourly_close" },
+            { fromField: "hourly_volume", toField: "hourly_volume" },
+            { fromField: "hourly_macd", toField: "hourly_macd" },
+            { fromField: "hourly_macdColor", toField: "hourly_macdColor" },
+            { fromField: "hourly_macdSignal", toField: "hourly_macdSignal" },
+            { fromField: "hourly_ema1", toField: "hourly_ema1" },
+            { fromField: "hourly_ema2", toField: "hourly_ema2" },
+            { fromField: "hourly_sma1", toField: "hourly_sma1" },
+
+            { fromField: "daily_open", toField: "daily_open" },
+            { fromField: "daily_high", toField: "daily_high" },
+            { fromField: "daily_low", toField: "daily_low" },
+            { fromField: "daily_close", toField: "daily_close" },
+            { fromField: "daily_volume", toField: "daily_volume" },
+            { fromField: "daily_macd", toField: "daily_macd" },
+            { fromField: "daily_macdColor", toField: "daily_macdColor" },
+            { fromField: "daily_macdSignal", toField: "daily_macdSignal" },
+            { fromField: "daily_ema1", toField: "daily_ema1" },
+            { fromField: "daily_ema2", toField: "daily_ema2" },
+            { fromField: "daily_sma1", toField: "daily_sma1" }
+        ];
         chartDataSet.dataProvider = chartDataProvider;
         chartDataSet.categoryField = "date";
 
@@ -404,16 +1033,21 @@
 
         var chartAxis3 = new AmCharts.ValueAxis();
         chartAxis3.id = "MACDAxis"
-        chartAxis3.labelsEnabled = false;
-        chartAxis3.position = "right";
-        chartAxis3.gridThickness = 0;
-        chartAxis3.axisThickness = 0;
+        chartAxis3.color = _blueColor;
 
         // chart category axis settings (Y-Axis)
         var categoryAxesSettings = new AmCharts.CategoryAxesSettings()
-        categoryAxesSettings.maxSeries = 150;
-        categoryAxesSettings.groupToPeriods = ["15mm", "hh", "DD", "WW", "MM", "YYYY"];
-        categoryAxesSettings.minPeriod = "15mm";
+        categoryAxesSettings.maxSeries = 0;
+        categoryAxesSettings.groupToPeriods = ["15mm", "hh", "DD", "WW", "MM"];
+        categoryAxesSettings.parseDates = true;
+
+        if (chartDataType == "Daily") categoryAxesSettings.minPeriod = "DD";
+        else if (chartDataType == "Weekly") categoryAxesSettings.minPeriod = "WW";
+        else if (chartDataType == "Monthly") categoryAxesSettings.minPeriod = "MM";
+        else if (chartDataType == "Hourly") categoryAxesSettings.minPeriod = "hh";
+        else if (chartDataType == "15Min") categoryAxesSettings.minPeriod = "15mm";
+        else categoryAxesSettings.minPeriod = "DD";
+
         categoryAxesSettings.equalSpacing = true;
         categoryAxesSettings.color = _blueColor;
         categoryAxesSettings.inside = true;
@@ -423,16 +1057,79 @@
         chartCursorSettings.valueLineEnabled = true;
         chartCursorSettings.valueBalloonsEnabled = true;
 
+        // fields
+        var openField = "open";
+        var closeField = "close";
+        var highField = "high";
+        var lowField = "low";
+        var volumeField = "volume";
+        var macdField = "macd";
+        var macdColorField = "macdColor";
+        var macdSignalField = "macdSignal";
+        var ema1Field = "ema1";
+        var ema2Field = "ema2";
+        var sma1Field = "sma1";
+
+        if (chartDataType == "Daily") {
+            openField = "open";
+            closeField = "close";
+            highField = "high";
+            lowField = "low";
+            volumeField = "volume";
+            macdField = "weekly_macd";
+            macdColorField = "weekly_macdColor";
+            macdSignalField = "weekly_macdSignal";
+            ema1Field = "ema1";
+            ema2Field = "ema2";
+            sma1Field = "sma1";
+        } else if (chartDataType == "15Min") {
+            openField = "open";
+            closeField = "close";
+            highField = "high";
+            lowField = "low";
+            volumeField = "volume";
+            macdField = "hourly_macd";
+            macdColorField = "hourly_macdColor";
+            macdSignalField = "hourly_macdSignal";
+            ema1Field = "ema1";
+            ema2Field = "ema2";
+            sma1Field = "sma1";
+        } else if (chartDataType == "Hourly") {
+            openField = "hourly_open";
+            closeField = "hourly_close";
+            highField = "hourly_high";
+            lowField = "hourly_low";
+            volumeField = "hourly_volume";
+            macdField = "daily_macd";
+            macdColorField = "daily_macdColor";
+            macdSignalField = "daily_macdSignal";
+            ema1Field = "hourly_ema1";
+            ema2Field = "hourly_ema2";
+            sma1Field = "hourly_sma1";
+        } else if (chartDataType == "Weekly") {
+            openField = "weekly_open";
+            closeField = "weekly_close";
+            highField = "weekly_high";
+            lowField = "weekly_low";
+            volumeField = "weekly_volume";
+            macdField = "monthly_macd";
+            macdColorField = "monthly_macdColor";
+            macdSignalField = "monthly_macdSignal";
+            ema1Field = "weekly_ema1";
+            ema2Field = "weekly_ema2";
+            sma1Field = "weekly_sma1";
+        } 
+
         // chart graphs
         var chartGraph1 = new AmCharts.StockGraph();
         chartGraph1.id = "Price";
         chartGraph1.title = "Price";
         chartGraph1.type = "candlestick";
-        chartGraph1.openField = "open";
-        chartGraph1.closeField = "close";
-        chartGraph1.highField = "high";
-        chartGraph1.lowField = "low";
-        chartGraph1.valueField = "close";
+        chartGraph1.openField = openField;
+        chartGraph1.closeField = closeField;
+        chartGraph1.highField = highField;
+        chartGraph1.lowField = lowField;
+        chartGraph1.valueField = closeField;
         chartGraph1.lineColor = "#0FB203";
         chartGraph1.fillColors = "#0FB203";
         chartGraph1.negativeLineColor = "#A80008";
@@ -447,7 +1144,7 @@
         var chartGraph2 = new AmCharts.StockGraph();
         chartGraph2.id = "Volume";
         chartGraph2.title = "Volume (M)";
-        chartGraph2.valueField = "volume";
+        chartGraph2.valueField = volumeField;
         chartGraph2.type = "column";
         chartGraph2.useDataSetColors = false;
         chartGraph2.color = _grayColor;
@@ -460,26 +1157,58 @@
         var chartGraph3 = new AmCharts.StockGraph();
         chartGraph3.id = "MACD";
         chartGraph3.title = "MACD";
-        chartGraph3.valueField = "macd";
+        chartGraph3.valueField = macdField;
         chartGraph3.useDataSetColors = false;
-        chartGraph3.color = _blueColor;
-        chartGraph3.lineColor = _blueColor;
-        chartGraph3.type = "line";
+        chartGraph3.lineColorField = macdColorField;
+        chartGraph3.type = "step";
         chartGraph3.lineThickness = 1;
         chartGraph3.showBalloon = false;
         chartGraph3.valueAxis = chartAxis3;
 
-        var chartGraph4 = new AmCharts.StockGraph();
-        chartGraph4.id = "MACDSignal";
-        chartGraph4.title = "Signal";
-        chartGraph4.valueField = "macdSignal";
-        chartGraph4.useDataSetColors = false;
-        chartGraph4.color = _redColor;
-        chartGraph4.lineColor = _redColor;
-        chartGraph4.type = "line";
-        chartGraph4.lineThickness = 1;
-        chartGraph4.showBalloon = false;
-        chartGraph4.valueAxis = chartAxis3;
+        //var chartGraph4 = new AmCharts.StockGraph();
+        //chartGraph4.id = "MACDSignal";
+        //chartGraph4.title = "Signal";
+        //chartGraph4.valueField = macdSignalField;
+        //chartGraph4.useDataSetColors = false;
+        //chartGraph4.color = _redColor;
+        //chartGraph4.lineColor = _redColor;
+        //chartGraph4.type = "line";
+        //chartGraph4.lineThickness = 1;
+        //chartGraph4.showBalloon = false;
+        //chartGraph4.valueAxis = chartAxis3;
+
+        var chartGraph5 = new AmCharts.StockGraph();
+        chartGraph5.id = "graphEMA1";
+        chartGraph5.valueField = ema1Field;
+        chartGraph5.title = "EMA1";
+        chartGraph5.useDataSetColors = false;
+        chartGraph5.type = "line";
+        chartGraph5.lineThickness = 1;
+        chartGraph5.showBalloon = false;
+        chartGraph5.lineColor = _seaGreenColor;
+        chartGraph5.valueAxis = chartAxis1;
+
+        var chartGraph6 = new AmCharts.StockGraph();
+        chartGraph6.id = "graphEMA2";
+        chartGraph6.valueField = ema2Field;
+        chartGraph6.title = "EMA2";
+        chartGraph6.useDataSetColors = false;
+        chartGraph6.type = "line";
+        chartGraph6.lineThickness = 1;
+        chartGraph6.showBalloon = false;
+        chartGraph6.lineColor = _violetColor;
+        chartGraph6.valueAxis = chartAxis1;
+
+        var chartGraph7 = new AmCharts.StockGraph();
+        chartGraph7.id = "graphSMA1";
+        chartGraph7.valueField = sma1Field;
+        chartGraph7.title = "SMA1";
+        chartGraph7.useDataSetColors = false;
+        chartGraph7.type = "line";
+        chartGraph7.lineThickness = 1;
+        chartGraph7.showBalloon = false;
+        chartGraph7.lineColor = _pinkColor;
+        chartGraph7.valueAxis = chartAxis1;
 
         // chart panels
         var chartPanel1 = new AmCharts.StockPanel();
@@ -489,15 +1218,24 @@
         chartPanel1.recalculateToPercents = "never";
         chartPanel1.addValueAxis(chartAxis1);
         chartPanel1.addValueAxis(chartAxis2);
-        chartPanel1.addStockGraph(chartGraph1);
-        chartPanel1.addStockGraph(chartGraph2);
+        chartPanel1.addStockGraph(chartGraph1); // price
+        chartPanel1.addStockGraph(chartGraph2); // volume
+        chartPanel1.addStockGraph(chartGraph5); // ema1 - 50ema
+        chartPanel1.addStockGraph(chartGraph6); // ema2 - 21ema
+        chartPanel1.addStockGraph(chartGraph7); // sma1 - 200sma
 
         var chartPanel2 = new AmCharts.StockPanel();
         chartPanel2.allowTurningOff = true;
         chartPanel2.percentHeight = 30;
         chartPanel2.addValueAxis(chartAxis3);
         chartPanel2.addStockGraph(chartGraph3);
-        chartPanel2.addStockGraph(chartGraph4);
+
+        // trend lines (magenta channel)
+        // var magentaChannelTop = new AmCharts.TrendLine();
+        // var magentaChannelMid = new AmCharts.TrendLine();
+        // var magentaChannelBot = new AmCharts.TrendLine();
+
+        // drawMagentaChannel(chartPanel1, chartDataProvider, 1, 252, magentaChannelTop, magentaChannelBot, magentaChannelMid);
 
         // period selector
         var periodSelector = new AmCharts.PeriodSelector();
@@ -505,24 +1243,31 @@
         periodSelector.inputFieldsEnabled = false;
         periodSelector.color = _blueColor;
         periodSelector.periods = [
+        //{
+        //    period: "YYYY",
+        //    count: 5.5,
+        //    selected: true,
+        //    label: "5 Years"
+        //},
+        //{
+        //    period: "YYYY",
+        //    count: 1.5,
+        //    selected: false,
+        //    label: "1 Year"
+        //}, {
+        //    period: "MM",
+        //    count: 12,
+        //    selected: false,
+        //    label: "6 Months"
+        //}, {
+        //    period: "DD",
+        //    count: 210,
+        //    selected: false,
+        //    label: "30 Days"
+        //},
         {
-            period: "YYYY",
-            count: 1,
-            selected: false,
-            label: "1 Year"
-        }, {
-            period: "MM",
-            count: 6,
-            selected: dom == "ChartDiv2" ? true : false,
-            label: "6 Months"
-        }, {
-            period: "DD",
-            count: 30,
-            selected: dom == "ChartDiv3" ? true : false,
-            label: "30 Days"
-        }, {
             period: "MAX",
-            selected: dom == "ChartDiv1" ? true : false,
+            selected: true,
             label: "Max"
         }];
 
@@ -538,9 +1283,181 @@
         chart.chartCursorSettings = chartCursorSettings;
         chart.periodSelector = periodSelector;
         chart.write(dom);
+
+        return chart;
+    }
+    // compute correlation
+    function computeCorrelation(chartDataProvider, startIndex, endIndex) {
+        var X = 0;
+        var Y = 0;
+        var sumOfX = 0;
+        var sumOfY = 0;
+        var sumOfX2 = 0;
+        var sumOfY2 = 0;
+        var sumOfXY = 0;
+
+        for (var i = startIndex - 1; i < endIndex - 1; i++) {
+            X = X + 1;
+            Y = parseFloat(chartDataProvider[i]["close"]);
+            sumOfX = sumOfX + X;
+            sumOfY = sumOfY + Y;
+            sumOfXY = sumOfXY + (X * Y);
+            sumOfX2 = sumOfX2 + (X * X);
+            sumOfY2 = sumOfY2 + (Y * Y);
+        }
+        //r = Σ (xy) / sqrt [ ( Σ x2 ) * ( Σ y2 ) ]
+        return (sumOfXY - ((sumOfX * sumOfY) / X)) / Math.sqrt(((sumOfX2 - ((sumOfX * sumOfX) / X)) * (sumOfY2 - ((sumOfY * sumOfY) / X)))); // Pearson
+    }
+    // draw magenta channel
+    function drawMagentaChannel(chartPanel, chartDataProvider, startIndex, endIndex, magentaChannelTop, magentaChannelBot, magentaChannelMid) {
+        var m = 0;
+        var NumberOfDays = 0;
+
+        // parse chartDataProvider
+        var data = [];
+        for (i = 0; i < 252; i++) {
+            data
+        }
+
+        // Get the number of days
+        if (endIndex > 126) {
+            NumberOfDays = 126 - startIndex + 1;
+            chartNoOfDays = NumberOfDays;
+        } else {
+            NumberOfDays = endIndex - startIndex + 1;
+        }
+        //chartNoOfDays = NumberOfDays; // Use to display the Number of days in the chart.
+
+        // Check for the correlation (you only check for the correlation if the data is more than 30 days onward)
+        // Move the startIndex if the correlation is greater than 0.8 both ways to that day
+        // Recompute the number of days to that day
+        if (NumberOfDays > 30) {
+            var correlationStartIndex = endIndex > 126 ? 126 : endIndex;
+            var counter = 0;
+            for (var i = correlationStartIndex; i > startIndex - 1; i--) {
+                if (counter > 30) {
+                    chartCoefficient = Math.abs(computeCorrelation(chartDataProvider, i, correlationStartIndex));
+                    if (chartCoefficient <= 0.9) {
+                        startIndex = i;
+                        if (endIndex > 126) {
+                            NumberOfDays = 126 - startIndex + 1;
+                        } else {
+                            NumberOfDays = endIndex - startIndex + 1;
+                        }
+                        break;
+                    }
+                }
+                counter++;
+            }
+            //debugger;
+        } else {
+            if (startIndex <= 126) {
+                chartCoefficient = Math.abs(computeCorrelation(chartDataProvider, startIndex, endIndex > 126 ? 126 : endIndex));
+            }
+        }
+        //debugger;
+        chartChannelNoOfDays = NumberOfDays; // Use to display the number of days in the channel.
+
+        // Compute for the slope
+        if (endIndex > 126) {
+            m = (parseFloat(chartDataProvider[125]["close"]) - parseFloat(chartDataProvider[startIndex - 1]["close"])) / NumberOfDays;
+
+            if (parseFloat(chartDataProvider[startIndex - 1]["close"]) == 0) {
+                chartSlopePercentage = 0;
+            } else {
+                chartSlopePercentage = ((parseFloat(chartDataProvider[125]["close"]) - parseFloat(chartDataProvider[startIndex - 1]["close"])) / parseFloat(chartDataProvider[startIndex - 1]["close"])) * 100;
+            }
+        } else {
+            m = (parseFloat(chartDataProvider[endIndex - 1]["close"]) - parseFloat(chartDataProvider[startIndex - 1]["close"])) / NumberOfDays;
+
+            if (parseFloat(chartDataProvider[startIndex - 1]["close"]) == 0) {
+                chartSlopePercentage = 0;
+            } else {
+                chartSlopePercentage = ((parseFloat(chartDataProvider[endIndex - 1]["close"]) - parseFloat(chartDataProvider[startIndex - 1]["close"])) / parseFloat(chartDataProvider[startIndex - 1]["close"])) * 100;
+            }
+        }
+
+        // Prepare the data (intercepts)
+        var b = [];
+        for (var i = 0; i < NumberOfDays ; i++) {
+            b[i] = parseFloat(chartDataProvider[i + startIndex - 1]["close"]) - (m * (i + 1));
+        }
+        b.sort(function (a, b) {
+            return a - b;
+        });
+
+        // Set the b-intercepts
+        var bMax = b[parseInt(NumberOfDays * .9)];
+        var bMid = b[parseInt(NumberOfDays * .5)];
+        var bMin = b[parseInt(NumberOfDays * .1)];
+
+        if (bMin != 0) {
+            chartChannelRange = ((bMax - bMin) / bMin) * 100;
+        } else {
+            chartChannelRange = 100;
+        }
+
+        // Plot the channels
+        magentaChannelTop.lineColor = _greenColor;
+        magentaChannelTop.initialDate = chartDataProvider[startIndex - 1]["date"];
+        magentaChannelTop.finalDate = chartDataProvider[endIndex - 1]["date"];
+        magentaChannelTop.initialValue = (m + bMax);
+        magentaChannelTop.finalValue = ((m * (endIndex - startIndex + 1)) + bMax);
+        magentaChannelTop.lineThickness = 2;
+        chartPanel.addTrendLine(magentaChannelTop);
+
+        magentaChannelBot.lineColor = _redColor;
+        magentaChannelBot.initialDate = chartDataProvider[startIndex - 1]["date"];
+        magentaChannelBot.finalDate = chartDataProvider[endIndex - 1]["date"];
+        magentaChannelBot.initialValue = (m + bMin);
+        magentaChannelBot.finalValue = ((m * (endIndex - startIndex + 1)) + bMin);
+        magentaChannelBot.lineThickness = 2;
+        chartPanel.addTrendLine(magentaChannelBot);
+
+        magentaChannelMid.lineColor = _magentaColor;
+        magentaChannelMid.initialDate = chartDataProvider[startIndex - 1]["date"];
+        magentaChannelMid.finalDate = chartDataProvider[endIndex - 1]["date"];
+        magentaChannelMid.initialValue = (m + bMid);
+        magentaChannelMid.finalValue = ((m * (endIndex - startIndex + 1)) + bMid);
+        magentaChannelMid.lineThickness = 1;
+        chartPanel.addTrendLine(magentaChannelMid);
+
+        chartPanel.validateNow();
+    }
+    // maximize and minimize div charts
+    function maximizeChart(id) {
+        $("#ChartData1").hide();
+        $("#ChartData1").removeClass("col-lg-4");
+        $("#ChartData2").hide();
+        $("#ChartData2").removeClass("col-lg-4");
+        $("#ChartData3").hide();
+        $("#ChartData3").removeClass("col-lg-4");
+
+        $("#ChartData" + id).show();
+        $("#ChartData" + id).addClass("col-lg-12");
+
+        if (id == '1') _chart1.invalidateSize();
+        if (id == '2') _chart2.invalidateSize();
+        if (id == '3') _chart3.invalidateSize();
+    }
+    function minimizeChart(id) {
+        $("#ChartData1").show();
+        $("#ChartData1").addClass("col-lg-4");
+        $("#ChartData2").show();
+        $("#ChartData2").addClass("col-lg-4");
+        $("#ChartData3").show();
+        $("#ChartData3").addClass("col-lg-4");
+
+        $("#ChartData" + id).removeClass("col-lg-12");
+
+        if (id == '1') _chart1.invalidateSize();
+        if (id == '2') _chart2.invalidateSize();
+        if (id == '3') _chart3.invalidateSize();
     }
 
-    // main
+    // =============
+    // main function
+    // =============
     $(document).ready(function () {
         $.ytLoad();
 
@@ -573,19 +1490,17 @@
 
         setStatus();
 
-        //var serverSentEvents = new window.EventSource('/api/GetTradierStream');
-        //serverSentEvents.onmessage = function (e) {
-        //    $('#chartdata1').val($('#chartdata1').val() + "\n" + e.data);
-        //};
-
-        //serverSentEvents.addEventListener("testEvent", function (e) {
-        //    $('#chartdata1').val($('#chartdata1').val() + "\n" + e.data);
-        //});
-
-        //serverSentEvents.onerror = function (e) {
-        //    toastr.error("Error accessing data.");
-        //};
-
         document.getElementById("Symbol").addEventListener("change", getSymbolData);
+
+        $('#DataType1').on('change', function () {
+            _chart1 = makeChart("ChartDiv1");
+        });
+        $('#DataType2').on('change', function () {
+            _chart2 = makeChart("ChartDiv2");
+        });
+        $('#DataType3').on('change', function () {
+            _chart3 = makeChart("ChartDiv3");
+        });
+
     });
 </script>

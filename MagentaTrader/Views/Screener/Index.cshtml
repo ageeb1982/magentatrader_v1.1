@@ -291,6 +291,8 @@
 </div>
 
 <script type="text/javascript">
+    var currentUser;
+
     var ScreenerData;
     var ScreenerGrid;
     var YearlyWinLossData;
@@ -442,6 +444,7 @@
                         EMAGrowthDecayRate: result[i].EMAGrowthDecayRate,
                         EMAStartDate: result[i].EMAStartDate,
                         EMALinear: result[i].EMALinear,
+                        MACDLinear: result[i].MACDLinear,
                         Nov7ClosePrice: result[i].Nov7ClosePrice,
                         Nov7NumberOfDays: result[i].Nov7NumberOfDays,
                         Nov7CorrelationCoefficient: result[i].Nov7CorrelationCoefficient,
@@ -567,6 +570,13 @@
                                 "isContentHtml": true,
                                 "wordWrap": true
                             }, {
+                                "header": "MACD Rate",
+                                "binding": "MACDGrowthDecayRate",
+                                "width": "*",
+                                "allowSorting": true,
+                                "isContentHtml": true,
+                                "wordWrap": true
+                            }, {
                                 "header": "EMA Rate",
                                 "binding": "EMAGrowthDecayRate",
                                 "width": "*",
@@ -574,8 +584,8 @@
                                 "isContentHtml": true,
                                 "wordWrap": true
                             }, {
-                                "header": "EMA Start",
-                                "binding": "EMAStartDate",
+                                "header": "MACD Linear",
+                                "binding": "MACDLinear",
                                 "width": "*",
                                 "allowSorting": true,
                                 "isContentHtml": true,
@@ -1091,7 +1101,7 @@
         $("#SharedFavoritesGrid").empty();
 
         $.ajax({
-            url: '/api/UserFavoriteSharedList',
+            url: '/api/UserFavoriteSharedListV2/' + currentUser,
             cache: false,
             type: 'GET',
             contentType: 'application/json; charset=utf-8',
@@ -1389,6 +1399,8 @@
     }
 
     $(document).ready(function () {
+        currentUser = '@User.Identity.Name';
+
         ScreenerGrid = new wijmo.grid.FlexGrid('#ScreenerGrid');
         YearlyWinLossGrid = new wijmo.grid.FlexGrid('#YearlyWinLossGrid');
 

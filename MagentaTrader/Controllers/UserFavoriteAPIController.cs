@@ -78,6 +78,39 @@ namespace MagentaTrader.Controllers
             return userFavorites.ToList();
         }
 
+        // GET api/UserFavoriteSharedListV2
+        [Authorize]
+        [Route("api/UserFavoriteSharedListV2/{UserName}")]
+        public List<Models.UserFavorite> GetUserFavoriteSharedListV2(String UserName)
+        {
+            List<Models.UserFavorite> userFavorites = new List<Models.UserFavorite>();
+
+            try
+            {
+                var data = from d in db.TrnUserFavorites
+                           where d.IsShared == true || d.MstUser.UserName == UserName
+                           orderby d.Description ascending
+                           select new Models.UserFavorite
+                           {
+                               Id = d.Id,
+                               UserId = d.UserId,
+                               User = d.MstUser.UserName,
+                               Description = d.Description,
+                               IsShared = d.IsShared,
+                               EncodedDate = d.EncodedDate.HasValue ? Convert.ToString(d.EncodedDate.Value.Year) + "-" + Convert.ToString(d.EncodedDate.Value.Month + 100).Substring(1, 2) + "-" + Convert.ToString(d.EncodedDate.Value.Day + 100).Substring(1, 2) : "NA",
+                               NoOfSymbols = d.TrnUserFavoritesSymbols.Count()
+                           };
+
+                userFavorites = data.ToList();
+            }
+            catch
+            {
+                userFavorites = new List<Models.UserFavorite>();
+            }
+
+            return userFavorites.ToList();
+        }
+
         // GET api/UserFavorite/1
         [Authorize]
         [Route("api/UserFavorite/{Id}")]

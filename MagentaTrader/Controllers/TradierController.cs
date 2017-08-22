@@ -114,6 +114,37 @@ namespace MagentaTrader.Controllers
             }
         }
 
+        // GET api/GetTradierTimeSales/velocity/aapl/098f6bcd4621d373cade4e832627b4f6
+        [Authorize]
+        [Route("api/GetTradierTimeSales/velocity/{symbol}/{token}")]
+        public Models.TradierTimeSalesSeries GetTradierTimeSalesVelocity(string symbol, string token)
+        {
+            string start = DateTime.Now.AddDays(-38).ToString("yyyy-MM-dd HH:mm");
+            string end = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.tradier.com/v1/markets/timesales?symbol=" + symbol + "&interval=15min&start=" + start + "&end=" + end);
+
+            httpWebRequest.Method = "GET";
+            httpWebRequest.Accept = "application/json";
+
+            httpWebRequest.Headers.Add("Authorization", "Bearer " + token);
+            try
+            {
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    var result = streamReader.ReadToEnd();
+                    JavaScriptSerializer js = new JavaScriptSerializer();
+                    Models.TradierTimeSalesSeries q = (Models.TradierTimeSalesSeries)js.Deserialize(result, typeof(Models.TradierTimeSalesSeries));
+                    return q;
+                }
+            }
+            catch
+            {
+                return new Models.TradierTimeSalesSeries();
+            }
+        }
+
         // GET api/GetTradierUserProfile/098f6bcd4621d373cade4e832627b4f6
         [Authorize]
         [Route("api/GetTradierUserProfile/{token}")]

@@ -281,6 +281,9 @@
     <Compile Include="Models\TradierQuote.cs" />
     <Compile Include="Models\TradierQuoteSymbol.cs" />
     <Compile Include="Models\TradierQuoteSymbolQuotes.cs" />
+    <Compile Include="Models\TradierTimeSales.cs" />
+    <Compile Include="Models\TradierTimeSalesList.cs" />
+    <Compile Include="Models\TradierTimeSalesSeries.cs" />
     <Compile Include="Models\TradierUser.cs" />
     <Compile Include="Models\TradierUserAccount.cs" />
     <Compile Include="Models\TradierUserProfile.cs" />
@@ -871,8 +874,10 @@
     <Content Include="Content\Site.css" />
     <Content Include="img\alaska1.jpg" />
     <Content Include="img\banner-bg.jpg" />
+    <Content Include="img\campaign\BC20170508.png" />
     <Content Include="img\campaign\IW20170305-1.png" />
     <Content Include="img\campaign\IW20170305-2.png" />
+    <Content Include="img\campaign\LV20171030.png" />
     <Content Include="img\campaign\xxx.png" />
     <Content Include="img\campaign\IW20160619.png" />
     <Content Include="img\campaign\MagentaTour2017.png" />
@@ -1573,6 +1578,8 @@
     <Content Include="Views\Help\Index.cshtml" />
     <Content Include="Views\Campaign\IW20170305.cshtml" />
     <Content Include="Views\Velocity\Index.cshtml" />
+    <Content Include="Views\Campaign\LV20171030.cshtml" />
+    <Content Include="Views\Campaign\BC20170508.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

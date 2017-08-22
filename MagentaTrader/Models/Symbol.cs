@@ -51,5 +51,6 @@ namespace MagentaTrader.Models
         public decimal Nov7ClosePrice { get; set; }
         public int Nov7NumberOfDays { get; set; }
         public decimal Nov7CorrelationCoefficient { get; set; }
+        public decimal MACDLinear { get; set; }
     }
 }

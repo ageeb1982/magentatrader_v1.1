@@ -90,15 +90,15 @@ namespace MagentaTrader.Data
     partial void InsertTrnUserAlertSymbol(TrnUserAlertSymbol instance);
     partial void UpdateTrnUserAlertSymbol(TrnUserAlertSymbol instance);
     partial void DeleteTrnUserAlertSymbol(TrnUserAlertSymbol instance);
-    partial void InsertMstSymbol(MstSymbol instance);
-    partial void UpdateMstSymbol(MstSymbol instance);
-    partial void DeleteMstSymbol(MstSymbol instance);
     partial void InsertMstUser(MstUser instance);
     partial void UpdateMstUser(MstUser instance);
     partial void DeleteMstUser(MstUser instance);
     partial void InsertTrnUserAlert(TrnUserAlert instance);
     partial void UpdateTrnUserAlert(TrnUserAlert instance);
     partial void DeleteTrnUserAlert(TrnUserAlert instance);
+    partial void InsertMstSymbol(MstSymbol instance);
+    partial void UpdateMstSymbol(MstSymbol instance);
+    partial void DeleteMstSymbol(MstSymbol instance);
     #endregion
 		
 		public MagentaTradersDBDataContext() : 
@@ -291,14 +291,6 @@ namespace MagentaTrader.Data
 			}
 		}
 		
-		public System.Data.Linq.Table<MstSymbol> MstSymbols
-		{
-			get
-			{
-				return this.GetTable<MstSymbol>();
-			}
-		}
-		
 		public System.Data.Linq.Table<MstUser> MstUsers
 		{
 			get
@@ -312,6 +304,14 @@ namespace MagentaTrader.Data
 			get
 			{
 				return this.GetTable<TrnUserAlert>();
+			}
+		}
+		
+		public System.Data.Linq.Table<MstSymbol> MstSymbols
+		{
+			get
+			{
+				return this.GetTable<MstSymbol>();
 			}
 		}
 	}
@@ -3307,9 +3307,9 @@ namespace MagentaTrader.Data
 		
 		private string _Trend;
 		
-		private EntityRef<MstSymbol> _MstSymbol;
-		
 		private EntityRef<MstUser> _MstUser;
+		
+		private EntityRef<MstSymbol> _MstSymbol;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -3335,8 +3335,8 @@ namespace MagentaTrader.Data
 		
 		public TrnFavorite()
 		{
-			this._MstSymbol = default(EntityRef<MstSymbol>);
 			this._MstUser = default(EntityRef<MstUser>);
+			this._MstSymbol = default(EntityRef<MstSymbol>);
 			OnCreated();
 		}
 		
@@ -3508,40 +3508,6 @@ namespace MagentaTrader.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnFavorite", Storage="_MstSymbol", ThisKey="SymbolId", OtherKey="Id", IsForeignKey=true)]
-		public MstSymbol MstSymbol
-		{
-			get
-			{
-				return this._MstSymbol.Entity;
-			}
-			set
-			{
-				MstSymbol previousValue = this._MstSymbol.Entity;
-				if (((previousValue != value) 
-							|| (this._MstSymbol.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._MstSymbol.Entity = null;
-						previousValue.TrnFavorites.Remove(this);
-					}
-					this._MstSymbol.Entity = value;
-					if ((value != null))
-					{
-						value.TrnFavorites.Add(this);
-						this._SymbolId = value.Id;
-					}
-					else
-					{
-						this._SymbolId = default(int);
-					}
-					this.SendPropertyChanged("MstSymbol");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnFavorite", Storage="_MstUser", ThisKey="UserId", OtherKey="Id", IsForeignKey=true)]
 		public MstUser MstUser
 		{
@@ -3572,6 +3538,40 @@ namespace MagentaTrader.Data
 						this._UserId = default(int);
 					}
 					this.SendPropertyChanged("MstUser");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnFavorite", Storage="_MstSymbol", ThisKey="SymbolId", OtherKey="Id", IsForeignKey=true)]
+		public MstSymbol MstSymbol
+		{
+			get
+			{
+				return this._MstSymbol.Entity;
+			}
+			set
+			{
+				MstSymbol previousValue = this._MstSymbol.Entity;
+				if (((previousValue != value) 
+							|| (this._MstSymbol.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._MstSymbol.Entity = null;
+						previousValue.TrnFavorites.Remove(this);
+					}
+					this._MstSymbol.Entity = value;
+					if ((value != null))
+					{
+						value.TrnFavorites.Add(this);
+						this._SymbolId = value.Id;
+					}
+					else
+					{
+						this._SymbolId = default(int);
+					}
+					this.SendPropertyChanged("MstSymbol");
 				}
 			}
 		}
@@ -4731,9 +4731,9 @@ namespace MagentaTrader.Data
 		
 		private System.DateTime _EncodedDate;
 		
-		private EntityRef<MstSymbol> _MstSymbol;
-		
 		private EntityRef<TrnUserAlert> _TrnUserAlert;
+		
+		private EntityRef<MstSymbol> _MstSymbol;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -4755,8 +4755,8 @@ namespace MagentaTrader.Data
 		
 		public TrnUserAlertSymbol()
 		{
-			this._MstSymbol = default(EntityRef<MstSymbol>);
 			this._TrnUserAlert = default(EntityRef<TrnUserAlert>);
+			this._MstSymbol = default(EntityRef<MstSymbol>);
 			OnCreated();
 		}
 		
@@ -4888,40 +4888,6 @@ namespace MagentaTrader.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnUserAlertSymbol", Storage="_MstSymbol", ThisKey="SymbolId", OtherKey="Id", IsForeignKey=true)]
-		public MstSymbol MstSymbol
-		{
-			get
-			{
-				return this._MstSymbol.Entity;
-			}
-			set
-			{
-				MstSymbol previousValue = this._MstSymbol.Entity;
-				if (((previousValue != value) 
-							|| (this._MstSymbol.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._MstSymbol.Entity = null;
-						previousValue.TrnUserAlertSymbols.Remove(this);
-					}
-					this._MstSymbol.Entity = value;
-					if ((value != null))
-					{
-						value.TrnUserAlertSymbols.Add(this);
-						this._SymbolId = value.Id;
-					}
-					else
-					{
-						this._SymbolId = default(int);
-					}
-					this.SendPropertyChanged("MstSymbol");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnUserAlert_TrnUserAlertSymbol", Storage="_TrnUserAlert", ThisKey="UserAlertId", OtherKey="Id", IsForeignKey=true)]
 		public TrnUserAlert TrnUserAlert
 		{
@@ -4956,1241 +4922,37 @@ namespace MagentaTrader.Data
 			}
 		}
 		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.MstSymbol")]
-	public partial class MstSymbol : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _Id;
-		
-		private string _Symbol;
-		
-		private string _Description;
-		
-		private string _Exchange;
-		
-		private System.Nullable<System.DateTime> _LatestQuoteDate;
-		
-		private System.Nullable<System.DateTime> _CalendarUpDate;
-		
-		private string _CalendarUpParticulars;
-		
-		private System.Nullable<decimal> _CalendarUpDelta;
-		
-		private System.Nullable<decimal> _CalendarUpPercentage;
-		
-		private System.Nullable<System.DateTime> _CalendarDownDate;
-		
-		private string _CalendarDownParticulars;
-		
-		private System.Nullable<decimal> _CalendarDownDelta;
-		
-		private System.Nullable<decimal> _CalendarDownPercentage;
-		
-		private System.Nullable<decimal> _ClosePrice;
-		
-		private System.Nullable<decimal> _Volume;
-		
-		private System.Nullable<decimal> _GrowthDecayRate;
-		
-		private System.Nullable<decimal> _GrowthDecayRateW1;
-		
-		private System.Nullable<decimal> _GrowthDecayRateW2;
-		
-		private System.Nullable<decimal> _GrowthDecayRateW3;
-		
-		private System.Nullable<decimal> _GrowthDecayRateM1;
-		
-		private System.Nullable<decimal> _GrowthDecayRateM2;
-		
-		private System.Nullable<decimal> _GrowthDecayRateM3;
-		
-		private System.Nullable<int> _NoOfYears;
-		
-		private System.Nullable<int> _TrendNoOfDays;
-		
-		private string _WinLossCurrent30;
-		
-		private System.Nullable<decimal> _WinLossAverageCurrent30;
-		
-		private string _WinLoss20;
-		
-		private System.Nullable<decimal> _WinLossAverage20;
-		
-		private string _WinLoss40;
-		
-		private System.Nullable<decimal> _WinLossAverage40;
-		
-		private string _WinLoss60;
-		
-		private System.Nullable<decimal> _WinLossAverage60;
-		
-		private System.Nullable<decimal> _CorrelationCoefficient30;
-		
-		private System.Nullable<decimal> _SeasonalityCorrelation;
-		
-		private System.Nullable<int> _MACDTrendNoOfDays;
-		
-		private System.Nullable<decimal> _MACDGrowthDecayRate;
-		
-		private System.Nullable<int> _EMATrendNoOfDays;
-		
-		private System.Nullable<decimal> _EMAGrowthDecayRate;
-		
-		private System.Nullable<System.DateTime> _EMAStartDate;
-		
-		private System.Nullable<decimal> _EMALinear;
-		
-		private System.Nullable<int> _MACDLastCrossoverNoOfDays;
-		
-		private string _MACDPosition;
-		
-		private System.Nullable<int> _EMALastCrossoverNoOfDays;
-		
-		private System.Nullable<decimal> _Nov7ClosePrice;
-		
-		private System.Nullable<int> _Nov7NumberOfDays;
-		
-		private System.Nullable<decimal> _Nov7CorrelationCoefficient;
-		
-		private EntitySet<TrnStockPrice> _TrnStockPrices;
-		
-		private EntitySet<TrnFavorite> _TrnFavorites;
-		
-		private EntitySet<TrnSectorSymbol> _TrnSectorSymbols;
-		
-		private EntitySet<TrnUserFavoritesSymbol> _TrnUserFavoritesSymbols;
-		
-		private EntitySet<TrnStockEarning> _TrnStockEarnings;
-		
-		private EntitySet<TrnUserAlertSymbol> _TrnUserAlertSymbols;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnIdChanging(int value);
-    partial void OnIdChanged();
-    partial void OnSymbolChanging(string value);
-    partial void OnSymbolChanged();
-    partial void OnDescriptionChanging(string value);
-    partial void OnDescriptionChanged();
-    partial void OnExchangeChanging(string value);
-    partial void OnExchangeChanged();
-    partial void OnLatestQuoteDateChanging(System.Nullable<System.DateTime> value);
-    partial void OnLatestQuoteDateChanged();
-    partial void OnCalendarUpDateChanging(System.Nullable<System.DateTime> value);
-    partial void OnCalendarUpDateChanged();
-    partial void OnCalendarUpParticularsChanging(string value);
-    partial void OnCalendarUpParticularsChanged();
-    partial void OnCalendarUpDeltaChanging(System.Nullable<decimal> value);
-    partial void OnCalendarUpDeltaChanged();
-    partial void OnCalendarUpPercentageChanging(System.Nullable<decimal> value);
-    partial void OnCalendarUpPercentageChanged();
-    partial void OnCalendarDownDateChanging(System.Nullable<System.DateTime> value);
-    partial void OnCalendarDownDateChanged();
-    partial void OnCalendarDownParticularsChanging(string value);
-    partial void OnCalendarDownParticularsChanged();
-    partial void OnCalendarDownDeltaChanging(System.Nullable<decimal> value);
-    partial void OnCalendarDownDeltaChanged();
-    partial void OnCalendarDownPercentageChanging(System.Nullable<decimal> value);
-    partial void OnCalendarDownPercentageChanged();
-    partial void OnClosePriceChanging(System.Nullable<decimal> value);
-    partial void OnClosePriceChanged();
-    partial void OnVolumeChanging(System.Nullable<decimal> value);
-    partial void OnVolumeChanged();
-    partial void OnGrowthDecayRateChanging(System.Nullable<decimal> value);
-    partial void OnGrowthDecayRateChanged();
-    partial void OnGrowthDecayRateW1Changing(System.Nullable<decimal> value);
-    partial void OnGrowthDecayRateW1Changed();
-    partial void OnGrowthDecayRateW2Changing(System.Nullable<decimal> value);
-    partial void OnGrowthDecayRateW2Changed();
-    partial void OnGrowthDecayRateW3Changing(System.Nullable<decimal> value);
-    partial void OnGrowthDecayRateW3Changed();
-    partial void OnGrowthDecayRateM1Changing(System.Nullable<decimal> value);
-    partial void OnGrowthDecayRateM1Changed();
-    partial void OnGrowthDecayRateM2Changing(System.Nullable<decimal> value);
-    partial void OnGrowthDecayRateM2Changed();
-    partial void OnGrowthDecayRateM3Changing(System.Nullable<decimal> value);
-    partial void OnGrowthDecayRateM3Changed();
-    partial void OnNoOfYearsChanging(System.Nullable<int> value);
-    partial void OnNoOfYearsChanged();
-    partial void OnTrendNoOfDaysChanging(System.Nullable<int> value);
-    partial void OnTrendNoOfDaysChanged();
-    partial void OnWinLossCurrent30Changing(string value);
-    partial void OnWinLossCurrent30Changed();
-    partial void OnWinLossAverageCurrent30Changing(System.Nullable<decimal> value);
-    partial void OnWinLossAverageCurrent30Changed();
-    partial void OnWinLoss20Changing(string value);
-    partial void OnWinLoss20Changed();
-    partial void OnWinLossAverage20Changing(System.Nullable<decimal> value);
-    partial void OnWinLossAverage20Changed();
-    partial void OnWinLoss40Changing(string value);
-    partial void OnWinLoss40Changed();
-    partial void OnWinLossAverage40Changing(System.Nullable<decimal> value);
-    partial void OnWinLossAverage40Changed();
-    partial void OnWinLoss60Changing(string value);
-    partial void OnWinLoss60Changed();
-    partial void OnWinLossAverage60Changing(System.Nullable<decimal> value);
-    partial void OnWinLossAverage60Changed();
-    partial void OnCorrelationCoefficient30Changing(System.Nullable<decimal> value);
-    partial void OnCorrelationCoefficient30Changed();
-    partial void OnSeasonalityCorrelationChanging(System.Nullable<decimal> value);
-    partial void OnSeasonalityCorrelationChanged();
-    partial void OnMACDTrendNoOfDaysChanging(System.Nullable<int> value);
-    partial void OnMACDTrendNoOfDaysChanged();
-    partial void OnMACDGrowthDecayRateChanging(System.Nullable<decimal> value);
-    partial void OnMACDGrowthDecayRateChanged();
-    partial void OnEMATrendNoOfDaysChanging(System.Nullable<int> value);
-    partial void OnEMATrendNoOfDaysChanged();
-    partial void OnEMAGrowthDecayRateChanging(System.Nullable<decimal> value);
-    partial void OnEMAGrowthDecayRateChanged();
-    partial void OnEMAStartDateChanging(System.Nullable<System.DateTime> value);
-    partial void OnEMAStartDateChanged();
-    partial void OnEMALinearChanging(System.Nullable<decimal> value);
-    partial void OnEMALinearChanged();
-    partial void OnMACDLastCrossoverNoOfDaysChanging(System.Nullable<int> value);
-    partial void OnMACDLastCrossoverNoOfDaysChanged();
-    partial void OnMACDPositionChanging(string value);
-    partial void OnMACDPositionChanged();
-    partial void OnEMALastCrossoverNoOfDaysChanging(System.Nullable<int> value);
-    partial void OnEMALastCrossoverNoOfDaysChanged();
-    partial void OnNov7ClosePriceChanging(System.Nullable<decimal> value);
-    partial void OnNov7ClosePriceChanged();
-    partial void OnNov7NumberOfDaysChanging(System.Nullable<int> value);
-    partial void OnNov7NumberOfDaysChanged();
-    partial void OnNov7CorrelationCoefficientChanging(System.Nullable<decimal> value);
-    partial void OnNov7CorrelationCoefficientChanged();
-    #endregion
-		
-		public MstSymbol()
-		{
-			this._TrnStockPrices = new EntitySet<TrnStockPrice>(new Action<TrnStockPrice>(this.attach_TrnStockPrices), new Action<TrnStockPrice>(this.detach_TrnStockPrices));
-			this._TrnFavorites = new EntitySet<TrnFavorite>(new Action<TrnFavorite>(this.attach_TrnFavorites), new Action<TrnFavorite>(this.detach_TrnFavorites));
-			this._TrnSectorSymbols = new EntitySet<TrnSectorSymbol>(new Action<TrnSectorSymbol>(this.attach_TrnSectorSymbols), new Action<TrnSectorSymbol>(this.detach_TrnSectorSymbols));
-			this._TrnUserFavoritesSymbols = new EntitySet<TrnUserFavoritesSymbol>(new Action<TrnUserFavoritesSymbol>(this.attach_TrnUserFavoritesSymbols), new Action<TrnUserFavoritesSymbol>(this.detach_TrnUserFavoritesSymbols));
-			this._TrnStockEarnings = new EntitySet<TrnStockEarning>(new Action<TrnStockEarning>(this.attach_TrnStockEarnings), new Action<TrnStockEarning>(this.detach_TrnStockEarnings));
-			this._TrnUserAlertSymbols = new EntitySet<TrnUserAlertSymbol>(new Action<TrnUserAlertSymbol>(this.attach_TrnUserAlertSymbols), new Action<TrnUserAlertSymbol>(this.detach_TrnUserAlertSymbols));
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int Id
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnUserAlertSymbol", Storage="_MstSymbol", ThisKey="SymbolId", OtherKey="Id", IsForeignKey=true)]
+		public MstSymbol MstSymbol
 		{
 			get
 			{
-				return this._Id;
+				return this._MstSymbol.Entity;
 			}
 			set
 			{
-				if ((this._Id != value))
+				MstSymbol previousValue = this._MstSymbol.Entity;
+				if (((previousValue != value) 
+							|| (this._MstSymbol.HasLoadedOrAssignedValue == false)))
 				{
-					this.OnIdChanging(value);
 					this.SendPropertyChanging();
-					this._Id = value;
-					this.SendPropertyChanged("Id");
-					this.OnIdChanged();
+					if ((previousValue != null))
+					{
+						this._MstSymbol.Entity = null;
+						previousValue.TrnUserAlertSymbols.Remove(this);
+					}
+					this._MstSymbol.Entity = value;
+					if ((value != null))
+					{
+						value.TrnUserAlertSymbols.Add(this);
+						this._SymbolId = value.Id;
+					}
+					else
+					{
+						this._SymbolId = default(int);
+					}
+					this.SendPropertyChanged("MstSymbol");
 				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Symbol", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
-		public string Symbol
-		{
-			get
-			{
-				return this._Symbol;
-			}
-			set
-			{
-				if ((this._Symbol != value))
-				{
-					this.OnSymbolChanging(value);
-					this.SendPropertyChanging();
-					this._Symbol = value;
-					this.SendPropertyChanged("Symbol");
-					this.OnSymbolChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Description", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
-		public string Description
-		{
-			get
-			{
-				return this._Description;
-			}
-			set
-			{
-				if ((this._Description != value))
-				{
-					this.OnDescriptionChanging(value);
-					this.SendPropertyChanging();
-					this._Description = value;
-					this.SendPropertyChanged("Description");
-					this.OnDescriptionChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Exchange", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
-		public string Exchange
-		{
-			get
-			{
-				return this._Exchange;
-			}
-			set
-			{
-				if ((this._Exchange != value))
-				{
-					this.OnExchangeChanging(value);
-					this.SendPropertyChanging();
-					this._Exchange = value;
-					this.SendPropertyChanged("Exchange");
-					this.OnExchangeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LatestQuoteDate", DbType="DateTime")]
-		public System.Nullable<System.DateTime> LatestQuoteDate
-		{
-			get
-			{
-				return this._LatestQuoteDate;
-			}
-			set
-			{
-				if ((this._LatestQuoteDate != value))
-				{
-					this.OnLatestQuoteDateChanging(value);
-					this.SendPropertyChanging();
-					this._LatestQuoteDate = value;
-					this.SendPropertyChanged("LatestQuoteDate");
-					this.OnLatestQuoteDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarUpDate", DbType="DateTime")]
-		public System.Nullable<System.DateTime> CalendarUpDate
-		{
-			get
-			{
-				return this._CalendarUpDate;
-			}
-			set
-			{
-				if ((this._CalendarUpDate != value))
-				{
-					this.OnCalendarUpDateChanging(value);
-					this.SendPropertyChanging();
-					this._CalendarUpDate = value;
-					this.SendPropertyChanged("CalendarUpDate");
-					this.OnCalendarUpDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarUpParticulars", DbType="NVarChar(255)")]
-		public string CalendarUpParticulars
-		{
-			get
-			{
-				return this._CalendarUpParticulars;
-			}
-			set
-			{
-				if ((this._CalendarUpParticulars != value))
-				{
-					this.OnCalendarUpParticularsChanging(value);
-					this.SendPropertyChanging();
-					this._CalendarUpParticulars = value;
-					this.SendPropertyChanged("CalendarUpParticulars");
-					this.OnCalendarUpParticularsChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarUpDelta", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> CalendarUpDelta
-		{
-			get
-			{
-				return this._CalendarUpDelta;
-			}
-			set
-			{
-				if ((this._CalendarUpDelta != value))
-				{
-					this.OnCalendarUpDeltaChanging(value);
-					this.SendPropertyChanging();
-					this._CalendarUpDelta = value;
-					this.SendPropertyChanged("CalendarUpDelta");
-					this.OnCalendarUpDeltaChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarUpPercentage", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> CalendarUpPercentage
-		{
-			get
-			{
-				return this._CalendarUpPercentage;
-			}
-			set
-			{
-				if ((this._CalendarUpPercentage != value))
-				{
-					this.OnCalendarUpPercentageChanging(value);
-					this.SendPropertyChanging();
-					this._CalendarUpPercentage = value;
-					this.SendPropertyChanged("CalendarUpPercentage");
-					this.OnCalendarUpPercentageChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarDownDate", DbType="DateTime")]
-		public System.Nullable<System.DateTime> CalendarDownDate
-		{
-			get
-			{
-				return this._CalendarDownDate;
-			}
-			set
-			{
-				if ((this._CalendarDownDate != value))
-				{
-					this.OnCalendarDownDateChanging(value);
-					this.SendPropertyChanging();
-					this._CalendarDownDate = value;
-					this.SendPropertyChanged("CalendarDownDate");
-					this.OnCalendarDownDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarDownParticulars", DbType="NVarChar(255)")]
-		public string CalendarDownParticulars
-		{
-			get
-			{
-				return this._CalendarDownParticulars;
-			}
-			set
-			{
-				if ((this._CalendarDownParticulars != value))
-				{
-					this.OnCalendarDownParticularsChanging(value);
-					this.SendPropertyChanging();
-					this._CalendarDownParticulars = value;
-					this.SendPropertyChanged("CalendarDownParticulars");
-					this.OnCalendarDownParticularsChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarDownDelta", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> CalendarDownDelta
-		{
-			get
-			{
-				return this._CalendarDownDelta;
-			}
-			set
-			{
-				if ((this._CalendarDownDelta != value))
-				{
-					this.OnCalendarDownDeltaChanging(value);
-					this.SendPropertyChanging();
-					this._CalendarDownDelta = value;
-					this.SendPropertyChanged("CalendarDownDelta");
-					this.OnCalendarDownDeltaChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarDownPercentage", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> CalendarDownPercentage
-		{
-			get
-			{
-				return this._CalendarDownPercentage;
-			}
-			set
-			{
-				if ((this._CalendarDownPercentage != value))
-				{
-					this.OnCalendarDownPercentageChanging(value);
-					this.SendPropertyChanging();
-					this._CalendarDownPercentage = value;
-					this.SendPropertyChanged("CalendarDownPercentage");
-					this.OnCalendarDownPercentageChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ClosePrice", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> ClosePrice
-		{
-			get
-			{
-				return this._ClosePrice;
-			}
-			set
-			{
-				if ((this._ClosePrice != value))
-				{
-					this.OnClosePriceChanging(value);
-					this.SendPropertyChanging();
-					this._ClosePrice = value;
-					this.SendPropertyChanged("ClosePrice");
-					this.OnClosePriceChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Volume", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> Volume
-		{
-			get
-			{
-				return this._Volume;
-			}
-			set
-			{
-				if ((this._Volume != value))
-				{
-					this.OnVolumeChanging(value);
-					this.SendPropertyChanging();
-					this._Volume = value;
-					this.SendPropertyChanged("Volume");
-					this.OnVolumeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRate", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> GrowthDecayRate
-		{
-			get
-			{
-				return this._GrowthDecayRate;
-			}
-			set
-			{
-				if ((this._GrowthDecayRate != value))
-				{
-					this.OnGrowthDecayRateChanging(value);
-					this.SendPropertyChanging();
-					this._GrowthDecayRate = value;
-					this.SendPropertyChanged("GrowthDecayRate");
-					this.OnGrowthDecayRateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRateW1", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> GrowthDecayRateW1
-		{
-			get
-			{
-				return this._GrowthDecayRateW1;
-			}
-			set
-			{
-				if ((this._GrowthDecayRateW1 != value))
-				{
-					this.OnGrowthDecayRateW1Changing(value);
-					this.SendPropertyChanging();
-					this._GrowthDecayRateW1 = value;
-					this.SendPropertyChanged("GrowthDecayRateW1");
-					this.OnGrowthDecayRateW1Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRateW2", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> GrowthDecayRateW2
-		{
-			get
-			{
-				return this._GrowthDecayRateW2;
-			}
-			set
-			{
-				if ((this._GrowthDecayRateW2 != value))
-				{
-					this.OnGrowthDecayRateW2Changing(value);
-					this.SendPropertyChanging();
-					this._GrowthDecayRateW2 = value;
-					this.SendPropertyChanged("GrowthDecayRateW2");
-					this.OnGrowthDecayRateW2Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRateW3", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> GrowthDecayRateW3
-		{
-			get
-			{
-				return this._GrowthDecayRateW3;
-			}
-			set
-			{
-				if ((this._GrowthDecayRateW3 != value))
-				{
-					this.OnGrowthDecayRateW3Changing(value);
-					this.SendPropertyChanging();
-					this._GrowthDecayRateW3 = value;
-					this.SendPropertyChanged("GrowthDecayRateW3");
-					this.OnGrowthDecayRateW3Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRateM1", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> GrowthDecayRateM1
-		{
-			get
-			{
-				return this._GrowthDecayRateM1;
-			}
-			set
-			{
-				if ((this._GrowthDecayRateM1 != value))
-				{
-					this.OnGrowthDecayRateM1Changing(value);
-					this.SendPropertyChanging();
-					this._GrowthDecayRateM1 = value;
-					this.SendPropertyChanged("GrowthDecayRateM1");
-					this.OnGrowthDecayRateM1Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRateM2", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> GrowthDecayRateM2
-		{
-			get
-			{
-				return this._GrowthDecayRateM2;
-			}
-			set
-			{
-				if ((this._GrowthDecayRateM2 != value))
-				{
-					this.OnGrowthDecayRateM2Changing(value);
-					this.SendPropertyChanging();
-					this._GrowthDecayRateM2 = value;
-					this.SendPropertyChanged("GrowthDecayRateM2");
-					this.OnGrowthDecayRateM2Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRateM3", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> GrowthDecayRateM3
-		{
-			get
-			{
-				return this._GrowthDecayRateM3;
-			}
-			set
-			{
-				if ((this._GrowthDecayRateM3 != value))
-				{
-					this.OnGrowthDecayRateM3Changing(value);
-					this.SendPropertyChanging();
-					this._GrowthDecayRateM3 = value;
-					this.SendPropertyChanged("GrowthDecayRateM3");
-					this.OnGrowthDecayRateM3Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NoOfYears", DbType="Int")]
-		public System.Nullable<int> NoOfYears
-		{
-			get
-			{
-				return this._NoOfYears;
-			}
-			set
-			{
-				if ((this._NoOfYears != value))
-				{
-					this.OnNoOfYearsChanging(value);
-					this.SendPropertyChanging();
-					this._NoOfYears = value;
-					this.SendPropertyChanged("NoOfYears");
-					this.OnNoOfYearsChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TrendNoOfDays", DbType="Int")]
-		public System.Nullable<int> TrendNoOfDays
-		{
-			get
-			{
-				return this._TrendNoOfDays;
-			}
-			set
-			{
-				if ((this._TrendNoOfDays != value))
-				{
-					this.OnTrendNoOfDaysChanging(value);
-					this.SendPropertyChanging();
-					this._TrendNoOfDays = value;
-					this.SendPropertyChanged("TrendNoOfDays");
-					this.OnTrendNoOfDaysChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossCurrent30", DbType="NVarChar(50)")]
-		public string WinLossCurrent30
-		{
-			get
-			{
-				return this._WinLossCurrent30;
-			}
-			set
-			{
-				if ((this._WinLossCurrent30 != value))
-				{
-					this.OnWinLossCurrent30Changing(value);
-					this.SendPropertyChanging();
-					this._WinLossCurrent30 = value;
-					this.SendPropertyChanged("WinLossCurrent30");
-					this.OnWinLossCurrent30Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossAverageCurrent30", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> WinLossAverageCurrent30
-		{
-			get
-			{
-				return this._WinLossAverageCurrent30;
-			}
-			set
-			{
-				if ((this._WinLossAverageCurrent30 != value))
-				{
-					this.OnWinLossAverageCurrent30Changing(value);
-					this.SendPropertyChanging();
-					this._WinLossAverageCurrent30 = value;
-					this.SendPropertyChanged("WinLossAverageCurrent30");
-					this.OnWinLossAverageCurrent30Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLoss20", DbType="NVarChar(50)")]
-		public string WinLoss20
-		{
-			get
-			{
-				return this._WinLoss20;
-			}
-			set
-			{
-				if ((this._WinLoss20 != value))
-				{
-					this.OnWinLoss20Changing(value);
-					this.SendPropertyChanging();
-					this._WinLoss20 = value;
-					this.SendPropertyChanged("WinLoss20");
-					this.OnWinLoss20Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossAverage20", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> WinLossAverage20
-		{
-			get
-			{
-				return this._WinLossAverage20;
-			}
-			set
-			{
-				if ((this._WinLossAverage20 != value))
-				{
-					this.OnWinLossAverage20Changing(value);
-					this.SendPropertyChanging();
-					this._WinLossAverage20 = value;
-					this.SendPropertyChanged("WinLossAverage20");
-					this.OnWinLossAverage20Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLoss40", DbType="NVarChar(50)")]
-		public string WinLoss40
-		{
-			get
-			{
-				return this._WinLoss40;
-			}
-			set
-			{
-				if ((this._WinLoss40 != value))
-				{
-					this.OnWinLoss40Changing(value);
-					this.SendPropertyChanging();
-					this._WinLoss40 = value;
-					this.SendPropertyChanged("WinLoss40");
-					this.OnWinLoss40Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossAverage40", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> WinLossAverage40
-		{
-			get
-			{
-				return this._WinLossAverage40;
-			}
-			set
-			{
-				if ((this._WinLossAverage40 != value))
-				{
-					this.OnWinLossAverage40Changing(value);
-					this.SendPropertyChanging();
-					this._WinLossAverage40 = value;
-					this.SendPropertyChanged("WinLossAverage40");
-					this.OnWinLossAverage40Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLoss60", DbType="NVarChar(50)")]
-		public string WinLoss60
-		{
-			get
-			{
-				return this._WinLoss60;
-			}
-			set
-			{
-				if ((this._WinLoss60 != value))
-				{
-					this.OnWinLoss60Changing(value);
-					this.SendPropertyChanging();
-					this._WinLoss60 = value;
-					this.SendPropertyChanged("WinLoss60");
-					this.OnWinLoss60Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossAverage60", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> WinLossAverage60
-		{
-			get
-			{
-				return this._WinLossAverage60;
-			}
-			set
-			{
-				if ((this._WinLossAverage60 != value))
-				{
-					this.OnWinLossAverage60Changing(value);
-					this.SendPropertyChanging();
-					this._WinLossAverage60 = value;
-					this.SendPropertyChanged("WinLossAverage60");
-					this.OnWinLossAverage60Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CorrelationCoefficient30", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> CorrelationCoefficient30
-		{
-			get
-			{
-				return this._CorrelationCoefficient30;
-			}
-			set
-			{
-				if ((this._CorrelationCoefficient30 != value))
-				{
-					this.OnCorrelationCoefficient30Changing(value);
-					this.SendPropertyChanging();
-					this._CorrelationCoefficient30 = value;
-					this.SendPropertyChanged("CorrelationCoefficient30");
-					this.OnCorrelationCoefficient30Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SeasonalityCorrelation", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> SeasonalityCorrelation
-		{
-			get
-			{
-				return this._SeasonalityCorrelation;
-			}
-			set
-			{
-				if ((this._SeasonalityCorrelation != value))
-				{
-					this.OnSeasonalityCorrelationChanging(value);
-					this.SendPropertyChanging();
-					this._SeasonalityCorrelation = value;
-					this.SendPropertyChanged("SeasonalityCorrelation");
-					this.OnSeasonalityCorrelationChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDTrendNoOfDays", DbType="Int")]
-		public System.Nullable<int> MACDTrendNoOfDays
-		{
-			get
-			{
-				return this._MACDTrendNoOfDays;
-			}
-			set
-			{
-				if ((this._MACDTrendNoOfDays != value))
-				{
-					this.OnMACDTrendNoOfDaysChanging(value);
-					this.SendPropertyChanging();
-					this._MACDTrendNoOfDays = value;
-					this.SendPropertyChanged("MACDTrendNoOfDays");
-					this.OnMACDTrendNoOfDaysChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDGrowthDecayRate", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> MACDGrowthDecayRate
-		{
-			get
-			{
-				return this._MACDGrowthDecayRate;
-			}
-			set
-			{
-				if ((this._MACDGrowthDecayRate != value))
-				{
-					this.OnMACDGrowthDecayRateChanging(value);
-					this.SendPropertyChanging();
-					this._MACDGrowthDecayRate = value;
-					this.SendPropertyChanged("MACDGrowthDecayRate");
-					this.OnMACDGrowthDecayRateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EMATrendNoOfDays", DbType="Int")]
-		public System.Nullable<int> EMATrendNoOfDays
-		{
-			get
-			{
-				return this._EMATrendNoOfDays;
-			}
-			set
-			{
-				if ((this._EMATrendNoOfDays != value))
-				{
-					this.OnEMATrendNoOfDaysChanging(value);
-					this.SendPropertyChanging();
-					this._EMATrendNoOfDays = value;
-					this.SendPropertyChanged("EMATrendNoOfDays");
-					this.OnEMATrendNoOfDaysChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EMAGrowthDecayRate", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> EMAGrowthDecayRate
-		{
-			get
-			{
-				return this._EMAGrowthDecayRate;
-			}
-			set
-			{
-				if ((this._EMAGrowthDecayRate != value))
-				{
-					this.OnEMAGrowthDecayRateChanging(value);
-					this.SendPropertyChanging();
-					this._EMAGrowthDecayRate = value;
-					this.SendPropertyChanged("EMAGrowthDecayRate");
-					this.OnEMAGrowthDecayRateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EMAStartDate", DbType="DateTime")]
-		public System.Nullable<System.DateTime> EMAStartDate
-		{
-			get
-			{
-				return this._EMAStartDate;
-			}
-			set
-			{
-				if ((this._EMAStartDate != value))
-				{
-					this.OnEMAStartDateChanging(value);
-					this.SendPropertyChanging();
-					this._EMAStartDate = value;
-					this.SendPropertyChanged("EMAStartDate");
-					this.OnEMAStartDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EMALinear", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> EMALinear
-		{
-			get
-			{
-				return this._EMALinear;
-			}
-			set
-			{
-				if ((this._EMALinear != value))
-				{
-					this.OnEMALinearChanging(value);
-					this.SendPropertyChanging();
-					this._EMALinear = value;
-					this.SendPropertyChanged("EMALinear");
-					this.OnEMALinearChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDLastCrossoverNoOfDays", DbType="Int")]
-		public System.Nullable<int> MACDLastCrossoverNoOfDays
-		{
-			get
-			{
-				return this._MACDLastCrossoverNoOfDays;
-			}
-			set
-			{
-				if ((this._MACDLastCrossoverNoOfDays != value))
-				{
-					this.OnMACDLastCrossoverNoOfDaysChanging(value);
-					this.SendPropertyChanging();
-					this._MACDLastCrossoverNoOfDays = value;
-					this.SendPropertyChanged("MACDLastCrossoverNoOfDays");
-					this.OnMACDLastCrossoverNoOfDaysChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDPosition", DbType="NVarChar(50)")]
-		public string MACDPosition
-		{
-			get
-			{
-				return this._MACDPosition;
-			}
-			set
-			{
-				if ((this._MACDPosition != value))
-				{
-					this.OnMACDPositionChanging(value);
-					this.SendPropertyChanging();
-					this._MACDPosition = value;
-					this.SendPropertyChanged("MACDPosition");
-					this.OnMACDPositionChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EMALastCrossoverNoOfDays", DbType="Int")]
-		public System.Nullable<int> EMALastCrossoverNoOfDays
-		{
-			get
-			{
-				return this._EMALastCrossoverNoOfDays;
-			}
-			set
-			{
-				if ((this._EMALastCrossoverNoOfDays != value))
-				{
-					this.OnEMALastCrossoverNoOfDaysChanging(value);
-					this.SendPropertyChanging();
-					this._EMALastCrossoverNoOfDays = value;
-					this.SendPropertyChanged("EMALastCrossoverNoOfDays");
-					this.OnEMALastCrossoverNoOfDaysChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Nov7ClosePrice", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> Nov7ClosePrice
-		{
-			get
-			{
-				return this._Nov7ClosePrice;
-			}
-			set
-			{
-				if ((this._Nov7ClosePrice != value))
-				{
-					this.OnNov7ClosePriceChanging(value);
-					this.SendPropertyChanging();
-					this._Nov7ClosePrice = value;
-					this.SendPropertyChanged("Nov7ClosePrice");
-					this.OnNov7ClosePriceChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Nov7NumberOfDays", DbType="Int")]
-		public System.Nullable<int> Nov7NumberOfDays
-		{
-			get
-			{
-				return this._Nov7NumberOfDays;
-			}
-			set
-			{
-				if ((this._Nov7NumberOfDays != value))
-				{
-					this.OnNov7NumberOfDaysChanging(value);
-					this.SendPropertyChanging();
-					this._Nov7NumberOfDays = value;
-					this.SendPropertyChanged("Nov7NumberOfDays");
-					this.OnNov7NumberOfDaysChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Nov7CorrelationCoefficient", DbType="Decimal(18,5)")]
-		public System.Nullable<decimal> Nov7CorrelationCoefficient
-		{
-			get
-			{
-				return this._Nov7CorrelationCoefficient;
-			}
-			set
-			{
-				if ((this._Nov7CorrelationCoefficient != value))
-				{
-					this.OnNov7CorrelationCoefficientChanging(value);
-					this.SendPropertyChanging();
-					this._Nov7CorrelationCoefficient = value;
-					this.SendPropertyChanged("Nov7CorrelationCoefficient");
-					this.OnNov7CorrelationCoefficientChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnStockPrice", Storage="_TrnStockPrices", ThisKey="Id", OtherKey="SymbolId")]
-		public EntitySet<TrnStockPrice> TrnStockPrices
-		{
-			get
-			{
-				return this._TrnStockPrices;
-			}
-			set
-			{
-				this._TrnStockPrices.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnFavorite", Storage="_TrnFavorites", ThisKey="Id", OtherKey="SymbolId")]
-		public EntitySet<TrnFavorite> TrnFavorites
-		{
-			get
-			{
-				return this._TrnFavorites;
-			}
-			set
-			{
-				this._TrnFavorites.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnSectorSymbol", Storage="_TrnSectorSymbols", ThisKey="Id", OtherKey="SymbolId")]
-		public EntitySet<TrnSectorSymbol> TrnSectorSymbols
-		{
-			get
-			{
-				return this._TrnSectorSymbols;
-			}
-			set
-			{
-				this._TrnSectorSymbols.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnUserFavoritesSymbol", Storage="_TrnUserFavoritesSymbols", ThisKey="Id", OtherKey="SymbolId")]
-		public EntitySet<TrnUserFavoritesSymbol> TrnUserFavoritesSymbols
-		{
-			get
-			{
-				return this._TrnUserFavoritesSymbols;
-			}
-			set
-			{
-				this._TrnUserFavoritesSymbols.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnStockEarning", Storage="_TrnStockEarnings", ThisKey="Id", OtherKey="SymbolId")]
-		public EntitySet<TrnStockEarning> TrnStockEarnings
-		{
-			get
-			{
-				return this._TrnStockEarnings;
-			}
-			set
-			{
-				this._TrnStockEarnings.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnUserAlertSymbol", Storage="_TrnUserAlertSymbols", ThisKey="Id", OtherKey="SymbolId")]
-		public EntitySet<TrnUserAlertSymbol> TrnUserAlertSymbols
-		{
-			get
-			{
-				return this._TrnUserAlertSymbols;
-			}
-			set
-			{
-				this._TrnUserAlertSymbols.Assign(value);
 			}
 		}
 		
@@ -6212,78 +4974,6 @@ namespace MagentaTrader.Data
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
-		}
-		
-		private void attach_TrnStockPrices(TrnStockPrice entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstSymbol = this;
-		}
-		
-		private void detach_TrnStockPrices(TrnStockPrice entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstSymbol = null;
-		}
-		
-		private void attach_TrnFavorites(TrnFavorite entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstSymbol = this;
-		}
-		
-		private void detach_TrnFavorites(TrnFavorite entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstSymbol = null;
-		}
-		
-		private void attach_TrnSectorSymbols(TrnSectorSymbol entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstSymbol = this;
-		}
-		
-		private void detach_TrnSectorSymbols(TrnSectorSymbol entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstSymbol = null;
-		}
-		
-		private void attach_TrnUserFavoritesSymbols(TrnUserFavoritesSymbol entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstSymbol = this;
-		}
-		
-		private void detach_TrnUserFavoritesSymbols(TrnUserFavoritesSymbol entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstSymbol = null;
-		}
-		
-		private void attach_TrnStockEarnings(TrnStockEarning entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstSymbol = this;
-		}
-		
-		private void detach_TrnStockEarnings(TrnStockEarning entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstSymbol = null;
-		}
-		
-		private void attach_TrnUserAlertSymbols(TrnUserAlertSymbol entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstSymbol = this;
-		}
-		
-		private void detach_TrnUserAlertSymbols(TrnUserAlertSymbol entity)
-		{
-			this.SendPropertyChanging();
-			entity.MstSymbol = null;
 		}
 	}
 	
@@ -7598,6 +6288,1340 @@ namespace MagentaTrader.Data
 		{
 			this.SendPropertyChanging();
 			entity.TrnUserAlert = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.MstSymbol")]
+	public partial class MstSymbol : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private string _Symbol;
+		
+		private string _Description;
+		
+		private string _Exchange;
+		
+		private System.Nullable<System.DateTime> _LatestQuoteDate;
+		
+		private System.Nullable<System.DateTime> _CalendarUpDate;
+		
+		private string _CalendarUpParticulars;
+		
+		private System.Nullable<decimal> _CalendarUpDelta;
+		
+		private System.Nullable<decimal> _CalendarUpPercentage;
+		
+		private System.Nullable<System.DateTime> _CalendarDownDate;
+		
+		private string _CalendarDownParticulars;
+		
+		private System.Nullable<decimal> _CalendarDownDelta;
+		
+		private System.Nullable<decimal> _CalendarDownPercentage;
+		
+		private System.Nullable<decimal> _ClosePrice;
+		
+		private System.Nullable<decimal> _Volume;
+		
+		private System.Nullable<decimal> _GrowthDecayRate;
+		
+		private System.Nullable<decimal> _GrowthDecayRateW1;
+		
+		private System.Nullable<decimal> _GrowthDecayRateW2;
+		
+		private System.Nullable<decimal> _GrowthDecayRateW3;
+		
+		private System.Nullable<decimal> _GrowthDecayRateM1;
+		
+		private System.Nullable<decimal> _GrowthDecayRateM2;
+		
+		private System.Nullable<decimal> _GrowthDecayRateM3;
+		
+		private System.Nullable<int> _NoOfYears;
+		
+		private System.Nullable<int> _TrendNoOfDays;
+		
+		private string _WinLossCurrent30;
+		
+		private System.Nullable<decimal> _WinLossAverageCurrent30;
+		
+		private string _WinLoss20;
+		
+		private System.Nullable<decimal> _WinLossAverage20;
+		
+		private string _WinLoss40;
+		
+		private System.Nullable<decimal> _WinLossAverage40;
+		
+		private string _WinLoss60;
+		
+		private System.Nullable<decimal> _WinLossAverage60;
+		
+		private System.Nullable<decimal> _CorrelationCoefficient30;
+		
+		private System.Nullable<decimal> _SeasonalityCorrelation;
+		
+		private System.Nullable<int> _MACDTrendNoOfDays;
+		
+		private System.Nullable<decimal> _MACDGrowthDecayRate;
+		
+		private System.Nullable<int> _EMATrendNoOfDays;
+		
+		private System.Nullable<decimal> _EMAGrowthDecayRate;
+		
+		private System.Nullable<System.DateTime> _EMAStartDate;
+		
+		private System.Nullable<decimal> _EMALinear;
+		
+		private System.Nullable<int> _MACDLastCrossoverNoOfDays;
+		
+		private string _MACDPosition;
+		
+		private System.Nullable<int> _EMALastCrossoverNoOfDays;
+		
+		private System.Nullable<decimal> _Nov7ClosePrice;
+		
+		private System.Nullable<int> _Nov7NumberOfDays;
+		
+		private System.Nullable<decimal> _Nov7CorrelationCoefficient;
+		
+		private System.Nullable<decimal> _MACDLinear;
+		
+		private EntitySet<TrnStockPrice> _TrnStockPrices;
+		
+		private EntitySet<TrnFavorite> _TrnFavorites;
+		
+		private EntitySet<TrnSectorSymbol> _TrnSectorSymbols;
+		
+		private EntitySet<TrnUserFavoritesSymbol> _TrnUserFavoritesSymbols;
+		
+		private EntitySet<TrnStockEarning> _TrnStockEarnings;
+		
+		private EntitySet<TrnUserAlertSymbol> _TrnUserAlertSymbols;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnSymbolChanging(string value);
+    partial void OnSymbolChanged();
+    partial void OnDescriptionChanging(string value);
+    partial void OnDescriptionChanged();
+    partial void OnExchangeChanging(string value);
+    partial void OnExchangeChanged();
+    partial void OnLatestQuoteDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnLatestQuoteDateChanged();
+    partial void OnCalendarUpDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnCalendarUpDateChanged();
+    partial void OnCalendarUpParticularsChanging(string value);
+    partial void OnCalendarUpParticularsChanged();
+    partial void OnCalendarUpDeltaChanging(System.Nullable<decimal> value);
+    partial void OnCalendarUpDeltaChanged();
+    partial void OnCalendarUpPercentageChanging(System.Nullable<decimal> value);
+    partial void OnCalendarUpPercentageChanged();
+    partial void OnCalendarDownDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnCalendarDownDateChanged();
+    partial void OnCalendarDownParticularsChanging(string value);
+    partial void OnCalendarDownParticularsChanged();
+    partial void OnCalendarDownDeltaChanging(System.Nullable<decimal> value);
+    partial void OnCalendarDownDeltaChanged();
+    partial void OnCalendarDownPercentageChanging(System.Nullable<decimal> value);
+    partial void OnCalendarDownPercentageChanged();
+    partial void OnClosePriceChanging(System.Nullable<decimal> value);
+    partial void OnClosePriceChanged();
+    partial void OnVolumeChanging(System.Nullable<decimal> value);
+    partial void OnVolumeChanged();
+    partial void OnGrowthDecayRateChanging(System.Nullable<decimal> value);
+    partial void OnGrowthDecayRateChanged();
+    partial void OnGrowthDecayRateW1Changing(System.Nullable<decimal> value);
+    partial void OnGrowthDecayRateW1Changed();
+    partial void OnGrowthDecayRateW2Changing(System.Nullable<decimal> value);
+    partial void OnGrowthDecayRateW2Changed();
+    partial void OnGrowthDecayRateW3Changing(System.Nullable<decimal> value);
+    partial void OnGrowthDecayRateW3Changed();
+    partial void OnGrowthDecayRateM1Changing(System.Nullable<decimal> value);
+    partial void OnGrowthDecayRateM1Changed();
+    partial void OnGrowthDecayRateM2Changing(System.Nullable<decimal> value);
+    partial void OnGrowthDecayRateM2Changed();
+    partial void OnGrowthDecayRateM3Changing(System.Nullable<decimal> value);
+    partial void OnGrowthDecayRateM3Changed();
+    partial void OnNoOfYearsChanging(System.Nullable<int> value);
+    partial void OnNoOfYearsChanged();
+    partial void OnTrendNoOfDaysChanging(System.Nullable<int> value);
+    partial void OnTrendNoOfDaysChanged();
+    partial void OnWinLossCurrent30Changing(string value);
+    partial void OnWinLossCurrent30Changed();
+    partial void OnWinLossAverageCurrent30Changing(System.Nullable<decimal> value);
+    partial void OnWinLossAverageCurrent30Changed();
+    partial void OnWinLoss20Changing(string value);
+    partial void OnWinLoss20Changed();
+    partial void OnWinLossAverage20Changing(System.Nullable<decimal> value);
+    partial void OnWinLossAverage20Changed();
+    partial void OnWinLoss40Changing(string value);
+    partial void OnWinLoss40Changed();
+    partial void OnWinLossAverage40Changing(System.Nullable<decimal> value);
+    partial void OnWinLossAverage40Changed();
+    partial void OnWinLoss60Changing(string value);
+    partial void OnWinLoss60Changed();
+    partial void OnWinLossAverage60Changing(System.Nullable<decimal> value);
+    partial void OnWinLossAverage60Changed();
+    partial void OnCorrelationCoefficient30Changing(System.Nullable<decimal> value);
+    partial void OnCorrelationCoefficient30Changed();
+    partial void OnSeasonalityCorrelationChanging(System.Nullable<decimal> value);
+    partial void OnSeasonalityCorrelationChanged();
+    partial void OnMACDTrendNoOfDaysChanging(System.Nullable<int> value);
+    partial void OnMACDTrendNoOfDaysChanged();
+    partial void OnMACDGrowthDecayRateChanging(System.Nullable<decimal> value);
+    partial void OnMACDGrowthDecayRateChanged();
+    partial void OnEMATrendNoOfDaysChanging(System.Nullable<int> value);
+    partial void OnEMATrendNoOfDaysChanged();
+    partial void OnEMAGrowthDecayRateChanging(System.Nullable<decimal> value);
+    partial void OnEMAGrowthDecayRateChanged();
+    partial void OnEMAStartDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnEMAStartDateChanged();
+    partial void OnEMALinearChanging(System.Nullable<decimal> value);
+    partial void OnEMALinearChanged();
+    partial void OnMACDLastCrossoverNoOfDaysChanging(System.Nullable<int> value);
+    partial void OnMACDLastCrossoverNoOfDaysChanged();
+    partial void OnMACDPositionChanging(string value);
+    partial void OnMACDPositionChanged();
+    partial void OnEMALastCrossoverNoOfDaysChanging(System.Nullable<int> value);
+    partial void OnEMALastCrossoverNoOfDaysChanged();
+    partial void OnNov7ClosePriceChanging(System.Nullable<decimal> value);
+    partial void OnNov7ClosePriceChanged();
+    partial void OnNov7NumberOfDaysChanging(System.Nullable<int> value);
+    partial void OnNov7NumberOfDaysChanged();
+    partial void OnNov7CorrelationCoefficientChanging(System.Nullable<decimal> value);
+    partial void OnNov7CorrelationCoefficientChanged();
+    partial void OnMACDLinearChanging(System.Nullable<decimal> value);
+    partial void OnMACDLinearChanged();
+    #endregion
+		
+		public MstSymbol()
+		{
+			this._TrnStockPrices = new EntitySet<TrnStockPrice>(new Action<TrnStockPrice>(this.attach_TrnStockPrices), new Action<TrnStockPrice>(this.detach_TrnStockPrices));
+			this._TrnFavorites = new EntitySet<TrnFavorite>(new Action<TrnFavorite>(this.attach_TrnFavorites), new Action<TrnFavorite>(this.detach_TrnFavorites));
+			this._TrnSectorSymbols = new EntitySet<TrnSectorSymbol>(new Action<TrnSectorSymbol>(this.attach_TrnSectorSymbols), new Action<TrnSectorSymbol>(this.detach_TrnSectorSymbols));
+			this._TrnUserFavoritesSymbols = new EntitySet<TrnUserFavoritesSymbol>(new Action<TrnUserFavoritesSymbol>(this.attach_TrnUserFavoritesSymbols), new Action<TrnUserFavoritesSymbol>(this.detach_TrnUserFavoritesSymbols));
+			this._TrnStockEarnings = new EntitySet<TrnStockEarning>(new Action<TrnStockEarning>(this.attach_TrnStockEarnings), new Action<TrnStockEarning>(this.detach_TrnStockEarnings));
+			this._TrnUserAlertSymbols = new EntitySet<TrnUserAlertSymbol>(new Action<TrnUserAlertSymbol>(this.attach_TrnUserAlertSymbols), new Action<TrnUserAlertSymbol>(this.detach_TrnUserAlertSymbols));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Symbol", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string Symbol
+		{
+			get
+			{
+				return this._Symbol;
+			}
+			set
+			{
+				if ((this._Symbol != value))
+				{
+					this.OnSymbolChanging(value);
+					this.SendPropertyChanging();
+					this._Symbol = value;
+					this.SendPropertyChanged("Symbol");
+					this.OnSymbolChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Description", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		public string Description
+		{
+			get
+			{
+				return this._Description;
+			}
+			set
+			{
+				if ((this._Description != value))
+				{
+					this.OnDescriptionChanging(value);
+					this.SendPropertyChanging();
+					this._Description = value;
+					this.SendPropertyChanged("Description");
+					this.OnDescriptionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Exchange", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string Exchange
+		{
+			get
+			{
+				return this._Exchange;
+			}
+			set
+			{
+				if ((this._Exchange != value))
+				{
+					this.OnExchangeChanging(value);
+					this.SendPropertyChanging();
+					this._Exchange = value;
+					this.SendPropertyChanged("Exchange");
+					this.OnExchangeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LatestQuoteDate", DbType="DateTime")]
+		public System.Nullable<System.DateTime> LatestQuoteDate
+		{
+			get
+			{
+				return this._LatestQuoteDate;
+			}
+			set
+			{
+				if ((this._LatestQuoteDate != value))
+				{
+					this.OnLatestQuoteDateChanging(value);
+					this.SendPropertyChanging();
+					this._LatestQuoteDate = value;
+					this.SendPropertyChanged("LatestQuoteDate");
+					this.OnLatestQuoteDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarUpDate", DbType="DateTime")]
+		public System.Nullable<System.DateTime> CalendarUpDate
+		{
+			get
+			{
+				return this._CalendarUpDate;
+			}
+			set
+			{
+				if ((this._CalendarUpDate != value))
+				{
+					this.OnCalendarUpDateChanging(value);
+					this.SendPropertyChanging();
+					this._CalendarUpDate = value;
+					this.SendPropertyChanged("CalendarUpDate");
+					this.OnCalendarUpDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarUpParticulars", DbType="NVarChar(255)")]
+		public string CalendarUpParticulars
+		{
+			get
+			{
+				return this._CalendarUpParticulars;
+			}
+			set
+			{
+				if ((this._CalendarUpParticulars != value))
+				{
+					this.OnCalendarUpParticularsChanging(value);
+					this.SendPropertyChanging();
+					this._CalendarUpParticulars = value;
+					this.SendPropertyChanged("CalendarUpParticulars");
+					this.OnCalendarUpParticularsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarUpDelta", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> CalendarUpDelta
+		{
+			get
+			{
+				return this._CalendarUpDelta;
+			}
+			set
+			{
+				if ((this._CalendarUpDelta != value))
+				{
+					this.OnCalendarUpDeltaChanging(value);
+					this.SendPropertyChanging();
+					this._CalendarUpDelta = value;
+					this.SendPropertyChanged("CalendarUpDelta");
+					this.OnCalendarUpDeltaChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarUpPercentage", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> CalendarUpPercentage
+		{
+			get
+			{
+				return this._CalendarUpPercentage;
+			}
+			set
+			{
+				if ((this._CalendarUpPercentage != value))
+				{
+					this.OnCalendarUpPercentageChanging(value);
+					this.SendPropertyChanging();
+					this._CalendarUpPercentage = value;
+					this.SendPropertyChanged("CalendarUpPercentage");
+					this.OnCalendarUpPercentageChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarDownDate", DbType="DateTime")]
+		public System.Nullable<System.DateTime> CalendarDownDate
+		{
+			get
+			{
+				return this._CalendarDownDate;
+			}
+			set
+			{
+				if ((this._CalendarDownDate != value))
+				{
+					this.OnCalendarDownDateChanging(value);
+					this.SendPropertyChanging();
+					this._CalendarDownDate = value;
+					this.SendPropertyChanged("CalendarDownDate");
+					this.OnCalendarDownDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarDownParticulars", DbType="NVarChar(255)")]
+		public string CalendarDownParticulars
+		{
+			get
+			{
+				return this._CalendarDownParticulars;
+			}
+			set
+			{
+				if ((this._CalendarDownParticulars != value))
+				{
+					this.OnCalendarDownParticularsChanging(value);
+					this.SendPropertyChanging();
+					this._CalendarDownParticulars = value;
+					this.SendPropertyChanged("CalendarDownParticulars");
+					this.OnCalendarDownParticularsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarDownDelta", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> CalendarDownDelta
+		{
+			get
+			{
+				return this._CalendarDownDelta;
+			}
+			set
+			{
+				if ((this._CalendarDownDelta != value))
+				{
+					this.OnCalendarDownDeltaChanging(value);
+					this.SendPropertyChanging();
+					this._CalendarDownDelta = value;
+					this.SendPropertyChanged("CalendarDownDelta");
+					this.OnCalendarDownDeltaChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CalendarDownPercentage", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> CalendarDownPercentage
+		{
+			get
+			{
+				return this._CalendarDownPercentage;
+			}
+			set
+			{
+				if ((this._CalendarDownPercentage != value))
+				{
+					this.OnCalendarDownPercentageChanging(value);
+					this.SendPropertyChanging();
+					this._CalendarDownPercentage = value;
+					this.SendPropertyChanged("CalendarDownPercentage");
+					this.OnCalendarDownPercentageChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ClosePrice", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> ClosePrice
+		{
+			get
+			{
+				return this._ClosePrice;
+			}
+			set
+			{
+				if ((this._ClosePrice != value))
+				{
+					this.OnClosePriceChanging(value);
+					this.SendPropertyChanging();
+					this._ClosePrice = value;
+					this.SendPropertyChanged("ClosePrice");
+					this.OnClosePriceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Volume", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> Volume
+		{
+			get
+			{
+				return this._Volume;
+			}
+			set
+			{
+				if ((this._Volume != value))
+				{
+					this.OnVolumeChanging(value);
+					this.SendPropertyChanging();
+					this._Volume = value;
+					this.SendPropertyChanged("Volume");
+					this.OnVolumeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRate", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> GrowthDecayRate
+		{
+			get
+			{
+				return this._GrowthDecayRate;
+			}
+			set
+			{
+				if ((this._GrowthDecayRate != value))
+				{
+					this.OnGrowthDecayRateChanging(value);
+					this.SendPropertyChanging();
+					this._GrowthDecayRate = value;
+					this.SendPropertyChanged("GrowthDecayRate");
+					this.OnGrowthDecayRateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRateW1", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> GrowthDecayRateW1
+		{
+			get
+			{
+				return this._GrowthDecayRateW1;
+			}
+			set
+			{
+				if ((this._GrowthDecayRateW1 != value))
+				{
+					this.OnGrowthDecayRateW1Changing(value);
+					this.SendPropertyChanging();
+					this._GrowthDecayRateW1 = value;
+					this.SendPropertyChanged("GrowthDecayRateW1");
+					this.OnGrowthDecayRateW1Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRateW2", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> GrowthDecayRateW2
+		{
+			get
+			{
+				return this._GrowthDecayRateW2;
+			}
+			set
+			{
+				if ((this._GrowthDecayRateW2 != value))
+				{
+					this.OnGrowthDecayRateW2Changing(value);
+					this.SendPropertyChanging();
+					this._GrowthDecayRateW2 = value;
+					this.SendPropertyChanged("GrowthDecayRateW2");
+					this.OnGrowthDecayRateW2Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRateW3", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> GrowthDecayRateW3
+		{
+			get
+			{
+				return this._GrowthDecayRateW3;
+			}
+			set
+			{
+				if ((this._GrowthDecayRateW3 != value))
+				{
+					this.OnGrowthDecayRateW3Changing(value);
+					this.SendPropertyChanging();
+					this._GrowthDecayRateW3 = value;
+					this.SendPropertyChanged("GrowthDecayRateW3");
+					this.OnGrowthDecayRateW3Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRateM1", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> GrowthDecayRateM1
+		{
+			get
+			{
+				return this._GrowthDecayRateM1;
+			}
+			set
+			{
+				if ((this._GrowthDecayRateM1 != value))
+				{
+					this.OnGrowthDecayRateM1Changing(value);
+					this.SendPropertyChanging();
+					this._GrowthDecayRateM1 = value;
+					this.SendPropertyChanged("GrowthDecayRateM1");
+					this.OnGrowthDecayRateM1Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRateM2", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> GrowthDecayRateM2
+		{
+			get
+			{
+				return this._GrowthDecayRateM2;
+			}
+			set
+			{
+				if ((this._GrowthDecayRateM2 != value))
+				{
+					this.OnGrowthDecayRateM2Changing(value);
+					this.SendPropertyChanging();
+					this._GrowthDecayRateM2 = value;
+					this.SendPropertyChanged("GrowthDecayRateM2");
+					this.OnGrowthDecayRateM2Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GrowthDecayRateM3", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> GrowthDecayRateM3
+		{
+			get
+			{
+				return this._GrowthDecayRateM3;
+			}
+			set
+			{
+				if ((this._GrowthDecayRateM3 != value))
+				{
+					this.OnGrowthDecayRateM3Changing(value);
+					this.SendPropertyChanging();
+					this._GrowthDecayRateM3 = value;
+					this.SendPropertyChanged("GrowthDecayRateM3");
+					this.OnGrowthDecayRateM3Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NoOfYears", DbType="Int")]
+		public System.Nullable<int> NoOfYears
+		{
+			get
+			{
+				return this._NoOfYears;
+			}
+			set
+			{
+				if ((this._NoOfYears != value))
+				{
+					this.OnNoOfYearsChanging(value);
+					this.SendPropertyChanging();
+					this._NoOfYears = value;
+					this.SendPropertyChanged("NoOfYears");
+					this.OnNoOfYearsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TrendNoOfDays", DbType="Int")]
+		public System.Nullable<int> TrendNoOfDays
+		{
+			get
+			{
+				return this._TrendNoOfDays;
+			}
+			set
+			{
+				if ((this._TrendNoOfDays != value))
+				{
+					this.OnTrendNoOfDaysChanging(value);
+					this.SendPropertyChanging();
+					this._TrendNoOfDays = value;
+					this.SendPropertyChanged("TrendNoOfDays");
+					this.OnTrendNoOfDaysChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossCurrent30", DbType="NVarChar(50)")]
+		public string WinLossCurrent30
+		{
+			get
+			{
+				return this._WinLossCurrent30;
+			}
+			set
+			{
+				if ((this._WinLossCurrent30 != value))
+				{
+					this.OnWinLossCurrent30Changing(value);
+					this.SendPropertyChanging();
+					this._WinLossCurrent30 = value;
+					this.SendPropertyChanged("WinLossCurrent30");
+					this.OnWinLossCurrent30Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossAverageCurrent30", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> WinLossAverageCurrent30
+		{
+			get
+			{
+				return this._WinLossAverageCurrent30;
+			}
+			set
+			{
+				if ((this._WinLossAverageCurrent30 != value))
+				{
+					this.OnWinLossAverageCurrent30Changing(value);
+					this.SendPropertyChanging();
+					this._WinLossAverageCurrent30 = value;
+					this.SendPropertyChanged("WinLossAverageCurrent30");
+					this.OnWinLossAverageCurrent30Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLoss20", DbType="NVarChar(50)")]
+		public string WinLoss20
+		{
+			get
+			{
+				return this._WinLoss20;
+			}
+			set
+			{
+				if ((this._WinLoss20 != value))
+				{
+					this.OnWinLoss20Changing(value);
+					this.SendPropertyChanging();
+					this._WinLoss20 = value;
+					this.SendPropertyChanged("WinLoss20");
+					this.OnWinLoss20Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossAverage20", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> WinLossAverage20
+		{
+			get
+			{
+				return this._WinLossAverage20;
+			}
+			set
+			{
+				if ((this._WinLossAverage20 != value))
+				{
+					this.OnWinLossAverage20Changing(value);
+					this.SendPropertyChanging();
+					this._WinLossAverage20 = value;
+					this.SendPropertyChanged("WinLossAverage20");
+					this.OnWinLossAverage20Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLoss40", DbType="NVarChar(50)")]
+		public string WinLoss40
+		{
+			get
+			{
+				return this._WinLoss40;
+			}
+			set
+			{
+				if ((this._WinLoss40 != value))
+				{
+					this.OnWinLoss40Changing(value);
+					this.SendPropertyChanging();
+					this._WinLoss40 = value;
+					this.SendPropertyChanged("WinLoss40");
+					this.OnWinLoss40Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossAverage40", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> WinLossAverage40
+		{
+			get
+			{
+				return this._WinLossAverage40;
+			}
+			set
+			{
+				if ((this._WinLossAverage40 != value))
+				{
+					this.OnWinLossAverage40Changing(value);
+					this.SendPropertyChanging();
+					this._WinLossAverage40 = value;
+					this.SendPropertyChanged("WinLossAverage40");
+					this.OnWinLossAverage40Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLoss60", DbType="NVarChar(50)")]
+		public string WinLoss60
+		{
+			get
+			{
+				return this._WinLoss60;
+			}
+			set
+			{
+				if ((this._WinLoss60 != value))
+				{
+					this.OnWinLoss60Changing(value);
+					this.SendPropertyChanging();
+					this._WinLoss60 = value;
+					this.SendPropertyChanged("WinLoss60");
+					this.OnWinLoss60Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WinLossAverage60", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> WinLossAverage60
+		{
+			get
+			{
+				return this._WinLossAverage60;
+			}
+			set
+			{
+				if ((this._WinLossAverage60 != value))
+				{
+					this.OnWinLossAverage60Changing(value);
+					this.SendPropertyChanging();
+					this._WinLossAverage60 = value;
+					this.SendPropertyChanged("WinLossAverage60");
+					this.OnWinLossAverage60Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CorrelationCoefficient30", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> CorrelationCoefficient30
+		{
+			get
+			{
+				return this._CorrelationCoefficient30;
+			}
+			set
+			{
+				if ((this._CorrelationCoefficient30 != value))
+				{
+					this.OnCorrelationCoefficient30Changing(value);
+					this.SendPropertyChanging();
+					this._CorrelationCoefficient30 = value;
+					this.SendPropertyChanged("CorrelationCoefficient30");
+					this.OnCorrelationCoefficient30Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SeasonalityCorrelation", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> SeasonalityCorrelation
+		{
+			get
+			{
+				return this._SeasonalityCorrelation;
+			}
+			set
+			{
+				if ((this._SeasonalityCorrelation != value))
+				{
+					this.OnSeasonalityCorrelationChanging(value);
+					this.SendPropertyChanging();
+					this._SeasonalityCorrelation = value;
+					this.SendPropertyChanged("SeasonalityCorrelation");
+					this.OnSeasonalityCorrelationChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDTrendNoOfDays", DbType="Int")]
+		public System.Nullable<int> MACDTrendNoOfDays
+		{
+			get
+			{
+				return this._MACDTrendNoOfDays;
+			}
+			set
+			{
+				if ((this._MACDTrendNoOfDays != value))
+				{
+					this.OnMACDTrendNoOfDaysChanging(value);
+					this.SendPropertyChanging();
+					this._MACDTrendNoOfDays = value;
+					this.SendPropertyChanged("MACDTrendNoOfDays");
+					this.OnMACDTrendNoOfDaysChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDGrowthDecayRate", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> MACDGrowthDecayRate
+		{
+			get
+			{
+				return this._MACDGrowthDecayRate;
+			}
+			set
+			{
+				if ((this._MACDGrowthDecayRate != value))
+				{
+					this.OnMACDGrowthDecayRateChanging(value);
+					this.SendPropertyChanging();
+					this._MACDGrowthDecayRate = value;
+					this.SendPropertyChanged("MACDGrowthDecayRate");
+					this.OnMACDGrowthDecayRateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EMATrendNoOfDays", DbType="Int")]
+		public System.Nullable<int> EMATrendNoOfDays
+		{
+			get
+			{
+				return this._EMATrendNoOfDays;
+			}
+			set
+			{
+				if ((this._EMATrendNoOfDays != value))
+				{
+					this.OnEMATrendNoOfDaysChanging(value);
+					this.SendPropertyChanging();
+					this._EMATrendNoOfDays = value;
+					this.SendPropertyChanged("EMATrendNoOfDays");
+					this.OnEMATrendNoOfDaysChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EMAGrowthDecayRate", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> EMAGrowthDecayRate
+		{
+			get
+			{
+				return this._EMAGrowthDecayRate;
+			}
+			set
+			{
+				if ((this._EMAGrowthDecayRate != value))
+				{
+					this.OnEMAGrowthDecayRateChanging(value);
+					this.SendPropertyChanging();
+					this._EMAGrowthDecayRate = value;
+					this.SendPropertyChanged("EMAGrowthDecayRate");
+					this.OnEMAGrowthDecayRateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EMAStartDate", DbType="DateTime")]
+		public System.Nullable<System.DateTime> EMAStartDate
+		{
+			get
+			{
+				return this._EMAStartDate;
+			}
+			set
+			{
+				if ((this._EMAStartDate != value))
+				{
+					this.OnEMAStartDateChanging(value);
+					this.SendPropertyChanging();
+					this._EMAStartDate = value;
+					this.SendPropertyChanged("EMAStartDate");
+					this.OnEMAStartDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EMALinear", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> EMALinear
+		{
+			get
+			{
+				return this._EMALinear;
+			}
+			set
+			{
+				if ((this._EMALinear != value))
+				{
+					this.OnEMALinearChanging(value);
+					this.SendPropertyChanging();
+					this._EMALinear = value;
+					this.SendPropertyChanged("EMALinear");
+					this.OnEMALinearChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDLastCrossoverNoOfDays", DbType="Int")]
+		public System.Nullable<int> MACDLastCrossoverNoOfDays
+		{
+			get
+			{
+				return this._MACDLastCrossoverNoOfDays;
+			}
+			set
+			{
+				if ((this._MACDLastCrossoverNoOfDays != value))
+				{
+					this.OnMACDLastCrossoverNoOfDaysChanging(value);
+					this.SendPropertyChanging();
+					this._MACDLastCrossoverNoOfDays = value;
+					this.SendPropertyChanged("MACDLastCrossoverNoOfDays");
+					this.OnMACDLastCrossoverNoOfDaysChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDPosition", DbType="NVarChar(50)")]
+		public string MACDPosition
+		{
+			get
+			{
+				return this._MACDPosition;
+			}
+			set
+			{
+				if ((this._MACDPosition != value))
+				{
+					this.OnMACDPositionChanging(value);
+					this.SendPropertyChanging();
+					this._MACDPosition = value;
+					this.SendPropertyChanged("MACDPosition");
+					this.OnMACDPositionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EMALastCrossoverNoOfDays", DbType="Int")]
+		public System.Nullable<int> EMALastCrossoverNoOfDays
+		{
+			get
+			{
+				return this._EMALastCrossoverNoOfDays;
+			}
+			set
+			{
+				if ((this._EMALastCrossoverNoOfDays != value))
+				{
+					this.OnEMALastCrossoverNoOfDaysChanging(value);
+					this.SendPropertyChanging();
+					this._EMALastCrossoverNoOfDays = value;
+					this.SendPropertyChanged("EMALastCrossoverNoOfDays");
+					this.OnEMALastCrossoverNoOfDaysChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Nov7ClosePrice", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> Nov7ClosePrice
+		{
+			get
+			{
+				return this._Nov7ClosePrice;
+			}
+			set
+			{
+				if ((this._Nov7ClosePrice != value))
+				{
+					this.OnNov7ClosePriceChanging(value);
+					this.SendPropertyChanging();
+					this._Nov7ClosePrice = value;
+					this.SendPropertyChanged("Nov7ClosePrice");
+					this.OnNov7ClosePriceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Nov7NumberOfDays", DbType="Int")]
+		public System.Nullable<int> Nov7NumberOfDays
+		{
+			get
+			{
+				return this._Nov7NumberOfDays;
+			}
+			set
+			{
+				if ((this._Nov7NumberOfDays != value))
+				{
+					this.OnNov7NumberOfDaysChanging(value);
+					this.SendPropertyChanging();
+					this._Nov7NumberOfDays = value;
+					this.SendPropertyChanged("Nov7NumberOfDays");
+					this.OnNov7NumberOfDaysChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Nov7CorrelationCoefficient", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> Nov7CorrelationCoefficient
+		{
+			get
+			{
+				return this._Nov7CorrelationCoefficient;
+			}
+			set
+			{
+				if ((this._Nov7CorrelationCoefficient != value))
+				{
+					this.OnNov7CorrelationCoefficientChanging(value);
+					this.SendPropertyChanging();
+					this._Nov7CorrelationCoefficient = value;
+					this.SendPropertyChanged("Nov7CorrelationCoefficient");
+					this.OnNov7CorrelationCoefficientChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MACDLinear", DbType="Decimal(18,5)")]
+		public System.Nullable<decimal> MACDLinear
+		{
+			get
+			{
+				return this._MACDLinear;
+			}
+			set
+			{
+				if ((this._MACDLinear != value))
+				{
+					this.OnMACDLinearChanging(value);
+					this.SendPropertyChanging();
+					this._MACDLinear = value;
+					this.SendPropertyChanged("MACDLinear");
+					this.OnMACDLinearChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnStockPrice", Storage="_TrnStockPrices", ThisKey="Id", OtherKey="SymbolId")]
+		public EntitySet<TrnStockPrice> TrnStockPrices
+		{
+			get
+			{
+				return this._TrnStockPrices;
+			}
+			set
+			{
+				this._TrnStockPrices.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnFavorite", Storage="_TrnFavorites", ThisKey="Id", OtherKey="SymbolId")]
+		public EntitySet<TrnFavorite> TrnFavorites
+		{
+			get
+			{
+				return this._TrnFavorites;
+			}
+			set
+			{
+				this._TrnFavorites.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnSectorSymbol", Storage="_TrnSectorSymbols", ThisKey="Id", OtherKey="SymbolId")]
+		public EntitySet<TrnSectorSymbol> TrnSectorSymbols
+		{
+			get
+			{
+				return this._TrnSectorSymbols;
+			}
+			set
+			{
+				this._TrnSectorSymbols.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnUserFavoritesSymbol", Storage="_TrnUserFavoritesSymbols", ThisKey="Id", OtherKey="SymbolId")]
+		public EntitySet<TrnUserFavoritesSymbol> TrnUserFavoritesSymbols
+		{
+			get
+			{
+				return this._TrnUserFavoritesSymbols;
+			}
+			set
+			{
+				this._TrnUserFavoritesSymbols.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnStockEarning", Storage="_TrnStockEarnings", ThisKey="Id", OtherKey="SymbolId")]
+		public EntitySet<TrnStockEarning> TrnStockEarnings
+		{
+			get
+			{
+				return this._TrnStockEarnings;
+			}
+			set
+			{
+				this._TrnStockEarnings.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstSymbol_TrnUserAlertSymbol", Storage="_TrnUserAlertSymbols", ThisKey="Id", OtherKey="SymbolId")]
+		public EntitySet<TrnUserAlertSymbol> TrnUserAlertSymbols
+		{
+			get
+			{
+				return this._TrnUserAlertSymbols;
+			}
+			set
+			{
+				this._TrnUserAlertSymbols.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_TrnStockPrices(TrnStockPrice entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = this;
+		}
+		
+		private void detach_TrnStockPrices(TrnStockPrice entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = null;
+		}
+		
+		private void attach_TrnFavorites(TrnFavorite entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = this;
+		}
+		
+		private void detach_TrnFavorites(TrnFavorite entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = null;
+		}
+		
+		private void attach_TrnSectorSymbols(TrnSectorSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = this;
+		}
+		
+		private void detach_TrnSectorSymbols(TrnSectorSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = null;
+		}
+		
+		private void attach_TrnUserFavoritesSymbols(TrnUserFavoritesSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = this;
+		}
+		
+		private void detach_TrnUserFavoritesSymbols(TrnUserFavoritesSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = null;
+		}
+		
+		private void attach_TrnStockEarnings(TrnStockEarning entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = this;
+		}
+		
+		private void detach_TrnStockEarnings(TrnStockEarning entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = null;
+		}
+		
+		private void attach_TrnUserAlertSymbols(TrnUserAlertSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = this;
+		}
+		
+		private void detach_TrnUserAlertSymbols(TrnUserAlertSymbol entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstSymbol = null;
 		}
 	}
 }
