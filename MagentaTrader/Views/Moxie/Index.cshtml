@@ -1,0 +1,206 @@
+﻿@{
+    //ViewBag.Title = "Index";
+
+    var PageName = "Moxie";
+    var Version = "v.Beta.1.20180312";
+}
+
+<link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
+<link href="/css/toastr.css" rel="stylesheet" />
+
+<script src="/js/jquery-1.10.2.min.js"></script>
+<script src="/js/knockout-3.2.0.js"></script>
+<script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+<script src="/js/date.js"></script>
+<script src="/js/toastr.js"></script>
+
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"> - @PageName @Version</span></a>
+        </div>
+    </div>
+</nav>
+
+<br />
+<br />
+<br />
+<br />
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="MoxieGrid" class="grid"></div>
+            <div class="row">
+                <div class="btn-group col-md-7" id="NavPage">
+                    <button type="button" class="btn btn-default" id="NavFirstPage">
+                        <span class="glyphicon glyphicon-fast-backward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" id="NavPreviousPage">
+                        <span class="glyphicon glyphicon-step-backward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" disabled style="width:100px" id="NavCurrentPage"></button>
+                    <button type="button" class="btn btn-default" id="NavNextPage">
+                        <span class="glyphicon glyphicon-step-forward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" id="NavLastPage">
+                        <span class="glyphicon glyphicon-fast-forward"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var MoxieData;
+    var MoxieCollection;
+    var MoxieGrid;
+
+    var NavFirstPage;
+    var NavPreviousPage;
+    var NavNextPage;
+    var NavLastPage;
+    var NavCurrentPage;
+
+    function UpdateNavPage() {
+        if (MoxieCollection.pageSize <= 0) {
+            document.getElementById('NavPage').style.display = 'none';
+            return;
+        }
+        document.getElementById('NavPage').style.display = 'block';
+        if (MoxieCollection.pageIndex === 0) {
+            NavFirstPage.setAttribute('disabled', 'disabled');
+            NavPreviousPage.setAttribute('disabled', 'disabled');
+            NavNextPage.removeAttribute('disabled');
+            NavLastPage.removeAttribute('disabled');
+        }
+        else if (MoxieCollection.pageIndex === (MoxieCollection.pageCount - 1)) {
+            NavFirstPage.removeAttribute('disabled');
+            NavPreviousPage.removeAttribute('disabled');
+            NavNextPage.setAttribute('disabled', 'disabled');
+            NavLastPage.setAttribute('disabled', 'disabled');
+        }
+        else {
+            NavFirstPage.removeAttribute('disabled');
+            NavPreviousPage.removeAttribute('disabled');
+            NavNextPage.removeAttribute('disabled');
+            NavLastPage.removeAttribute('disabled');
+        }
+        NavCurrentPage.innerHTML = (MoxieCollection.pageIndex + 1) + ' / ' + MoxieCollection.pageCount;
+    }
+    function AddListenerNavPage() {
+        NavFirstPage.addEventListener('click', function () {
+            MoxieCollection.moveToFirstPage();
+            UpdateNavPage();
+        });
+        NavPreviousPage.addEventListener('click', function () {
+            MoxieCollection.moveToPreviousPage();
+            UpdateNavPage();
+        });
+        NavNextPage.addEventListener('click', function () {
+            MoxieCollection.moveToNextPage();
+            UpdateNavPage();
+        });
+        NavLastPage.addEventListener('click', function () {
+            MoxieCollection.moveToLastPage();
+            UpdateNavPage();
+        });
+    }
+    function GetMoxie() {
+        $.ajax({
+            url: '/api/Moxie',
+            type: 'GET',
+            dataType: 'json',
+            success: function (result) {
+                // Data
+                MoxieData = new wijmo.collections.ObservableArray();
+                for (var i = 0; i < result.length; i++) {
+                    MoxieData.push({
+                        ViewId: "<a href='/Campaign/ViewVideo?id=" + result[i]["Id"] + "'>" + result[i]["Id"] + "</a>",
+                        Id: result[i]["Id"],
+                        EventDate: result[i]["EventDate"],
+                        EventDescription: result[i]["EventDescription"],
+                        Particulars: result[i]["Particulars"],
+                        URL: result[i]["URL"],
+                        VideoURL: result[i]["VideoURL"],
+                        EventType: result[i]["EventType"],
+                        IsRestricted: result[i]["IsRestricted"],
+                        IsArchived: result[i]["IsArchived"],
+                        VideoURL: result[i]["VideoURL"]
+                    });
+                }
+                // Collection
+                MoxieCollection = new wijmo.collections.CollectionView(MoxieData);
+                MoxieCollection.pageSize = 10;
+                MoxieCollection.collectionChanged.addHandler(function (sender, args) {
+                    UpdateNavPage();
+                });
+                // Grid
+                MoxieGrid.dispose();
+                MoxieGrid = new wijmo.grid.FlexGrid('#MoxieGrid');
+                MoxieGrid.initialize({
+                    columns: [
+                    {
+                        "header": "View",
+                        "binding": "ViewId",
+                        "width": 60,
+                        "allowSorting": false,
+                        "isContentHtml": true
+                    },
+                    {
+                        "header": "Date",
+                        "binding": "EventDate",
+                        "allowSorting": true,
+                        "width": 100
+                    },
+                    {
+                        "header": "Event",
+                        "binding": "EventDescription",
+                        "allowSorting": true,
+                        "width": "*"
+                    },
+                    {
+                        "header": "Particulars",
+                        "binding": "Particulars",
+                        "allowSorting": true,
+                        "width": "*"
+                    }],
+                    autoGenerateColumns: false,
+                    itemsSource: MoxieCollection,
+                    isReadOnly: true,
+                    selectionMode: wijmo.grid.SelectionMode.Row
+                });
+                MoxieGrid.trackChanges = true;
+                UpdateNavPage();
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        NavFirstPage = document.getElementById('NavFirstPage');
+        NavPreviousPage = document.getElementById('NavPreviousPage');
+        NavNextPage = document.getElementById('NavNextPage');
+        NavLastPage = document.getElementById('NavLastPage');
+        NavCurrentPage = document.getElementById('NavCurrentPage');
+
+        MoxieData = new wijmo.collections.ObservableArray();
+        MoxieCollection = new wijmo.collections.CollectionView();
+        MoxieCollection.collectionChanged.addHandler(function (sender, args) {
+            UpdateNavPage();
+        });
+        MoxieGrid = new wijmo.grid.FlexGrid('#MoxieGrid');
+
+        AddListenerNavPage();
+
+        GetMoxie();
+    });
+</script>
+

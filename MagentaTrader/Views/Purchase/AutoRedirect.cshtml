@@ -1,0 +1,19 @@
+﻿<form hidden name="PrePage" method="post" action="https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx"> 
+    <input type="hidden" name="LinkId" value="05f14a3e-708a-497e-b76c-04f87e71b8e9" /> 
+    <input type="image" src="//content.authorize.net/images/buy-now-gold.gif" /> 
+    <input type='submit' name='ok' id='ok' />
+</form>
+
+<script type="text/javascript">
+    function submitForm() {
+        var referrer = document.referrer;
+
+        if (referrer.includes("barefeetmodels") == true) {
+            document.getElementById('ok').click();
+        } else {
+            window.location.href = "http://barefeetmodels.com";
+        }
+    }
+
+    window.onload = submitForm;
+</script>

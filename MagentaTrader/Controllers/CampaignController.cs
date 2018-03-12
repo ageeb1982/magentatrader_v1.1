@@ -269,5 +269,19 @@ namespace MagentaTrader.Controllers
         {
             return View();
         }
+
+        //
+        // GET: /Campaign/TradersWorld2017
+        public ActionResult TradersWorld2017()
+        {
+            return View();
+        }
+
+        //
+        // GET: /Campaign/CarnivalCruise2017
+        public ActionResult CarnivalCruise2017()
+        {
+            return View();
+        }
 	}
 }

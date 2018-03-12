@@ -1,0 +1,1113 @@
+﻿
+@{
+    ViewBag.Title = "Variable Screener";
+}
+
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/styles.css" rel="stylesheet" />
+<link href="/css/toastr.css" rel="stylesheet" />
+
+<script src="/js/jquery.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.js"></script>
+
+<script src="/js/toastr.js"></script>
+<script src="/js/date.js"></script>
+
+<script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.input.min.js"></script>
+<script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.chart.min.js"></script>
+
+<link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
+
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"> - Variable Screener</span></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <h2 class="section-heading">Variable Screener</h2>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <button id="OpenSharedFavorites" type="submit" class="btn btn-primary btn-block" onclick="OpenSharedFavorites_OnClick()">Shared Favorites</button>
+            @*<a href='javascript:;' onclick='SharedFavorites_OnClick();'>Shared Favorites</a>*@
+        </div>
+        <div class="col-lg-4">
+            <input type="text" class="form-control" id="FavoriteCode" placeholder="None" disabled="disabled">
+        </div>
+        <div class="col-lg-2">
+            <button id="StartScan" type="submit" class="btn btn-primary btn-block" onclick="StartScan_OnClick()">Start Scanning</button>
+        </div>
+        <div class="col-lg-2">
+            <button id="Download" type="submit" class="btn btn-primary btn-block" onclick="Download_OnClick()">Download</button>
+        </div>
+    </div>
+    
+    <br />
+
+    <div class="row" style="position:absolute;width: 100%;">
+        <div class="col-lg-12">
+            <div id="SymbolResultGrid" class="grid"></div>
+            <br />
+            <div class="row">
+                <div class="btn-group col-md-7" id="srNav">
+                    <button type="button" class="btn btn-default" id="srNavFirst">
+                        <span class="glyphicon glyphicon-fast-backward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" id="srNavPrevious">
+                        <span class="glyphicon glyphicon-step-backward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" disabled style="width:100px" id="srNavCurrent"></button>
+                    <button type="button" class="btn btn-default" id="srNavNext">
+                        <span class="glyphicon glyphicon-step-forward"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" id="srNavLast">
+                        <span class="glyphicon glyphicon-fast-forward"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@*Shared Favorites Modal*@
+<div class="modal fade" id="SharedFavorites">
+    <div class="modal-dialog" style="width: 1100px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 id="SharedFavoritesTitle" class="modal-title">Shared Favorites</h4>
+            </div>
+            <div class="modal-body">
+                <div id="SharedFavoritesGrid" class="grid"></div>
+                <br />
+                <div class="row">
+                    <div class="btn-group col-md-7" id="sfNav">
+                        <button type="button" class="btn btn-default" id="sfNavFirst">
+                            <span class="glyphicon glyphicon-fast-backward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" id="sfNavPrevious">
+                            <span class="glyphicon glyphicon-step-backward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" disabled style="width:100px" id="sfNavCurrent"></button>
+                        <button type="button" class="btn btn-default" id="sfNavNext">
+                            <span class="glyphicon glyphicon-step-forward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" id="sfNavLast">
+                            <span class="glyphicon glyphicon-fast-forward"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+    var currentUser;
+
+    var sharedFavoritesGrid;
+    var sharedFavoritesCollection;
+    var sharedFavoritesData;
+
+    var sfNavFirst;
+    var sfNavPrevious;
+    var sfNavNext;
+    var sfNavLast;
+    var sfNavCurrent;
+
+    var symbolResultGrid;
+    var symbolResultCollection;
+    var symbolResultData;
+
+    var srNavFirst;
+    var srNavPrevious;
+    var srNavNext;
+    var srNavLast;
+    var srNavCurrent;
+
+    // Events
+    function OpenSharedFavorites_OnClick() {
+        $('#SharedFavorites').modal({
+            show: true,
+            backdrop: false
+        });
+
+        createSharedFavorites();
+    }
+    function PickSharedFavorites_OnClick(userFavoriteId) {
+        $('#SharedFavorites').modal('hide');
+
+        sharedFavoritesCollection.editItem(sharedFavoritesCollection.currentItem);
+        document.getElementById('FavoriteCode').value = sharedFavoritesCollection.currentEditItem.Remarks;
+
+        createSymbolResults(userFavoriteId);
+    }
+    function StartScan_OnClick() {
+        var numberOfPages = symbolResultCollection.pageCount - 1;
+        symbolResultCollection.moveToFirstPage();
+        for (var i = 0; i <= numberOfPages; i++) {
+            symbolResultCollection.moveCurrentToFirst();
+            for (var c = 0; c < symbolResultCollection.itemCount; c++) {
+                symbolResultCollection.editItem(symbolResultCollection.currentItem);
+                var record = symbolResultCollection.currentEditItem;
+                computeVariableScanner(record);
+                symbolResultCollection.moveCurrentToNext();
+            }
+            symbolResultCollection.moveToNextPage();
+        }
+    }
+    function Download_OnClick() {
+        var CSV = '';
+        var data = [];
+        var fileName = 'variablescanner.CSV';
+
+        // data
+        for (i = 0; i < symbolResultData.length; i++) {
+            if (symbolResultData[i].UpPercentage > 0 && symbolResultData[i].DownPercentage > 0) {
+                data.push({
+                    Symbol: symbolResultData[i].Symbol,
+                    SymbolDescription: symbolResultData[i].SymbolDescription,
+                    UpDate: symbolResultData[i].UpDate.toISOString().slice(0, 10),
+                    UpRate: "'" + symbolResultData[i].UpRate + "'",
+                    UpRatePercentage: symbolResultData[i].UpRatePercentage,
+                    UpPercentage: symbolResultData[i].UpPercentage,
+                    UpNumberOfDays: symbolResultData[i].UpNumberOfDays,
+                    UpDaysAverage: symbolResultData[i].UpDaysAverage,
+                    UpYear0: symbolResultData[i].UpYear0,
+                    UpYear1: symbolResultData[i].UpYear1,
+                    UpYear2: symbolResultData[i].UpYear2,
+                    UpYear3: symbolResultData[i].UpYear3,
+                    UpYear4: symbolResultData[i].UpYear4,
+                    UpYear5: symbolResultData[i].UpYear5,
+                    UpYear6: symbolResultData[i].UpYear6,
+                    UpYear7: symbolResultData[i].UpYear7,
+                    UpYear8: symbolResultData[i].UpYear8,
+                    UpYear9: symbolResultData[i].UpYear9,
+                    DownDate: symbolResultData[i].DownDate.toISOString().slice(0, 10),
+                    DownRate: "'" + symbolResultData[i].DownRate + "'",
+                    DownRatePercentage: symbolResultData[i].DownRatePercentage,
+                    DownPercentage: symbolResultData[i].DownPercentage,
+                    DownNumberOfDays: symbolResultData[i].DownNumberOfDays,
+                    DownDaysAverage: symbolResultData[i].DownDaysAverage,
+                    DownYear0: symbolResultData[i].DownYear0,
+                    DownYear1: symbolResultData[i].DownYear1,
+                    DownYear2: symbolResultData[i].DownYear2,
+                    DownYear3: symbolResultData[i].DownYear3,
+                    DownYear4: symbolResultData[i].DownYear4,
+                    DownYear5: symbolResultData[i].DownYear5,
+                    DownYear6: symbolResultData[i].DownYear6,
+                    DownYear7: symbolResultData[i].DownYear7,
+                    DownYear8: symbolResultData[i].DownYear8,
+                    DownYear9: symbolResultData[i].DownYear9
+                });
+            }
+        }
+
+        // label
+        var labelRow = '';
+        for (var d in data[0]) labelRow += d + ',';
+        labelRow = labelRow.slice(0, -1);
+        CSV += labelRow + '\r\n';
+
+        // row
+        for (var i = 0; i < data.length; i++) {
+            var dataRow = '';
+            for (var s in data[i]) {
+                dataRow += '"' + data[i][s] + '",';
+            }
+            dataRow.slice(0, dataRow.length - 1);
+            CSV += dataRow + '\r\n';
+        }
+
+        // file
+        if (CSV == '') {
+            toastr.error("No data");
+        } else {
+            var link = document.createElement("a");
+
+            if (link.download !== undefined) {
+                var blob = new Blob([CSV], { type: 'text/csv;charset=utf-8;' });
+                var url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", fileName);
+                link.style = "visibility:hidden";
+            }
+
+            if (navigator.msSaveBlob) {
+                link.addEventListener("click", function (event) {
+                    var blob = new Blob([CSV], {
+                        "type": "text/csv;charset=utf-8;"
+                    });
+                    navigator.msSaveBlob(blob, fileName);
+                }, false);
+            }
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            toastr.success("Dowload successful.");
+        }
+
+    }
+
+    // Shared Favourites Grid
+    function createSharedFavorites() {
+        $("#SharedFavoritesGrid").empty();
+
+        $.ajax({
+            url: '/api/UserFavoriteSharedList',
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            success: function (result) {
+                if (result.length > 0) {
+                    // Data
+                    while (sharedFavoritesData.length > 0) sharedFavoritesData.pop();
+                    for (var i = 0; i < result.length; i++) {
+                        sharedFavoritesData.push({
+                            PickId: "<button class='btn btn-primary btn-xs' data-toggle='modal' id='PickSharedFavorites' onclick='PickSharedFavorites_OnClick(" + result[i].Id +")'>Pick</button>",
+                            Remarks: result[i].Description,
+                            Id: result[i].Id,
+                            User: result[i].User,
+                            UserId: result[i].UserId,
+                            NoOfSymbols: result[i].NoOfSymbols,
+                        });
+                    }
+
+                    // Collection
+                    sharedFavoritesCollection = new wijmo.collections.CollectionView(sharedFavoritesData);
+                    sharedFavoritesCollection.pageSize = 10;
+                    sharedFavoritesCollection.collectionChanged.addHandler(function (sender, args) {
+                        updateNavSharedFavorites();
+                    });
+                    // Grid
+                    sharedFavoritesGrid.dispose();
+                    sharedFavoritesGrid = new wijmo.grid.FlexGrid('#SharedFavoritesGrid');
+                    sharedFavoritesGrid.initialize({
+                        columns: [
+                                    {
+                                        "header": "Pick",
+                                        "binding": "PickId",
+                                        "width": 60,
+                                        "isContentHtml": true
+                                    },
+                                    {
+                                        "header": "User",
+                                        "binding": "User",
+                                        "width": 120,
+                                        "allowSorting": true
+                                    },
+                                    {
+                                        "header": "Favorite Name",
+                                        "binding": "Remarks",
+                                        "width": "*",
+                                        "allowSorting": true
+                                    },
+                                    {
+                                        "header": "Symbol(s)",
+                                        "binding": "NoOfSymbols",
+                                        "width": 80
+                                    }
+                        ],
+                        autoGenerateColumns: false,
+                        itemsSource: sharedFavoritesCollection,
+                        isReadOnly: true,
+                        selectionMode: wijmo.grid.SelectionMode.Row
+                    });
+                    sharedFavoritesGrid.trackChanges = true;
+                    sharedFavoritesGrid.focus();
+                    sharedFavoritesGrid.select(new wijmo.grid.CellRange(0, 2, 0, 2), true);
+                    updateNavSharedFavorites();
+                }
+            }
+        });
+    }
+    function updateNavSharedFavorites() {
+        if (sharedFavoritesCollection.pageSize <= 0) {
+            document.getElementById('sfNav').style.display = 'none';
+            return;
+        }
+        if (sharedFavoritesCollection.pageIndex === 0) {
+            sfNavFirst.setAttribute('disabled', 'disabled');
+            sfNavPrevious.setAttribute('disabled', 'disabled');
+            sfNavNext.removeAttribute('disabled');
+            sfNavLast.removeAttribute('disabled');
+        }
+        else if (sharedFavoritesCollection.pageIndex === (sharedFavoritesCollection.pageCount - 1)) {
+            sfNavFirst.removeAttribute('disabled');
+            sfNavPrevious.removeAttribute('disabled');
+            sfNavNext.setAttribute('disabled', 'disabled');
+            sfNavLast.setAttribute('disabled', 'disabled');
+        }
+        else {
+            sfNavFirst.removeAttribute('disabled');
+            sfNavPrevious.removeAttribute('disabled');
+            sfNavNext.removeAttribute('disabled');
+            sfNavLast.removeAttribute('disabled');
+        }
+        sfNavCurrent.innerHTML = (sharedFavoritesCollection.pageIndex + 1) + ' / ' + sharedFavoritesCollection.pageCount;
+    }
+    function addNavSharedFavoritesListeners() {
+        sfNavFirst.addEventListener('click', function () {
+            sharedFavoritesCollection.moveToFirstPage();
+            updateNavSharedFavorites();
+        });
+        sfNavPrevious.addEventListener('click', function () {
+            sharedFavoritesCollection.moveToPreviousPage();
+            updateNavSharedFavorites();
+        });
+        sfNavNext.addEventListener('click', function () {
+            sharedFavoritesCollection.moveToNextPage();
+            updateNavSharedFavorites();
+        });
+        sfNavLast.addEventListener('click', function () {
+            sharedFavoritesCollection.moveToLastPage();
+            updateNavSharedFavorites();
+        });
+    }
+
+    // Symbol Results Grid
+    function createSymbolResults(userFavoriteId) {
+        $("#SymbolResultGrid").empty();
+
+        $.ajax({
+            url: '/api/UserFavoriteSymbolList/' + userFavoriteId,
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            success: function (result) {
+                // Data
+                while (symbolResultData.length > 0) symbolResultData.pop();
+                for (var i = 0; i < result.length; i++) {
+                    symbolResultData.push({
+                        Id: result[i].Id,
+                        UserFavoritesId: result[i].UserFavoritesId,
+                        SymbolId: result[i].SymbolId,
+                        Symbol: result[i].Symbol,
+                        SymbolLink: "<a href='/Software?symbol=" + result[i].Symbol + "' target='_blank'><font color='black'>" + result[i].Symbol + "</font></a>",
+                        SymbolDescription: result[i].SymbolDescription,
+                        UpDate: "",
+                        UpRate: "",
+                        UpRatePercentage: 0,
+                        UpPercentage: 0,
+                        UpNumberOfDays: "",
+                        UpDaysAverage: 0,
+                        UpYear0: 0,
+                        UpYear1: 0,
+                        UpYear2: 0,
+                        UpYear3: 0,
+                        UpYear4: 0,
+                        UpYear5: 0,
+                        UpYear6: 0,
+                        UpYear7: 0,
+                        UpYear8: 0,
+                        UpYear9: 0,
+                        DownDate: "",
+                        DownRate: "",
+                        DownRatePercentage: 0,
+                        DownPercentage: 0,
+                        DownNumberOfDays: "",
+                        DownDaysAverage: 0,
+                        DownYear0: 0,
+                        DownYear1: 0,
+                        DownYear2: 0,
+                        DownYear3: 0,
+                        DownYear4: 0,
+                        DownYear5: 0,
+                        DownYear6: 0,
+                        DownYear7: 0,
+                        DownYear8: 0,
+                        DownYear9: 0
+                    });
+                }
+                // Collection
+                symbolResultCollection = new wijmo.collections.CollectionView(symbolResultData);
+                symbolResultCollection.pageSize = 20;
+                symbolResultCollection.collectionChanged.addHandler(function (sender, args) {
+                    updateNavSymbolResults();
+                });
+                // Grid
+                symbolResultGrid.dispose();
+                symbolResultGrid = new wijmo.grid.FlexGrid('#SymbolResultGrid');
+                symbolResultGrid.initialize({
+                    columns: [
+                                {
+                                    "header": "Symbol",
+                                    "binding": "SymbolLink",
+                                    "width": 60,
+                                    "isContentHtml": true
+                                },
+                                //{
+                                //    "header": "SymbolDescription",
+                                //    "binding": "SymbolDescription",
+                                //    "width": 250,
+                                //    "allowSorting": true
+                                //},
+                                {
+                                    "header": "Up-Date",
+                                    "binding": "UpDate",
+                                    "width": 70,
+                                    "allowSorting": true
+                                },
+                                {
+                                    "header": "Up-Rate",
+                                    "binding": "UpRate",
+                                    "width": 60
+                                },
+                                {
+                                    "header": "Up-Rate%",
+                                    "binding": "UpRatePercentage",
+                                    "width": 60
+                                },
+                                {
+                                    "header": "Up-%",
+                                    "binding": "UpPercentage",
+                                    "width": 60
+                                },
+                                {
+                                    "header": "Up-Days",
+                                    "binding": "UpNumberOfDays",
+                                    "width": 60
+                                },
+                                {
+                                    "header": "Up-Average%",
+                                    "binding": "UpDaysAverage",
+                                    "width": 60
+                                },
+                                {
+                                    "header": "UY0",
+                                    "binding": "UpYear0",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "UY1",
+                                    "binding": "UpYear1",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "UY2",
+                                    "binding": "UpYear2",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "UY3",
+                                    "binding": "UpYear3",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "UY4",
+                                    "binding": "UpYear4",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "UY5",
+                                    "binding": "UpYear5",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "UY6",
+                                    "binding": "UpYear6",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "UY7",
+                                    "binding": "UpYear7",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "UY8",
+                                    "binding": "UpYear8",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "UY9",
+                                    "binding": "UpYear9",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "Down-Date",
+                                    "binding": "DownDate",
+                                    "width": 70,
+                                    "allowSorting": true
+                                },
+                                {
+                                    "header": "Down-Rate",
+                                    "binding": "DownRate",
+                                    "width": 60
+                                },
+                                {
+                                    "header": "Down-Rate%",
+                                    "binding": "DownRatePercentage",
+                                    "width": 60
+                                },
+                                {
+                                    "header": "Down-%",
+                                    "binding": "DownPercentage",
+                                    "width": 60
+                                },
+                                {
+                                    "header": "Down-Days",
+                                    "binding": "DownNumberOfDays",
+                                    "width": 60
+                                },
+                                {
+                                    "header": "Down-Average%",
+                                    "binding": "DownDaysAverage",
+                                    "width": 60
+                                },
+                                {
+                                    "header": "DY0",
+                                    "binding": "DownYear0",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "DY1",
+                                    "binding": "DownYear1",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "DY2",
+                                    "binding": "DownYear2",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "DY3",
+                                    "binding": "DownYear3",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "DY4",
+                                    "binding": "DownYear4",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "DY5",
+                                    "binding": "DownYear5",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "DY6",
+                                    "binding": "DownYear6",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "DY7",
+                                    "binding": "DownYear7",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "DY8",
+                                    "binding": "DownYear8",
+                                    "width": "*"
+                                },
+                                {
+                                    "header": "DY9",
+                                    "binding": "DownYear9",
+                                    "width": "*"
+                                }
+                    ],
+                    autoGenerateColumns: false,
+                    itemsSource: symbolResultCollection,
+                    isReadOnly: true,
+                    selectionMode: wijmo.grid.SelectionMode.Row,
+                    itemFormatter: function (panel, r, c, cell) {
+                        //if (wijmo.grid.CellType.Cell == panel.cellType) {
+                            cell.style.fontSize = "80%";
+                        //}
+                    }
+                });
+                symbolResultGrid.trackChanges = true;
+                symbolResultGrid.focus();
+                symbolResultGrid.select(new wijmo.grid.CellRange(0, 2, 0, 2), true);
+                updateNavSymbolResults();
+            }
+        });
+    }
+    function updateNavSymbolResults() {
+        if (symbolResultCollection.pageSize <= 0) {
+            document.getElementById('srNav').style.display = 'none';
+            return;
+        }
+        if (symbolResultCollection.pageIndex === 0) {
+            srNavFirst.setAttribute('disabled', 'disabled');
+            srNavPrevious.setAttribute('disabled', 'disabled');
+            srNavNext.removeAttribute('disabled');
+            srNavLast.removeAttribute('disabled');
+        }
+        else if (symbolResultCollection.pageIndex === (symbolResultCollection.pageCount - 1)) {
+            srNavFirst.removeAttribute('disabled');
+            srNavPrevious.removeAttribute('disabled');
+            srNavNext.setAttribute('disabled', 'disabled');
+            srNavLast.setAttribute('disabled', 'disabled');
+        }
+        else {
+            srNavFirst.removeAttribute('disabled');
+            srNavPrevious.removeAttribute('disabled');
+            srNavNext.removeAttribute('disabled');
+            srNavLast.removeAttribute('disabled');
+        }
+        srNavCurrent.innerHTML = (symbolResultCollection.pageIndex + 1) + ' / ' + symbolResultCollection.pageCount;
+    }
+    function addNavSymbolResulstListeners() {
+        srNavFirst.addEventListener('click', function () {
+            symbolResultCollection.moveToFirstPage();
+            updateNavSymbolResults();
+        });
+        srNavPrevious.addEventListener('click', function () {
+            symbolResultCollection.moveToPreviousPage();
+            updateNavSymbolResults();
+        });
+        srNavNext.addEventListener('click', function () {
+            symbolResultCollection.moveToNextPage();
+            updateNavSymbolResults();
+        });
+        srNavLast.addEventListener('click', function () {
+            symbolResultCollection.moveToLastPage();
+            updateNavSymbolResults();
+        });
+    }
+
+    // Utilities
+    function parseDate(dateString) {
+        var parts = dateString.split('-');
+        return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+    function sign(x) {
+        return typeof x === 'number' ? x ? x < 0 ? -1 : 1 : x === x ? 0 : NaN : NaN;
+    }
+    function padDigits(number, digits) {
+        return Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number;
+    }
+
+    // Variable Scanner
+    function scanYearlyData(yearlyData, noOfYears, index, daySpan, direction) {
+        var result = [];
+        var up = 0;
+        var down = 0;
+        var averageUp = 0;
+        var averageDown = 0;
+
+        result[0] = [];
+        result[1] = [];
+        result[2] = [];
+        result[3] = [];
+        result[4] = []; for (var d = 0; d < 10; d++) result[4].push(0);
+        result[5] = []; for (var d = 0; d < 10; d++) result[5].push(0);
+
+        if (direction == "up") {
+            for (var y = 0; y < noOfYears; y++) {
+                var startData = yearlyData[y][index];
+                var endData = yearlyData[y][index + daySpan - 1];
+                if (endData > startData) {
+                    up++;
+                    if (startData != 0) {
+                        result[4][y] = (((((endData - startData) / startData) * sign(startData)) * 100)).toFixed(2);
+                        averageUp = averageUp + (((((endData - startData) / startData) * sign(startData)) * 100));
+                    }
+                }
+            }
+            if (up > 0) {
+                averageUp = averageUp / up;
+            }
+            result[0][0] = up;
+            result[1][0] = averageUp;
+            result[2][0] = 0;
+            result[3][0] = 0;
+        } else {
+            for (var y = 0; y < noOfYears; y++) {
+                var startData = yearlyData[y][index];
+                var endData = yearlyData[y][index + daySpan - 1];
+                if (startData > endData) {
+                    down++;
+                    if (endData != 0) {
+                        result[5][y] = ((((startData - endData) / endData) * sign(endData)) * 100).toFixed(2);
+                        averageDown = averageDown + ((((startData - endData) / endData) * sign(endData)) * 100);
+                    }
+                }
+            }
+            if (down > 0) {
+                averageDown = averageDown / down;
+            }
+            result[0][0] = 0;
+            result[1][0] = 0;
+            result[2][0] = down;
+            result[3][0] = averageDown;
+        }
+        return result;
+    }
+    function computeVariableScanner(record) {
+        var symbol = record.Symbol;
+        $.ajax({
+            url: '/api/StockPrice/' + symbol,
+            cache: false,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            data: {},
+            success: function (result) {
+                if (result.StockPrices.length > 0) {
+
+                    // ================
+                    // raw stock prices
+                    // ================
+                    var dataSymbol = result.Symbol;
+                    var dataSymbolDescription = result.SymbolDescription;
+                    var data = result.StockPrices;
+
+                    // =====================
+                    // prepared stock prices
+                    // =====================
+                    var preparedStockPrice = [];
+                    var firstClosingPrice = [];
+                    var dayIndex = 126;
+                    var countYear = 0;
+                    var numberOfYears = 0;
+
+                    for (var i = 0; i < data.length; i++) {
+                        var date = parseDate(data[i]["QuoteDate"]);
+                        var open = data[i]["OpenPrice"];
+                        var high = data[i]["HighPrice"];
+                        var low = data[i]["LowPrice"];
+                        var close = data[i]["ClosePrice"];
+                        var volume = data[i]["Volume"];
+
+                        preparedStockPrice.push({
+                            date: date,
+                            open: open,
+                            high: high,
+                            low: low,
+                            close: close,
+                            season: 0,
+                            season5Year: 0,
+                            seasonCount: dayIndex,
+                            volume: volume
+                        });
+
+                        dayIndex--;
+                        if (dayIndex == 0) {
+                            dayIndex = 252;
+                            if (countYear > 0) {
+                                firstClosingPrice.push(close);
+                            }
+                            countYear++;
+                        } else {
+                            if (i == data.length - 1) {
+                                if (countYear > 0) {
+                                    firstClosingPrice.push(close);
+                                }
+                            }
+                        }
+                    }
+
+                    // =========================
+                    // seasonal stock price data
+                    // =========================
+                    var season = 0;
+                    var season5Year = 0;
+
+                    var seasonYearData = [];
+                    var closeYearData = [];
+                    var seasonTenYearData = [];
+                    var seasonFiveYearData = [];
+
+                    countYear = 0;
+                    dayIndex = 251;
+
+                    while (seasonYearData.length > 0) seasonYearData.pop();
+                    for (var i = 0; i < 12; i++) {
+                        seasonYearData[i] = [];
+                        for (var d = 0; d < 252; d++) seasonYearData[i].push(0);
+                    }
+
+                    while (closeYearData.length > 0) closeYearData.pop();
+                    for (var i = 0; i < 12; i++) {
+                        closeYearData[i] = [];
+                        for (var d = 0; d < 252; d++) closeYearData[i].push(0);
+                    }
+
+
+                    for (var i = 126; i < preparedStockPrice.length; i++) {
+                        if (firstClosingPrice[countYear] > 0) {
+                            season = ((parseFloat(preparedStockPrice[i]["close"]) - firstClosingPrice[countYear]) / firstClosingPrice[countYear]) * 100;
+                        } else {
+                            season = 0;
+                        }
+
+                        if (countYear < 5) season5Year = season;
+
+                        preparedStockPrice[i]["season"] = season;
+                        preparedStockPrice[i]["season5Year"] = season5Year;
+
+                        seasonYearData[countYear][dayIndex] = season;
+                        closeYearData[countYear][dayIndex] = parseFloat(preparedStockPrice[i]["close"]);
+
+                        dayIndex--;
+                        if (dayIndex == -1) {
+                            dayIndex = 251;
+                            countYear++;
+                        }
+                    }
+
+                    numberOfYears = countYear + 1;
+
+                    for (i = 0; i < 252; i++) {
+                        season = 0;
+                        season5Year = 0;
+                        for (y = 0; y < 10; y++) {
+                            season = season + seasonYearData[y][i];
+                            if (y < 5) season5Year = season5Year + seasonYearData[y][i];
+                        }
+                        seasonTenYearData[i] = season;
+                        seasonFiveYearData[i] = season5Year;
+                    }
+
+                    // ================
+                    // create plot data
+                    // ================
+                    var plotStockPrice = [];
+                    var futureDate = new Date((new Date(preparedStockPrice[0]["date"])).add(1).days());
+
+                    for (i = 0; i < 252; i++) {
+                        var earning = 0;
+                        if (i > 125) {
+                            if (new Date(futureDate).getDay() == 0 || new Date(futureDate).getDay() == 6) {
+                                i--;
+                            } else {
+                                plotStockPrice.push({
+                                    date: new Date(futureDate),
+                                    season: (seasonTenYearData[i] / 10).toFixed(2),
+                                    season5Year: (seasonFiveYearData[i] / 5).toFixed(2),
+                                    seasonCount: i + 1,
+                                    seasonY0: seasonYearData[0][i].toFixed(2),
+                                    seasonY1: seasonYearData[1][i].toFixed(2),
+                                    seasonY2: seasonYearData[2][i].toFixed(2),
+                                    seasonY3: seasonYearData[3][i].toFixed(2),
+                                    seasonY4: seasonYearData[4][i].toFixed(2),
+                                    seasonY5: seasonYearData[5][i].toFixed(2),
+                                    seasonY6: seasonYearData[6][i].toFixed(2),
+                                    seasonY7: seasonYearData[7][i].toFixed(2),
+                                    seasonY8: seasonYearData[8][i].toFixed(2),
+                                    seasonY9: seasonYearData[9][i].toFixed(2)
+                                });
+                            }
+                            futureDate = futureDate.add(1).day();
+                        } else {
+                            plotStockPrice.push({
+                                date: preparedStockPrice[125 - i]["date"],
+                                open: preparedStockPrice[125 - i]["open"],
+                                high: preparedStockPrice[125 - i]["high"],
+                                low: preparedStockPrice[125 - i]["low"],
+                                close: preparedStockPrice[125 - i]["close"],
+                                season: (seasonTenYearData[i] / 10).toFixed(2),
+                                season5Year: (seasonFiveYearData[i] / 5).toFixed(2),
+                                seasonCount: i + 1,
+                                seasonY0: seasonYearData[0][i].toFixed(2),
+                                seasonY1: seasonYearData[1][i].toFixed(2),
+                                seasonY2: seasonYearData[2][i].toFixed(2),
+                                seasonY3: seasonYearData[3][i].toFixed(2),
+                                seasonY4: seasonYearData[4][i].toFixed(2),
+                                seasonY5: seasonYearData[5][i].toFixed(2),
+                                seasonY6: seasonYearData[6][i].toFixed(2),
+                                seasonY7: seasonYearData[7][i].toFixed(2),
+                                seasonY8: seasonYearData[8][i].toFixed(2),
+                                seasonY9: seasonYearData[9][i].toFixed(2),
+                                volume: preparedStockPrice[125 - i]["volume"]
+                            });
+                        }
+                    }
+
+                    // =============================
+                    // compute variable scanner data
+                    // =============================
+                    var startNoOfDay = 10;
+                    var endNoOfDay = 40;
+                    var noOfYears = firstClosingPrice.length;
+
+                    var highestUp = 0;
+                    var highestUpAverage = 0;
+                    var highestUpIndex = 0;
+                    var highestUpDaySpan = 0;
+                    var highestUpYears = [];
+
+                    var highestDown = 0;
+                    var highestDownAverage = 0;
+                    var highestDownIndex = 0;
+                    var highestDownDaySpan = 0;
+                    var highestDownYears = [];
+
+                    for (var d = startNoOfDay; d <= endNoOfDay; d++) {
+                        for (var i = 125 ; i < 252 - d ; i++) {
+                            // Get result
+                            var seasonTenYear = parseFloat(plotStockPrice[i]["season"]);
+                            var seasonTenYearPlusVarDays = parseFloat(plotStockPrice[i + d - 1]["season"]);
+                            var result = [];
+                            if (seasonTenYearPlusVarDays > seasonTenYear) {
+                                result = scanYearlyData(closeYearData, noOfYears, i, d, "up");
+                            } else {
+                                result = scanYearlyData(closeYearData, noOfYears, i, d, "down");
+                            }
+                            // Compare result
+                            if (result[0][0] > 0) {
+                                if (result[0][0] > highestUp || (result[0][0] == highestUp && result[1][0] > highestUpAverage)) {
+                                    highestUp = result[0][0];
+                                    highestUpAverage = result[1][0];
+                                    highestUpIndex = i;
+                                    highestUpDaySpan = d;
+                                    highestUpYears = result[4];
+                                }
+                            } else if (result[2][0] > 0) {
+                                if (result[2][0] > highestDown || (result[2][0] == highestDown && result[3][0] > highestDownAverage)) {
+                                    highestDown = result[2][0];
+                                    highestDownAverage = result[3][0];
+                                    highestDownIndex = i;
+                                    highestDownDaySpan = d;
+                                    highestDownYears = result[5];
+                                }
+                            }
+                        }
+                    }
+
+                    // ===========================
+                    // Update symbol results table
+                    // ===========================
+                    if (highestUp > 0) {
+                        record.UpDate = plotStockPrice[highestUpIndex]["date"];
+                        record.UpRate = padDigits(highestUp, 2) + "/" + padDigits((numberOfYears), 2);
+                        if (numberOfYears > 0) {
+                            record.UpRatePercentage = Number(((highestUp / numberOfYears) * 100).toFixed(2));
+                        } else {
+                            record.UpRatePercentage = 0;
+                        }
+                        record.UpNumberOfDays = highestUpDaySpan;
+                        record.UpPercentage = highestUpAverage;
+                        if (highestUpDaySpan > 0) {
+                            record.UpDaysAverage = Number(((highestUpAverage / highestUpDaySpan)).toFixed(2));
+                        } else {
+                            record.UpDaysAverage = 0;
+                        }
+                        for(var i=0;i<highestUpYears.length;i++) {
+                            if (i == 0) record.UpYear0 = highestUpYears[i];
+                            if (i == 1) record.UpYear1 = highestUpYears[i];
+                            if (i == 2) record.UpYear2 = highestUpYears[i];
+                            if (i == 3) record.UpYear3 = highestUpYears[i];
+                            if (i == 4) record.UpYear4 = highestUpYears[i];
+                            if (i == 5) record.UpYear5 = highestUpYears[i];
+                            if (i == 6) record.UpYear6 = highestUpYears[i];
+                            if (i == 7) record.UpYear7 = highestUpYears[i];
+                            if (i == 8) record.UpYear8 = highestUpYears[i];
+                            if (i == 9) record.UpYear9 = highestUpYears[i];
+                        }
+                    }
+
+                    if (highestDown > 0) {
+                        record.DownDate = plotStockPrice[highestDownIndex]["date"];
+                        record.DownRate = padDigits(highestDown, 2) + "/" + padDigits((numberOfYears), 2);
+                        if (numberOfYears > 0) {
+                            record.DownRatePercentage = Number(((highestDown / numberOfYears) * 100).toFixed(2));
+                        } else {
+                            record.DownRatePercentage = 0;
+                        }
+                        record.DownNumberOfDays = highestDownDaySpan;
+                        record.DownPercentage = highestDownAverage;
+                        if (highestDownDaySpan > 0) {
+                            record.DownDaysAverage = Number(((highestDownAverage / highestDownDaySpan)).toFixed(2));
+                        } else {
+                            record.DownDaysAverage = 0;
+                        }
+                        for (var i = 0; i < highestDownYears.length; i++) {
+                            if (i == 0) record.DownYear0 = highestDownYears[i];
+                            if (i == 1) record.DownYear1 = highestDownYears[i];
+                            if (i == 2) record.DownYear2 = highestDownYears[i];
+                            if (i == 3) record.DownYear3 = highestDownYears[i];
+                            if (i == 4) record.DownYear4 = highestDownYears[i];
+                            if (i == 5) record.DownYear5 = highestDownYears[i];
+                            if (i == 6) record.DownYear6 = highestDownYears[i];
+                            if (i == 7) record.DownYear7 = highestDownYears[i];
+                            if (i == 8) record.DownYear8 = highestDownYears[i];
+                            if (i == 9) record.DownYear9 = highestDownYears[i];
+                        }
+                    }
+
+                    symbolResultCollection.commitEdit();
+                    symbolResultCollection.refresh();
+
+                    toastr.success(symbol + " Done!");
+
+                } else {
+
+                    toastr.error("Please retry.  Symbol not found.");
+
+                }
+            }
+        }).fail(
+                function (xhr, textStatus, err) {
+                    toastr.error(err);
+                }
+        );
+    }
+
+    $(document).ready(function () {
+
+        currentUser = '@User.Identity.Name';
+
+        // Shared Favorites
+
+        sfNavFirst = document.getElementById('sfNavFirst');
+        sfNavPrevious = document.getElementById('sfNavPrevious');
+        sfNavNext = document.getElementById('sfNavNext');
+        sfNavLast = document.getElementById('sfNavLast');
+        sfNavCurrent = document.getElementById('sfNavCurrent');
+
+        sharedFavoritesCollection = new wijmo.collections.CollectionView();
+        sharedFavoritesData = new wijmo.collections.ObservableArray();
+        sharedFavoritesGrid = new wijmo.grid.FlexGrid('#SharedFavoritesGrid');
+
+        addNavSharedFavoritesListeners();
+
+        sharedFavoritesCollection.collectionChanged.addHandler(function (sender, args) {
+            updateNavSharedFavorites();
+        });
+
+        // Symbol Results
+
+        srNavFirst = document.getElementById('srNavFirst');
+        srNavPrevious = document.getElementById('srNavPrevious');
+        srNavNext = document.getElementById('srNavNext');
+        srNavLast = document.getElementById('srNavLast');
+        srNavCurrent = document.getElementById('srNavCurrent');
+
+        symbolResultCollection = new wijmo.collections.CollectionView();
+        symbolResultData = new wijmo.collections.ObservableArray();
+        symbolResultGrid = new wijmo.grid.FlexGrid('#SymbolResultGrid');
+
+        addNavSymbolResulstListeners();
+
+        symbolResultCollection.collectionChanged.addHandler(function (sender, args) {
+            updateNavSymbolResults();
+        });
+
+    });
+
+</script>

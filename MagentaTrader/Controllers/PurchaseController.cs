@@ -21,5 +21,12 @@ namespace MagentaTrader.Controllers
         {
             return View();
         }
+
+        //
+        // GET: /Purchase/AutoRedirect
+        public ActionResult AutoRedirect()
+        {
+            return View();
+        }
 	}
 }

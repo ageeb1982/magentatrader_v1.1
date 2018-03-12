@@ -15,5 +15,13 @@ namespace MagentaTrader.Controllers
         {
             return View();
         }
+
+        //
+        // GET: /Screener/Variable
+        [Authorize(Roles = "Chart")]
+        public ActionResult Variable()
+        {
+            return View();
+        }
 	}
 }

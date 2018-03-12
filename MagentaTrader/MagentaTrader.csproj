@@ -190,6 +190,7 @@
     <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MemberController.cs" />
+    <Compile Include="Controllers\MoxieController.cs" />
     <Compile Include="Controllers\NewsController.cs" />
     <Compile Include="Controllers\PremiumWebinarsController.cs" />
     <Compile Include="Controllers\ProductController.cs" />
@@ -875,6 +876,7 @@
     <Content Include="img\alaska1.jpg" />
     <Content Include="img\banner-bg.jpg" />
     <Content Include="img\campaign\BC20170508.png" />
+    <Content Include="img\campaign\carnivalcruise.jpg" />
     <Content Include="img\campaign\IW20170305-1.png" />
     <Content Include="img\campaign\IW20170305-2.png" />
     <Content Include="img\campaign\LV20171030.png" />
@@ -899,6 +901,8 @@
     <Content Include="img\logo.png" />
     <Content Include="img\lv-nov13-16-seatingplan.png" />
     <Content Include="img\lvnov132016.jpg" />
+    <Content Include="img\m1.png" />
+    <Content Include="img\m2.png" />
     <Content Include="img\magenta-questrade.png" />
     <Content Include="img\magenta-screen.png" />
     <Content Include="img\magenta-tradier.png" />
@@ -1443,6 +1447,7 @@
     <Content Include="js\bootstrap-toggle.min.js.map" />
     <Content Include="js\bootstrap2-toggle.min.js.map" />
     <Content Include="img\logo-velocity.psd" />
+    <Content Include="img\campaign\magenta-ad1.pdf" />
     <None Include="Properties\PublishProfiles\magentatrader - FTP %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\magentatrader - FTP %283%29.pubxml" />
     <None Include="Properties\PublishProfiles\magentatrader - FTP %284%29.pubxml" />
@@ -1580,6 +1585,11 @@
     <Content Include="Views\Velocity\Index.cshtml" />
     <Content Include="Views\Campaign\LV20171030.cshtml" />
     <Content Include="Views\Campaign\BC20170508.cshtml" />
+    <Content Include="Views\Screener\Variable.cshtml" />
+    <Content Include="Views\Campaign\TradersWorld2017.cshtml" />
+    <Content Include="Views\Campaign\CarnivalCruise2017.cshtml" />
+    <Content Include="Views\Purchase\AutoRedirect.cshtml" />
+    <Content Include="Views\Moxie\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

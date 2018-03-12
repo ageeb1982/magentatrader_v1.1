@@ -121,14 +121,14 @@
             <input type="text" class="form-control" id="FavoriteCode" placeholder="None" disabled="disabled">
         </div>
         <div class="col-lg-2">
-            <p>Nov 7 AGR</p>
+            <p>Jan 2 AGR</p>
             <select id="Nov7AGR" class="form-control">
                 <option value="0" selected="selected">Not Included</option>
                 <option value="80">Min 80</option>
             </select>
         </div>
         <div class="col-lg-2">
-            <p>Nov 7 Linear</p>
+            <p>Jan 2 Linear</p>
             <select id="Nov7Correlation" class="form-control">
                 <option value="10" selected="selected">0.10</option>
                 <option value="20">0.20</option>
@@ -401,7 +401,8 @@
             data: { Parameters: p },
             dataType: 'json',
             success: function (result) {
-                var nov7Date = new Date("Nov 7, 2016 11:13:00");
+                //var nov7Date = new Date("Nov 7, 2016 11:13:00");
+                var nov7Date = new Date("Jan 2, 2018 11:13:00");
                 var currentDate = Date.now();
                 var datediff = dateDiffInDays(nov7Date, currentDate);
                 var satSun = countSatSun(nov7Date, currentDate);
@@ -640,14 +641,14 @@
                                 "isContentHtml": true,
                                 "wordWrap": true
                             }, {
-                                "header": "Nov7%",
+                                "header": "Jan2%",
                                 "binding": "Nov7AGR",
                                 "width": "*",
                                 "allowSorting": true,
                                 "isContentHtml": true,
                                 "wordWrap": true
                             }, {
-                                "header": "Nov7 Linear",
+                                "header": "Jan2 Linear",
                                 "binding": "Nov7CorrelationCoefficient",
                                 "width": "*",
                                 "allowSorting": true,
@@ -796,14 +797,14 @@
                                 "isContentHtml": true,
                                 "wordWrap": true
                             }, {
-                                "header": "Nov7%",
+                                "header": "Jan2%",
                                 "binding": "Nov7AGR",
                                 "width": "*",
                                 "allowSorting": true,
                                 "isContentHtml": true,
                                 "wordWrap": true
                             }, {
-                                "header": "Nov7 Linear",
+                                "header": "Jan2 Linear",
                                 "binding": "Nov7CorrelationCoefficient",
                                 "width": "*",
                                 "allowSorting": true,
