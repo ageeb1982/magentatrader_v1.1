@@ -340,4 +340,14 @@
       <Association Name="MstSymbol_TrnUserAlertSymbol" Member="TrnUserAlertSymbols" ThisKey="Id" OtherKey="SymbolId" Type="TrnUserAlertSymbol" />
     </Type>
   </Table>
+  <Table Name="dbo.TmpWorkshop" Member="TmpWorkshops">
+    <Type Name="TmpWorkshop">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="Email" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="Phone" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="DateEncoded" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Workshop" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
 </Database>

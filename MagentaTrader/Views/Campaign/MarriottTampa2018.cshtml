@@ -1,0 +1,130 @@
+﻿
+@{
+    ViewBag.Title = "Marriott";
+}
+
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/styles.css" rel="stylesheet" />
+<link href="/css/toastr.css" rel="stylesheet" />
+
+<script src="/js/jquery.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.js"></script>
+
+<script src="/js/toastr.js"></script>
+<script src="/js/date.js"></script>
+
+<script src="/wijmo/controls/wijmo.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.input.min.js"></script>
+<script src="/wijmo/controls/wijmo.grid.min.js" type="text/javascript"></script>
+<script src="/wijmo/controls/wijmo.chart.min.js"></script>
+
+<link href="/wijmo/styles/wijmo.min.css" rel="stylesheet" />
+
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="/Home"><span><img src="/img/logo-1.png" /></span><span class="hidden-xs"></span></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <br />
+        <br />
+        <br />
+        <br />
+        <div class="row text-center">
+            <img src="~/img/campaign/marriotttampa2018.jpg" />
+        </div>
+        <div class="row text-center">
+            <h3>Sign up for a FREE seat at the Marriott Tampa Conference for 10AM Staturday September 2018</h3>
+            <p>You will receive an email confirming your seat.  Your information will not be shared or sold to anyone.</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="col-md-8"><img src="~/img/campaign/marriotttampa2018map.jpg" /></div>
+                <div class="col-md-4">
+                    <p>Marriott<br />Tampa International Airport<br />4200 George J Bean Pkwy<br />Tampa, FL 33607</p>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="form-group row">
+                    <h3><label for="name" class="col-md-2 control-label">Name:</label></h3>
+                    <div class="col-md-8">
+                        <input id="name" type="text" class="form-control" maxlength="200" placeholder="Name">
+                    </div>
+                </div>    
+                <div class="form-group row">
+                    <h3><label for="email" class="col-md-2 control-label">Email:</label></h3>
+                    <div class="col-md-8">
+                        <input id="email" type="text" class="form-control" maxlength="200" placeholder="Email">
+                    </div>
+                </div>    
+                <div class="form-group row">
+                    <h3><label for="phone" class="col-md-2 control-label">Phone:</label></h3>
+                    <div class="col-md-8">
+                        <input id="phone" type="text" class="form-control" maxlength="200" placeholder="Phone">
+                    </div>
+                </div>  
+                <div class="form-group row">
+                    <label for="submit" class="col-md-2 control-label"></label>
+                    <div class="col-md-8">
+                        <button type="button" class="btn btn-primary" onclick="cmdSubmit_OnClick()">Submit</button>
+                    </div>
+                </div> 
+            </div>
+        </div>
+    </div>
+</div>
+
+@*
+    =====================
+    Module - v 2018.09.03
+    =====================
+*@
+<script type="text/javascript">
+    function validateEmail(email) {
+        var re = /^[_a-z0-9-A-Z-]+(\.[_a-z0-9-A-Z-]+)*@@[a-z0-9-A-Z-]+(\.[a-z0-9-A-Z-]+)*(\.[a-z]{2,4})$/;
+        return re.test(email);
+    } 
+
+    function cmdSubmit_OnClick() {
+        var name = document.getElementById('name').value;
+        var email = document.getElementById('email').value;
+        var phone = document.getElementById('phone').value;
+
+        if(name=="" || email=="" || phone=="") {
+            toastr.error("Don't leave any vacant field(s).");
+        } else {
+            if (validateEmail(email)) {
+                $.ajax({
+                    url: '/api/GetInformationForMarriottTampa2018/' + name + '/' + email + '/' + phone,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    data: {},
+                    success: function (data) {
+                        if (Number(data) > 0) {
+                            toastr.success("Thank you.");
+                        } else {
+                            toastr.error("Information was not added.");
+                        }
+                    }
+                }).fail(
+                    function (xhr, textStatus, err) {
+                        toastr.error(err);
+                    }
+                );
+            } else {
+                toastr.error("Email not valid.");
+            }
+        }
+    }
+</script>

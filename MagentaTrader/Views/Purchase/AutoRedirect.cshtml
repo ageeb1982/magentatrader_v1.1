@@ -1,15 +1,30 @@
-﻿<form hidden name="PrePage" method="post" action="https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx"> 
+﻿@{
+    var Affiliate = Request.QueryString["affiliate"];
+}
+
+<form hidden name="PrePage" method="post" action="https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx"> 
     <input type="hidden" name="LinkId" value="05f14a3e-708a-497e-b76c-04f87e71b8e9" /> 
     <input type="image" src="//content.authorize.net/images/buy-now-gold.gif" /> 
     <input type='submit' name='ok' id='ok' />
 </form>
 
+<form name="PrePage1" method="post" action="https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx"> 
+    <input type="hidden" name="LinkId" value="5c7b16a8-b68d-46fa-8dfe-2971449cc88b" /> 
+    <input type="image" src="//content.authorize.net/images/buy-now-gold.gif" /> 
+    <input type='submit' name='ok1' id='ok1' />
+</form>
+
 <script type="text/javascript">
     function submitForm() {
         var referrer = document.referrer;
+        var Affiliate = "@Affiliate";
 
         if (referrer.includes("barefeetmodels") == true) {
-            document.getElementById('ok').click();
+            if (Affiliate.toUpperCase() == "PORNHUB") {
+                document.getElementById('ok1').click();
+            } else {
+                document.getElementById('ok').click();
+            }
         } else {
             window.location.href = "http://barefeetmodels.com";
         }

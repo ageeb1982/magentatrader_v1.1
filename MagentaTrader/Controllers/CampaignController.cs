@@ -283,5 +283,12 @@ namespace MagentaTrader.Controllers
         {
             return View();
         }
+
+        //
+        // GET: /Campaign/MarriottTampa2018
+        public ActionResult MarriottTampa2018()
+        {
+            return View();
+        }
 	}
 }

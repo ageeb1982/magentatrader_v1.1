@@ -181,6 +181,7 @@
     <Compile Include="Controllers\BookClubController.cs" />
     <Compile Include="Controllers\BrokerLoginController.cs" />
     <Compile Include="Controllers\CalendarController.cs" />
+    <Compile Include="Controllers\CampaignAPIController.cs" />
     <Compile Include="Controllers\CampaignController.cs" />
     <Compile Include="Controllers\EarningController.cs" />
     <Compile Include="Controllers\EventController.cs" />
@@ -880,6 +881,8 @@
     <Content Include="img\campaign\IW20170305-1.png" />
     <Content Include="img\campaign\IW20170305-2.png" />
     <Content Include="img\campaign\LV20171030.png" />
+    <Content Include="img\campaign\marriotttampa2018.jpg" />
+    <Content Include="img\campaign\marriotttampa2018map.jpg" />
     <Content Include="img\campaign\xxx.png" />
     <Content Include="img\campaign\IW20160619.png" />
     <Content Include="img\campaign\MagentaTour2017.png" />
@@ -1458,9 +1461,11 @@
     <None Include="Properties\PublishProfiles\magentatrader - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\MagentaTrader2016 - FTP %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\MagentaTrader2016 - FTP %283%29.pubxml" />
+    <None Include="Properties\PublishProfiles\MagentaTrader2016 - FTP %284%29.pubxml" />
     <None Include="Properties\PublishProfiles\MagentaTrader2016 - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\MagentaTrader2016 - Web Deploy %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\MagentaTrader2016 - Web Deploy %283%29.pubxml" />
+    <None Include="Properties\PublishProfiles\MagentaTrader2016 - Web Deploy %284%29.pubxml" />
     <None Include="Properties\PublishProfiles\MagentaTrader2016 - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\magentatraders - FTP %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\magentatraders - FTP %283%29.pubxml" />
@@ -1590,6 +1595,7 @@
     <Content Include="Views\Campaign\CarnivalCruise2017.cshtml" />
     <Content Include="Views\Purchase\AutoRedirect.cshtml" />
     <Content Include="Views\Moxie\Index.cshtml" />
+    <Content Include="Views\Campaign\MarriottTampa2018.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
