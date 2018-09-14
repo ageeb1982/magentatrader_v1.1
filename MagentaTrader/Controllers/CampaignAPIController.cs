@@ -35,5 +35,32 @@ namespace MagentaTrader.Controllers
                 return 0;
             }
         }
+
+        [Route("api/GetCampaignEmails/{workshop}")]
+        public List<CampaignEmails> GetCampaignEmails(string workshop)
+        {
+            var emails = from d in db.TmpWorkshops
+                         where d.Workshop == workshop
+                         select new CampaignEmails
+                         {
+                             Name = d.Name,
+                             Email = d.Email
+                         };
+
+            if (emails.Any())
+            {
+                return emails.ToList();
+            }
+            else
+            {
+                return new List<CampaignEmails>();
+            }
+        }
+    }
+
+    public class CampaignEmails 
+    {
+        public String Name {get; set;}
+        public String Email {get; set;}
     }
 }

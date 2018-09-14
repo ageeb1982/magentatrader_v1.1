@@ -1596,6 +1596,7 @@
     <Content Include="Views\Purchase\AutoRedirect.cshtml" />
     <Content Include="Views\Moxie\Index.cshtml" />
     <Content Include="Views\Campaign\MarriottTampa2018.cshtml" />
+    <Content Include="Views\Campaign\Emails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -290,5 +290,12 @@ namespace MagentaTrader.Controllers
         {
             return View();
         }
+
+        //
+        // GET: /Campaign/Emails
+        public ActionResult Emails()
+        {
+            return View();
+        }
 	}
 }
