@@ -11,6 +11,7 @@ namespace MagentaTrader.Controllers
     {
         private Data.MagentaTradersDBDataContext db = new Data.MagentaTradersDBDataContext();
 
+        [Authorize]
         [Route("api/GetInformationForMarriottTampa2018/{name}/{email}/{phone}")]
         public long GetInformationForMarriottTampa2018(string name, string email, string phone)
         {
@@ -36,6 +37,7 @@ namespace MagentaTrader.Controllers
             }
         }
 
+        [Authorize]
         [Route("api/GetCampaignEmails/{workshop}")]
         public List<CampaignEmails> GetCampaignEmails(string workshop)
         {
