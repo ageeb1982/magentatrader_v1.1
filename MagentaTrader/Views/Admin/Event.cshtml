@@ -123,6 +123,19 @@
                         <dd>
                             <input class="form-control" id="EventEdit_URL" name="EventEdit_URL" required maxlength="250"/>
                         </dd>
+                        <dt>
+                            Upload File
+                        </dt>
+                        <dd>
+                            <div class="col-md-8">
+                                <input id="video_file" type="file" />
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary" id="CmdUploadFile" onclick="CmdUploadFile_OnClick()">
+                                    Upload
+                                </button>
+                            </div>
+                        </dd>
                         <dt>Video URL</dt>
                         <dd>
                             <input class="form-control" id="EventEdit_VideoURL" name="EventEdit_VideoURL" />
@@ -152,12 +165,21 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" id="CmdEventEditOk" @*onclick="CmdEventEditOk_OnClick()"*@ >
-                    Ok
-                </button>
-                <button type="button" class="btn btn-danger" id="CmdEventEditCancel">
-                    Cancel
-                </button>
+                <div class="col-sm-6">
+                    <div class="progress" style="display:none">
+                        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
+                            0%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <button type="submit" class="btn btn-primary" id="CmdEventEditOk">
+                        Ok
+                    </button>
+                    <button type="button" class="btn btn-danger" id="CmdEventEditCancel">
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -278,6 +300,47 @@
                 }
             });
         }
+    }
+    function CmdUploadFile_OnClick() {
+        var data = new FormData();
+
+        data.append("File", document.getElementById('video_file').files[0], document.getElementById('video_file').files[0].name);
+
+        $('#CmdUploadFile').prop('disabled', true);
+
+        $.ajax({
+            url: "/api/Blobs/Add",
+            method: "POST",
+            contentType: false,
+            processData: false,
+            data: data,
+            async: true,
+            xhr: function () {
+                var xhr = new window.XMLHttpRequest();
+                //Handle progress
+                //Upload progress
+                xhr.upload.addEventListener("progress", function (evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = (evt.loaded / evt.total) * 100;
+                        if (percentComplete >= 100) {
+                            $(".progress").width(percentComplete + '%');
+                            $(".progress").text(percentComplete + '% - Posting to storage..');
+                        } else {
+                            $(".progress").width(percentComplete + '%');
+                            $(".progress").text(percentComplete + '% - Loading..');
+                        }
+
+                        console.log(percentComplete);
+                    }
+                }, false);
+                return xhr;
+            },
+            success: function (data) {
+                toastr.success('Successfully uploaded.');
+
+                $('#CmdUploadFile').prop('disabled', false);
+            }
+        });
     }
 
     function CmdEventEditOkFunction() {
